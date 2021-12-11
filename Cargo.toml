@@ -1,0 +1,8 @@
+[package]
+name = "degenerate"
+version = "0.0.0"
+description = "Raw Degeneracy"
+edition = "2021"
+license = "CC0-1.0"
+
+[dependencies]
