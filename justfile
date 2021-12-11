@@ -1,5 +1,3 @@
-ci: build test clippy fmt-check
-
 build:
 	cargo build
 
@@ -9,18 +7,14 @@ test:
 clippy:
   cargo clippy --all-targets --all-features
 
-fmt-check:
-  cargo +nightly fmt --all -- --check
-  @echo formatting check done
-
 run *args:
-	cargo run -- --{{args}}
+	cargo run -- {{args}}
 
 fmt:
-	cargo +nightly fmt
+	cargo fmt
 
 check:
  cargo check
 
-watch +COMMAND='test':
+watch +COMMAND='ltest':
 	cargo watch --clear --exec "{{COMMAND}}"

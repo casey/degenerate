@@ -6,3 +6,5 @@ edition = "2021"
 license = "CC0-1.0"
 
 [dependencies]
+image = "0.23.14"
+structopt = "0.3.25"
