@@ -6,6 +6,7 @@ pub(crate) enum Filter {
   Invert,
   Modulus { divisor: usize, remainder: usize },
   Top,
+  Pixelate { size: usize },
 }
 
 impl Filter {
@@ -54,6 +55,15 @@ impl Filter {
               line.iter_mut().for_each(|scalar| *scalar = !*scalar);
             }
           });
+      Self::Pixelate { size } => {
+        for row in 0..state.height() {
+          for col in 0..state.width() {
+            let source_row = row / size * size + size / 2;
+            let source_col = col / size * size + size / 2;
+            let source_pixel = state.get_pixel(source_row, source_col);
+            state.set_pixel(row, col, source_pixel);
+          }
+        }
       }
     }
   }
@@ -73,6 +83,9 @@ impl FromStr for Filter {
       ["modulus", divisor, remainder] => Ok(Self::Modulus {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
+      }),
+      ["pixelate", size] => Ok(Self::Pixelate {
+        size: size.parse()?,
       }),
       ["top"] => Ok(Self::Top),
       _ => Err(format!("Invalid filter: {}", s).into()),

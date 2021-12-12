@@ -21,6 +21,28 @@ impl State {
     (self.width, self.height)
   }
 
+  pub(crate) fn height(&self) -> usize {
+    self.height
+  }
+
+  pub(crate) fn width(&self) -> usize {
+    self.width
+  }
+
+  pub(crate) fn get_pixel(&self, row: usize, col: usize) -> [u8; 3] {
+    let i = (row * self.width + col) * 3;
+
+    [self.buffer[i], self.buffer[i + 1], self.buffer[i + 2]]
+  }
+
+  pub(crate) fn set_pixel(&mut self, row: usize, col: usize, pixel: [u8; 3]) {
+    let i = (row * self.width + col) * 3;
+
+    self.buffer[i] = pixel[0];
+    self.buffer[i + 1] = pixel[1];
+    self.buffer[i + 2] = pixel[2];
+  }
+
   pub(crate) fn generate(&mut self, width: usize, height: usize) {
     self.width = width;
     self.height = height;
