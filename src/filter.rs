@@ -1,12 +1,13 @@
 use super::*;
 
 pub(crate) enum Filter {
+  Circle,
   Even,
   Generate { width: usize, height: usize },
   Invert,
   Modulus { divisor: usize, remainder: usize },
-  Top,
   Pixelate { size: usize },
+  Top,
 }
 
 impl Filter {
@@ -56,6 +57,23 @@ impl Filter {
             }
           });
       }
+      Self::Circle => {
+        let (width, height) = state.dimensions();
+        state
+          .scalars_mut()
+          .chunks_mut(width * 3)
+          .enumerate()
+          .for_each(|(row, line)| {
+            line.iter_mut().enumerate().for_each(|(col, scalar)| {
+              if (col as i64 / 3 - (width as i64 / 2)).pow(2)
+                + (row as i64 - (height as i64 / 2)).pow(2)
+                <= (width as i64 / 2).pow(2)
+              {
+                *scalar = !*scalar;
+              }
+            })
+          });
+      }
       Self::Pixelate { size } => {
         for row in 0..state.height() {
           for col in 0..state.width() {
@@ -75,6 +93,7 @@ impl FromStr for Filter {
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     match s.split(':').collect::<Vec<&str>>().as_slice() {
+      ["circle"] => Ok(Self::Circle),
       ["even"] => Ok(Self::Even),
       ["generate", width, height] => Ok(Self::Generate {
         width: width.parse()?,
