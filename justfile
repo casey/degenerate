@@ -9,6 +9,7 @@ clippy:
 
 run *args:
 	cargo run -- {{args}}
+	open output.png
 
 fmt:
 	cargo fmt
