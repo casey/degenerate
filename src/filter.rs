@@ -3,6 +3,7 @@ use super::*;
 pub(crate) enum Filter {
   Generate { width: usize, height: usize },
   Invert,
+  Modulus { divisor: usize, remainder: usize },
   Top,
 }
 
@@ -17,6 +18,17 @@ impl Filter {
           .scalars_mut()
           .iter_mut()
           .for_each(|scalar| *scalar = !*scalar);
+      }
+      Self::Modulus { divisor, remainder } => {
+        state
+          .scalars_mut()
+          .iter_mut()
+          .enumerate()
+          .for_each(|(i, scalar)| {
+            if i % divisor == *remainder {
+              *scalar = !*scalar;
+            }
+          })
       }
       Self::Top => {
         let (width, height) = state.dimensions();
@@ -44,6 +56,10 @@ impl FromStr for Filter {
         height: height.parse()?,
       }),
       ["invert"] => Ok(Self::Invert),
+      ["modulus", divisor, remainder] => Ok(Self::Modulus {
+        divisor: divisor.parse()?,
+        remainder: remainder.parse()?,
+      }),
       ["top"] => Ok(Self::Top),
       _ => Err(format!("Invalid filter: {}", s).into()),
     }
