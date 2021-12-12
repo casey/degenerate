@@ -17,6 +17,10 @@ impl State {
     }
   }
 
+  pub(crate) fn dimensions(&self) -> (usize, usize) {
+    (self.width, self.height)
+  }
+
   pub(crate) fn generate(&mut self, width: usize, height: usize) {
     self.width = width;
     self.height = height;
