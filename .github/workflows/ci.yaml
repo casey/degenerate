@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  all:
+    name: All
+
+    runs-on: ubuntu-latest
+
+    env:
+      RUSTFLAGS: --deny warnings
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Rust Toolchain Components
+      uses: actions-rs/toolchain@v1
+
+    - uses: Swatinem/rust-cache@v1
+
+    - name: Check Lockfile
+      run: |
+        cargo update --locked --package degenerate
+
+    - name: Test
+      run: cargo test --all
+
+    - name: Clippy
+      run: cargo clippy --all --all-targets
+
+    - name: Format
+      run: cargo fmt --all -- --check
+
+    - name: Check for Forbidden Words
+      run: |
+        sudo apt-get update
+        sudo apt-get install ripgrep
+        ./bin/forbid
