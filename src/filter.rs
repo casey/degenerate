@@ -14,6 +14,35 @@ pub(crate) enum Filter {
 impl Filter {
   pub(crate) fn apply(&self, state: &mut State) {
     match self {
+      Self::Circle => {
+        let (width, height) = state.dimensions();
+        state
+          .scalars_mut()
+          .chunks_mut(width * 3)
+          .enumerate()
+          .for_each(|(row, line)| {
+            line.iter_mut().enumerate().for_each(|(col, scalar)| {
+              if (col as i64 / 3 - (width as i64 / 2)).pow(2)
+                + (row as i64 - (height as i64 / 2)).pow(2)
+                <= (width as i64 / 2).pow(2)
+              {
+                *scalar = !*scalar;
+              }
+            })
+          });
+      }
+      Self::Even => {
+        let (width, _) = state.dimensions();
+        state
+          .scalars_mut()
+          .chunks_mut(width * 3)
+          .enumerate()
+          .for_each(|(i, line)| {
+            if i & 1 == 0 {
+              line.iter_mut().for_each(|scalar| *scalar = !*scalar);
+            }
+          });
+      }
       Self::Generate { width, height } => {
         state.generate(*width, *height);
       }
@@ -33,47 +62,6 @@ impl Filter {
               *scalar = !*scalar;
             }
           })
-      }
-      Self::Top => {
-        let (width, height) = state.dimensions();
-        state
-          .scalars_mut()
-          .chunks_mut(width * 3)
-          .enumerate()
-          .for_each(|(i, line)| {
-            if i < height / 2 {
-              line.iter_mut().for_each(|scalar| *scalar = !*scalar);
-            }
-          });
-      }
-      Self::Even => {
-        let (width, _) = state.dimensions();
-        state
-          .scalars_mut()
-          .chunks_mut(width * 3)
-          .enumerate()
-          .for_each(|(i, line)| {
-            if i & 1 == 0 {
-              line.iter_mut().for_each(|scalar| *scalar = !*scalar);
-            }
-          });
-      }
-      Self::Circle => {
-        let (width, height) = state.dimensions();
-        state
-          .scalars_mut()
-          .chunks_mut(width * 3)
-          .enumerate()
-          .for_each(|(row, line)| {
-            line.iter_mut().enumerate().for_each(|(col, scalar)| {
-              if (col as i64 / 3 - (width as i64 / 2)).pow(2)
-                + (row as i64 - (height as i64 / 2)).pow(2)
-                <= (width as i64 / 2).pow(2)
-              {
-                *scalar = !*scalar;
-              }
-            })
-          });
       }
       Self::Square => {
         let (width, height) = state.dimensions();
@@ -104,6 +92,18 @@ impl Filter {
             state.set_pixel(row, col, source_pixel);
           }
         }
+      }
+      Self::Top => {
+        let (width, height) = state.dimensions();
+        state
+          .scalars_mut()
+          .chunks_mut(width * 3)
+          .enumerate()
+          .for_each(|(i, line)| {
+            if i < height / 2 {
+              line.iter_mut().for_each(|scalar| *scalar = !*scalar);
+            }
+          });
       }
     }
   }
