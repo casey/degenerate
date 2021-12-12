@@ -17,5 +17,8 @@ fmt:
 check:
  cargo check
 
+forbid:
+	./bin/forbid
+
 watch +COMMAND='ltest':
 	cargo watch --clear --exec "{{COMMAND}}"
