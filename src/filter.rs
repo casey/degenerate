@@ -46,8 +46,8 @@ impl Filter {
       Self::Pixelate { size } => {
         for row in 0..state.height() {
           for col in 0..state.width() {
-            let source_row = row / size * size;
-            let source_col = col / size * size;
+            let source_row = row / size * size + size / 2;
+            let source_col = col / size * size + size / 2;
             let source_pixel = state.get_pixel(source_row, source_col);
             state.set_pixel(row, col, source_pixel);
           }
