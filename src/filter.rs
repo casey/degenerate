@@ -55,6 +55,7 @@ impl Filter {
               line.iter_mut().for_each(|scalar| *scalar = !*scalar);
             }
           });
+      }
       Self::Pixelate { size } => {
         for row in 0..state.height() {
           for col in 0..state.width() {
