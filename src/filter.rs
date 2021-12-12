@@ -1,6 +1,7 @@
 use super::*;
 
 pub(crate) enum Filter {
+  Even,
   Generate { width: usize, height: usize },
   Invert,
   Modulus { divisor: usize, remainder: usize },
@@ -43,6 +44,17 @@ impl Filter {
             }
           });
       }
+      Self::Even => {
+        let (width, _) = state.dimensions();
+        state
+          .scalars_mut()
+          .chunks_mut(width * 3)
+          .enumerate()
+          .for_each(|(i, line)| {
+            if i & 1 == 0 {
+              line.iter_mut().for_each(|scalar| *scalar = !*scalar);
+            }
+          });
       Self::Pixelate { size } => {
         for row in 0..state.height() {
           for col in 0..state.width() {
@@ -62,6 +74,7 @@ impl FromStr for Filter {
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     match s.split(':').collect::<Vec<&str>>().as_slice() {
+      ["even"] => Ok(Self::Even),
       ["generate", width, height] => Ok(Self::Generate {
         width: width.parse()?,
         height: height.parse()?,
