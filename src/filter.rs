@@ -13,6 +13,35 @@ pub(crate) enum Filter {
 impl Filter {
   pub(crate) fn apply(&self, state: &mut State) {
     match self {
+      Self::Circle => {
+        let (width, height) = state.dimensions();
+        state
+          .scalars_mut()
+          .chunks_mut(width * 3)
+          .enumerate()
+          .for_each(|(row, line)| {
+            line.iter_mut().enumerate().for_each(|(col, scalar)| {
+              if (col as i64 / 3 - (width as i64 / 2)).pow(2)
+                + (row as i64 - (height as i64 / 2)).pow(2)
+                <= (width as i64 / 2).pow(2)
+              {
+                *scalar = !*scalar;
+              }
+            })
+          });
+      }
+      Self::Even => {
+        let (width, _) = state.dimensions();
+        state
+          .scalars_mut()
+          .chunks_mut(width * 3)
+          .enumerate()
+          .for_each(|(i, line)| {
+            if i & 1 == 0 {
+              line.iter_mut().for_each(|scalar| *scalar = !*scalar);
+            }
+          });
+      }
       Self::Generate { width, height } => {
         state.generate(*width, *height);
       }
@@ -33,6 +62,16 @@ impl Filter {
             }
           })
       }
+      Self::Pixelate { size } => {
+        for row in 0..state.height() {
+          for col in 0..state.width() {
+            let source_row = row / size * size + size / 2;
+            let source_col = col / size * size + size / 2;
+            let source_pixel = state.get_pixel(source_row, source_col);
+            state.set_pixel(row, col, source_pixel);
+          }
+        }
+      }
       Self::Top => {
         let (width, height) = state.dimensions();
         state
@@ -44,45 +83,6 @@ impl Filter {
               line.iter_mut().for_each(|scalar| *scalar = !*scalar);
             }
           });
-      }
-      Self::Even => {
-        let (width, _) = state.dimensions();
-        state
-          .scalars_mut()
-          .chunks_mut(width * 3)
-          .enumerate()
-          .for_each(|(i, line)| {
-            if i & 1 == 0 {
-              line.iter_mut().for_each(|scalar| *scalar = !*scalar);
-            }
-          });
-      }
-      Self::Circle => {
-        let (width, height) = state.dimensions();
-        state
-          .scalars_mut()
-          .chunks_mut(width * 3)
-          .enumerate()
-          .for_each(|(row, line)| {
-            line.iter_mut().enumerate().for_each(|(col, scalar)| {
-              if (col as i64 / 3 - (width as i64 / 2)).pow(2)
-                + (row as i64 - (height as i64 / 2)).pow(2)
-                <= (width as i64 / 2).pow(2)
-              {
-                *scalar = !*scalar;
-              }
-            })
-          });
-      }
-      Self::Pixelate { size } => {
-        for row in 0..state.height() {
-          for col in 0..state.width() {
-            let source_row = row / size * size + size / 2;
-            let source_col = col / size * size + size / 2;
-            let source_pixel = state.get_pixel(source_row, source_col);
-            state.set_pixel(row, col, source_pixel);
-          }
-        }
       }
     }
   }
