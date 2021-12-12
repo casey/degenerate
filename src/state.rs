@@ -55,6 +55,6 @@ impl State {
 
   pub(crate) fn image(&self) -> Result<RgbImage> {
     ImageBuffer::from_raw(self.width as u32, self.height as u32, self.buffer.clone())
-      .ok_or(format!("State is not valid image.").into())
+      .ok_or_else(|| "State is not valid image.".into())
   }
 }
