@@ -8,6 +8,7 @@ pub(crate) enum Filter {
   Modulus { divisor: usize, remainder: usize },
   Pixelate { size: usize },
   Top,
+  Square,
 }
 
 impl Filter {
@@ -74,6 +75,26 @@ impl Filter {
             })
           });
       }
+      Self::Square => {
+        let (width, height) = state.dimensions();
+        let (x1, y1) = (width as i64 / 4, height as i64 / 4);
+        let (x2, y2) = (x1 + width as i64 / 2, y1 + height as i64 / 2);
+        state
+          .scalars_mut()
+          .chunks_mut(width * 3)
+          .enumerate()
+          .for_each(|(row, line)| {
+            line.iter_mut().enumerate().for_each(|(col, scalar)| {
+              if (col as i64 / 3) > (x1 as i64)
+                && (col as i64 / 3) < (x2 as i64)
+                && (row as i64) > (y1 as i64)
+                && (row as i64) < (y2 as i64)
+              {
+                *scalar = !*scalar;
+              }
+            })
+          });
+      }
       Self::Pixelate { size } => {
         for row in 0..state.height() {
           for col in 0..state.width() {
@@ -94,6 +115,7 @@ impl FromStr for Filter {
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     match s.split(':').collect::<Vec<&str>>().as_slice() {
       ["circle"] => Ok(Self::Circle),
+      ["square"] => Ok(Self::Square),
       ["even"] => Ok(Self::Even),
       ["generate", width, height] => Ok(Self::Generate {
         width: width.parse()?,
