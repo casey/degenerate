@@ -53,6 +53,10 @@ impl State {
     &mut self.buffer
   }
 
+  pub(crate) fn rows_mut(&mut self) -> ChunksMut<'_, u8> {
+    self.buffer.chunks_mut(self.width * 3)
+  }
+
   pub(crate) fn image(&self) -> Result<RgbImage> {
     ImageBuffer::from_raw(self.width as u32, self.height as u32, self.buffer.clone())
       .ok_or_else(|| "State is not valid image.".into())
