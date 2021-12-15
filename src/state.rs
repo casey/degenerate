@@ -49,6 +49,10 @@ impl State {
     self.buffer = vec![0; width * height * 3];
   }
 
+  pub(crate) fn scalars(&self) -> &[u8] {
+    &self.buffer
+  }
+
   pub(crate) fn scalars_mut(&mut self) -> &mut [u8] {
     &mut self.buffer
   }

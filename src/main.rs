@@ -1,6 +1,10 @@
 use {
   crate::{arguments::Arguments, filter::Filter, state::State},
-  std::{slice::ChunksMut, str::FromStr},
+  image::{
+    pnm::{PnmEncoder, PnmSubtype, SampleEncoding},
+    ImageEncoder,
+  },
+  std::{io, path::PathBuf, slice::ChunksMut, str::FromStr},
   structopt::StructOpt,
 };
 
@@ -20,7 +24,17 @@ fn main() -> Result<()> {
     filter.apply(&mut state);
   }
 
-  state.image()?.save("output.png")?;
+  // state.image()?.save("output.png")?;
+
+  let encoder =
+    PnmEncoder::new(io::stdout()).with_subtype(PnmSubtype::Pixmap(SampleEncoding::Ascii));
+
+  encoder.write_image(
+    state.scalars(),
+    state.width().try_into()?,
+    state.height().try_into()?,
+    image::ColorType::Rgb8,
+  )?;
 
   Ok(())
 }
