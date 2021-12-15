@@ -19,10 +19,6 @@ impl State {
     self.matrix.nrows()
   }
 
-  pub(crate) fn dimensions(&self) -> (usize, usize) {
-    (self.width(), self.height())
-  }
-
   pub fn matrix(&mut self) -> &mut DMatrix<[u8; 4]> {
     &mut self.matrix
   }
