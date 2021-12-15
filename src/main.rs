@@ -4,7 +4,8 @@ use {
     pnm::{PnmEncoder, PnmSubtype, SampleEncoding},
     ImageEncoder,
   },
-  std::{io, path::PathBuf, slice::ChunksMut, str::FromStr},
+  nalgebra::DMatrix,
+  std::{io, str::FromStr},
   structopt::StructOpt,
 };
 
@@ -24,17 +25,7 @@ fn main() -> Result<()> {
     filter.apply(&mut state);
   }
 
-  // state.image()?.save("output.png")?;
-
-  let encoder =
-    PnmEncoder::new(io::stdout()).with_subtype(PnmSubtype::Pixmap(SampleEncoding::Ascii));
-
-  encoder.write_image(
-    state.scalars(),
-    state.width().try_into()?,
-    state.height().try_into()?,
-    image::ColorType::Rgb8,
-  )?;
+  state.write()?;
 
   Ok(())
 }

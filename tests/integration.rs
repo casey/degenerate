@@ -1,6 +1,5 @@
 use {
   executable_path::executable_path,
-  image::GenericImageView,
   std::{process::Command, str},
 };
 

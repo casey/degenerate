@@ -1,68 +1,38 @@
 use super::*;
 
-use image::{ImageBuffer, RgbImage};
-
 pub(crate) struct State {
-  width: usize,
-  height: usize,
-  buffer: Vec<u8>,
+  matrix: DMatrix<[u8; 4]>,
 }
 
 impl State {
   pub(crate) fn new() -> Self {
     Self {
-      width: 0,
-      height: 0,
-      buffer: Vec::new(),
+      matrix: DMatrix::repeat(0, 0, [0, 0, 0, 0]),
     }
   }
 
-  pub(crate) fn dimensions(&self) -> (usize, usize) {
-    (self.width, self.height)
-  }
-
-  pub(crate) fn height(&self) -> usize {
-    self.height
-  }
-
-  pub(crate) fn width(&self) -> usize {
-    self.width
-  }
-
-  pub(crate) fn get_pixel(&self, row: usize, col: usize) -> [u8; 3] {
-    let i = (row * self.width + col) * 3;
-
-    [self.buffer[i], self.buffer[i + 1], self.buffer[i + 2]]
-  }
-
-  pub(crate) fn set_pixel(&mut self, row: usize, col: usize, pixel: [u8; 3]) {
-    let i = (row * self.width + col) * 3;
-
-    self.buffer[i] = pixel[0];
-    self.buffer[i + 1] = pixel[1];
-    self.buffer[i + 2] = pixel[2];
-  }
-
   pub(crate) fn generate(&mut self, width: usize, height: usize) {
-    self.width = width;
-    self.height = height;
-    self.buffer = vec![0; width * height * 3];
+    self.matrix.resize_mut(width, height, [0, 0, 0, 0]);
   }
 
-  pub(crate) fn scalars(&self) -> &[u8] {
-    &self.buffer
-  }
+  pub(crate) fn write(&self) -> Result<()> {
+    let encoder =
+      PnmEncoder::new(io::stdout()).with_subtype(PnmSubtype::Pixmap(SampleEncoding::Ascii));
 
-  pub(crate) fn scalars_mut(&mut self) -> &mut [u8] {
-    &mut self.buffer
-  }
+    let mut buffer: Vec<u8> = Vec::with_capacity(self.matrix.len() * 4);
+    for row in self.matrix.row_iter() {
+      for pixel in &row {
+        buffer.extend_from_slice(&pixel[..3]);
+      }
+    }
 
-  pub(crate) fn rows_mut(&mut self) -> ChunksMut<'_, u8> {
-    self.buffer.chunks_mut(self.width * 3)
-  }
+    encoder.write_image(
+      &buffer,
+      self.matrix.ncols() as u32,
+      self.matrix.nrows() as u32,
+      image::ColorType::Rgb8,
+    )?;
 
-  pub(crate) fn image(&self) -> Result<RgbImage> {
-    ImageBuffer::from_raw(self.width as u32, self.height as u32, self.buffer.clone())
-      .ok_or_else(|| "State is not valid image.".into())
+    Ok(())
   }
 }
