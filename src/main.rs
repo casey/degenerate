@@ -2,10 +2,10 @@ use {
   crate::{arguments::Arguments, filter::Filter, state::State},
   image::{
     pnm::{PnmEncoder, PnmSubtype, SampleEncoding},
-    ImageEncoder,
+    ImageBuffer, ImageEncoder, RgbImage,
   },
   nalgebra::DMatrix,
-  std::{io, str::FromStr},
+  std::{io, path::PathBuf, str::FromStr},
   structopt::StructOpt,
 };
 
@@ -25,7 +25,11 @@ fn main() -> Result<()> {
     filter.apply(&mut state);
   }
 
-  state.write()?;
+  if let Some(path) = arguments.output {
+    state.save(path)?;
+  } else {
+    state.write()?;
+  }
 
   Ok(())
 }
