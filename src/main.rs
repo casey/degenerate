@@ -1,11 +1,8 @@
 use {
   crate::{arguments::Arguments, filter::Filter, state::State},
-  image::{
-    pnm::{PnmEncoder, PnmSubtype, SampleEncoding},
-    ImageBuffer, ImageEncoder, RgbImage,
-  },
+  image::{ImageBuffer, RgbImage},
   nalgebra::{DMatrix, Vector3},
-  std::{io, path::PathBuf, str::FromStr},
+  std::{path::PathBuf, str::FromStr},
   structopt::StructOpt,
 };
 
