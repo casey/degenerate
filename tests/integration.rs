@@ -5,24 +5,29 @@ use {
 
 type Result<T, E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
-#[test]
-fn even() -> Result<()> {
-  let output = Command::new(executable_path("degenerate"))
-    .args(["generate:4:4", "even"])
-    .output()?;
+fn test(args: &[&str], expected_output: &str) -> Result<()> {
+  let mut command = Command::new(executable_path("degenerate"));
+
+  command.args(args);
+
+  let output = command.output()?;
 
   assert!(
     output.status.success(),
-    "{}",
+    "Command {:?} failed: {}",
+    command,
     str::from_utf8(&output.stderr)?
   );
 
-  assert_eq!(
-    str::from_utf8(&output.stdout)?,
-    "P3\n4 4 255\n255 255 255 255 255 255 255 255 255 255 255 255 0 0 0 0 0 0 0 0 0 0 0 \n0 255 255 255 255 255 255 255 255 255 255 255 255 0 0 0 0 0 0 0 0 0 0 \n0 0 "
-  );
+  assert_eq!(str::from_utf8(&output.stdout)?, expected_output);
 
   Ok(())
+}
+
+#[test]
+fn even() -> Result<()> {
+  test(&["generate:4:4", "even"],
+    "P3\n4 4 255\n255 255 255 255 255 255 255 255 255 255 255 255 0 0 0 0 0 0 0 0 0 0 0 \n0 255 255 255 255 255 255 255 255 255 255 255 255 0 0 0 0 0 0 0 0 0 0 \n0 0 ")
 }
 
 #[test]
