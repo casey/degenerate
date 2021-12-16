@@ -5,7 +5,7 @@ use {
 
 type Result<T, E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
-fn test(args: &[&str], expected_output: &str) -> Result<()> {
+fn assert_output_eq(args: &[&str], expected_output: &str) -> Result<()> {
   let mut command = Command::new(executable_path("degenerate"));
 
   command.args(args);
@@ -26,7 +26,7 @@ fn test(args: &[&str], expected_output: &str) -> Result<()> {
 
 #[test]
 fn even() -> Result<()> {
-  test(&["generate:4:4", "even"],
+  assert_output_eq(&["generate:4:4", "even"],
     "P3\n4 4 255\n255 255 255 255 255 255 255 255 255 255 255 255 0 0 0 0 0 0 0 0 0 0 0 \n0 255 255 255 255 255 255 255 255 255 255 255 255 0 0 0 0 0 0 0 0 0 0 \n0 0 ")
 }
 
