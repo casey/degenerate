@@ -4,7 +4,7 @@ use {
     pnm::{PnmEncoder, PnmSubtype, SampleEncoding},
     ImageBuffer, ImageEncoder, RgbImage,
   },
-  nalgebra::DMatrix,
+  nalgebra::{DMatrix, Vector3},
   std::{io, path::PathBuf, str::FromStr},
   structopt::StructOpt,
 };

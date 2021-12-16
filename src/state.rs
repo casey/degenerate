@@ -1,13 +1,13 @@
 use super::*;
 
 pub(crate) struct State {
-  matrix: DMatrix<[u8; 4]>,
+  matrix: DMatrix<Vector3<u8>>,
 }
 
 impl State {
   pub(crate) fn new() -> Self {
     Self {
-      matrix: DMatrix::repeat(0, 0, [0, 0, 0, 0]),
+      matrix: DMatrix::zeros(0, 0),
     }
   }
 
@@ -19,7 +19,7 @@ impl State {
     self.matrix.nrows()
   }
 
-  pub fn matrix(&mut self) -> &mut DMatrix<[u8; 4]> {
+  pub fn matrix(&mut self) -> &mut DMatrix<Vector3<u8>> {
     &mut self.matrix
   }
 
@@ -27,8 +27,8 @@ impl State {
     let mut buffer = Vec::with_capacity(self.matrix.len() * 4);
 
     for row in self.matrix.row_iter() {
-      for pixel in &row {
-        buffer.extend_from_slice(&pixel[..3]);
+      for element in &row {
+        buffer.extend_from_slice(element.data.as_slice());
       }
     }
 
@@ -36,7 +36,7 @@ impl State {
   }
 
   pub(crate) fn generate(&mut self, width: usize, height: usize) {
-    self.matrix.resize_mut(width, height, [0, 0, 0, 0]);
+    self.matrix.resize_mut(width, height, Vector3::new(0, 0, 0));
   }
 
   pub(crate) fn write(&self) -> Result<()> {
