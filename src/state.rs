@@ -40,15 +40,24 @@ impl State {
   }
 
   pub(crate) fn write(&self) -> Result<()> {
-    let encoder =
-      PnmEncoder::new(io::stdout()).with_subtype(PnmSubtype::Pixmap(SampleEncoding::Ascii));
+    println!(
+      "P3 {} {} {}",
+      self.matrix.ncols(),
+      self.matrix.nrows(),
+      u8::max_value()
+    );
 
-    encoder.write_image(
-      &self.scalars(),
-      self.matrix.ncols() as u32,
-      self.matrix.nrows() as u32,
-      image::ColorType::Rgb8,
-    )?;
+    for (i, row) in self.matrix.row_iter().enumerate() {
+      if i > 0 {
+        println!();
+      }
+      for (i, element) in row.iter().enumerate() {
+        if i > 0 {
+          print!(" ");
+        }
+        print!("{: >3} {: >3} {: >3}", element.x, element.y, element.z);
+      }
+    }
 
     Ok(())
   }
