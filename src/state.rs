@@ -11,6 +11,10 @@ impl State {
     }
   }
 
+  pub(crate) fn dimensions(&self) -> (usize, usize) {
+    (self.width(), self.height())
+  }
+
   pub(crate) fn width(&self) -> usize {
     self.matrix.ncols()
   }
@@ -24,7 +28,7 @@ impl State {
   }
 
   pub(crate) fn scalars(&self) -> Vec<u8> {
-    let mut buffer = Vec::with_capacity(self.matrix.len() * 4);
+    let mut buffer = Vec::with_capacity(self.matrix.len() * 3);
 
     for row in self.matrix.row_iter() {
       for element in &row {
@@ -40,12 +44,7 @@ impl State {
   }
 
   pub(crate) fn write(&self) -> Result<()> {
-    println!(
-      "P3 {} {} {}",
-      self.matrix.ncols(),
-      self.matrix.nrows(),
-      u8::max_value()
-    );
+    println!("P3 {} {} {}", self.width(), self.height(), u8::max_value());
 
     for (i, row) in self.matrix.row_iter().enumerate() {
       if i > 0 {
