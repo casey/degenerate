@@ -43,32 +43,16 @@ impl State {
     self.matrix.resize_mut(width, height, Vector3::new(0, 0, 0));
   }
 
-  pub(crate) fn write(&self, text_bitmap: bool) -> Result<()> {
-    if text_bitmap {
-      for (i, row) in self.matrix.row_iter().enumerate() {
-        if i > 0 {
-          println!();
-        }
-        for element in &row {
-          if element.is_zero() {
-            print!("0");
-          } else {
-            print!("1");
-          }
-        }
+  pub(crate) fn write(&self) -> Result<()> {
+    for (i, row) in self.matrix.row_iter().enumerate() {
+      if i > 0 {
+        println!();
       }
-    } else {
-      println!("P3 {} {} {}", self.width(), self.height(), u8::max_value());
-
-      for (i, row) in self.matrix.row_iter().enumerate() {
-        if i > 0 {
-          println!();
-        }
-        for (i, element) in row.iter().enumerate() {
-          if i > 0 {
-            print!(" ");
-          }
-          print!("{: >3} {: >3} {: >3}", element.x, element.y, element.z);
+      for element in &row {
+        if element.is_zero() {
+          print!("0");
+        } else {
+          print!("1");
         }
       }
     }

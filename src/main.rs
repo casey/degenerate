@@ -25,7 +25,7 @@ fn main() -> Result<()> {
   if let Some(path) = arguments.output {
     state.save(path)?;
   } else {
-    state.write(arguments.text_bitmap)?;
+    state.write()?;
   }
 
   Ok(())
