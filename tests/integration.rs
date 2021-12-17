@@ -6,7 +6,7 @@ use {
 
 type Result<T, E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
-fn assert_output_eq(args: &[&str], expected_output: &[&str]) -> Result<()> {
+fn assert_output_eq(args: &[&str], expected_bitmap: &str) -> Result<()> {
   let mut command = Command::new(executable_path("degenerate"));
 
   command.args(args);
@@ -20,7 +20,10 @@ fn assert_output_eq(args: &[&str], expected_output: &[&str]) -> Result<()> {
     str::from_utf8(&output.stderr)?
   );
 
-  assert_eq!(str::from_utf8(&output.stdout)?, expected_output.join("\n"));
+  assert_eq!(
+    str::from_utf8(&output.stdout)?,
+    expected_bitmap.replace(" ", "")
+  );
 
   Ok(())
 }
@@ -28,35 +31,29 @@ fn assert_output_eq(args: &[&str], expected_output: &[&str]) -> Result<()> {
 #[test]
 fn even() -> Result<()> {
   assert_output_eq(
-    &["generate:4:4", "even"],
-    &[
-      "P3 4 4 255",
-      "255 255 255 255 255 255 255 255 255 255 255 255",
-      "  0   0   0   0   0   0   0   0   0   0   0   0",
-      "255 255 255 255 255 255 255 255 255 255 255 255",
-      "  0   0   0   0   0   0   0   0   0   0   0   0",
-    ],
+    &["--text-bitmap", "generate:4:4", "even"],
+    "1111
+     0000
+     1111
+     0000",
   )
 }
 
 #[test]
 fn top() -> Result<()> {
   assert_output_eq(
-    &["generate:2:2", "top"],
-    &[
-      "P3 2 2 255",
-      "255 255 255 255 255 255",
-      "  0   0   0   0   0   0",
-    ],
+    &["--text-bitmap", "generate:2:2", "top"],
+    "11
+     00",
   )
 }
 
 #[test]
 fn generate() -> Result<()> {
-  assert_output_eq(&["generate:1:1"], &["P3 1 1 255", "  0   0   0"])
+  assert_output_eq(&["--text-bitmap", "generate:1:1"], "0")
 }
 
 #[test]
 fn invert() -> Result<()> {
-  assert_output_eq(&["generate:1:1", "invert"], &["P3 1 1 255", "255 255 255"])
+  assert_output_eq(&["--text-bitmap", "generate:1:1", "invert"], "1")
 }
