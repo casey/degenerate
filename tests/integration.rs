@@ -57,3 +57,13 @@ fn generate() -> Result<()> {
 fn invert() -> Result<()> {
   assert_output_eq(&["generate:1:1", "invert"], "1")
 }
+
+#[test]
+fn square() -> Result<()> {
+  assert_output_eq(
+    &["generate:4:4", "square"],
+    "0000
+     0110
+     0000",
+  )
+}
