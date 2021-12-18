@@ -68,3 +68,12 @@ fn square() -> Result<()> {
      0000",
   )
 }
+
+#[test]
+fn modulus() -> Result<()> {
+  assert_output_eq(
+    &["resize:4:2", "modulus:2:0"],
+    "1111
+     0000",
+  )
+}
