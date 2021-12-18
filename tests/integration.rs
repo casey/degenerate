@@ -64,6 +64,7 @@ fn square() -> Result<()> {
     &["generate:4:4", "square"],
     "0000
      0110
+     0110
      0000",
   )
 }

@@ -64,15 +64,16 @@ impl Filter {
       }
       Self::Square => {
         let (width, height) = state.dimensions();
-        let (x1, y1) = (width / 4, height / 4);
-        let (x2, y2) = (x1 + width / 2, y1 + height / 2);
+        let (x1, y1) = (width as f32 / 4.0, height as f32 / 4.0);
+        let (x2, y2) = (x1 + width as f32 / 2.0, y1 + height as f32 / 2.0);
         state
           .matrix()
           .row_iter_mut()
           .enumerate()
           .for_each(|(row, mut line)| {
             line.iter_mut().enumerate().for_each(|(col, pixel)| {
-              if col > x1 && col < x2 && row > y1 && row < y2 {
+              let (row, col) = (row as f32, col as f32);
+              if col >= x1 && col < x2 && row >= y1 && row < y2 {
                 pixel.iter_mut().for_each(|scalar| *scalar = !*scalar);
               }
             })
