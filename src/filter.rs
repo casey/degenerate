@@ -3,7 +3,7 @@ use super::*;
 pub(crate) enum Filter {
   Circle,
   Even,
-  Generate { width: usize, height: usize },
+  Resize { rows: usize, cols: usize },
   Invert,
   Modulus { divisor: usize, remainder: usize },
   // Pixelate { size: usize },
@@ -15,8 +15,7 @@ impl Filter {
   pub(crate) fn apply(&self, state: &mut State) {
     match self {
       Self::Circle => {
-        let (width, height) = state.dimensions();
-        let (width, height) = (width as f32, height as f32);
+        let (width, height) = (state.dimensions().x as f32, state.dimensions().y as f32);
         state
           .matrix()
           .row_iter_mut()
@@ -33,7 +32,7 @@ impl Filter {
           });
       }
       Self::Even => {
-        let height = state.height();
+        let height = state.dimensions().y;
         state
           .matrix()
           .rows_with_step_mut(0, height / 2, 1)
@@ -42,8 +41,8 @@ impl Filter {
             row.iter_mut().for_each(|scalar| *scalar = !*scalar);
           });
       }
-      Self::Generate { width, height } => {
-        state.generate(*width, *height);
+      Self::Resize { rows, cols } => {
+        state.resize(Vector2::new(*rows, *cols));
       }
       Self::Invert => {
         state
@@ -63,9 +62,12 @@ impl Filter {
           })
       }
       Self::Square => {
-        let (width, height) = state.dimensions();
-        let (x1, y1) = (width as f32 / 4.0, height as f32 / 4.0);
-        let (x2, y2) = (x1 + width as f32 / 2.0, y1 + height as f32 / 2.0);
+        let dimensions = state.dimensions();
+        let (x1, y1) = (dimensions.x as f32 / 4.0, dimensions.y as f32 / 4.0);
+        let (x2, y2) = (
+          x1 + dimensions.x as f32 / 2.0,
+          y1 + dimensions.y as f32 / 2.0,
+        );
         state
           .matrix()
           .row_iter_mut()
@@ -90,7 +92,7 @@ impl Filter {
       //   }
       // }
       Self::Top => {
-        let height = state.height();
+        let height = state.dimensions().y;
         state
           .matrix()
           .rows_mut(0, height / 2)
@@ -109,9 +111,9 @@ impl FromStr for Filter {
       ["circle"] => Ok(Self::Circle),
       ["square"] => Ok(Self::Square),
       ["even"] => Ok(Self::Even),
-      ["generate", width, height] => Ok(Self::Generate {
-        width: width.parse()?,
-        height: height.parse()?,
+      ["resize", rows, cols] => Ok(Self::Resize {
+        rows: rows.parse()?,
+        cols: cols.parse()?,
       }),
       ["invert"] => Ok(Self::Invert),
       ["modulus", divisor, remainder] => Ok(Self::Modulus {

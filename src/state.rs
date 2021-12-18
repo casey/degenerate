@@ -11,16 +11,12 @@ impl State {
     }
   }
 
-  pub(crate) fn dimensions(&self) -> (usize, usize) {
-    (self.width(), self.height())
+  pub(crate) fn resize(&mut self, dim: Vector2<usize>) {
+    self.matrix.resize_mut(dim.y, dim.x, Zero::zero())
   }
 
-  pub(crate) fn width(&self) -> usize {
-    self.matrix.ncols()
-  }
-
-  pub(crate) fn height(&self) -> usize {
-    self.matrix.nrows()
+  pub(crate) fn dimensions(&self) -> Vector2<usize> {
+    Vector2::new(self.matrix.ncols(), self.matrix.nrows())
   }
 
   pub fn matrix(&mut self) -> &mut DMatrix<Vector3<u8>> {
@@ -37,10 +33,6 @@ impl State {
     }
 
     buffer
-  }
-
-  pub(crate) fn generate(&mut self, width: usize, height: usize) {
-    self.matrix.resize_mut(width, height, Vector3::new(0, 0, 0));
   }
 
   pub(crate) fn write(&self) -> Result<()> {
@@ -61,9 +53,12 @@ impl State {
   }
 
   pub(crate) fn save(&self, path: PathBuf) -> Result<()> {
-    let image: Result<RgbImage> =
-      ImageBuffer::from_raw(self.width() as u32, self.height() as u32, self.scalars())
-        .ok_or_else(|| "State is not a valid image".into());
+    let image: Result<RgbImage> = ImageBuffer::from_raw(
+      self.matrix.nrows() as u32,
+      self.matrix.ncols() as u32,
+      self.scalars(),
+    )
+    .ok_or_else(|| "State is not a valid image".into());
 
     image?.save(path)?;
 

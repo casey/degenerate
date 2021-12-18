@@ -1,7 +1,7 @@
 use {
   crate::{arguments::Arguments, filter::Filter, state::State},
   image::{ImageBuffer, RgbImage},
-  nalgebra::{DMatrix, Vector3},
+  nalgebra::{DMatrix, Vector2, Vector3},
   std::{path::PathBuf, str::FromStr},
   structopt::StructOpt,
 };

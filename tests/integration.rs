@@ -31,7 +31,7 @@ fn assert_output_eq(args: &[&str], expected_bitmap: &str) -> Result<()> {
 #[test]
 fn even() -> Result<()> {
   assert_output_eq(
-    &["generate:4:4", "even"],
+    &["resize:4:4", "even"],
     "1111
      0000
      1111
@@ -42,26 +42,26 @@ fn even() -> Result<()> {
 #[test]
 fn top() -> Result<()> {
   assert_output_eq(
-    &["generate:2:2", "top"],
+    &["resize:2:2", "top"],
     "11
      00",
   )
 }
 
 #[test]
-fn generate() -> Result<()> {
-  assert_output_eq(&["generate:1:1"], "0")
+fn resize() -> Result<()> {
+  assert_output_eq(&["resize:2:1"], "00")
 }
 
 #[test]
 fn invert() -> Result<()> {
-  assert_output_eq(&["generate:1:1", "invert"], "1")
+  assert_output_eq(&["resize:1:1", "invert"], "1")
 }
 
 #[test]
 fn square() -> Result<()> {
   assert_output_eq(
-    &["generate:4:4", "square"],
+    &["resize:4:4", "square"],
     "0000
      0110
      0110
