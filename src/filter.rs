@@ -4,7 +4,7 @@ pub(crate) enum Filter {
   Circle,
   Even,
   Resize { rows: usize, cols: usize },
-  Invert,
+  All,
   Modulus { divisor: usize, remainder: usize },
   Top,
   Square,
@@ -43,7 +43,7 @@ impl Filter {
       Self::Resize { rows, cols } => {
         state.resize(Vector2::new(*rows, *cols));
       }
-      Self::Invert => {
+      Self::All => {
         state
           .matrix()
           .iter_mut()
@@ -104,7 +104,7 @@ impl FromStr for Filter {
         rows: rows.parse()?,
         cols: cols.parse()?,
       }),
-      ["invert"] => Ok(Self::Invert),
+      ["all"] => Ok(Self::All),
       ["modulus", divisor, remainder] => Ok(Self::Modulus {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,

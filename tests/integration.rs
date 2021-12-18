@@ -55,7 +55,7 @@ fn resize() -> Result<()> {
 
 #[test]
 fn invert() -> Result<()> {
-  assert_output_eq(&["resize:1:1", "invert"], "1")
+  assert_output_eq(&["resize:1:1", "all"], "1")
 }
 
 #[test]
