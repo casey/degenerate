@@ -72,7 +72,7 @@ fn square() -> Result<()> {
 #[test]
 fn modulus() -> Result<()> {
   assert_output_eq(
-    &["resize:4:2", "modulus:2:0"],
+    &["resize:4:2", "mod:2:0"],
     "1111
      0000",
   )

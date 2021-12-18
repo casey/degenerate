@@ -5,7 +5,7 @@ pub(crate) enum Filter {
   Even,
   Resize { rows: usize, cols: usize },
   All,
-  Modulus { divisor: usize, remainder: usize },
+  Mod { divisor: usize, remainder: usize },
   Top,
   Square,
 }
@@ -49,7 +49,7 @@ impl Filter {
           .iter_mut()
           .for_each(|pixel| pixel.iter_mut().for_each(|scalar| *scalar = !*scalar));
       }
-      Self::Modulus { divisor, remainder } => {
+      Self::Mod { divisor, remainder } => {
         state
           .matrix()
           .iter_mut()
@@ -105,7 +105,7 @@ impl FromStr for Filter {
         cols: cols.parse()?,
       }),
       ["all"] => Ok(Self::All),
-      ["modulus", divisor, remainder] => Ok(Self::Modulus {
+      ["mod", divisor, remainder] => Ok(Self::Mod {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
       }),

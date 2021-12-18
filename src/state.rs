@@ -23,16 +23,13 @@ impl State {
     &mut self.matrix
   }
 
-  pub(crate) fn scalars(&self) -> Vec<u8> {
-    let mut buffer = Vec::with_capacity(self.matrix.len() * 3);
-
-    for row in self.matrix.row_iter() {
-      for element in &row {
-        buffer.extend_from_slice(element.data.as_slice());
-      }
-    }
-
-    buffer
+  pub(crate) fn image(&self) -> Result<RgbImage> {
+    ImageBuffer::from_raw(
+      self.matrix.nrows().try_into()?,
+      self.matrix.ncols().try_into()?,
+      self.matrix.transpose().iter().flatten().cloned().collect(),
+    )
+    .ok_or_else(|| "State is not a valid image".into())
   }
 
   pub(crate) fn write(&self) -> Result<()> {
@@ -53,14 +50,7 @@ impl State {
   }
 
   pub(crate) fn save(&self, path: PathBuf) -> Result<()> {
-    let image: Result<RgbImage> = ImageBuffer::from_raw(
-      self.matrix.nrows() as u32,
-      self.matrix.ncols() as u32,
-      self.scalars(),
-    )
-    .ok_or_else(|| "State is not a valid image".into());
-
-    image?.save(path)?;
+    self.image()?.save(path)?;
 
     Ok(())
   }
