@@ -6,7 +6,6 @@ pub(crate) enum Filter {
   Resize { rows: usize, cols: usize },
   Invert,
   Modulus { divisor: usize, remainder: usize },
-  // Pixelate { size: usize },
   Top,
   Square,
 }
@@ -81,16 +80,6 @@ impl Filter {
             })
           });
       }
-      // Self::Pixelate { size } => {
-      //   for row in 0..state.height() {
-      //     for col in 0..state.width() {
-      //       let source_row = row / size * size + size / 2;
-      //       let source_col = col / size * size + size / 2;
-      //       let source_pixel = state.get_pixel(source_row, source_col);
-      //       state.set_pixel(row, col, source_pixel);
-      //     }
-      //   }
-      // }
       Self::Top => {
         let height = state.dimensions().y;
         state
@@ -120,9 +109,6 @@ impl FromStr for Filter {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
       }),
-      // ["pixelate", size] => Ok(Self::Pixelate {
-      //   size: size.parse()?,
-      // }),
       ["top"] => Ok(Self::Top),
       _ => Err(format!("Invalid filter: {}", s).into()),
     }
