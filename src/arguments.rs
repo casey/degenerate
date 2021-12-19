@@ -16,13 +16,13 @@ impl Arguments {
         rows: 4096,
         cols: 4096,
       }
-      .apply(&mut state);
+      .apply(&mut state)?;
     } else {
-      Filter::Resize { rows: 20, cols: 80 }.apply(&mut state);
+      Filter::Resize { rows: 20, cols: 80 }.apply(&mut state)?;
     }
 
     for filter in self.filters {
-      filter.apply(&mut state);
+      filter.apply(&mut state)?;
     }
 
     if let Some(path) = self.output {
