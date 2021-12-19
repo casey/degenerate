@@ -1,7 +1,7 @@
 use {
   executable_path::executable_path,
   pretty_assertions::assert_eq,
-  std::{process::Command, str},
+  std::{process::Command, str, fs},
 };
 
 type Result<T, E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
@@ -111,6 +111,26 @@ fn default_bitmap_size() -> Result<()> {
      00000000000000000000000000000000000000000000000000000000000000000000000000000000
      00000000000000000000000000000000000000000000000000000000000000000000000000000000
      00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+     00000000000000000000000000000000000000000000000000000000000000000000000000000000",
   )
+}
+
+#[test]
+fn default_image_size() -> Result<()> {
+  let output = Command::new(executable_path("degenerate"))
+    .arg("--output=output.txt")
+    .output()?;
+
+  assert!(
+    output.status.success(),
+    "Command failed: {}",
+    str::from_utf8(&output.stderr)?
+  );
+
+  let content = fs::read_to_string("output.txt")?;
+  let lines = content.lines();
+
+  assert_eq!(lines.count(), 4096);
+
+  Ok(())
 }

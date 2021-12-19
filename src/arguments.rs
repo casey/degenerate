@@ -11,7 +11,11 @@ impl Arguments {
   pub(crate) fn run(self) -> Result<()> {
     let mut state = State::new();
 
-    Filter::Resize { rows: 20, cols: 80 }.apply(&mut state);
+    if self.output.is_some() {
+      Filter::Resize { rows: 4096, cols: 4096 }.apply(&mut state);
+    } else {
+      Filter::Resize { rows: 20, cols: 80 }.apply(&mut state);
+    }
 
     for filter in self.filters {
       filter.apply(&mut state);
@@ -20,7 +24,7 @@ impl Arguments {
     if let Some(path) = self.output {
       state.save(path)?;
     } else {
-      state.write()?;
+      state.write(io::stdout())?;
     }
 
     Ok(())

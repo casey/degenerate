@@ -32,26 +32,31 @@ impl State {
     .ok_or_else(|| "State is not a valid image".into())
   }
 
-  pub(crate) fn write(&self) -> Result<()> {
+  pub(crate) fn write(&self, mut w: impl Write) -> Result<()> {
+    let mut w = BufWriter::new(w);
+
     for (i, row) in self.matrix.row_iter().enumerate() {
       if i > 0 {
-        println!();
+        writeln!(w)?;
       }
       for element in &row {
         if element.is_zero() {
-          print!("0");
+          write!(w, "0")?;
         } else {
-          print!("1");
+          write!(w, "1")?;
         }
       }
     }
+
+    w.flush()?;
 
     Ok(())
   }
 
   pub(crate) fn save(&self, path: PathBuf) -> Result<()> {
-    self.image()?.save(path)?;
-
-    Ok(())
+    match path.extension() {
+      Some(ext) if ext == "txt" => self.write(File::create(path)?),
+      _ => Ok(self.image()?.save(path)?)
+    }
   }
 }
