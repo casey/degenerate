@@ -1,64 +1,60 @@
-use super::*;
-
-use image::{ImageBuffer, RgbImage};
+use {super::*, num_traits::identities::Zero};
 
 pub(crate) struct State {
-  width: usize,
-  height: usize,
-  buffer: Vec<u8>,
+  matrix: DMatrix<Vector3<u8>>,
 }
 
 impl State {
   pub(crate) fn new() -> Self {
     Self {
-      width: 0,
-      height: 0,
-      buffer: Vec::new(),
+      matrix: DMatrix::zeros(0, 0),
     }
   }
 
-  pub(crate) fn dimensions(&self) -> (usize, usize) {
-    (self.width, self.height)
+  pub(crate) fn resize(&mut self, dim: Vector2<usize>) {
+    self.matrix.resize_mut(dim.x, dim.y, Zero::zero())
   }
 
-  pub(crate) fn height(&self) -> usize {
-    self.height
+  pub(crate) fn dimensions(&self) -> Vector2<usize> {
+    Vector2::new(self.matrix.ncols(), self.matrix.nrows())
   }
 
-  pub(crate) fn width(&self) -> usize {
-    self.width
-  }
-
-  pub(crate) fn get_pixel(&self, row: usize, col: usize) -> [u8; 3] {
-    let i = (row * self.width + col) * 3;
-
-    [self.buffer[i], self.buffer[i + 1], self.buffer[i + 2]]
-  }
-
-  pub(crate) fn set_pixel(&mut self, row: usize, col: usize, pixel: [u8; 3]) {
-    let i = (row * self.width + col) * 3;
-
-    self.buffer[i] = pixel[0];
-    self.buffer[i + 1] = pixel[1];
-    self.buffer[i + 2] = pixel[2];
-  }
-
-  pub(crate) fn generate(&mut self, width: usize, height: usize) {
-    self.width = width;
-    self.height = height;
-    self.buffer = vec![0; width * height * 3];
-  }
-
-  pub(crate) fn scalars_mut(&mut self) -> &mut [u8] {
-    &mut self.buffer
-  }
-
-  pub(crate) fn rows_mut(&mut self) -> ChunksMut<'_, u8> {
-    self.buffer.chunks_mut(self.width * 3)
+  pub fn matrix(&mut self) -> &mut DMatrix<Vector3<u8>> {
+    &mut self.matrix
   }
 
   pub(crate) fn image(&self) -> Result<RgbImage> {
-    ImageBuffer::from_raw(self.width as u32, self.height as u32, self.buffer.clone())
-      .ok_or_else(|| "State is not valid image.".into())
+    ImageBuffer::from_raw(
+      self.matrix.nrows().try_into()?,
+      self.matrix.ncols().try_into()?,
+      self.matrix.transpose().iter().flatten().cloned().collect(),
+    )
+    .ok_or_else(|| "State is not a valid image".into())
+  }
+
+  pub(crate) fn write(&self, w: impl Write) -> Result<()> {
+    let mut w = BufWriter::new(w);
+
+    for row in self.matrix.row_iter() {
+      for element in &row {
+        if element.is_zero() {
+          write!(w, "0")?;
+        } else {
+          write!(w, "1")?;
+        }
+      }
+      writeln!(w)?;
+    }
+
+    w.flush()?;
+
+    Ok(())
+  }
+
+  pub(crate) fn save(&self, path: PathBuf) -> Result<()> {
+    match path.extension() {
+      Some(ext) if ext == "txt" => self.write(File::create(path)?),
+      _ => Ok(self.image()?.save(path)?),
+    }
   }
 }

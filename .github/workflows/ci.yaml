@@ -37,7 +37,7 @@ jobs:
         cargo update --locked --package degenerate
 
     - name: Test
-      run: cargo test --all
+      run: cargo test --all -- --include-ignored
 
     - name: Clippy
       run: cargo clippy --all --all-targets
