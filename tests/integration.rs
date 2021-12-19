@@ -138,7 +138,11 @@ fn default_image_size() -> Result<()> {
   let content = fs::read_to_string("output.txt")?;
   let lines = content.lines();
 
-  assert_eq!(lines.count(), 4096);
+  assert_eq!(lines.clone().count(), 4096);
+
+  for line in lines {
+    assert_eq!(line.len(), 4096);
+  }
 
   Ok(())
 }
