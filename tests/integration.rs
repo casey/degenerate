@@ -1,7 +1,7 @@
 use {
   executable_path::executable_path,
   pretty_assertions::assert_eq,
-  std::{process::Command, str, fs},
+  std::{fs, process::Command, str},
 };
 
 type Result<T, E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
@@ -20,10 +20,10 @@ fn assert_output_eq(args: &[&str], expected_bitmap: &str) -> Result<()> {
     str::from_utf8(&output.stderr)?
   );
 
-  assert_eq!(
-    str::from_utf8(&output.stdout)?,
-    expected_bitmap.replace(" ", "")
-  );
+  let mut expected_bitmap = expected_bitmap.replace(" ", "");
+  expected_bitmap.push('\n');
+
+  assert_eq!(str::from_utf8(&output.stdout)?, expected_bitmap);
 
   Ok(())
 }
@@ -31,10 +31,17 @@ fn assert_output_eq(args: &[&str], expected_bitmap: &str) -> Result<()> {
 #[test]
 fn circle() -> Result<()> {
   assert_output_eq(
-    &["resize:3:3", "circle"],
-    "010
-     111
-     010",
+    &["resize:10:10", "circle"],
+    "0001111000
+     0111111110
+     0111111110
+     1111111111
+     1111111111
+     1111111111
+     1111111111
+     0111111110
+     0111111110
+     0001111000"
   )
 }
 
