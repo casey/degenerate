@@ -11,6 +11,8 @@ impl Arguments {
   pub(crate) fn run(self) -> Result<()> {
     let mut state = State::new();
 
+    Filter::Resize { rows: 20, cols: 80 }.apply(&mut state);
+
     for filter in self.filters {
       filter.apply(&mut state);
     }

@@ -12,7 +12,7 @@ impl State {
   }
 
   pub(crate) fn resize(&mut self, dim: Vector2<usize>) {
-    self.matrix.resize_mut(dim.y, dim.x, Zero::zero())
+    self.matrix.resize_mut(dim.x, dim.y, Zero::zero())
   }
 
   pub(crate) fn dimensions(&self) -> Vector2<usize> {

@@ -21,7 +21,7 @@ impl Filter {
           .enumerate()
           .for_each(|(row, mut line)| {
             line.iter_mut().enumerate().for_each(|(col, pixel)| {
-              let (row, col) = (row as f32, col as f32);
+              let (row, col) = (row as f32 + 0.5, col as f32 + 0.5);
               if (col - (width / 2.0)).powf(2.0) + (row - (height / 2.0)).powf(2.0)
                 <= (width / 2.0).powf(2.0)
               {
@@ -100,9 +100,9 @@ impl FromStr for Filter {
       ["circle"] => Ok(Self::Circle),
       ["square"] => Ok(Self::Square),
       ["even"] => Ok(Self::Even),
-      ["resize", rows, cols] => Ok(Self::Resize {
-        rows: rows.parse()?,
+      ["resize", cols, rows] => Ok(Self::Resize {
         cols: cols.parse()?,
+        rows: rows.parse()?,
       }),
       ["all"] => Ok(Self::All),
       ["mod", divisor, remainder] => Ok(Self::Mod {
