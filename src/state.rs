@@ -32,13 +32,10 @@ impl State {
     .ok_or_else(|| "State is not a valid image".into())
   }
 
-  pub(crate) fn write(&self, mut w: impl Write) -> Result<()> {
+  pub(crate) fn write(&self, w: impl Write) -> Result<()> {
     let mut w = BufWriter::new(w);
 
-    for (i, row) in self.matrix.row_iter().enumerate() {
-      if i > 0 {
-        writeln!(w)?;
-      }
+    for row in self.matrix.row_iter() {
       for element in &row {
         if element.is_zero() {
           write!(w, "0")?;
@@ -46,6 +43,7 @@ impl State {
           write!(w, "1")?;
         }
       }
+      writeln!(w)?;
     }
 
     w.flush()?;
