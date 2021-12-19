@@ -71,7 +71,7 @@ fn top() -> Result<()> {
 }
 
 #[test]
-fn repl() -> Result<()> {
+fn repl_valid_filter() -> Result<()> {
   let mut command = Command::new(executable_path("degenerate"))
     .args(["resize:4:4", "repl"])
     .stdin(Stdio::piped())
@@ -85,6 +85,26 @@ fn repl() -> Result<()> {
   assert_eq!(
     str::from_utf8(&command.wait_with_output()?.stdout)?,
     "1111\n0000\n1111\n0000\n"
+  );
+
+  Ok(())
+}
+
+#[test]
+fn repl_invalid_filter() -> Result<()> {
+  let mut command = Command::new(executable_path("degenerate"))
+    .args(["resize:4:4", "repl"])
+    .stdin(Stdio::piped())
+    .stdout(Stdio::piped())
+    .stderr(Stdio::piped())
+    .spawn()?;
+
+  let stdin = command.stdin.as_mut().unwrap();
+  write!(stdin, "invalid")?;
+
+  assert_eq!(
+    str::from_utf8(&command.wait_with_output()?.stdout)?,
+    "0000\n0000\n0000\n0000\n"
   );
 
   Ok(())
