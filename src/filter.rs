@@ -1,17 +1,18 @@
 use super::*;
 
 pub(crate) enum Filter {
+  All,
   Circle,
   Even,
-  Resize { rows: usize, cols: usize },
-  All,
   Mod { divisor: usize, remainder: usize },
-  Top,
+  Repl,
+  Resize { rows: usize, cols: usize },
   Square,
+  Top,
 }
 
 impl Filter {
-  pub(crate) fn apply(&self, state: &mut State) {
+  pub(crate) fn apply(&self, state: &mut State) -> Result<()> {
     match self {
       Self::Circle => {
         let (width, height) = (state.dimensions().x as f32, state.dimensions().y as f32);
@@ -42,6 +43,20 @@ impl Filter {
       }
       Self::Resize { rows, cols } => {
         state.resize(Vector2::new(*rows, *cols));
+      }
+      Self::Repl => {
+        for result in BufReader::new(io::stdin()).lines() {
+          let line = result?;
+          match line.trim().parse::<Filter>() {
+            Ok(filter) => {
+              filter.apply(state)?;
+              state.write(io::stderr())?;
+            }
+            Err(err) => {
+              eprintln!("Could not parse filter from `{}`: {}", line, err);
+            }
+          }
+        }
       }
       Self::All => {
         state
@@ -89,6 +104,8 @@ impl Filter {
           .for_each(|row| row.iter_mut().for_each(|scalar| *scalar = !*scalar));
       }
     }
+
+    Ok(())
   }
 }
 
@@ -97,6 +114,7 @@ impl FromStr for Filter {
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     match s.split(':').collect::<Vec<&str>>().as_slice() {
+      ["repl"] => Ok(Self::Repl),
       ["circle"] => Ok(Self::Circle),
       ["square"] => Ok(Self::Square),
       ["even"] => Ok(Self::Even),
