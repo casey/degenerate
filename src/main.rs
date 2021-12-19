@@ -2,7 +2,12 @@ use {
   crate::{arguments::Arguments, filter::Filter, state::State},
   image::{ImageBuffer, RgbImage},
   nalgebra::{DMatrix, Vector2, Vector3},
-  std::{path::PathBuf, str::FromStr, fs::File, io::{self, Write, BufWriter}},
+  std::{
+    fs::File,
+    io::{self, BufWriter, Write},
+    path::PathBuf,
+    str::FromStr,
+  },
   structopt::StructOpt,
 };
 

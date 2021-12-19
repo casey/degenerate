@@ -54,7 +54,7 @@ impl State {
   pub(crate) fn save(&self, path: PathBuf) -> Result<()> {
     match path.extension() {
       Some(ext) if ext == "txt" => self.write(File::create(path)?),
-      _ => Ok(self.image()?.save(path)?)
+      _ => Ok(self.image()?.save(path)?),
     }
   }
 }
