@@ -115,6 +115,7 @@ fn default_bitmap_size() -> Result<()> {
   )
 }
 
+#[ignore]
 #[test]
 fn default_image_size() -> Result<()> {
   let output = Command::new(executable_path("degenerate"))
