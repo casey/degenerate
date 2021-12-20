@@ -1,7 +1,12 @@
 use {
   executable_path::executable_path,
   pretty_assertions::assert_eq,
-  std::{fs, process::Command, str},
+  std::{
+    fs,
+    io::prelude::*,
+    process::{Command, Stdio},
+    str,
+  },
 };
 
 type Result<T, E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
@@ -63,6 +68,46 @@ fn top() -> Result<()> {
     "11
      00",
   )
+}
+
+#[test]
+fn repl_valid_filter() -> Result<()> {
+  let mut command = Command::new(executable_path("degenerate"))
+    .args(["resize:4:4", "repl"])
+    .stdin(Stdio::piped())
+    .stdout(Stdio::piped())
+    .stderr(Stdio::piped())
+    .spawn()?;
+
+  let stdin = command.stdin.as_mut().unwrap();
+  write!(stdin, "even")?;
+
+  assert_eq!(
+    str::from_utf8(&command.wait_with_output()?.stdout)?,
+    "1111\n0000\n1111\n0000\n"
+  );
+
+  Ok(())
+}
+
+#[test]
+fn repl_invalid_filter() -> Result<()> {
+  let mut command = Command::new(executable_path("degenerate"))
+    .args(["resize:4:4", "repl"])
+    .stdin(Stdio::piped())
+    .stdout(Stdio::piped())
+    .stderr(Stdio::piped())
+    .spawn()?;
+
+  let stdin = command.stdin.as_mut().unwrap();
+  write!(stdin, "invalid")?;
+
+  assert_eq!(
+    str::from_utf8(&command.wait_with_output()?.stdout)?,
+    "0000\n0000\n0000\n0000\n"
+  );
+
+  Ok(())
 }
 
 #[test]
