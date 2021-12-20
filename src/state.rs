@@ -76,8 +76,7 @@ impl State {
                 .chars()
                 .map(|c| Vector3::from_element(c.to_digit(2).unwrap_or(0) as u8))
             })
-            .flatten()
-            .collect::<Vec<Vector3<u8>>>(),
+            .flatten(),
         );
       }
       _ => {
@@ -92,8 +91,7 @@ impl State {
             image
               .rows()
               .map(|row| row.map(|pixel| Vector3::new(pixel[0], pixel[1], pixel[2])))
-              .flatten()
-              .collect::<Vec<Vector3<u8>>>(),
+              .flatten(),
           );
         }
       }
