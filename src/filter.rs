@@ -3,10 +3,10 @@ use super::*;
 pub(crate) enum Filter {
   All,
   Circle,
-  Even,
   Mod { divisor: usize, remainder: usize },
   Repl,
   Resize { rows: usize, cols: usize },
+  Rows { limit: usize, step: usize },
   Square,
   Top,
 }
@@ -29,16 +29,6 @@ impl Filter {
                 pixel.iter_mut().for_each(|scalar| *scalar = !*scalar);
               }
             })
-          });
-      }
-      Self::Even => {
-        let height = state.dimensions().y;
-        state
-          .matrix()
-          .rows_with_step_mut(0, height / 2, 1)
-          .iter_mut()
-          .for_each(|row| {
-            row.iter_mut().for_each(|scalar| *scalar = !*scalar);
           });
       }
       Self::Resize { rows, cols } => {
@@ -74,6 +64,15 @@ impl Filter {
               pixel.iter_mut().for_each(|scalar| *scalar = !*scalar);
             }
           })
+      }
+      Self::Rows { limit, step } => {
+        state
+          .matrix()
+          .rows_with_step_mut(0, *limit, *step)
+          .iter_mut()
+          .for_each(|row| {
+            row.iter_mut().for_each(|scalar| *scalar = !*scalar);
+          });
       }
       Self::Square => {
         let dimensions = state.dimensions();
@@ -114,19 +113,22 @@ impl FromStr for Filter {
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     match s.split(':').collect::<Vec<&str>>().as_slice() {
-      ["repl"] => Ok(Self::Repl),
-      ["circle"] => Ok(Self::Circle),
-      ["square"] => Ok(Self::Square),
-      ["even"] => Ok(Self::Even),
-      ["resize", cols, rows] => Ok(Self::Resize {
-        cols: cols.parse()?,
-        rows: rows.parse()?,
-      }),
       ["all"] => Ok(Self::All),
+      ["circle"] => Ok(Self::Circle),
       ["mod", divisor, remainder] => Ok(Self::Mod {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
       }),
+      ["repl"] => Ok(Self::Repl),
+      ["resize", cols, rows] => Ok(Self::Resize {
+        cols: cols.parse()?,
+        rows: rows.parse()?,
+      }),
+      ["rows", limit, step] => Ok(Self::Rows {
+        limit: limit.parse()?,
+        step: step.parse()?,
+      }),
+      ["square"] => Ok(Self::Square),
       ["top"] => Ok(Self::Top),
       _ => Err(format!("Invalid filter: {}", s).into()),
     }

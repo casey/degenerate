@@ -51,17 +51,6 @@ fn circle() -> Result<()> {
 }
 
 #[test]
-fn even() -> Result<()> {
-  assert_output_eq(
-    &["resize:4:4", "even"],
-    "1111
-     0000
-     1111
-     0000",
-  )
-}
-
-#[test]
 fn top() -> Result<()> {
   assert_output_eq(
     &["resize:2:2", "top"],
@@ -80,7 +69,7 @@ fn repl_valid_filter() -> Result<()> {
     .spawn()?;
 
   let stdin = command.stdin.as_mut().unwrap();
-  write!(stdin, "even")?;
+  write!(stdin, "rows:2:1")?;
 
   assert_eq!(
     str::from_utf8(&command.wait_with_output()?.stdout)?,
@@ -118,6 +107,17 @@ fn resize() -> Result<()> {
 #[test]
 fn invert() -> Result<()> {
   assert_output_eq(&["resize:1:1", "all"], "1")
+}
+
+#[test]
+fn rows() -> Result<()> {
+  assert_output_eq(
+    &["resize:4:4", "rows:2:1"],
+    "1111
+     0000
+     1111
+     0000",
+  )
 }
 
 #[test]
