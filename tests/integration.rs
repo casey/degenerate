@@ -121,6 +121,25 @@ fn invert() -> Result<()> {
 }
 
 #[test]
+fn save() -> Result<()> {
+  let path = "output.txt";
+
+  assert_output_eq(
+    &["resize:4:4", &format!("save:{}", path), "top"],
+    "1111
+     1111
+     0000
+     0000",
+  )?;
+
+  for line in fs::read_to_string(path)?.lines() {
+    assert_eq!(line, "0000");
+  }
+
+  Ok(())
+}
+
+#[test]
 fn square() -> Result<()> {
   assert_output_eq(
     &["resize:4:4", "square"],
