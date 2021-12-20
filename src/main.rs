@@ -1,7 +1,7 @@
 use {
   crate::{arguments::Arguments, filter::Filter, state::State},
   image::{io::Reader as ImageReader, ImageBuffer, RgbImage},
-  nalgebra::{DMatrix, Matrix, Vector2, Vector3},
+  nalgebra::{DMatrix, Vector2, Vector3},
   std::{
     fs::{self, File},
     io::{self, BufRead, BufReader, BufWriter, Write},
