@@ -51,6 +51,57 @@ impl State {
     Ok(())
   }
 
+  pub(crate) fn load(&mut self, path: PathBuf) -> Result<()> {
+    match path.extension() {
+      Some(ext) if ext == "txt" => {
+        let content = fs::read_to_string(&path)?;
+
+        let lines = content.lines();
+
+        let width = lines
+          .clone()
+          .collect::<Vec<&str>>()
+          .first()
+          .unwrap_or(&"")
+          .len();
+
+        let height = lines.clone().count();
+
+        self.matrix = DMatrix::from_iterator(
+          width,
+          height,
+          lines
+            .map(|line| {
+              line
+                .chars()
+                .map(|c| Vector3::from_element(c.to_digit(2).unwrap_or(0) as u8))
+            })
+            .flatten()
+            .collect::<Vec<Vector3<u8>>>(),
+        );
+      }
+      _ => {
+        let image = ImageReader::open(path)?.decode()?;
+
+        if let Some(image) = image.as_rgb8() {
+          let (width, height) = (image.width() as usize, image.height() as usize);
+
+          self.matrix = DMatrix::from_iterator(
+            height,
+            width,
+            image
+              .rows()
+              .map(|row| row.map(|pixel| Vector3::new(pixel[0], pixel[1], pixel[2])))
+              .flatten()
+              .collect::<Vec<Vector3<u8>>>(),
+          );
+        }
+      }
+    }
+
+    Ok(())
+  }
+
   pub(crate) fn save(&self, path: PathBuf) -> Result<()> {
     match path.extension() {
       Some(ext) if ext == "txt" => self.write(File::create(path)?),

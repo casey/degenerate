@@ -1,9 +1,9 @@
 use {
   crate::{arguments::Arguments, filter::Filter, state::State},
-  image::{ImageBuffer, RgbImage},
-  nalgebra::{DMatrix, Vector2, Vector3},
+  image::{io::Reader as ImageReader, ImageBuffer, RgbImage},
+  nalgebra::{DMatrix, Matrix, Vector2, Vector3},
   std::{
-    fs::File,
+    fs::{self, File},
     io::{self, BufRead, BufReader, BufWriter, Write},
     path::PathBuf,
     str::FromStr,
