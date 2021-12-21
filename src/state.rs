@@ -51,7 +51,7 @@ impl State {
     Ok(())
   }
 
-  pub(crate) fn load(&mut self, path: PathBuf) -> Result<()> {
+  pub(crate) fn load(&mut self, path: &PathBuf) -> Result<()> {
     match path.extension() {
       Some(ext) if ext == "txt" => {
         let content = fs::read_to_string(&path)?;
@@ -100,7 +100,7 @@ impl State {
     Ok(())
   }
 
-  pub(crate) fn save(&self, path: PathBuf) -> Result<()> {
+  pub(crate) fn save(&self, path: &PathBuf) -> Result<()> {
     match path.extension() {
       Some(ext) if ext == "txt" => self.write(File::create(path)?),
       _ => Ok(self.image()?.save(path)?),

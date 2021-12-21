@@ -1,8 +1,8 @@
 build:
 	cargo build
 
-test:
-	cargo test
+test *args:
+	cargo test -- {{args}}
 
 clippy:
   cargo clippy --all-targets --all-features

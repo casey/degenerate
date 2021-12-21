@@ -26,7 +26,7 @@ impl Arguments {
     }
 
     if let Some(path) = self.output {
-      state.save(path)?;
+      state.save(&path)?;
     } else {
       state.write(io::stdout())?;
     }

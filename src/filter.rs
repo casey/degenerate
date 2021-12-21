@@ -67,7 +67,7 @@ impl Filter {
           .for_each(|pixel| pixel.iter_mut().for_each(|scalar| *scalar = !*scalar));
       }
       Self::Load { path } => {
-        state.load(path.to_owned())?;
+        state.load(&path)?;
       }
       Self::Mod { divisor, remainder } => {
         state
@@ -81,7 +81,7 @@ impl Filter {
           })
       }
       Self::Save { path } => {
-        state.save(path.to_owned())?;
+        state.save(&path)?;
       }
       Self::Square => {
         let dimensions = state.dimensions();
