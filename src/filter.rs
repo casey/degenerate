@@ -76,9 +76,15 @@ impl Filter {
             }
           })
       }
-      Self::Save { path } => {
-        state.save(path.to_owned())?;
-      }
+      Self::Save { path } => match path.extension() {
+        Some(ext) if ext == "txt" => {
+          panic!(
+            "Cannot save state to {}: Invalid file format `.txt`.",
+            path.display()
+          );
+        }
+        _ => state.save(path)?,
+      },
       Self::Square => {
         let dimensions = state.dimensions();
         let (x1, y1) = (dimensions.x as f32 / 4.0, dimensions.y as f32 / 4.0);

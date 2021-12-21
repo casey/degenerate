@@ -122,7 +122,7 @@ fn invert() -> Result<()> {
 
 #[test]
 fn save() -> Result<()> {
-  let path = "output.txt";
+  let path = "output.png";
 
   assert_output_eq(
     &["resize:4:4", &format!("save:{}", path), "top"],
@@ -132,9 +132,21 @@ fn save() -> Result<()> {
      0000",
   )?;
 
-  for line in fs::read_to_string(path)?.lines() {
-    assert_eq!(line, "0000");
+  let image = image::open(path)?;
+  for pixel in image.as_rgb8().unwrap().pixels() {
+    assert_eq!(*pixel, image::Rgb::<u8>([0, 0, 0]));
   }
+
+  Ok(())
+}
+
+#[test]
+fn save_invalid_format() -> Result<()> {
+  let output = Command::new(executable_path("degenerate"))
+    .args(["resize:4:4", "top", "save:output.txt"])
+    .output()?;
+
+  assert!(!output.status.success());
 
   Ok(())
 }
