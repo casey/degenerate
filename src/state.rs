@@ -25,8 +25,8 @@ impl State {
 
   pub(crate) fn image(&self) -> Result<RgbImage> {
     ImageBuffer::from_raw(
-      self.matrix.nrows().try_into()?,
       self.matrix.ncols().try_into()?,
+      self.matrix.nrows().try_into()?,
       self.matrix.transpose().iter().flatten().cloned().collect(),
     )
     .ok_or_else(|| "State is not a valid image".into())

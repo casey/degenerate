@@ -129,8 +129,8 @@ fn save() -> Result<()> {
   )?;
 
   let image = image::open("output.png")?.as_rgb8().unwrap().to_owned();
-  assert_eq!(image.width(), 2);
-  assert_eq!(image.height(), 1);
+  assert_eq!(image.width(), 1);
+  assert_eq!(image.height(), 2);
   assert_eq!(image.to_vec(), &[255, 255, 255, 0, 0, 0]);
 
   Ok(())
