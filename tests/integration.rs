@@ -4,6 +4,7 @@ use {
   std::{
     fs,
     io::prelude::*,
+    iter,
     process::{Command, Stdio},
     str,
   },
@@ -122,20 +123,20 @@ fn invert() -> Result<()> {
 
 #[test]
 fn save() -> Result<()> {
-  let path = "output.png";
-
   assert_output_eq(
-    &["resize:4:4", &format!("save:{}", path), "top"],
+    &["resize:4:2", "save:output.png", "top"],
     "1111
-     1111
-     0000
      0000",
   )?;
 
-  let image = image::open(path)?;
-  for pixel in image.as_rgb8().unwrap().pixels() {
-    assert_eq!(*pixel, image::Rgb::<u8>([0, 0, 0]));
-  }
+  let image = image::open("output.png")?;
+  let image = image.as_rgb8().unwrap();
+
+  assert_eq!(image.width(), 2);
+  assert_eq!(image.height(), 4);
+
+  let pixels = image.to_vec();
+  assert_eq!(pixels, iter::repeat(0).take(4 * 3 * 2).collect::<Vec<u8>>());
 
   Ok(())
 }
