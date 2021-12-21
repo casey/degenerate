@@ -4,7 +4,6 @@ use {
   std::{
     fs,
     io::prelude::*,
-    iter,
     process::{Command, Stdio},
     str,
   },
