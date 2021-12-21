@@ -3,7 +3,7 @@ use {
   image::{ImageBuffer, RgbImage},
   nalgebra::{DMatrix, Vector2, Vector3},
   std::{
-    fs::{File},
+    fs::File,
     io::{self, BufRead, BufReader, BufWriter, Write},
     path::{Path, PathBuf},
     str::FromStr,
