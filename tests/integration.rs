@@ -124,19 +124,17 @@ fn invert() -> Result<()> {
 #[test]
 fn save() -> Result<()> {
   assert_output_eq(
-    &["resize:4:2", "save:output.png", "top"],
-    "1111
-     0000",
+    &["resize:1:2", "top", "save:output.png"],
+    "1
+     0",
   )?;
 
   let image = image::open("output.png")?;
   let image = image.as_rgb8().unwrap();
 
   assert_eq!(image.width(), 2);
-  assert_eq!(image.height(), 4);
-
-  let pixels = image.to_vec();
-  assert_eq!(pixels, iter::repeat(0).take(4 * 3 * 2).collect::<Vec<u8>>());
+  assert_eq!(image.height(), 1);
+  assert_eq!(image.to_vec(), &[255, 255, 255, 0, 0, 0]);
 
   Ok(())
 }
