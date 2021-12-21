@@ -5,7 +5,7 @@ use {
   std::{
     fs::File,
     io::{self, BufRead, BufReader, BufWriter, Write},
-    path::PathBuf,
+    path::{Path, PathBuf},
     str::FromStr,
   },
   structopt::StructOpt,
