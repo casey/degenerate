@@ -6,7 +6,7 @@ pub(crate) enum Filter {
   Mod { divisor: usize, remainder: usize },
   Repl,
   Resize { rows: usize, cols: usize },
-  Rows { limit: usize, step: usize },
+  Rows { nrows: usize, step: usize },
   Square,
   Top,
 }
@@ -65,10 +65,11 @@ impl Filter {
             }
           })
       }
-      Self::Rows { limit, step } => {
+      Self::Rows { nrows, step } => {
+        let height = state.dimensions().y;
         state
           .matrix()
-          .rows_with_step_mut(0, *limit, *step)
+          .rows_with_step_mut(0, *nrows.min(&(height / (step + 1))), *step)
           .iter_mut()
           .for_each(|row| {
             row.iter_mut().for_each(|scalar| *scalar = !*scalar);
@@ -124,8 +125,8 @@ impl FromStr for Filter {
         cols: cols.parse()?,
         rows: rows.parse()?,
       }),
-      ["rows", limit, step] => Ok(Self::Rows {
-        limit: limit.parse()?,
+      ["rows", nrows, step] => Ok(Self::Rows {
+        nrows: nrows.parse()?,
         step: step.parse()?,
       }),
       ["square"] => Ok(Self::Square),

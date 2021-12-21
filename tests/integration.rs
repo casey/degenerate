@@ -121,6 +121,17 @@ fn rows() -> Result<()> {
 }
 
 #[test]
+fn rows_invalid_number_of_rows() -> Result<()> {
+  assert_output_eq(
+    &["resize:4:4", "rows:3:1"],
+    "1111
+     0000
+     1111
+     0000",
+  )
+}
+
+#[test]
 fn square() -> Result<()> {
   assert_output_eq(
     &["resize:4:4", "square"],
