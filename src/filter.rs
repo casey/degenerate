@@ -7,6 +7,7 @@ pub(crate) enum Filter {
   Mod { divisor: usize, remainder: usize },
   Repl,
   Resize { rows: usize, cols: usize },
+  Save { path: PathBuf },
   Square,
   Top,
 }
@@ -75,6 +76,7 @@ impl Filter {
             }
           })
       }
+      Self::Save { path } => state.image()?.save(path)?,
       Self::Square => {
         let dimensions = state.dimensions();
         let (x1, y1) = (dimensions.x as f32 / 4.0, dimensions.y as f32 / 4.0);
@@ -114,19 +116,22 @@ impl FromStr for Filter {
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     match s.split(':').collect::<Vec<&str>>().as_slice() {
-      ["repl"] => Ok(Self::Repl),
-      ["circle"] => Ok(Self::Circle),
-      ["square"] => Ok(Self::Square),
-      ["even"] => Ok(Self::Even),
-      ["resize", cols, rows] => Ok(Self::Resize {
-        cols: cols.parse()?,
-        rows: rows.parse()?,
-      }),
       ["all"] => Ok(Self::All),
+      ["circle"] => Ok(Self::Circle),
+      ["even"] => Ok(Self::Even),
       ["mod", divisor, remainder] => Ok(Self::Mod {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
       }),
+      ["repl"] => Ok(Self::Repl),
+      ["resize", cols, rows] => Ok(Self::Resize {
+        cols: cols.parse()?,
+        rows: rows.parse()?,
+      }),
+      ["save", path] => Ok(Self::Save {
+        path: path.parse()?,
+      }),
+      ["square"] => Ok(Self::Square),
       ["top"] => Ok(Self::Top),
       _ => Err(format!("Invalid filter: {}", s).into()),
     }
