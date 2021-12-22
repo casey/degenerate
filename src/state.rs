@@ -1,13 +1,21 @@
-use {super::*, num_traits::identities::Zero};
+use {
+  super::*,
+  num_traits::identities::Zero,
+  rand::{rngs::StdRng, SeedableRng},
+};
 
 pub(crate) struct State {
   pub(crate) matrix: DMatrix<Vector3<u8>>,
+  pub(crate) operation: Operation,
+  pub(crate) rng: StdRng,
 }
 
 impl State {
   pub(crate) fn new() -> Self {
     Self {
       matrix: DMatrix::zeros(0, 0),
+      operation: Operation::Invert,
+      rng: StdRng::seed_from_u64(0),
     }
   }
 
@@ -33,11 +41,7 @@ impl State {
 
     for row in self.matrix.row_iter() {
       for element in &row {
-        if element.is_zero() {
-          write!(w, "0")?;
-        } else {
-          write!(w, "1")?;
-        }
+        write!(w, "{:X}", element.map(|scalar| scalar as u32).sum() / 48)?;
       }
       writeln!(w)?;
     }

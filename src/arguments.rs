@@ -2,7 +2,7 @@ use super::*;
 
 #[derive(StructOpt)]
 pub(crate) struct Arguments {
-  pub(crate) filters: Vec<Filter>,
+  pub(crate) commands: Vec<Command>,
   #[structopt(long)]
   pub(crate) output: Option<PathBuf>,
 }
@@ -12,17 +12,17 @@ impl Arguments {
     let mut state = State::new();
 
     if self.output.is_some() {
-      Filter::Resize {
+      Command::Resize {
         rows: 4096,
         cols: 4096,
       }
       .apply(&mut state)?;
     } else {
-      Filter::Resize { rows: 20, cols: 80 }.apply(&mut state)?;
+      Command::Resize { rows: 20, cols: 80 }.apply(&mut state)?;
     }
 
-    for filter in self.filters {
-      filter.apply(&mut state)?;
+    for command in self.commands {
+      command.apply(&mut state)?;
     }
 
     if let Some(path) = self.output {

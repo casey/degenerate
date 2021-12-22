@@ -5,14 +5,12 @@ pub(crate) enum Filter {
   Circle,
   Even,
   Mod { divisor: usize, remainder: usize },
-  Repl,
-  Resize { rows: usize, cols: usize },
   Square,
   Top,
 }
 
 impl Filter {
-  fn filter(&self, state: &State, col: usize, row: usize) -> bool {
+  pub(crate) fn filter(&self, state: &State, col: usize, row: usize) -> bool {
     match self {
       Self::Circle => {
         let width = state.matrix.ncols() as f32;
@@ -38,71 +36,6 @@ impl Filter {
         let (row, col) = (row as f32, col as f32);
         col >= x1 && col < x2 && row >= y1 && row < y2
       }
-      _ => todo!(),
-    }
-  }
-
-  pub(crate) fn apply_filter(&self, state: &mut State) {
-    for col in 0..state.matrix.ncols() {
-      for row in 0..state.matrix.nrows() {
-        if self.filter(state, col, row) {
-          state.matrix[(row, col)] = state.matrix[(row, col)].map(|scalar| !scalar);
-        }
-      }
-    }
-  }
-
-  pub(crate) fn apply(&self, state: &mut State) -> Result<()> {
-    match self {
-      Self::Circle => self.apply_filter(state),
-      Self::Even => self.apply_filter(state),
-      Self::All => self.apply_filter(state),
-      Self::Mod { .. } => self.apply_filter(state),
-      Self::Top => self.apply_filter(state),
-      Self::Square => self.apply_filter(state),
-      Self::Resize { rows, cols } => {
-        state.resize(Vector2::new(*rows, *cols));
-      }
-      Self::Repl => {
-        for result in BufReader::new(io::stdin()).lines() {
-          let line = result?;
-          match line.trim().parse::<Filter>() {
-            Ok(filter) => {
-              filter.apply(state)?;
-              state.write(io::stderr())?;
-            }
-            Err(err) => {
-              eprintln!("Could not parse filter from `{}`: {}", line, err);
-            }
-          }
-        }
-      }
-    }
-
-    Ok(())
-  }
-}
-
-impl FromStr for Filter {
-  type Err = Error;
-
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    match s.split(':').collect::<Vec<&str>>().as_slice() {
-      ["repl"] => Ok(Self::Repl),
-      ["circle"] => Ok(Self::Circle),
-      ["square"] => Ok(Self::Square),
-      ["even"] => Ok(Self::Even),
-      ["resize", cols, rows] => Ok(Self::Resize {
-        cols: cols.parse()?,
-        rows: rows.parse()?,
-      }),
-      ["all"] => Ok(Self::All),
-      ["mod", divisor, remainder] => Ok(Self::Mod {
-        divisor: divisor.parse()?,
-        remainder: remainder.parse()?,
-      }),
-      ["top"] => Ok(Self::Top),
-      _ => Err(format!("Invalid filter: {}", s).into()),
     }
   }
 }
