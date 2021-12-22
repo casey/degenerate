@@ -26,7 +26,9 @@ fn assert_output_eq(args: &[&str], expected_bitmap: &str) -> Result<()> {
   );
 
   let mut expected_bitmap = expected_bitmap.replace(" ", "");
-  expected_bitmap.push('\n');
+  if !expected_bitmap.is_empty() {
+    expected_bitmap.push('\n');
+  }
 
   assert_eq!(str::from_utf8(&output.stdout)?, expected_bitmap);
 
@@ -36,7 +38,7 @@ fn assert_output_eq(args: &[&str], expected_bitmap: &str) -> Result<()> {
 #[test]
 fn circle() -> Result<()> {
   assert_output_eq(
-    &["resize:10:10", "circle"],
+    &["resize:10:10", "circle", "print"],
     "000FFFF000
      0FFFFFFFF0
      0FFFFFFFF0
@@ -53,7 +55,7 @@ fn circle() -> Result<()> {
 #[test]
 fn even() -> Result<()> {
   assert_output_eq(
-    &["resize:4:4", "even"],
+    &["resize:4:4", "even", "print"],
     "FFFF
      0000
      FFFF
@@ -64,7 +66,7 @@ fn even() -> Result<()> {
 #[test]
 fn top() -> Result<()> {
   assert_output_eq(
-    &["resize:2:2", "top"],
+    &["resize:2:2", "top", "print"],
     "FF
      00",
   )
@@ -93,7 +95,7 @@ fn repl_valid_filter() -> Result<()> {
 #[test]
 fn repl_invalid_filter() -> Result<()> {
   let mut command = Command::new(executable_path("degenerate"))
-    .args(["resize:4:4", "repl"])
+    .args(["resize:4:4", "repl", "print"])
     .stdin(Stdio::piped())
     .stdout(Stdio::piped())
     .stderr(Stdio::piped())
@@ -112,18 +114,18 @@ fn repl_invalid_filter() -> Result<()> {
 
 #[test]
 fn resize() -> Result<()> {
-  assert_output_eq(&["resize:2:1"], "00")
+  assert_output_eq(&["resize:2:1", "print"], "00")
 }
 
 #[test]
 fn invert() -> Result<()> {
-  assert_output_eq(&["resize:1:1", "all"], "F")
+  assert_output_eq(&["resize:1:1", "all", "print"], "F")
 }
 
 #[test]
 fn save() -> Result<()> {
   assert_output_eq(
-    &["resize:1:2", "top", "save:output.png"],
+    &["resize:1:2", "top", "save:output.png", "print"],
     "F
      0",
   )?;
@@ -150,7 +152,7 @@ fn save_invalid_format() -> Result<()> {
 #[test]
 fn square() -> Result<()> {
   assert_output_eq(
-    &["resize:4:4", "square"],
+    &["resize:4:4", "square", "print"],
     "0000
      0FF0
      0FF0
@@ -161,7 +163,7 @@ fn square() -> Result<()> {
 #[test]
 fn modulus() -> Result<()> {
   assert_output_eq(
-    &["resize:4:2", "mod:2:0"],
+    &["resize:4:2", "mod:2:0", "print"],
     "FFFF
      0000",
   )
@@ -169,29 +171,7 @@ fn modulus() -> Result<()> {
 
 #[test]
 fn default_bitmap_size() -> Result<()> {
-  assert_output_eq(
-    &[],
-    "00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000
-     00000000000000000000000000000000000000000000000000000000000000000000000000000000",
-  )
+  assert_output_eq(&["print"], "")
 }
 
 #[ignore]
@@ -222,7 +202,7 @@ fn default_image_size() -> Result<()> {
 #[test]
 fn random() -> Result<()> {
   assert_output_eq(
-    &["resize:4:2", "random", "all"],
+    &["resize:4:2", "random", "all", "print"],
     "8569
      3275",
   )
@@ -231,7 +211,7 @@ fn random() -> Result<()> {
 #[test]
 fn reset_filter() -> Result<()> {
   assert_output_eq(
-    &["resize:4:2", "random", "all", "invert", "all"],
+    &["resize:4:2", "random", "all", "invert", "all", "print"],
     "7A96
      CD8A",
   )

@@ -6,9 +6,8 @@ use {
   nalgebra::{DMatrix, Vector2, Vector3},
   rand::Rng,
   std::{
-    fs::File,
     io::{self, BufRead, BufReader, BufWriter, Write},
-    path::{Path, PathBuf},
+    path::PathBuf,
     str::FromStr,
   },
   structopt::StructOpt,
