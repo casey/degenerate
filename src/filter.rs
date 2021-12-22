@@ -66,9 +66,7 @@ impl Filter {
           .iter_mut()
           .for_each(|pixel| pixel.iter_mut().for_each(|scalar| *scalar = !*scalar));
       }
-      Self::Load { path } => {
-        state.load(path)?;
-      }
+      Self::Load { path } => state.load(path)?,
       Self::Mod { divisor, remainder } => {
         state
           .matrix()
@@ -123,6 +121,9 @@ impl FromStr for Filter {
       ["all"] => Ok(Self::All),
       ["circle"] => Ok(Self::Circle),
       ["even"] => Ok(Self::Even),
+      ["load", path] => Ok(Self::Load {
+        path: path.parse()?,
+      }),
       ["mod", divisor, remainder] => Ok(Self::Mod {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,

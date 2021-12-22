@@ -159,34 +159,11 @@ fn square() -> Result<()> {
 }
 
 #[test]
-fn load_image_greater_width() -> Result<()> {
+fn load() -> Result<()> {
   assert_output_eq(
-    &["resize:3:4", "save:output.png", "top", "load:output.png"],
-    "0000
-     0000
-     0000",
-  )
-}
-
-#[test]
-fn load_image_greater_height() -> Result<()> {
-  assert_output_eq(
-    &["resize:4:3", "save:output.png", "top", "load:output.png"],
-    "000
-     000
-     000
-     000",
-  )
-}
-
-#[test]
-fn load_image_square() -> Result<()> {
-  assert_output_eq(
-    &["resize:4:4", "save:output.png", "top", "load:output.png"],
-    "0000
-     0000
-     0000
-     0000",
+    &["resize:1:2", "save:output.png", "top", "load:output.png"],
+    "0
+     0",
   )
 }
 

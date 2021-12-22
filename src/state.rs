@@ -69,7 +69,7 @@ impl State {
 
     Ok(())
   }
-  
+
   pub(crate) fn save(&self, path: &Path) -> Result<()> {
     match path.extension() {
       Some(ext) if ext == "txt" => self.write(File::create(path)?),
