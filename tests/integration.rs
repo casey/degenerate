@@ -122,19 +122,27 @@ fn invert() -> Result<()> {
 
 #[test]
 fn save() -> Result<()> {
-  let path = "output.txt";
-
   assert_output_eq(
-    &["resize:4:4", &format!("save:{}", path), "top"],
-    "1111
-     1111
-     0000
-     0000",
+    &["resize:1:2", "top", "save:output.png"],
+    "1
+     0",
   )?;
 
-  for line in fs::read_to_string(path)?.lines() {
-    assert_eq!(line, "0000");
-  }
+  let image = image::open("output.png")?.as_rgb8().unwrap().to_owned();
+  assert_eq!(image.width(), 1);
+  assert_eq!(image.height(), 2);
+  assert_eq!(image.to_vec(), &[255, 255, 255, 0, 0, 0]);
+
+  Ok(())
+}
+
+#[test]
+fn save_invalid_format() -> Result<()> {
+  let output = Command::new(executable_path("degenerate"))
+    .args(["resize:4:4", "top", "save:output.txt"])
+    .output()?;
+
+  assert!(!output.status.success());
 
   Ok(())
 }

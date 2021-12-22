@@ -80,9 +80,7 @@ impl Filter {
             }
           })
       }
-      Self::Save { path } => {
-        state.save(path)?;
-      }
+      Self::Save { path } => state.image()?.save(path)?,
       Self::Square => {
         let dimensions = state.dimensions();
         let (x1, y1) = (dimensions.x as f32 / 4.0, dimensions.y as f32 / 4.0);
@@ -125,9 +123,6 @@ impl FromStr for Filter {
       ["all"] => Ok(Self::All),
       ["circle"] => Ok(Self::Circle),
       ["even"] => Ok(Self::Even),
-      ["load", path] => Ok(Self::Load {
-        path: path.parse()?,
-      }),
       ["mod", divisor, remainder] => Ok(Self::Mod {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
