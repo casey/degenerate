@@ -3,6 +3,7 @@ use super::*;
 pub(crate) enum Command {
   Filter(Filter),
   Operation(Operation),
+  Print,
   Repl,
   Resize { rows: usize, cols: usize },
   Save { path: PathBuf },
@@ -21,13 +22,14 @@ impl Command {
         }
       }
       Self::Operation(operation) => state.operation = *operation,
+      Self::Print => state.print()?,
       Self::Repl => {
         for result in BufReader::new(io::stdin()).lines() {
           let line = result?;
           match line.trim().parse::<Command>() {
             Ok(command) => {
               command.apply(state)?;
-              state.write(io::stderr())?;
+              state.print()?;
             }
             Err(err) => {
               eprintln!("Could not parse command from `{}`: {}", line, err);
@@ -58,6 +60,7 @@ impl FromStr for Command {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
       })),
+      ["print"] => Ok(Self::Print),
       ["random"] => Ok(Self::Operation(Operation::Random)),
       ["repl"] => Ok(Self::Repl),
       ["resize", cols, rows] => Ok(Self::Resize {

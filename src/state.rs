@@ -2,6 +2,7 @@ use {
   super::*,
   num_traits::identities::Zero,
   rand::{rngs::StdRng, SeedableRng},
+  std::env,
 };
 
 pub(crate) struct State {
@@ -11,6 +12,21 @@ pub(crate) struct State {
 }
 
 impl State {
+  pub(crate) fn run() -> Result<()> {
+    let commands = env::args()
+      .skip(1)
+      .map(|arg| arg.parse())
+      .collect::<Result<Vec<Command>>>()?;
+
+    let mut state = Self::new();
+
+    for command in commands {
+      command.apply(&mut state)?;
+    }
+
+    Ok(())
+  }
+
   pub(crate) fn new() -> Self {
     Self {
       matrix: DMatrix::zeros(0, 0),
@@ -36,12 +52,16 @@ impl State {
     .ok_or_else(|| "State is not a valid image".into())
   }
 
-  pub(crate) fn write(&self, w: impl Write) -> Result<()> {
-    let mut w = BufWriter::new(w);
+  pub(crate) fn print(&self) -> Result<()> {
+    let mut w = BufWriter::new(io::stdout());
 
     for row in self.matrix.row_iter() {
       for element in &row {
-        write!(w, "{:X}", element.map(|scalar| scalar as u32).sum() / 48)?;
+        write!(
+          w,
+          "{:X}",
+          element.map(|scalar| scalar as u32).sum() / (16 * 3)
+        )?;
       }
       writeln!(w)?;
     }
@@ -49,12 +69,5 @@ impl State {
     w.flush()?;
 
     Ok(())
-  }
-
-  pub(crate) fn save(&self, path: &Path) -> Result<()> {
-    match path.extension() {
-      Some(ext) if ext == "txt" => self.write(File::create(path)?),
-      _ => Ok(self.image()?.save(path)?),
-    }
   }
 }

@@ -10,7 +10,6 @@ image = "0.23.14"
 nalgebra = "0.29.0"
 num-traits = "0.2.14"
 rand = "0.8.4"
-structopt = "0.3.25"
 
 [dev-dependencies]
 executable-path = "1.0.0"
