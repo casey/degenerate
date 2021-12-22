@@ -41,7 +41,11 @@ impl State {
 
     for row in self.matrix.row_iter() {
       for element in &row {
-        write!(w, "{:X}", element.map(|scalar| scalar as u32).sum() / 48)?;
+        write!(
+          w,
+          "{:X}",
+          element.map(|scalar| scalar as u32).sum() / (16 * 3)
+        )?;
       }
       writeln!(w)?;
     }
