@@ -19,10 +19,6 @@ impl State {
     Vector2::new(self.matrix.ncols(), self.matrix.nrows())
   }
 
-  pub fn matrix(&mut self) -> &mut DMatrix<Vector3<u8>> {
-    &mut self.matrix
-  }
-
   pub(crate) fn image(&self) -> Result<RgbImage> {
     ImageBuffer::from_raw(
       self.matrix.nrows().try_into()?,
