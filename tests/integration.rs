@@ -37,16 +37,16 @@ fn assert_output_eq(args: &[&str], expected_bitmap: &str) -> Result<()> {
 fn circle() -> Result<()> {
   assert_output_eq(
     &["resize:10:10", "circle"],
-    "0001111000
-     0111111110
-     0111111110
-     1111111111
-     1111111111
-     1111111111
-     1111111111
-     0111111110
-     0111111110
-     0001111000",
+    "000FFFF000
+     0FFFFFFFF0
+     0FFFFFFFF0
+     FFFFFFFFFF
+     FFFFFFFFFF
+     FFFFFFFFFF
+     FFFFFFFFFF
+     0FFFFFFFF0
+     0FFFFFFFF0
+     000FFFF000",
   )
 }
 
@@ -54,9 +54,9 @@ fn circle() -> Result<()> {
 fn even() -> Result<()> {
   assert_output_eq(
     &["resize:4:4", "even"],
-    "1111
+    "FFFF
      0000
-     1111
+     FFFF
      0000",
   )
 }
@@ -65,7 +65,7 @@ fn even() -> Result<()> {
 fn top() -> Result<()> {
   assert_output_eq(
     &["resize:2:2", "top"],
-    "11
+    "FF
      00",
   )
 }
@@ -84,7 +84,7 @@ fn repl_valid_filter() -> Result<()> {
 
   assert_eq!(
     str::from_utf8(&command.wait_with_output()?.stdout)?,
-    "1111\n0000\n1111\n0000\n"
+    "FFFF\n0000\nFFFF\n0000\n"
   );
 
   Ok(())
@@ -117,14 +117,14 @@ fn resize() -> Result<()> {
 
 #[test]
 fn invert() -> Result<()> {
-  assert_output_eq(&["resize:1:1", "all"], "1")
+  assert_output_eq(&["resize:1:1", "all"], "F")
 }
 
 #[test]
 fn save() -> Result<()> {
   assert_output_eq(
     &["resize:1:2", "top", "save:output.png"],
-    "1
+    "F
      0",
   )?;
 
@@ -152,8 +152,8 @@ fn square() -> Result<()> {
   assert_output_eq(
     &["resize:4:4", "square"],
     "0000
-     0110
-     0110
+     0FF0
+     0FF0
      0000",
   )
 }
@@ -171,7 +171,7 @@ fn load() -> Result<()> {
 fn modulus() -> Result<()> {
   assert_output_eq(
     &["resize:4:2", "mod:2:0"],
-    "1111
+    "FFFF
      0000",
   )
 }
@@ -226,4 +226,22 @@ fn default_image_size() -> Result<()> {
   }
 
   Ok(())
+}
+
+#[test]
+fn random() -> Result<()> {
+  assert_output_eq(
+    &["resize:4:2", "random", "all"],
+    "8569
+     3275",
+  )
+}
+
+#[test]
+fn reset_filter() -> Result<()> {
+  assert_output_eq(
+    &["resize:4:2", "random", "all", "invert", "all"],
+    "7A96
+     CD8A",
+  )
 }
