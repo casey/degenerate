@@ -3,9 +3,9 @@ use super::*;
 pub(crate) enum Command {
   Filter(Filter),
   Operation(Operation),
+  Print,
   Repl,
   Resize { rows: usize, cols: usize },
-  Print,
   Save { path: PathBuf },
 }
 
