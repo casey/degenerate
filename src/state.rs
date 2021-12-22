@@ -1,7 +1,7 @@
 use {super::*, num_traits::identities::Zero};
 
 pub(crate) struct State {
-  matrix: DMatrix<Vector3<u8>>,
+  pub(crate) matrix: DMatrix<Vector3<u8>>,
 }
 
 impl State {

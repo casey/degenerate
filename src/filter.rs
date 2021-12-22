@@ -12,35 +12,36 @@ pub(crate) enum Filter {
 }
 
 impl Filter {
-  pub(crate) fn apply(&self, state: &mut State) -> Result<()> {
+  fn filter(&self, state: &State, col: usize, row: usize) -> bool {
     match self {
       Self::Circle => {
-        let (width, height) = (state.dimensions().x as f32, state.dimensions().y as f32);
-        state
-          .matrix()
-          .row_iter_mut()
-          .enumerate()
-          .for_each(|(row, mut line)| {
-            line.iter_mut().enumerate().for_each(|(col, pixel)| {
-              let (row, col) = (row as f32 + 0.5, col as f32 + 0.5);
-              if (col - (width / 2.0)).powf(2.0) + (row - (height / 2.0)).powf(2.0)
-                <= (width / 2.0).powf(2.0)
-              {
-                pixel.iter_mut().for_each(|scalar| *scalar = !*scalar);
-              }
-            })
-          });
+        let width = state.matrix.ncols() as f32;
+        let height = state.matrix.nrows() as f32;
+        let col = col as f32 + 0.5;
+        let row = row as f32 + 0.5;
+        (col - (width / 2.0)).powf(2.0) + (row - (height / 2.0)).powf(2.0)
+          <= (width / 2.0).powf(2.0)
       }
-      Self::Even => {
-        let height = state.dimensions().y;
-        state
-          .matrix()
-          .rows_with_step_mut(0, height / 2, 1)
-          .iter_mut()
-          .for_each(|row| {
-            row.iter_mut().for_each(|scalar| *scalar = !*scalar);
-          });
+      Self::Even => row % 2 == 0,
+      _ => todo!(),
+    }
+  }
+
+  pub(crate) fn apply_filter(&self, state: &mut State) {
+    for col in 0..state.matrix.ncols() {
+      for row in 0..state.matrix.nrows() {
+        if self.filter(state, col, row) {
+          state.matrix[(row, col)] = state.matrix[(row, col)].map(|scalar| !scalar);
+        }
       }
+    }
+  }
+
+  pub(crate) fn apply(&self, state: &mut State) -> Result<()> {
+    match self {
+      Self::Circle => self.apply_filter(state),
+      Self::Even => self.apply_filter(state),
+
       Self::Resize { rows, cols } => {
         state.resize(Vector2::new(*rows, *cols));
       }
