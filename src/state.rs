@@ -2,6 +2,7 @@ use {
   super::*,
   num_traits::identities::Zero,
   rand::{rngs::StdRng, SeedableRng},
+  std::env,
 };
 
 pub(crate) struct State {
@@ -11,6 +12,21 @@ pub(crate) struct State {
 }
 
 impl State {
+  pub(crate) fn run() -> Result<()> {
+    let commands = env::args()
+      .skip(1)
+      .map(|arg| arg.parse())
+      .collect::<Result<Vec<Command>>>()?;
+
+    let mut state = Self::new();
+
+    for command in commands {
+      command.apply(&mut state)?;
+    }
+
+    Ok(())
+  }
+
   pub(crate) fn new() -> Self {
     Self {
       matrix: DMatrix::zeros(0, 0),

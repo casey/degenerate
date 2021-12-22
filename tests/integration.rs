@@ -2,7 +2,6 @@ use {
   executable_path::executable_path,
   pretty_assertions::assert_eq,
   std::{
-    fs,
     io::prelude::*,
     process::{Command, Stdio},
     str,
@@ -172,31 +171,6 @@ fn modulus() -> Result<()> {
 #[test]
 fn default_bitmap_size() -> Result<()> {
   assert_output_eq("print", "")
-}
-
-#[ignore]
-#[test]
-fn default_image_size() -> Result<()> {
-  let output = Command::new(executable_path("degenerate"))
-    .arg("--output=output.txt")
-    .output()?;
-
-  assert!(
-    output.status.success(),
-    "Command failed: {}",
-    str::from_utf8(&output.stderr)?
-  );
-
-  let content = fs::read_to_string("output.txt")?;
-  let lines = content.lines();
-
-  assert_eq!(lines.clone().count(), 4096);
-
-  for line in lines {
-    assert_eq!(line.len(), 4096);
-  }
-
-  Ok(())
 }
 
 #[test]
