@@ -51,6 +51,7 @@ impl FromStr for Command {
       ["all"] => Ok(Self::Filter(Filter::All)),
       ["circle"] => Ok(Self::Filter(Filter::Circle)),
       ["even"] => Ok(Self::Filter(Filter::Even)),
+      ["invert"] => Ok(Self::Operation(Operation::Invert)),
       ["mod", divisor, remainder] => Ok(Self::Filter(Filter::Mod {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,

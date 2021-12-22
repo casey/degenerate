@@ -200,3 +200,12 @@ fn random() -> Result<()> {
      3275",
   )
 }
+
+#[test]
+fn reset_filter() -> Result<()> {
+  assert_output_eq(
+    &["resize:4:2", "random", "all", "invert", "all"],
+    "7A96
+     CD8A",
+  )
+}
