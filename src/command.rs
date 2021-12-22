@@ -3,6 +3,7 @@ use super::*;
 pub(crate) enum Command {
   Filter(Filter),
   Operation(Operation),
+  Load { path: PathBuf },
   Repl,
   Resize { rows: usize, cols: usize },
   Save { path: PathBuf },
@@ -21,6 +22,7 @@ impl Command {
         }
       }
       Self::Operation(operation) => state.operation = *operation,
+      Self::Load { path } => state.load(path)?,
       Self::Repl => {
         for result in BufReader::new(io::stdin()).lines() {
           let line = result?;
@@ -54,6 +56,9 @@ impl FromStr for Command {
       ["circle"] => Ok(Self::Filter(Filter::Circle)),
       ["even"] => Ok(Self::Filter(Filter::Even)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
+      ["load", path] => Ok(Self::Load {
+        path: path.parse()?,
+      }),
       ["mod", divisor, remainder] => Ok(Self::Filter(Filter::Mod {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
