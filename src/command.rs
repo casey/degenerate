@@ -4,6 +4,7 @@ pub(crate) enum Command {
   Filter(Filter),
   Operation(Operation),
   Resize { rows: usize, cols: usize },
+  Save { path: PathBuf },
   Repl,
 }
 
@@ -37,6 +38,7 @@ impl Command {
       Self::Resize { rows, cols } => {
         state.resize(Vector2::new(*rows, *cols));
       }
+      Self::Save { path } => state.image()?.save(path)?,
     }
 
     Ok(())
@@ -61,6 +63,9 @@ impl FromStr for Command {
       ["resize", cols, rows] => Ok(Self::Resize {
         cols: cols.parse()?,
         rows: rows.parse()?,
+      }),
+      ["save", path] => Ok(Self::Save {
+        path: path.parse()?,
       }),
       ["square"] => Ok(Self::Filter(Filter::Square)),
       ["top"] => Ok(Self::Filter(Filter::Top)),

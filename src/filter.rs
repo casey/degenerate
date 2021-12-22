@@ -12,6 +12,7 @@ pub(crate) enum Filter {
 impl Filter {
   pub(crate) fn filter(&self, state: &State, col: usize, row: usize) -> bool {
     match self {
+      Self::All => true,
       Self::Circle => {
         let width = state.matrix.ncols() as f32;
         let height = state.matrix.nrows() as f32;
@@ -21,11 +22,9 @@ impl Filter {
           <= (width / 2.0).powf(2.0)
       }
       Self::Even => row % 2 == 0,
-      Self::All => true,
       Self::Mod { divisor, remainder } => {
         (col * state.matrix.nrows() + row) % divisor == *remainder
       }
-      Self::Top => row < state.matrix.nrows() / 2,
       Self::Square => {
         let dimensions = state.dimensions();
         let (x1, y1) = (dimensions.x as f32 / 4.0, dimensions.y as f32 / 4.0);
@@ -36,6 +35,7 @@ impl Filter {
         let (row, col) = (row as f32, col as f32);
         col >= x1 && col < x2 && row >= y1 && row < y2
       }
+      Self::Top => row < state.matrix.nrows() / 2,
     }
   }
 }

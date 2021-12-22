@@ -29,8 +29,8 @@ impl State {
 
   pub(crate) fn image(&self) -> Result<RgbImage> {
     ImageBuffer::from_raw(
-      self.matrix.nrows().try_into()?,
       self.matrix.ncols().try_into()?,
+      self.matrix.nrows().try_into()?,
       self.matrix.transpose().iter().flatten().cloned().collect(),
     )
     .ok_or_else(|| "State is not a valid image".into())
@@ -51,7 +51,7 @@ impl State {
     Ok(())
   }
 
-  pub(crate) fn save(&self, path: PathBuf) -> Result<()> {
+  pub(crate) fn save(&self, path: &Path) -> Result<()> {
     match path.extension() {
       Some(ext) if ext == "txt" => self.write(File::create(path)?),
       _ => Ok(self.image()?.save(path)?),
