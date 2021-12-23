@@ -6,12 +6,12 @@ edition = "2021"
 license = "CC0-1.0"
 
 [dependencies]
+dirs = "4.0.0"
 image = "0.23.14"
 nalgebra = "0.29.0"
 num-traits = "0.2.14"
 rand = "0.8.4"
 rustyline = "9.1.1"
-shellexpand = "2.1.0"
 tempfile = "3.2.0"
 unindent = "0.1.7"
 

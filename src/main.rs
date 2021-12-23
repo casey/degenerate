@@ -1,10 +1,10 @@
 use {
   crate::{command::Command, filter::Filter, operation::Operation, state::State},
+  dirs::home_dir,
   image::{ImageBuffer, RgbImage},
   nalgebra::{DMatrix, Vector3},
   rand::Rng,
   rustyline::Editor,
-  shellexpand::tilde,
   std::{
     io::{self, BufWriter, Write},
     path::{Path, PathBuf},

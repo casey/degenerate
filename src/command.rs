@@ -54,16 +54,13 @@ impl Command {
       Self::Operation(operation) => state.operation = *operation,
       Self::Print => state.print()?,
       Self::Repl => {
-        let history = tilde("~/.degenerate_history").to_string();
+        let history = home_dir().unwrap_or_default().join(".degenerate_history");
 
-        let mut rl = Editor::<()>::new();
+        let mut editor = Editor::<()>::new();
+        editor.load_history(&history).ok();
 
-        if rl.load_history(&history).is_err() {
-          eprintln!("Created history file in: {}", history);
-        }
-
-        while let Ok(line) = rl.readline(">> ") {
-          rl.add_history_entry(line.as_str());
+        while let Ok(line) = editor.readline("> ") {
+          editor.add_history_entry(line.as_str());
           match line.parse::<Self>() {
             Ok(command) => {
               command.apply(state)?;
@@ -75,7 +72,7 @@ impl Command {
           }
         }
 
-        rl.save_history(&history)?;
+        editor.save_history(&history)?;
       }
       Self::Resize(dimensions) => {
         state.resize(*dimensions);
