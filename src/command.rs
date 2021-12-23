@@ -58,26 +58,19 @@ impl Command {
 
         let mut rl = Editor::<()>::new();
 
-        if let Err(_) = rl.load_history(&history) {
+        if rl.load_history(&history).is_err() {
           println!("Created history file in: {}", history);
         }
 
-        loop {
-          match rl.readline(">> ") {
-            Ok(line) => {
-              rl.add_history_entry(line.as_str());
-              match line.parse::<Self>() {
-                Ok(command) => {
-                  command.apply(state)?;
-                  state.print()?;
-                }
-                Err(err) => {
-                  eprintln!("Could not parse command from `{}`: {}", line, err);
-                }
-              }
+        while let Ok(line) = rl.readline(">> ") {
+          rl.add_history_entry(line.as_str());
+          match line.parse::<Self>() {
+            Ok(command) => {
+              command.apply(state)?;
+              state.print()?;
             }
-            Err(_) => {
-              break;
+            Err(err) => {
+              eprintln!("Could not parse command from `{}`: {}", line, err);
             }
           }
         }
