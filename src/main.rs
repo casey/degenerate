@@ -1,11 +1,12 @@
 use {
   crate::{command::Command, filter::Filter, operation::Operation, state::State},
   image::{ImageBuffer, RgbImage},
-  nalgebra::{DMatrix, Vector2, Vector3},
+  nalgebra::{DMatrix, Vector3},
   rand::Rng,
   std::{
     io::{self, BufRead, BufReader, BufWriter, Write},
     path::PathBuf,
+    process,
     str::FromStr,
   },
 };
@@ -18,6 +19,9 @@ mod state;
 type Error = Box<dyn std::error::Error>;
 type Result<T, E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
-fn main() -> Result<()> {
-  State::run()
+fn main() {
+  if let Err(error) = State::run() {
+    eprintln!("error: {}", error);
+    process::exit(1);
+  }
 }
