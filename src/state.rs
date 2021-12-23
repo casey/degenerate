@@ -52,20 +52,22 @@ impl State {
   }
 
   pub(crate) fn load(&mut self, path: &Path) -> Result<()> {
-    let image = image::io::Reader::open(path)?.decode()?;
+    let image = image::io::Reader::open(path)?
+      .decode()?
+      .as_rgb8()
+      .ok_or_else(|| format!("{} is not a valid rgb8 image", path.display()))?
+      .to_owned();
 
-    if let Some(image) = image.as_rgb8() {
-      let (width, height) = (image.width() as usize, image.height() as usize);
+    let (width, height) = (image.width() as usize, image.height() as usize);
 
-      self.matrix = DMatrix::from_iterator(
-        height,
-        width,
-        image
-          .rows()
-          .map(|row| row.map(|pixel| Vector3::new(pixel[0], pixel[1], pixel[2])))
-          .flatten(),
-      );
-    }
+    self.matrix = DMatrix::from_iterator(
+      height,
+      width,
+      image
+        .rows()
+        .map(|row| row.map(|pixel| Vector3::new(pixel[0], pixel[1], pixel[2])))
+        .flatten(),
+    );
 
     Ok(())
   }
