@@ -59,7 +59,7 @@ impl Command {
         let mut rl = Editor::<()>::new();
 
         if rl.load_history(&history).is_err() {
-          println!("Created history file in: {}", history);
+          eprintln!("Created history file in: {}", history);
         }
 
         while let Ok(line) = rl.readline(">> ") {
