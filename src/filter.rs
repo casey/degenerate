@@ -5,7 +5,7 @@ pub(crate) enum Filter {
   All,
   Circle,
   Mod { divisor: usize, remainder: usize },
-  Rows { limit: usize, step: usize },
+  Rows { nrows: usize, step: usize },
   Square,
   Top,
 }
@@ -25,9 +25,9 @@ impl Filter {
       Self::Mod { divisor, remainder } => {
         (col * state.matrix.nrows() + row) % divisor == *remainder
       }
-      Self::Rows { limit, step } => (0..state.matrix.nrows())
-        .step_by(*step + limit)
-        .map(|row| (row..=row + *limit - 1))
+      Self::Rows { nrows, step } => (0..state.matrix.nrows())
+        .step_by(*step + nrows)
+        .map(|row| (row..=row + *nrows - 1))
         .flatten()
         .any(|x| x == row),
       Self::Square => {

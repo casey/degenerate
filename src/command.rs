@@ -95,8 +95,8 @@ impl FromStr for Command {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
       })),
-      ["rows", limit, step] => Ok(Self::Filter(Filter::Rows {
-        limit: limit.parse()?,
+      ["rows", nrows, step] => Ok(Self::Filter(Filter::Rows {
+        nrows: nrows.parse()?,
         step: step.parse()?,
       })),
       ["print"] => Ok(Self::Print),
