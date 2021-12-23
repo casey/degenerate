@@ -59,8 +59,12 @@ impl Command {
         let mut editor = Editor::<()>::new();
         editor.load_history(&history).ok();
 
-        while let Ok(line) = editor.readline("> ") {
+        loop {
+          let line = editor.readline("> ")?;
+
           editor.add_history_entry(line.as_str());
+          editor.save_history(&history)?;
+
           match line.parse::<Self>() {
             Ok(command) => {
               command.apply(state)?;
@@ -71,8 +75,6 @@ impl Command {
             }
           }
         }
-
-        editor.save_history(&history)?;
       }
       Self::Resize(dimensions) => {
         state.resize(*dimensions);
