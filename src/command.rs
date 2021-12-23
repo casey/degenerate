@@ -4,9 +4,9 @@ use super::*;
 pub(crate) enum Command {
   Filter(Filter),
   For(usize),
+  Load { path: PathBuf },
   Loop,
   Operation(Operation),
-  Load { path: PathBuf },
   Print,
   Repl,
   Resize((usize, usize)),
@@ -37,6 +37,7 @@ impl Command {
           state.loop_counter = 0;
         }
       }
+      Self::Load { path } => state.load(path)?,
       Self::Loop => {
         loop {
           state.program_counter = state.program_counter.wrapping_sub(1);
@@ -51,7 +52,6 @@ impl Command {
         state.loop_counter += 1;
       }
       Self::Operation(operation) => state.operation = *operation,
-      Self::Load { path } => state.load(path)?,
       Self::Print => state.print()?,
       Self::Repl => {
         for result in BufReader::new(io::stdin()).lines() {

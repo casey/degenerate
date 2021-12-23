@@ -271,11 +271,15 @@ fn square() -> Result<()> {
 
 #[test]
 fn load() -> Result<()> {
-  assert_output_eq(
-    &["resize:1:2", "save:output.png", "top", "load:output.png"],
-    "0
-     0",
-  )
+  Test::new()?
+    .program("resize:1:2 save:output.png top load:output.png print")
+    .expected_stdout(
+      "
+      0
+      0
+      ",
+    )
+    .run()
 }
 
 #[test]
