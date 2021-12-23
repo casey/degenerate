@@ -255,21 +255,6 @@ fn rows() -> Result<()> {
 }
 
 #[test]
-fn rows_invalid_step() -> Result<()> {
-  Test::new()?
-    .program("resize:4:4 rows:2:10 print")
-    .expected_stdout(
-      "
-      FFFF
-      FFFF
-      0000
-      0000
-      ",
-    )
-    .run()
-}
-
-#[test]
 fn square() -> Result<()> {
   Test::new()?
     .program("resize:4:4 square print")

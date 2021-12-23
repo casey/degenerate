@@ -27,7 +27,7 @@ impl Filter {
       }
       Self::Rows { limit, step } => (0..state.matrix.nrows())
         .step_by(*step + limit)
-        .map(|row| (row..=row + (*limit - 1)))
+        .map(|row| (row..=row + *limit - 1))
         .flatten()
         .any(|x| x == row),
       Self::Square => {
