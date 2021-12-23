@@ -1,8 +1,10 @@
+all: check-lockfile test clippy fmt-check forbid
+
 build:
 	cargo build
 
-test:
-	cargo test
+test *args:
+	cargo test -- {{args}}
 
 clippy:
   cargo clippy --all-targets --all-features
@@ -17,8 +19,14 @@ image *args:
 fmt:
 	cargo fmt
 
+fmt-check:
+	cargo fmt --all -- --check
+
 check:
  cargo check
+
+check-lockfile:
+	cargo update --locked --package degenerate
 
 forbid:
 	./bin/forbid
