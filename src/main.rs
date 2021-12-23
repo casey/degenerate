@@ -3,8 +3,10 @@ use {
   image::{ImageBuffer, RgbImage},
   nalgebra::{DMatrix, Vector3},
   rand::Rng,
+  rustyline::Editor,
+  shellexpand::tilde,
   std::{
-    io::{self, BufRead, BufReader, BufWriter, Write},
+    io::{self, BufWriter, Write},
     path::{Path, PathBuf},
     process,
     str::FromStr,

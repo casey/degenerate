@@ -54,18 +54,35 @@ impl Command {
       Self::Operation(operation) => state.operation = *operation,
       Self::Print => state.print()?,
       Self::Repl => {
-        for result in BufReader::new(io::stdin()).lines() {
-          let line = result?;
-          match line.trim().parse::<Self>() {
-            Ok(command) => {
-              command.apply(state)?;
-              state.print()?;
+        let history = tilde("~/.degenerate_history").to_string();
+
+        let mut rl = Editor::<()>::new();
+
+        if let Err(_) = rl.load_history(&history) {
+          println!("Created history file in: {}", history);
+        }
+
+        loop {
+          match rl.readline(">> ") {
+            Ok(line) => {
+              rl.add_history_entry(line.as_str());
+              match line.parse::<Self>() {
+                Ok(command) => {
+                  command.apply(state)?;
+                  state.print()?;
+                }
+                Err(err) => {
+                  eprintln!("Could not parse command from `{}`: {}", line, err);
+                }
+              }
             }
-            Err(err) => {
-              eprintln!("Could not parse command from `{}`: {}", line, err);
+            Err(_) => {
+              break;
             }
           }
         }
+
+        rl.save_history(&history)?;
       }
       Self::Resize(dimensions) => {
         state.resize(*dimensions);
