@@ -5,6 +5,7 @@ pub(crate) enum Filter {
   All,
   Circle,
   Mod { divisor: usize, remainder: usize },
+  Rows { limit: usize, step: usize },
   Square,
   Top,
 }
@@ -21,20 +22,14 @@ impl Filter {
         (col - (width / 2.0)).powf(2.0) + (row - (height / 2.0)).powf(2.0)
           <= (width / 2.0).powf(2.0)
       }
-      Self::Even => row % 2 == 0,
       Self::Mod { divisor, remainder } => {
         (col * state.matrix.nrows() + row) % divisor == *remainder
       }
-      Self::Rows { nrows, step } => {
-        let height = state.dimensions().y;
-        state
-          .matrix()
-          .rows_with_step_mut(0, *nrows.min(&(height / (step + 1))), *step)
-          .iter_mut()
-          .for_each(|row| {
-            row.iter_mut().for_each(|scalar| *scalar = !*scalar);
-          });
-      }
+      Self::Rows { limit, step } => (0..state.matrix.nrows())
+        .step_by(if *step == 1 { *step + 1 } else { *step + 2 })
+        .map(|row| (row..=row + *limit - 1))
+        .flatten()
+        .any(|x| x == row),
       Self::Square => {
         let dimensions = state.dimensions();
         let (x1, y1) = (dimensions.1 as f32 / 4.0, dimensions.0 as f32 / 4.0);

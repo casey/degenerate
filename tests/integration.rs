@@ -128,21 +128,6 @@ fn circle() -> Result<()> {
 }
 
 #[test]
-fn even() -> Result<()> {
-  Test::new()?
-    .program("resize:4:4 even print")
-    .expected_stdout(
-      "
-      FFFF
-      0000
-      FFFF
-      0000
-      ",
-    )
-    .run()
-}
-
-#[test]
 fn top() -> Result<()> {
   Test::new()?
     .program("resize:2:2 top print")
@@ -164,7 +149,7 @@ fn repl_valid_filter() -> Result<()> {
     .stderr(Stdio::piped())
     .spawn()?;
 
-  write!(command.stdin.as_mut().unwrap(), "even")?;
+  write!(command.stdin.as_mut().unwrap(), "rows:1:1")?;
 
   assert_eq!(
     str::from_utf8(&command.wait_with_output()?.stdout)?,
@@ -256,24 +241,32 @@ fn save_invalid_format() -> Result<()> {
 
 #[test]
 fn rows() -> Result<()> {
-  assert_output_eq(
-    &["resize:4:4", "rows:2:1"],
-    "1111
-     0000
-     1111
-     0000",
-  )
+  Test::new()?
+    .program("resize:4:4 rows:1:1 print")
+    .expected_stdout(
+      "
+      FFFF
+      0000
+      FFFF
+      0000
+      ",
+    )
+    .run()
 }
 
 #[test]
-fn rows_invalid_number_of_rows() -> Result<()> {
-  assert_output_eq(
-    &["resize:4:4", "rows:3:1"],
-    "1111
-     0000
-     1111
-     0000",
-  )
+fn rows_invalid_step() -> Result<()> {
+  Test::new()?
+    .program("resize:4:4 rows:2:10 print")
+    .expected_stdout(
+      "
+      FFFF
+      FFFF
+      0000
+      0000
+      ",
+    )
+    .run()
 }
 
 #[test]
@@ -383,7 +376,7 @@ fn looping() -> Result<()> {
 #[test]
 fn multiple_fors_reset_loop_counter() -> Result<()> {
   Test::new()?
-    .program("resize:4:4 for:2 square print loop for:1 even print loop")
+    .program("resize:4:4 for:2 square print loop for:1 rows:1:1 print loop")
     .expected_stdout(
       "
       0000
