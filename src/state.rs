@@ -5,6 +5,7 @@ use {
   std::env,
 };
 
+#[derive(Clone)]
 pub(crate) struct State {
   pub(crate) loop_counter: usize,
   pub(crate) matrix: DMatrix<Vector3<u8>>,
@@ -23,18 +24,26 @@ impl State {
       state.program.push(arg.parse()?);
     }
 
-    while let Some(command) = state.program.get(state.program_counter).cloned() {
-      if state.verbose {
-        eprintln!(
-          "PC {} LC {} {:?}",
-          state.program_counter, state.loop_counter, command
-        );
-      }
-      command.apply(&mut state)?;
-      state.program_counter = state.program_counter.wrapping_add(1);
-    }
+    while state.step()? {}
 
     Ok(())
+  }
+
+  pub(crate) fn step(&mut self) -> Result<bool> {
+    match self.program.get(self.program_counter).cloned() {
+      Some(command) => {
+        if self.verbose {
+          eprintln!(
+            "PC {} LC {} {:?}",
+            self.program_counter, self.loop_counter, command
+          );
+        }
+        command.apply(self)?;
+        self.program_counter = self.program_counter.wrapping_add(1);
+        Ok(true)
+      }
+      None => Ok(false),
+    }
   }
 
   pub(crate) fn new() -> Self {

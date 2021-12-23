@@ -12,6 +12,7 @@ num-traits = "0.2.14"
 rand = "0.8.4"
 tempfile = "3.2.0"
 unindent = "0.1.7"
+winit = "0.26.0"
 
 [dev-dependencies]
 executable-path = "1.0.0"

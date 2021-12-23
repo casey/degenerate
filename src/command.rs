@@ -1,4 +1,11 @@
-use super::*;
+use {
+  super::*,
+  winit::{
+    event::{Event, WindowEvent},
+    event_loop::{ControlFlow, EventLoop},
+    window::Window,
+  },
+};
 
 #[derive(Clone, Debug)]
 pub(crate) enum Command {
@@ -11,6 +18,7 @@ pub(crate) enum Command {
   Resize((usize, usize)),
   Save(PathBuf),
   Verbose,
+  Window,
 }
 
 impl Command {
@@ -70,6 +78,30 @@ impl Command {
       }
       Self::Save(path) => state.image()?.save(path)?,
       Self::Verbose => state.verbose = !state.verbose,
+      Self::Window => {
+        let mut event_loop = EventLoop::new();
+        let window = Window::new(&event_loop)?;
+
+        let mut state = state.clone();
+        state.program_counter = state.program_counter.wrapping_add(1);
+
+        event_loop.run(move |event, _, control_flow| match event {
+          Event::WindowEvent {
+            event: WindowEvent::CloseRequested,
+            ..
+          } => *control_flow = ControlFlow::Exit,
+          _ => match state.step() {
+            Err(error) => {
+              eprintln!("error: {}", error);
+              *control_flow = ControlFlow::Exit;
+            }
+            Ok(true) => {}
+            Ok(false) => {
+              *control_flow = ControlFlow::Exit;
+            }
+          },
+        });
+      }
     }
 
     Ok(())
@@ -99,6 +131,7 @@ impl FromStr for Command {
       ["square"] => Ok(Self::Filter(Filter::Square)),
       ["top"] => Ok(Self::Filter(Filter::Top)),
       ["verbose"] => Ok(Self::Verbose),
+      ["window"] => Ok(Self::Window),
       _ => Err(format!("Invalid command: {}", s).into()),
     }
   }
