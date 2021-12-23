@@ -5,7 +5,7 @@ use {
   rand::Rng,
   std::{
     io::{self, BufRead, BufReader, BufWriter, Write},
-    path::PathBuf,
+    path::{Path, PathBuf},
     process,
     str::FromStr,
   },

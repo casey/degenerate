@@ -4,6 +4,7 @@ use super::*;
 pub(crate) enum Command {
   Filter(Filter),
   For(usize),
+  Load { path: PathBuf },
   Loop,
   Operation(Operation),
   Print,
@@ -36,6 +37,7 @@ impl Command {
           state.loop_counter = 0;
         }
       }
+      Self::Load { path } => state.load(path)?,
       Self::Loop => {
         loop {
           state.program_counter = state.program_counter.wrapping_sub(1);
@@ -86,6 +88,9 @@ impl FromStr for Command {
       ["even"] => Ok(Self::Filter(Filter::Even)),
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
+      ["load", path] => Ok(Self::Load {
+        path: path.parse()?,
+      }),
       ["loop"] => Ok(Self::Loop),
       ["mod", divisor, remainder] => Ok(Self::Filter(Filter::Mod {
         divisor: divisor.parse()?,

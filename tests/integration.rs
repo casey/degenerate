@@ -270,6 +270,19 @@ fn square() -> Result<()> {
 }
 
 #[test]
+fn load() -> Result<()> {
+  Test::new()?
+    .program("resize:1:2 save:output.png top load:output.png print")
+    .expected_stdout(
+      "
+      0
+      0
+      ",
+    )
+    .run()
+}
+
+#[test]
 fn modulus() -> Result<()> {
   Test::new()?
     .program("resize:4:2 mod:2:0 print")
