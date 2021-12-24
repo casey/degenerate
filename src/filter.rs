@@ -25,11 +25,7 @@ impl Filter {
       Self::Mod { divisor, remainder } => {
         (col * state.matrix.nrows() + row) % divisor == *remainder
       }
-      Self::Rows { nrows, step } => (0..state.matrix.nrows())
-        .step_by(*step + nrows)
-        .map(|row| (row..=row + *nrows - 1))
-        .flatten()
-        .any(|x| x == row),
+      Self::Rows { nrows, step } => row % (nrows + step) < *nrows,
       Self::Square => {
         let dimensions = state.dimensions();
         let (x1, y1) = (dimensions.1 as f32 / 4.0, dimensions.0 as f32 / 4.0);
