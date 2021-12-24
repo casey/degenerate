@@ -26,9 +26,9 @@ fn main() {
     if let Some(ReadlineError::Eof | ReadlineError::Interrupted) =
       error.downcast_ref::<ReadlineError>()
     {
-    } else {
-      eprintln!("error: {}", error);
-      process::exit(1);
+      return;
     }
+    eprintln!("error: {}", error);
+    process::exit(1);
   }
 }
