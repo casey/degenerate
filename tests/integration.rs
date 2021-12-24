@@ -79,6 +79,8 @@ impl Test {
       );
     }
 
+    child.kill()?;
+
     Ok(())
   }
 
@@ -128,13 +130,36 @@ fn circle() -> Result<()> {
 }
 
 #[test]
-fn top() -> Result<()> {
+fn cross() -> Result<()> {
   Test::new()?
-    .program("resize:2:2 top print")
+    .program("resize:4:4 cross print")
     .expected_stdout(
       "
-      FF
-      00
+      0FF0
+      FFFF
+      FFFF
+      0FF0
+      ",
+    )
+    .run()
+}
+
+#[test]
+fn top() -> Result<()> {
+  Test::new()?
+    .program("resize:10:10 top print")
+    .expected_stdout(
+      "
+      FFFFFFFFFF
+      FFFFFFFFFF
+      FFFFFFFFFF
+      FFFFFFFFFF
+      FFFFFFFFFF
+      0000000000
+      0000000000
+      0000000000
+      0000000000
+      0000000000
       ",
     )
     .run()

@@ -1,8 +1,10 @@
 use {
-  crate::{command::Command, filter::Filter, operation::Operation, state::State},
+  crate::{
+    command::Command, coordinates::Coordinates, filter::Filter, operation::Operation, state::State,
+  },
   dirs::home_dir,
   image::{ImageBuffer, RgbImage},
-  nalgebra::{DMatrix, Vector3},
+  nalgebra::{DMatrix, Vector2, Vector3},
   rand::Rng,
   rustyline::{error::ReadlineError, Editor},
   std::{
@@ -14,6 +16,7 @@ use {
 };
 
 mod command;
+mod coordinates;
 mod filter;
 mod operation;
 mod state;
