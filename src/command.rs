@@ -20,7 +20,12 @@ impl Command {
       Self::Filter(filter) => {
         for col in 0..state.matrix.ncols() {
           for row in 0..state.matrix.nrows() {
-            if filter.filter(state, row, col) {
+            let coordinates = Vector2::new(
+              ((col as f32 + 0.5) / state.matrix.ncols() as f32) * 2.0 - 1.0,
+              ((row as f32 + 0.5) / state.matrix.nrows() as f32) * 2.0 - 1.0,
+            );
+            let pixel = Vector2::new(col, row);
+            if filter.filter(state, pixel, coordinates) {
               state.matrix[(row, col)] = state.operation.apply(state, state.matrix[(row, col)]);
             }
           }
@@ -94,6 +99,7 @@ impl FromStr for Command {
     match s.split(':').collect::<Vec<&str>>().as_slice() {
       ["all"] => Ok(Self::Filter(Filter::All)),
       ["circle"] => Ok(Self::Filter(Filter::Circle)),
+      ["cross"] => Ok(Self::Filter(Filter::Cross)),
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
       ["load", path] => Ok(Self::Load {

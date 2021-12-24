@@ -55,10 +55,6 @@ impl State {
       .resize_mut(dimensions.0, dimensions.1, Zero::zero())
   }
 
-  pub(crate) fn dimensions(&self) -> (usize, usize) {
-    (self.matrix.nrows(), self.matrix.ncols())
-  }
-
   pub(crate) fn image(&self) -> Result<RgbImage> {
     ImageBuffer::from_raw(
       self.matrix.ncols().try_into()?,

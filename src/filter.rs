@@ -4,6 +4,7 @@ use super::*;
 pub(crate) enum Filter {
   All,
   Circle,
+  Cross,
   Mod { divisor: usize, remainder: usize },
   Rows { nrows: usize, step: usize },
   Square,
@@ -11,32 +12,17 @@ pub(crate) enum Filter {
 }
 
 impl Filter {
-  pub(crate) fn filter(&self, state: &State, row: usize, col: usize) -> bool {
+  pub(crate) fn filter(&self, state: &State, pixel: Vector2<usize>, v: Vector2<f32>) -> bool {
     match self {
       Self::All => true,
-      Self::Circle => {
-        let width = state.matrix.ncols() as f32;
-        let height = state.matrix.nrows() as f32;
-        let col = col as f32 + 0.5;
-        let row = row as f32 + 0.5;
-        (col - (width / 2.0)).powf(2.0) + (row - (height / 2.0)).powf(2.0)
-          <= (width / 2.0).powf(2.0)
-      }
+      Self::Circle => v.norm() < 1.0,
+      Self::Cross => v.x.abs() < 0.5 || v.y.abs() < 0.5,
       Self::Mod { divisor, remainder } => {
-        (col * state.matrix.nrows() + row) % divisor == *remainder
+        (pixel.x * state.matrix.nrows() + pixel.y) % divisor == *remainder
       }
-      Self::Rows { nrows, step } => row % (nrows + step) < *nrows,
-      Self::Square => {
-        let dimensions = state.dimensions();
-        let (x1, y1) = (dimensions.1 as f32 / 4.0, dimensions.0 as f32 / 4.0);
-        let (x2, y2) = (
-          x1 + dimensions.1 as f32 / 2.0,
-          y1 + dimensions.0 as f32 / 2.0,
-        );
-        let (row, col) = (row as f32, col as f32);
-        col >= x1 && col < x2 && row >= y1 && row < y2
-      }
-      Self::Top => row < state.matrix.nrows() / 2,
+      Self::Rows { nrows, step } => pixel.y % (nrows + step) < *nrows,
+      Self::Square => v.abs() < Vector2::new(0.5, 0.5),
+      Self::Top => v.y < 0.5,
     }
   }
 }
