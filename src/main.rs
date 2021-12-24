@@ -4,7 +4,7 @@ use {
   image::{ImageBuffer, RgbImage},
   nalgebra::{DMatrix, Vector3},
   rand::Rng,
-  rustyline::Editor,
+  rustyline::{error::ReadlineError, Editor},
   std::{
     io::{self, BufWriter, Write},
     path::{Path, PathBuf},
@@ -23,7 +23,12 @@ type Result<T, E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
 fn main() {
   if let Err(error) = State::run() {
-    eprintln!("error: {}", error);
-    process::exit(1);
+    if let Some(ReadlineError::Eof | ReadlineError::Interrupted) =
+      error.downcast_ref::<ReadlineError>()
+    {
+    } else {
+      eprintln!("error: {}", error);
+      process::exit(1);
+    }
   }
 }
