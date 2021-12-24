@@ -2,6 +2,7 @@ use {
   executable_path::executable_path,
   pretty_assertions::assert_eq,
   std::{
+    fs,
     io::prelude::*,
     process::{Command, Stdio},
     str, thread,
@@ -32,9 +33,9 @@ impl Test {
     })
   }
 
-  fn program(self, program: &str) -> Self {
+  fn program(self, program: impl AsRef<str>) -> Self {
     Self {
-      program: program.to_owned(),
+      program: program.as_ref().to_owned(),
       ..self
     }
   }
@@ -415,4 +416,49 @@ fn infinite_loop() -> Result<()> {
   Test::new()?
     .program("loop")
     .run_with_timeout(Duration::from_millis(250))
+}
+
+#[test]
+fn image_tests() -> Result<()> {
+  for result in fs::read_dir("images")? {
+    let entry = result?;
+
+    let filename = entry
+      .file_name()
+      .into_string()
+      .map_err(|filename| format!("Could not convert filename to unicode: {:?}", filename))?;
+
+    if filename.starts_with('.') || filename.ends_with(".actual-output.png") {
+      continue;
+    }
+
+    let expected_path = entry.path();
+
+    let expected_image = image::open(&expected_path)?;
+
+    let program = expected_path
+      .file_stem()
+      .ok_or_else(|| format!("Could not extract file stem: {}", expected_path.display()))?
+      .to_str()
+      .ok_or_else(|| format!("Path was not valid UTF-8: {}", expected_path.display()))?;
+
+    let tempdir = Test::new()?
+      .program(format!("{} save:output.png", program))
+      .run_and_return_tempdir()?;
+
+    let actual_path = tempdir.path().join("output.png");
+
+    let actual_image = image::open(&actual_path)?;
+
+    if actual_image != expected_image {
+      let destination = format!("images/{}.actual-output.png", program);
+      fs::rename(&actual_path, &destination)?;
+      panic!(
+        "Image test failed:\nExpected: {}\nActual:   {}",
+        expected_path.display(),
+        destination,
+      );
+    }
+  }
+  Ok(())
 }
