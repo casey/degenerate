@@ -22,7 +22,7 @@ impl Filter {
       }
       Self::Rows { nrows, step } => pixel.y % (nrows + step) < *nrows,
       Self::Square => v.abs() < Vector2::new(0.5, 0.5),
-      Self::Top => v.y < 0.5,
+      Self::Top => v.y < 0.0,
     }
   }
 }

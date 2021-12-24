@@ -147,11 +147,19 @@ fn cross() -> Result<()> {
 #[test]
 fn top() -> Result<()> {
   Test::new()?
-    .program("resize:2:2 top print")
+    .program("resize:10:10 top print")
     .expected_stdout(
       "
-      FF
-      00
+      FFFFFFFFFF
+      FFFFFFFFFF
+      FFFFFFFFFF
+      FFFFFFFFFF
+      FFFFFFFFFF
+      0000000000
+      0000000000
+      0000000000
+      0000000000
+      0000000000
       ",
     )
     .run()
