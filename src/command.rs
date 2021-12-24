@@ -54,9 +54,18 @@ impl Command {
       Self::Operation(operation) => state.operation = *operation,
       Self::Print => state.print()?,
       Self::Repl => {
-        for result in BufReader::new(io::stdin()).lines() {
-          let line = result?;
-          match line.trim().parse::<Self>() {
+        let history = home_dir().unwrap_or_default().join(".degenerate_history");
+
+        let mut editor = Editor::<()>::new();
+        editor.load_history(&history).ok();
+
+        loop {
+          let line = editor.readline("> ")?;
+
+          editor.add_history_entry(line.as_str());
+          editor.save_history(&history)?;
+
+          match line.parse::<Self>() {
             Ok(command) => {
               command.apply(state)?;
               state.print()?;

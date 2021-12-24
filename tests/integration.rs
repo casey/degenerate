@@ -156,6 +156,11 @@ fn top() -> Result<()> {
 }
 
 #[test]
+fn repl_returns_success_after_reaching_eol() -> Result<()> {
+  Test::new()?.program("repl").run()
+}
+
+#[test]
 fn repl_valid_filter() -> Result<()> {
   let mut command = Command::new(executable_path("degenerate"))
     .args(["resize:4:4", "repl"])
@@ -177,18 +182,17 @@ fn repl_valid_filter() -> Result<()> {
 #[test]
 fn repl_invalid_filter() -> Result<()> {
   let mut command = Command::new(executable_path("degenerate"))
-    .args(["resize:4:4", "repl", "print"])
+    .args(["resize:4:4", "repl"])
     .stdin(Stdio::piped())
     .stdout(Stdio::piped())
     .stderr(Stdio::piped())
     .spawn()?;
 
-  let stdin = command.stdin.as_mut().unwrap();
-  write!(stdin, "invalid")?;
+  write!(command.stdin.as_mut().unwrap(), "invalid")?;
 
   assert_eq!(
-    str::from_utf8(&command.wait_with_output()?.stdout)?,
-    "0000\n0000\n0000\n0000\n"
+    str::from_utf8(&command.wait_with_output()?.stderr)?,
+    "Could not parse command from `invalid`: Invalid command: invalid\n"
   );
 
   Ok(())
