@@ -20,12 +20,8 @@ impl Command {
       Self::Filter(filter) => {
         for col in 0..state.matrix.ncols() {
           for row in 0..state.matrix.nrows() {
-            let coordinates = Vector2::new(
-              ((col as f32 + 0.5) / state.matrix.ncols() as f32) * 2.0 - 1.0,
-              ((row as f32 + 0.5) / state.matrix.nrows() as f32) * 2.0 - 1.0,
-            );
             let pixel = Vector2::new(col, row);
-            if filter.filter(state, pixel, coordinates) {
+            if filter.filter(state, pixel, pixel.coordinates(state.dimensions())) {
               state.matrix[(row, col)] = state.operation.apply(state, state.matrix[(row, col)]);
             }
           }

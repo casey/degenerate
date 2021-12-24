@@ -49,6 +49,10 @@ impl State {
     }
   }
 
+  pub(crate) fn dimensions(&self) -> Vector2<usize> {
+    Vector2::new(self.matrix.ncols(), self.matrix.nrows())
+  }
+
   pub(crate) fn resize(&mut self, dimensions: (usize, usize)) {
     self
       .matrix
