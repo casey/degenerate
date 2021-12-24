@@ -28,6 +28,7 @@ fn main() {
     {
       return;
     }
+
     eprintln!("error: {}", error);
     process::exit(1);
   }

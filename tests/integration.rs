@@ -156,6 +156,11 @@ fn top() -> Result<()> {
 }
 
 #[test]
+fn repl_returns_success_after_reaching_eol() -> Result<()> {
+  Test::new()?.program("repl").run()
+}
+
+#[test]
 fn repl_valid_filter() -> Result<()> {
   let mut command = Command::new(executable_path("degenerate"))
     .args(["resize:4:4", "repl"])
