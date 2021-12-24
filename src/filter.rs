@@ -4,8 +4,8 @@ use super::*;
 pub(crate) enum Filter {
   All,
   Circle,
-  Even,
   Mod { divisor: usize, remainder: usize },
+  Rows { nrows: usize, step: usize },
   Square,
   Top,
 }
@@ -22,10 +22,10 @@ impl Filter {
         (col - (width / 2.0)).powf(2.0) + (row - (height / 2.0)).powf(2.0)
           <= (width / 2.0).powf(2.0)
       }
-      Self::Even => row % 2 == 0,
       Self::Mod { divisor, remainder } => {
         (col * state.matrix.nrows() + row) % divisor == *remainder
       }
+      Self::Rows { nrows, step } => row % (nrows + step) < *nrows,
       Self::Square => {
         let dimensions = state.dimensions();
         let (x1, y1) = (dimensions.1 as f32 / 4.0, dimensions.0 as f32 / 4.0);

@@ -94,7 +94,6 @@ impl FromStr for Command {
     match s.split(':').collect::<Vec<&str>>().as_slice() {
       ["all"] => Ok(Self::Filter(Filter::All)),
       ["circle"] => Ok(Self::Filter(Filter::Circle)),
-      ["even"] => Ok(Self::Filter(Filter::Even)),
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
       ["load", path] => Ok(Self::Load {
@@ -104,6 +103,10 @@ impl FromStr for Command {
       ["mod", divisor, remainder] => Ok(Self::Filter(Filter::Mod {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
+      })),
+      ["rows", nrows, step] => Ok(Self::Filter(Filter::Rows {
+        nrows: nrows.parse()?,
+        step: step.parse()?,
       })),
       ["print"] => Ok(Self::Print),
       ["random"] => Ok(Self::Operation(Operation::Random)),

@@ -128,21 +128,6 @@ fn circle() -> Result<()> {
 }
 
 #[test]
-fn even() -> Result<()> {
-  Test::new()?
-    .program("resize:4:4 even print")
-    .expected_stdout(
-      "
-      FFFF
-      0000
-      FFFF
-      0000
-      ",
-    )
-    .run()
-}
-
-#[test]
 fn top() -> Result<()> {
   Test::new()?
     .program("resize:2:2 top print")
@@ -169,7 +154,7 @@ fn repl_valid_filter() -> Result<()> {
     .stderr(Stdio::piped())
     .spawn()?;
 
-  write!(command.stdin.as_mut().unwrap(), "even")?;
+  write!(command.stdin.as_mut().unwrap(), "rows:1:1")?;
 
   assert_eq!(
     str::from_utf8(&command.wait_with_output()?.stdout)?,
@@ -253,6 +238,21 @@ fn save_invalid_format() -> Result<()> {
     .expected_stderr(
       "
       error: The file extension `.\"txt\"` was not recognized as an image format
+      ",
+    )
+    .run()
+}
+
+#[test]
+fn rows() -> Result<()> {
+  Test::new()?
+    .program("resize:4:4 rows:1:1 print")
+    .expected_stdout(
+      "
+      FFFF
+      0000
+      FFFF
+      0000
       ",
     )
     .run()
@@ -365,7 +365,7 @@ fn looping() -> Result<()> {
 #[test]
 fn multiple_fors_reset_loop_counter() -> Result<()> {
   Test::new()?
-    .program("resize:4:4 for:2 square print loop for:1 even print loop")
+    .program("resize:4:4 for:2 square print loop for:1 rows:1:1 print loop")
     .expected_stdout(
       "
       0000
