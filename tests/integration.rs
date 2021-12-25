@@ -166,6 +166,27 @@ fn top() -> Result<()> {
 }
 
 #[test]
+fn x() -> Result<()> {
+  Test::new()?
+    .program("resize:10:10 x print")
+    .expected_stdout(
+      "
+      FF000000FF
+      FFF0000FFF
+      0FFF00FFF0
+      00FFFFFF00
+      000FFFF000
+      000FFFF000
+      00FFFFFF00
+      0FFF00FFF0
+      FFF0000FFF
+      FF000000FF
+      ",
+    )
+    .run()
+}
+
+#[test]
 fn repl_returns_success_after_reaching_eol() -> Result<()> {
   Test::new()?.program("repl").run()
 }
