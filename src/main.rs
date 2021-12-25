@@ -6,6 +6,7 @@ use {
   image::{ImageBuffer, RgbImage},
   nalgebra::{DMatrix, Vector2, Vector3},
   rand::Rng,
+  rand::{rngs::StdRng, SeedableRng},
   rustyline::{error::ReadlineError, Editor},
   std::{
     io::{self, BufWriter, Write},

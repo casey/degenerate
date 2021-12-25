@@ -1,9 +1,4 @@
-use {
-  super::*,
-  num_traits::identities::Zero,
-  rand::{rngs::StdRng, SeedableRng},
-  std::env,
-};
+use {super::*, num_traits::identities::Zero, std::env};
 
 pub(crate) struct State {
   pub(crate) loop_counter: usize,

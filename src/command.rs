@@ -8,8 +8,10 @@ pub(crate) enum Command {
   Loop,
   Operation(Operation),
   Print,
+  RandomFilter,
   Repl,
   Resize((usize, usize)),
+  Seed(u64),
   Save(PathBuf),
   Verbose,
 }
@@ -54,6 +56,7 @@ impl Command {
       }
       Self::Operation(operation) => state.operation = *operation,
       Self::Print => state.print()?,
+      Self::RandomFilter => Self::Filter(state.rng.gen()).apply(state)?,
       Self::Repl => {
         let history = home_dir().unwrap_or_default().join(".degenerate_history");
 
@@ -80,6 +83,7 @@ impl Command {
       Self::Resize(dimensions) => {
         state.resize(*dimensions);
       }
+      Self::Seed(seed) => state.rng = StdRng::seed_from_u64(*seed),
       Self::Save(path) => state.image()?.save(path)?,
       Self::Verbose => state.verbose = !state.verbose,
     }
@@ -106,15 +110,17 @@ impl FromStr for Command {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
       })),
+      ["print"] => Ok(Self::Print),
+      ["random"] => Ok(Self::Operation(Operation::Random)),
+      ["random-filter"] => Ok(Self::RandomFilter),
+      ["repl"] => Ok(Self::Repl),
+      ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["rows", nrows, step] => Ok(Self::Filter(Filter::Rows {
         nrows: nrows.parse()?,
         step: step.parse()?,
       })),
-      ["print"] => Ok(Self::Print),
-      ["random"] => Ok(Self::Operation(Operation::Random)),
-      ["repl"] => Ok(Self::Repl),
-      ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["save", path] => Ok(Self::Save(path.parse()?)),
+      ["seed", seed] => Ok(Self::Seed(seed.parse()?)),
       ["square"] => Ok(Self::Filter(Filter::Square)),
       ["top"] => Ok(Self::Filter(Filter::Top)),
       ["verbose"] => Ok(Self::Verbose),

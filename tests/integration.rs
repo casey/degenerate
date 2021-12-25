@@ -343,6 +343,19 @@ fn random() -> Result<()> {
 }
 
 #[test]
+fn random_seed() -> Result<()> {
+  Test::new()?
+    .program("resize:4:2 seed:1 random all print")
+    .expected_stdout(
+      "
+      56CC
+      7966
+      ",
+    )
+    .run()
+}
+
+#[test]
 fn reset_filter() -> Result<()> {
   Test::new()?
     .program("resize:4:2 random all invert all print")
@@ -415,4 +428,25 @@ fn infinite_loop() -> Result<()> {
   Test::new()?
     .program("loop")
     .run_with_timeout(Duration::from_millis(250))
+}
+
+#[test]
+fn random_filter() -> Result<()> {
+  Test::new()?
+    .program("resize:10:10 random-filter print")
+    .expected_stdout(
+      "
+      FFFFFFFFFF
+      FFFFFFFFFF
+      FFFFFFFFFF
+      FFFFFFFFFF
+      FFFFFFFFFF
+      0000000000
+      0000000000
+      0000000000
+      0000000000
+      0000000000
+      ",
+    )
+    .run()
 }
