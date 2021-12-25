@@ -118,6 +118,7 @@ impl FromStr for Command {
       ["square"] => Ok(Self::Filter(Filter::Square)),
       ["top"] => Ok(Self::Filter(Filter::Top)),
       ["verbose"] => Ok(Self::Verbose),
+      ["x"] => Ok(Self::Filter(Filter::X)),
       _ => Err(format!("Invalid command: {}", s).into()),
     }
   }
