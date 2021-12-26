@@ -153,29 +153,6 @@ fn repl_invalid_filter() -> Result<()> {
 }
 
 #[test]
-fn save() -> Result<()> {
-  let tempdir = Test::new()?
-    .program("resize:1:2 top save:output.png print")
-    .expected_stdout(
-      "
-      F
-      0
-      ",
-    )
-    .run_and_return_tempdir()?;
-
-  let image = image::open(tempdir.path().join("output.png"))?
-    .as_rgb8()
-    .unwrap()
-    .to_owned();
-  assert_eq!(image.width(), 1);
-  assert_eq!(image.height(), 2);
-  assert_eq!(image.to_vec(), &[255, 255, 255, 0, 0, 0]);
-
-  Ok(())
-}
-
-#[test]
 fn save_invalid_format() -> Result<()> {
   Test::new()?
     .program("resize:4:4 top save:output.txt")
