@@ -38,7 +38,7 @@ impl Command {
           state.loop_counter = 0;
         }
       }
-      Self::Load(path) => state.load(path.as_deref().unwrap_or(Path::new("output.png")))?,
+      Self::Load(path) => state.load(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
       Self::Loop => {
         loop {
           state.program_counter = state.program_counter.wrapping_sub(1);
@@ -82,7 +82,7 @@ impl Command {
       }
       Self::Save(path) => state
         .image()?
-        .save(path.as_deref().unwrap_or(Path::new("output.png")))?,
+        .save(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
       Self::Verbose => state.verbose = !state.verbose,
     }
 
