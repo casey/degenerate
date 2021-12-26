@@ -20,7 +20,6 @@ impl Command {
     match self {
       Self::Filter(filter) => {
         let mut output = state.matrix.clone();
-
         for col in 0..state.matrix.ncols() {
           for row in 0..state.matrix.nrows() {
             let pixel = Vector2::new(col, row);
@@ -33,12 +32,11 @@ impl Command {
                   .matrix
                   .get((transformed_pixel.y, transformed_pixel.x))
                   .cloned()
-                  .unwrap_or(Vector3::zeros()),
+                  .unwrap_or_else(Vector3::zeros),
               );
             }
           }
         }
-
         state.matrix = output;
       }
       Self::For(until) => {
