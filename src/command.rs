@@ -4,13 +4,13 @@ use super::*;
 pub(crate) enum Command {
   Filter(Filter),
   For(usize),
-  Load { path: PathBuf },
+  Load(Option<PathBuf>),
   Loop,
   Operation(Operation),
   Print,
   Repl,
   Resize((usize, usize)),
-  Save(PathBuf),
+  Save(Option<PathBuf>),
   Verbose,
 }
 
@@ -38,7 +38,7 @@ impl Command {
           state.loop_counter = 0;
         }
       }
-      Self::Load { path } => state.load(path)?,
+      Self::Load(path) => state.load(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
       Self::Loop => {
         loop {
           state.program_counter = state.program_counter.wrapping_sub(1);
@@ -80,7 +80,9 @@ impl Command {
       Self::Resize(dimensions) => {
         state.resize(*dimensions);
       }
-      Self::Save(path) => state.image()?.save(path)?,
+      Self::Save(path) => state
+        .image()?
+        .save(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
       Self::Verbose => state.verbose = !state.verbose,
     }
 
@@ -98,23 +100,23 @@ impl FromStr for Command {
       ["cross"] => Ok(Self::Filter(Filter::Cross)),
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
-      ["load", path] => Ok(Self::Load {
-        path: path.parse()?,
-      }),
+      ["load", path] => Ok(Self::Load(Some(path.parse()?))),
+      ["load"] => Ok(Self::Load(None)),
       ["loop"] => Ok(Self::Loop),
       ["mod", divisor, remainder] => Ok(Self::Filter(Filter::Mod {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
       })),
-      ["rows", nrows, step] => Ok(Self::Filter(Filter::Rows {
-        nrows: nrows.parse()?,
-        step: step.parse()?,
-      })),
       ["print"] => Ok(Self::Print),
       ["random"] => Ok(Self::Operation(Operation::Random)),
       ["repl"] => Ok(Self::Repl),
       ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
-      ["save", path] => Ok(Self::Save(path.parse()?)),
+      ["rows", nrows, step] => Ok(Self::Filter(Filter::Rows {
+        nrows: nrows.parse()?,
+        step: step.parse()?,
+      })),
+      ["save", path] => Ok(Self::Save(Some(path.parse()?))),
+      ["save"] => Ok(Self::Save(None)),
       ["square"] => Ok(Self::Filter(Filter::Square)),
       ["top"] => Ok(Self::Filter(Filter::Top)),
       ["verbose"] => Ok(Self::Verbose),

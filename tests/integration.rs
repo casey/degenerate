@@ -166,34 +166,8 @@ fn save_invalid_format() -> Result<()> {
 }
 
 #[test]
-fn load() -> Result<()> {
-  Test::new()?
-    .program("resize:1:2 save:output.png top load:output.png print")
-    .expected_stdout(
-      "
-      0
-      0
-      ",
-    )
-    .run()
-}
-
-#[test]
 fn default_bitmap_size() -> Result<()> {
   Test::new()?.program("print").run()
-}
-
-#[test]
-fn reset_filter() -> Result<()> {
-  Test::new()?
-    .program("resize:4:2 random all invert all print")
-    .expected_stdout(
-      "
-      7A96
-      CD8A
-      ",
-    )
-    .run()
 }
 
 #[test]
@@ -262,13 +236,14 @@ fn infinite_loop() -> Result<()> {
 fn image_tests() -> Result<()> {
   for result in fs::read_dir("images")? {
     let entry = result?;
+    eprintln!("Running image test on {}…", entry.path().display());
 
     let filename = entry
       .file_name()
       .into_string()
       .map_err(|filename| format!("Could not convert filename to unicode: {:?}", filename))?;
 
-    if filename.starts_with('.') || filename.ends_with(".actual-output.png") {
+    if !filename.ends_with(".png") || filename.ends_with(".actual-output.png") {
       continue;
     }
 
@@ -282,9 +257,7 @@ fn image_tests() -> Result<()> {
       .to_str()
       .ok_or_else(|| format!("Path was not valid UTF-8: {}", expected_path.display()))?;
 
-    let tempdir = Test::new()?
-      .program(format!("{} save:output.png", program))
-      .run_and_return_tempdir()?;
+    let tempdir = Test::new()?.program(program).run_and_return_tempdir()?;
 
     let actual_path = tempdir.path().join("output.png");
 
