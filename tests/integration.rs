@@ -110,84 +110,6 @@ impl Test {
 }
 
 #[test]
-fn circle() -> Result<()> {
-  Test::new()?
-    .program("resize:10:10 circle print")
-    .expected_stdout(
-      "
-      000FFFF000
-      0FFFFFFFF0
-      0FFFFFFFF0
-      FFFFFFFFFF
-      FFFFFFFFFF
-      FFFFFFFFFF
-      FFFFFFFFFF
-      0FFFFFFFF0
-      0FFFFFFFF0
-      000FFFF000
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn cross() -> Result<()> {
-  Test::new()?
-    .program("resize:4:4 cross print")
-    .expected_stdout(
-      "
-      0FF0
-      FFFF
-      FFFF
-      0FF0
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn top() -> Result<()> {
-  Test::new()?
-    .program("resize:10:10 top print")
-    .expected_stdout(
-      "
-      FFFFFFFFFF
-      FFFFFFFFFF
-      FFFFFFFFFF
-      FFFFFFFFFF
-      FFFFFFFFFF
-      0000000000
-      0000000000
-      0000000000
-      0000000000
-      0000000000
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn x() -> Result<()> {
-  Test::new()?
-    .program("resize:10:10 x print")
-    .expected_stdout(
-      "
-      FF000000FF
-      FFF0000FFF
-      0FFF00FFF0
-      00FFFFFF00
-      000FFFF000
-      000FFFF000
-      00FFFFFF00
-      0FFF00FFF0
-      FFF0000FFF
-      FF000000FF
-      ",
-    )
-    .run()
-}
-
-#[test]
 fn repl_returns_success_after_reaching_eol() -> Result<()> {
   Test::new()?.program("repl").run()
 }
@@ -231,30 +153,6 @@ fn repl_invalid_filter() -> Result<()> {
 }
 
 #[test]
-fn resize() -> Result<()> {
-  Test::new()?
-    .program("resize:2:1 print")
-    .expected_stdout(
-      "
-      00
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn invert() -> Result<()> {
-  Test::new()?
-    .program("resize:1:1 all print")
-    .expected_stdout(
-      "
-      F
-      ",
-    )
-    .run()
-}
-
-#[test]
 fn save() -> Result<()> {
   let tempdir = Test::new()?
     .program("resize:1:2 top save:output.png print")
@@ -291,36 +189,6 @@ fn save_invalid_format() -> Result<()> {
 }
 
 #[test]
-fn rows() -> Result<()> {
-  Test::new()?
-    .program("resize:4:4 rows:1:1 print")
-    .expected_stdout(
-      "
-      FFFF
-      0000
-      FFFF
-      0000
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn square() -> Result<()> {
-  Test::new()?
-    .program("resize:4:4 square print")
-    .expected_stdout(
-      "
-      0000
-      0FF0
-      0FF0
-      0000
-      ",
-    )
-    .run()
-}
-
-#[test]
 fn load() -> Result<()> {
   Test::new()?
     .program("resize:1:2 save:output.png top load:output.png print")
@@ -334,34 +202,8 @@ fn load() -> Result<()> {
 }
 
 #[test]
-fn modulus() -> Result<()> {
-  Test::new()?
-    .program("resize:4:2 mod:2:0 print")
-    .expected_stdout(
-      "
-      FFFF
-      0000
-      ",
-    )
-    .run()
-}
-
-#[test]
 fn default_bitmap_size() -> Result<()> {
   Test::new()?.program("print").run()
-}
-
-#[test]
-fn random() -> Result<()> {
-  Test::new()?
-    .program("resize:4:2 random all print")
-    .expected_stdout(
-      "
-      8569
-      3275
-      ",
-    )
-    .run()
 }
 
 #[test]
