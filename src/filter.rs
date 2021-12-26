@@ -13,7 +13,7 @@ pub(crate) enum Filter {
 }
 
 impl Filter {
-  pub(crate) fn filter(&self, state: &State, pixel: Vector2<usize>, v: Vector2<f32>) -> bool {
+  pub(crate) fn filter(&self, state: &State, pixel: Vector2<usize>, v: Vector2<f64>) -> bool {
     match self {
       Self::All => true,
       Self::Circle => v.norm() < 1.0,

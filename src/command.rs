@@ -10,7 +10,7 @@ pub(crate) enum Command {
   Print,
   Repl,
   Resize((usize, usize)),
-  Rotate(f32),
+  Rotate(f64),
   Save(Option<PathBuf>),
   Verbose,
 }
@@ -20,23 +20,25 @@ impl Command {
     match self {
       Self::Filter(filter) => {
         let mut output = state.matrix.clone();
+
         for col in 0..state.matrix.ncols() {
           for row in 0..state.matrix.nrows() {
             let pixel = Vector2::new(col, row);
             let coordinates = pixel.coordinates(state.dimensions());
             if filter.filter(state, pixel, coordinates) {
-              let transformed = (state.rotation * coordinates).pixel(state.dimensions());
+              let transformed_pixel = (state.rotation * coordinates).pixel(state.dimensions());
               output[(row, col)] = state.operation.apply(
-                state,
+                &mut state.rng,
                 state
                   .matrix
-                  .get((transformed.y, transformed.x))
+                  .get((transformed_pixel.y, transformed_pixel.x))
                   .cloned()
                   .unwrap_or(Vector3::zeros()),
               );
             }
           }
         }
+
         state.matrix = output;
       }
       Self::For(until) => {
@@ -92,7 +94,7 @@ impl Command {
       Self::Resize(dimensions) => {
         state.resize(*dimensions);
       }
-      Self::Rotate(turns) => state.rotation = Rotation2::new(turns * f32::consts::TAU),
+      Self::Rotate(turns) => state.rotation = Rotation2::new(turns * f64::consts::TAU),
       Self::Save(path) => state
         .image()?
         .save(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,

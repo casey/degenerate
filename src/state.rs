@@ -13,7 +13,7 @@ pub(crate) struct State {
   pub(crate) program_counter: usize,
   pub(crate) rng: StdRng,
   pub(crate) verbose: bool,
-  pub(crate) rotation: Rotation2<f32>,
+  pub(crate) rotation: Rotation2<f64>,
 }
 
 impl State {

@@ -9,7 +9,7 @@ use {
   rand::Rng,
   rustyline::{error::ReadlineError, Editor},
   std::{
-    f32,
+    f64,
     io::{self, BufWriter, Write},
     path::{Path, PathBuf},
     process,

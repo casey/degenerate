@@ -1,14 +1,14 @@
 use super::*;
 
 pub(crate) trait Coordinates {
-  fn coordinates(self, dimensions: Vector2<usize>) -> Vector2<f32>;
+  fn coordinates(self, dimensions: Vector2<usize>) -> Vector2<f64>;
 }
 
 impl Coordinates for Vector2<usize> {
-  fn coordinates(self, dimensions: Vector2<usize>) -> Vector2<f32> {
+  fn coordinates(self, dimensions: Vector2<usize>) -> Vector2<f64> {
     Vector2::new(
-      ((self.x as f32 + 0.5) / dimensions.x as f32) * 2.0 - 1.0,
-      ((self.y as f32 + 0.5) / dimensions.y as f32) * 2.0 - 1.0,
+      ((self.x as f64 + 0.5) / dimensions.x as f64) * 2.0 - 1.0,
+      ((self.y as f64 + 0.5) / dimensions.y as f64) * 2.0 - 1.0,
     )
   }
 }
