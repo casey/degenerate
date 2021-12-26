@@ -22,15 +22,16 @@ impl Command {
         let mut output = state.matrix.clone();
         for col in 0..state.matrix.ncols() {
           for row in 0..state.matrix.nrows() {
-            let pixel = Vector2::new(col, row);
-            let coordinates = pixel.coordinates(state.dimensions());
-            if filter.filter(state, pixel, coordinates) {
-              let transformed_pixel = (state.rotation * coordinates).pixel(state.dimensions());
+            let p = Vector2::new(col, row);
+            let c = p.coordinates(state.dimensions());
+            let tc = state.rotation * c;
+            let tp = tc.pixel(state.dimensions());
+            if filter.filter(state, tp, tc) {
               output[(row, col)] = state.operation.apply(
                 &mut state.rng,
                 state
                   .matrix
-                  .get((transformed_pixel.y, transformed_pixel.x))
+                  .get((tp.y, tp.x))
                   .cloned()
                   .unwrap_or_else(Vector3::zeros),
               );
