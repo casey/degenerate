@@ -4,13 +4,13 @@ use super::*;
 pub(crate) enum Command {
   Filter(Filter),
   For(usize),
-  Load { path: PathBuf },
+  Load(Option<PathBuf>),
   Loop,
   Operation(Operation),
   Print,
   Repl,
   Resize((usize, usize)),
-  Save(PathBuf),
+  Save(Option<PathBuf>),
   Verbose,
 }
 
@@ -38,7 +38,7 @@ impl Command {
           state.loop_counter = 0;
         }
       }
-      Self::Load { path } => state.load(path)?,
+      Self::Load(path) => state.load(path.as_deref().unwrap_or(Path::new("output.png")))?,
       Self::Loop => {
         loop {
           state.program_counter = state.program_counter.wrapping_sub(1);
@@ -80,7 +80,9 @@ impl Command {
       Self::Resize(dimensions) => {
         state.resize(*dimensions);
       }
-      Self::Save(path) => state.image()?.save(path)?,
+      Self::Save(path) => state
+        .image()?
+        .save(path.as_deref().unwrap_or(Path::new("output.png")))?,
       Self::Verbose => state.verbose = !state.verbose,
     }
 
@@ -98,9 +100,8 @@ impl FromStr for Command {
       ["cross"] => Ok(Self::Filter(Filter::Cross)),
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
-      ["load", path] => Ok(Self::Load {
-        path: path.parse()?,
-      }),
+      ["load"] => Ok(Self::Load(None)),
+      ["load", path] => Ok(Self::Load(Some(path.parse()?))),
       ["loop"] => Ok(Self::Loop),
       ["mod", divisor, remainder] => Ok(Self::Filter(Filter::Mod {
         divisor: divisor.parse()?,
@@ -114,10 +115,11 @@ impl FromStr for Command {
       ["random"] => Ok(Self::Operation(Operation::Random)),
       ["repl"] => Ok(Self::Repl),
       ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
-      ["save", path] => Ok(Self::Save(path.parse()?)),
-      ["square"] => Ok(Self::Filter(Filter::Square)),
+      ["save"] => Ok(Self::Save(None)),
+      ["save", path] => Ok(Self::Save(Some(path.parse()?))),
       ["top"] => Ok(Self::Filter(Filter::Top)),
       ["verbose"] => Ok(Self::Verbose),
+      ["square"] => Ok(Self::Filter(Filter::Square)),
       ["x"] => Ok(Self::Filter(Filter::X)),
       _ => Err(format!("Invalid command: {}", s).into()),
     }
