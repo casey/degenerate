@@ -10,6 +10,7 @@ pub(crate) enum Command {
   Print,
   Repl,
   Resize((usize, usize)),
+  Rotate(f32),
   Save(Option<PathBuf>),
   Verbose,
 }
@@ -18,14 +19,25 @@ impl Command {
   pub(crate) fn apply(&self, state: &mut State) -> Result<()> {
     match self {
       Self::Filter(filter) => {
+        let mut output = state.matrix.clone();
         for col in 0..state.matrix.ncols() {
           for row in 0..state.matrix.nrows() {
             let pixel = Vector2::new(col, row);
-            if filter.filter(state, pixel, pixel.coordinates(state.dimensions())) {
-              state.matrix[(row, col)] = state.operation.apply(state, state.matrix[(row, col)]);
+            let coordinates = pixel.coordinates(state.dimensions());
+            if filter.filter(state, pixel, coordinates) {
+              let transformed = (state.rotation * coordinates).pixel(state.dimensions());
+              output[(row, col)] = state.operation.apply(
+                state,
+                state
+                  .matrix
+                  .get((transformed.y, transformed.x))
+                  .cloned()
+                  .unwrap_or(Vector3::zeros()),
+              );
             }
           }
         }
+        state.matrix = output;
       }
       Self::For(until) => {
         if state.loop_counter >= *until {
@@ -80,6 +92,7 @@ impl Command {
       Self::Resize(dimensions) => {
         state.resize(*dimensions);
       }
+      Self::Rotate(turns) => state.rotation = Rotation2::new(turns * f32::consts::TAU),
       Self::Save(path) => state
         .image()?
         .save(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
@@ -111,6 +124,7 @@ impl FromStr for Command {
       ["random"] => Ok(Self::Operation(Operation::Random)),
       ["repl"] => Ok(Self::Repl),
       ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
+      ["rotate", turns] => Ok(Self::Rotate(turns.parse()?)),
       ["rows", nrows, step] => Ok(Self::Filter(Filter::Rows {
         nrows: nrows.parse()?,
         step: step.parse()?,
