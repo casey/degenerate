@@ -168,11 +168,11 @@ fn save_invalid_format() -> Result<()> {
 #[test]
 fn load() -> Result<()> {
   Test::new()?
-    .program("resize:1:2 save:output.png top load:output.png print")
+    .program("resize:4:2 random all invert all save:output.png load:output.png print")
     .expected_stdout(
       "
-      0
-      0
+      7A96
+      CD8A
       ",
     )
     .run()
@@ -300,5 +300,6 @@ fn image_tests() -> Result<()> {
       );
     }
   }
+
   Ok(())
 }

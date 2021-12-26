@@ -103,9 +103,8 @@ impl State {
         .rows()
         .map(|row| row.map(|pixel| Vector3::new(pixel[0], pixel[1], pixel[2])))
         .flatten(),
-    );
-
-    self.matrix = self.matrix.transpose();
+    )
+    .transpose();
 
     Ok(())
   }
