@@ -126,6 +126,10 @@ impl FromStr for Command {
       ["repl"] => Ok(Self::Repl),
       ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["rotate", turns] => Ok(Self::Rotate(turns.parse()?)),
+      ["rotate-color", axis, turns] => Ok(Self::Operation(Operation::RotateColor(
+        axis.parse()?,
+        turns.parse()?,
+      ))),
       ["rows", nrows, step] => Ok(Self::Filter(Filter::Rows {
         nrows: nrows.parse()?,
         step: step.parse()?,
