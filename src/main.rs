@@ -1,13 +1,15 @@
 use {
   crate::{
-    command::Command, coordinates::Coordinates, filter::Filter, operation::Operation, state::State,
+    command::Command, coordinates::Coordinates, filter::Filter, operation::Operation, pixel::Pixel,
+    state::State,
   },
   dirs::home_dir,
   image::{ImageBuffer, RgbImage},
-  nalgebra::{DMatrix, Vector2, Vector3},
+  nalgebra::{DMatrix, Rotation2, Vector2, Vector3},
   rand::Rng,
   rustyline::{error::ReadlineError, Editor},
   std::{
+    f64,
     io::{self, BufWriter, Write},
     path::{Path, PathBuf},
     process,
@@ -19,6 +21,7 @@ mod command;
 mod coordinates;
 mod filter;
 mod operation;
+mod pixel;
 mod state;
 
 type Error = Box<dyn std::error::Error>;
