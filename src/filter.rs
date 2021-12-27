@@ -13,11 +13,11 @@ pub(crate) enum Filter {
 }
 
 impl Filter {
-  pub(crate) fn filter(&self, state: &State, pixel: Vector2<usize>, v: Vector2<f32>) -> bool {
+  pub(crate) fn filter(&self, state: &State, pixel: Vector2<usize>, v: Vector2<f64>) -> bool {
     match self {
       Self::All => true,
       Self::Circle => v.norm() < 1.0,
-      Self::Cross => v.x.abs() < 0.5 || v.y.abs() < 0.5,
+      Self::Cross => v.x.abs() < 0.25 || v.y.abs() < 0.25,
       Self::Mod { divisor, remainder } => {
         (pixel.x * state.matrix.nrows() + pixel.y) % divisor == *remainder
       }
