@@ -99,13 +99,14 @@ impl State {
     let (width, height) = (image.width() as usize, image.height() as usize);
 
     self.matrix = DMatrix::from_iterator(
-      height,
       width,
+      height,
       image
         .rows()
         .map(|row| row.map(|pixel| Vector3::new(pixel[0], pixel[1], pixel[2])))
         .flatten(),
-    );
+    )
+    .transpose();
 
     Ok(())
   }

@@ -273,5 +273,6 @@ fn image_tests() -> Result<()> {
       );
     }
   }
+
   Ok(())
 }
