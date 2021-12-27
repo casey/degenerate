@@ -166,19 +166,6 @@ fn save_invalid_format() -> Result<()> {
 }
 
 #[test]
-fn load() -> Result<()> {
-  Test::new()?
-    .program("resize:4:2 random all invert all save:output.png load:output.png print")
-    .expected_stdout(
-      "
-      7A96
-      CD8A
-      ",
-    )
-    .run()
-}
-
-#[test]
 fn default_bitmap_size() -> Result<()> {
   Test::new()?.program("print").run()
 }
