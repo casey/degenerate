@@ -17,7 +17,7 @@ impl Filter {
     match self {
       Self::All => true,
       Self::Circle => v.norm() < 1.0,
-      Self::Cross => v.x.abs() < 0.5 || v.y.abs() < 0.5,
+      Self::Cross => v.x.abs() < 0.25 || v.y.abs() < 0.25,
       Self::Mod { divisor, remainder } => {
         (pixel.x * state.matrix.nrows() + pixel.y) % divisor == *remainder
       }
