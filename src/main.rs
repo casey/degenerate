@@ -1,7 +1,7 @@
 use {
   crate::{
-    command::Command, coordinates::Coordinates, filter::Filter, operation::Operation, pixel::Pixel,
-    state::State,
+    color_axis::ColorAxis, command::Command, coordinates::Coordinates, filter::Filter,
+    operation::Operation, pixel::Pixel, state::State,
   },
   dirs::home_dir,
   image::{ImageBuffer, RgbImage},
@@ -15,9 +15,10 @@ use {
     process,
     str::FromStr,
   },
-  strum::EnumString
+  strum::EnumString,
 };
 
+mod color_axis;
 mod command;
 mod coordinates;
 mod filter;
