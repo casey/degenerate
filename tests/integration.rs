@@ -166,7 +166,7 @@ fn save_invalid_format() -> Result<()> {
 }
 
 #[test]
-fn default_bitmap_size() -> Result<()> {
+fn default_size_is_empty() -> Result<()> {
   Test::new()?.program("print").run()
 }
 

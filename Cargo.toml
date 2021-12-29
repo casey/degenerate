@@ -11,6 +11,7 @@ image = "0.23.14"
 nalgebra = "0.29.0"
 num-traits = "0.2.14"
 rand = "0.8.4"
+rand_derive2 = "0.1.17"
 rustyline = "9.1.1"
 strum = { version = "0.23.0", features = ["derive"] }
 tempfile = "3.2.0"

@@ -1,6 +1,6 @@
-use super::*;
+use {super::*, rand_derive2::RandGen};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, RandGen)]
 pub(crate) enum Filter {
   All,
   Circle,
@@ -21,7 +21,7 @@ impl Filter {
       Self::Mod { divisor, remainder } => {
         (pixel.x * state.matrix.nrows() + pixel.y) % divisor == *remainder
       }
-      Self::Rows { nrows, step } => pixel.y % (nrows + step) < *nrows,
+      Self::Rows { nrows, step } => pixel.y % (nrows.saturating_add(*step)) < *nrows,
       Self::Square => v.abs() < Vector2::new(0.5, 0.5),
       Self::Top => v.y < 0.0,
       Self::X => (v.x - v.y).abs() < 0.25 || (v.x + v.y).abs() < 0.25,

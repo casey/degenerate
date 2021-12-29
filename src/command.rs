@@ -8,10 +8,12 @@ pub(crate) enum Command {
   Loop,
   Operation(Operation),
   Print,
+  RandomFilter,
   Repl,
   Resize((usize, usize)),
   Rotate(f64),
   Save(Option<PathBuf>),
+  Seed(u64),
   Verbose,
 }
 
@@ -67,6 +69,7 @@ impl Command {
       }
       Self::Operation(operation) => state.operation = *operation,
       Self::Print => state.print()?,
+      Self::RandomFilter => Self::Filter(state.rng.gen()).apply(state)?,
       Self::Repl => {
         let history = home_dir().unwrap_or_default().join(".degenerate_history");
 
@@ -97,6 +100,7 @@ impl Command {
       Self::Save(path) => state
         .image()?
         .save(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
+      Self::Seed(seed) => state.rng = StdRng::seed_from_u64(*seed),
       Self::Verbose => state.verbose = !state.verbose,
     }
 
@@ -123,6 +127,7 @@ impl FromStr for Command {
       })),
       ["print"] => Ok(Self::Print),
       ["random"] => Ok(Self::Operation(Operation::Random)),
+      ["random-filter"] => Ok(Self::RandomFilter),
       ["repl"] => Ok(Self::Repl),
       ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["rotate", turns] => Ok(Self::Rotate(turns.parse()?)),
@@ -136,6 +141,7 @@ impl FromStr for Command {
       })),
       ["save", path] => Ok(Self::Save(Some(path.parse()?))),
       ["save"] => Ok(Self::Save(None)),
+      ["seed", seed] => Ok(Self::Seed(seed.parse()?)),
       ["square"] => Ok(Self::Filter(Filter::Square)),
       ["top"] => Ok(Self::Filter(Filter::Top)),
       ["verbose"] => Ok(Self::Verbose),
