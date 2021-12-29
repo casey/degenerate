@@ -30,7 +30,6 @@ impl Command {
             let i = v.pixel(state.dimensions());
             if filter.filter(state, i, v) {
               output[(row, col)] = state.operation.apply(
-                &mut state.rng,
                 state
                   .matrix
                   .get((i.y, i.x))
@@ -126,7 +125,6 @@ impl FromStr for Command {
         remainder: remainder.parse()?,
       })),
       ["print"] => Ok(Self::Print),
-      ["random"] => Ok(Self::Operation(Operation::Random)),
       ["random-filter"] => Ok(Self::RandomFilter),
       ["repl"] => Ok(Self::Repl),
       ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
