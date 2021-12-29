@@ -12,7 +12,9 @@ use {
   unindent::Unindent,
 };
 
-type Result<T, E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
+mod image_tests;
+
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 struct Test {
   expected_status: i32,
@@ -107,6 +109,28 @@ impl Test {
 
     Ok(self.tempdir)
   }
+}
+
+fn image_test(program: &str) -> Result<()> {
+  let tempdir = Test::new()?.program(program).run_and_return_tempdir()?;
+
+  let actual_path = tempdir.path().join("output.png");
+
+  let actual_image = image::open(&actual_path)?;
+
+  let expected_path = format!("images/{}.png", program);
+  let expected_image = image::open(&expected_path)?;
+
+  if actual_image != expected_image {
+    let destination = format!("images/{}.actual-output.png", program);
+    fs::rename(&actual_path, &destination)?;
+    panic!(
+      "Image test failed:\nExpected: {}\nActual:   {}",
+      expected_path, destination,
+    );
+  }
+
+  Ok(())
 }
 
 #[test]
@@ -230,49 +254,4 @@ fn infinite_loop() -> Result<()> {
   Test::new()?
     .program("loop")
     .run_with_timeout(Duration::from_millis(250))
-}
-
-#[test]
-fn image_tests() -> Result<()> {
-  for result in fs::read_dir("images")? {
-    let entry = result?;
-    eprintln!("Running image test on {}…", entry.path().display());
-
-    let filename = entry
-      .file_name()
-      .into_string()
-      .map_err(|filename| format!("Could not convert filename to unicode: {:?}", filename))?;
-
-    if !filename.ends_with(".png") || filename.ends_with(".actual-output.png") {
-      continue;
-    }
-
-    let expected_path = entry.path();
-
-    let expected_image = image::open(&expected_path)?;
-
-    let program = expected_path
-      .file_stem()
-      .ok_or_else(|| format!("Could not extract file stem: {}", expected_path.display()))?
-      .to_str()
-      .ok_or_else(|| format!("Path was not valid UTF-8: {}", expected_path.display()))?;
-
-    let tempdir = Test::new()?.program(program).run_and_return_tempdir()?;
-
-    let actual_path = tempdir.path().join("output.png");
-
-    let actual_image = image::open(&actual_path)?;
-
-    if actual_image != expected_image {
-      let destination = format!("images/{}.actual-output.png", program);
-      fs::rename(&actual_path, &destination)?;
-      panic!(
-        "Image test failed:\nExpected: {}\nActual:   {}",
-        expected_path.display(),
-        destination,
-      );
-    }
-  }
-
-  Ok(())
 }

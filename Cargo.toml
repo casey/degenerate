@@ -4,6 +4,7 @@ version = "0.0.0"
 description = "Raw Degeneracy"
 edition = "2021"
 license = "CC0-1.0"
+autotests = false
 
 [dependencies]
 dirs = "4.0.0"
@@ -14,9 +15,17 @@ rand = "0.8.4"
 rand_derive2 = "0.1.17"
 rustyline = "9.1.1"
 strum = { version = "0.23.0", features = ["derive"] }
-tempfile = "3.2.0"
-unindent = "0.1.7"
 
 [dev-dependencies]
 executable-path = "1.0.0"
 pretty_assertions = "1.0.0"
+tempfile = "3.2.0"
+unindent = "0.1.7"
+
+[build-dependencies]
+camino = "1.0.5"
+indoc = "1.0.3"
+
+[[test]]
+name = "integration"
+path = "tests/integration.rs"
