@@ -24,7 +24,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
       .file_stem()
       .ok_or_else(|| format!("Could not extract file stem: {}", expected_path))?;
 
-    let identifier = program.replace(|c| !matches!(c, 'a'..='z' | '0'..='9'), "_");
+    let identifier = program.replace(|c| !c.is_alphanumeric(), "_");
 
     write!(
       file,
