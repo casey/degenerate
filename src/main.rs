@@ -1,11 +1,11 @@
 use {
   crate::{
-    command::Command, coordinates::Coordinates, filter::Filter, operation::Operation, pixel::Pixel,
-    state::State,
+    color_axis::ColorAxis, command::Command, coordinates::Coordinates, filter::Filter,
+    operation::Operation, pixel::Pixel, state::State,
   },
   dirs::home_dir,
   image::{ImageBuffer, RgbImage},
-  nalgebra::{DMatrix, Rotation2, Vector2, Vector3},
+  nalgebra::{DMatrix, Rotation2, Rotation3, Vector2, Vector3},
   rand::Rng,
   rustyline::{error::ReadlineError, Editor},
   std::{
@@ -15,8 +15,10 @@ use {
     process,
     str::FromStr,
   },
+  strum::EnumString,
 };
 
+mod color_axis;
 mod command;
 mod coordinates;
 mod filter;

@@ -12,6 +12,7 @@ nalgebra = "0.29.0"
 num-traits = "0.2.14"
 rand = "0.8.4"
 rustyline = "9.1.1"
+strum = { version = "0.23.0", features = ["derive"] }
 tempfile = "3.2.0"
 unindent = "0.1.7"
 
