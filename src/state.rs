@@ -8,6 +8,7 @@ pub(crate) struct State {
   pub(crate) program_counter: usize,
   pub(crate) rng: StdRng,
   pub(crate) verbose: bool,
+  pub(crate) rotation: Rotation2<f64>,
 }
 
 impl State {
@@ -40,6 +41,7 @@ impl State {
       program: Vec::new(),
       program_counter: 0,
       rng: StdRng::seed_from_u64(0),
+      rotation: Rotation2::identity(),
       verbose: false,
     }
   }
@@ -92,13 +94,14 @@ impl State {
     let (width, height) = (image.width() as usize, image.height() as usize);
 
     self.matrix = DMatrix::from_iterator(
-      height,
       width,
+      height,
       image
         .rows()
         .map(|row| row.map(|pixel| Vector3::new(pixel[0], pixel[1], pixel[2])))
         .flatten(),
-    );
+    )
+    .transpose();
 
     Ok(())
   }

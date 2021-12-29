@@ -2,6 +2,7 @@ use {
   executable_path::executable_path,
   pretty_assertions::assert_eq,
   std::{
+    fs,
     io::prelude::*,
     process::{Command, Stdio},
     str, thread,
@@ -32,9 +33,9 @@ impl Test {
     })
   }
 
-  fn program(self, program: &str) -> Self {
+  fn program(self, program: impl AsRef<str>) -> Self {
     Self {
-      program: program.to_owned(),
+      program: program.as_ref().to_owned(),
       ..self
     }
   }
@@ -109,63 +110,6 @@ impl Test {
 }
 
 #[test]
-fn circle() -> Result<()> {
-  Test::new()?
-    .program("resize:10:10 circle print")
-    .expected_stdout(
-      "
-      000FFFF000
-      0FFFFFFFF0
-      0FFFFFFFF0
-      FFFFFFFFFF
-      FFFFFFFFFF
-      FFFFFFFFFF
-      FFFFFFFFFF
-      0FFFFFFFF0
-      0FFFFFFFF0
-      000FFFF000
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn cross() -> Result<()> {
-  Test::new()?
-    .program("resize:4:4 cross print")
-    .expected_stdout(
-      "
-      0FF0
-      FFFF
-      FFFF
-      0FF0
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn top() -> Result<()> {
-  Test::new()?
-    .program("resize:10:10 top print")
-    .expected_stdout(
-      "
-      FFFFFFFFFF
-      FFFFFFFFFF
-      FFFFFFFFFF
-      FFFFFFFFFF
-      FFFFFFFFFF
-      0000000000
-      0000000000
-      0000000000
-      0000000000
-      0000000000
-      ",
-    )
-    .run()
-}
-
-#[test]
 fn repl_returns_success_after_reaching_eol() -> Result<()> {
   Test::new()?.program("repl").run()
 }
@@ -209,53 +153,6 @@ fn repl_invalid_filter() -> Result<()> {
 }
 
 #[test]
-fn resize() -> Result<()> {
-  Test::new()?
-    .program("resize:2:1 print")
-    .expected_stdout(
-      "
-      00
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn invert() -> Result<()> {
-  Test::new()?
-    .program("resize:1:1 all print")
-    .expected_stdout(
-      "
-      F
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn save() -> Result<()> {
-  let tempdir = Test::new()?
-    .program("resize:1:2 top save:output.png print")
-    .expected_stdout(
-      "
-      F
-      0
-      ",
-    )
-    .run_and_return_tempdir()?;
-
-  let image = image::open(tempdir.path().join("output.png"))?
-    .as_rgb8()
-    .unwrap()
-    .to_owned();
-  assert_eq!(image.width(), 1);
-  assert_eq!(image.height(), 2);
-  assert_eq!(image.to_vec(), &[255, 255, 255, 0, 0, 0]);
-
-  Ok(())
-}
-
-#[test]
 fn save_invalid_format() -> Result<()> {
   Test::new()?
     .program("resize:4:4 top save:output.txt")
@@ -269,103 +166,8 @@ fn save_invalid_format() -> Result<()> {
 }
 
 #[test]
-fn rows() -> Result<()> {
-  Test::new()?
-    .program("resize:4:4 rows:1:1 print")
-    .expected_stdout(
-      "
-      FFFF
-      0000
-      FFFF
-      0000
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn square() -> Result<()> {
-  Test::new()?
-    .program("resize:4:4 square print")
-    .expected_stdout(
-      "
-      0000
-      0FF0
-      0FF0
-      0000
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn load() -> Result<()> {
-  Test::new()?
-    .program("resize:1:2 save:output.png top load:output.png print")
-    .expected_stdout(
-      "
-      0
-      0
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn modulus() -> Result<()> {
-  Test::new()?
-    .program("resize:4:2 mod:2:0 print")
-    .expected_stdout(
-      "
-      FFFF
-      0000
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn default_bitmap_size() -> Result<()> {
+fn default_size_is_empty() -> Result<()> {
   Test::new()?.program("print").run()
-}
-
-#[test]
-fn random() -> Result<()> {
-  Test::new()?
-    .program("resize:4:2 random all print")
-    .expected_stdout(
-      "
-      8569
-      3275
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn random_seed() -> Result<()> {
-  Test::new()?
-    .program("resize:4:2 seed:1 random all print")
-    .expected_stdout(
-      "
-      56CC
-      7966
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn reset_filter() -> Result<()> {
-  Test::new()?
-    .program("resize:4:2 random all invert all print")
-    .expected_stdout(
-      "
-      7A96
-      CD8A
-      ",
-    )
-    .run()
 }
 
 #[test]
@@ -431,22 +233,46 @@ fn infinite_loop() -> Result<()> {
 }
 
 #[test]
-fn random_filter() -> Result<()> {
-  Test::new()?
-    .program("resize:10:10 random-filter print")
-    .expected_stdout(
-      "
-      FFFFFFFFFF
-      FFFFFFFFFF
-      FFFFFFFFFF
-      FFFFFFFFFF
-      FFFFFFFFFF
-      0000000000
-      0000000000
-      0000000000
-      0000000000
-      0000000000
-      ",
-    )
-    .run()
+fn image_tests() -> Result<()> {
+  for result in fs::read_dir("images")? {
+    let entry = result?;
+    eprintln!("Running image test on {}…", entry.path().display());
+
+    let filename = entry
+      .file_name()
+      .into_string()
+      .map_err(|filename| format!("Could not convert filename to unicode: {:?}", filename))?;
+
+    if !filename.ends_with(".png") || filename.ends_with(".actual-output.png") {
+      continue;
+    }
+
+    let expected_path = entry.path();
+
+    let expected_image = image::open(&expected_path)?;
+
+    let program = expected_path
+      .file_stem()
+      .ok_or_else(|| format!("Could not extract file stem: {}", expected_path.display()))?
+      .to_str()
+      .ok_or_else(|| format!("Path was not valid UTF-8: {}", expected_path.display()))?;
+
+    let tempdir = Test::new()?.program(program).run_and_return_tempdir()?;
+
+    let actual_path = tempdir.path().join("output.png");
+
+    let actual_image = image::open(&actual_path)?;
+
+    if actual_image != expected_image {
+      let destination = format!("images/{}.actual-output.png", program);
+      fs::rename(&actual_path, &destination)?;
+      panic!(
+        "Image test failed:\nExpected: {}\nActual:   {}",
+        expected_path.display(),
+        destination,
+      );
+    }
+  }
+
+  Ok(())
 }

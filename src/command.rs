@@ -4,15 +4,16 @@ use super::*;
 pub(crate) enum Command {
   Filter(Filter),
   For(usize),
-  Load { path: PathBuf },
+  Load(Option<PathBuf>),
   Loop,
   Operation(Operation),
   Print,
   RandomFilter,
   Repl,
   Resize((usize, usize)),
+  Rotate(f64),
+  Save(Option<PathBuf>),
   Seed(u64),
-  Save(PathBuf),
   Verbose,
 }
 
@@ -20,14 +21,26 @@ impl Command {
   pub(crate) fn apply(&self, state: &mut State) -> Result<()> {
     match self {
       Self::Filter(filter) => {
+        let mut output = state.matrix.clone();
         for col in 0..state.matrix.ncols() {
           for row in 0..state.matrix.nrows() {
-            let pixel = Vector2::new(col, row);
-            if filter.filter(state, pixel, pixel.coordinates(state.dimensions())) {
-              state.matrix[(row, col)] = state.operation.apply(state, state.matrix[(row, col)]);
+            let i = Vector2::new(col, row);
+            let v = i.coordinates(state.dimensions());
+            let v = state.rotation * v;
+            let i = v.pixel(state.dimensions());
+            if filter.filter(state, i, v) {
+              output[(row, col)] = state.operation.apply(
+                &mut state.rng,
+                state
+                  .matrix
+                  .get((i.y, i.x))
+                  .cloned()
+                  .unwrap_or_else(Vector3::zeros),
+              );
             }
           }
         }
+        state.matrix = output;
       }
       Self::For(until) => {
         if state.loop_counter >= *until {
@@ -40,7 +53,7 @@ impl Command {
           state.loop_counter = 0;
         }
       }
-      Self::Load { path } => state.load(path)?,
+      Self::Load(path) => state.load(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
       Self::Loop => {
         loop {
           state.program_counter = state.program_counter.wrapping_sub(1);
@@ -83,8 +96,11 @@ impl Command {
       Self::Resize(dimensions) => {
         state.resize(*dimensions);
       }
+      Self::Rotate(turns) => state.rotation = Rotation2::new(turns * f64::consts::TAU),
+      Self::Save(path) => state
+        .image()?
+        .save(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
       Self::Seed(seed) => state.rng = StdRng::seed_from_u64(*seed),
-      Self::Save(path) => state.image()?.save(path)?,
       Self::Verbose => state.verbose = !state.verbose,
     }
 
@@ -102,9 +118,8 @@ impl FromStr for Command {
       ["cross"] => Ok(Self::Filter(Filter::Cross)),
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
-      ["load", path] => Ok(Self::Load {
-        path: path.parse()?,
-      }),
+      ["load", path] => Ok(Self::Load(Some(path.parse()?))),
+      ["load"] => Ok(Self::Load(None)),
       ["loop"] => Ok(Self::Loop),
       ["mod", divisor, remainder] => Ok(Self::Filter(Filter::Mod {
         divisor: divisor.parse()?,
@@ -119,11 +134,18 @@ impl FromStr for Command {
         nrows: nrows.parse()?,
         step: step.parse()?,
       })),
-      ["save", path] => Ok(Self::Save(path.parse()?)),
+      ["save", path] => Ok(Self::Save(Some(path.parse()?))),
+      ["save"] => Ok(Self::Save(None)),
       ["seed", seed] => Ok(Self::Seed(seed.parse()?)),
+      ["rotate", turns] => Ok(Self::Rotate(turns.parse()?)),
+      ["rotate-color", axis, turns] => Ok(Self::Operation(Operation::RotateColor(
+        axis.parse()?,
+        turns.parse()?,
+      ))),
       ["square"] => Ok(Self::Filter(Filter::Square)),
       ["top"] => Ok(Self::Filter(Filter::Top)),
       ["verbose"] => Ok(Self::Verbose),
+      ["x"] => Ok(Self::Filter(Filter::X)),
       _ => Err(format!("Invalid command: {}", s).into()),
     }
   }
