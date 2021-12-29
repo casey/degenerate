@@ -1,49 +1,53 @@
-use std::io::Write;
+use {camino::Utf8PathBuf, indoc::indoc, std::io::Write};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+  println!("cargo:rerun-if-changed=images");
+
   let mut programs = Vec::new();
 
   for result in std::fs::read_dir("images")? {
     let entry = result?;
-    eprintln!("Generating image test on {}…", entry.path().display());
+    let expected_path = Utf8PathBuf::try_from(entry.path())?;
+    println!("cargo:rerun-if-changed={}", expected_path);
 
-    let filename = entry
+    let filename = expected_path
       .file_name()
-      .into_string()
-      .map_err(|filename| format!("Could not convert filename to unicode: {:?}", filename))?;
+      .ok_or_else(|| format!("Could not extract file name: {}", expected_path))?;
 
     if !filename.ends_with(".png") || filename.ends_with(".actual-output.png") {
       continue;
     }
 
-    let expected_path = entry.path();
-
     let program = expected_path
       .file_stem()
-      .ok_or_else(|| format!("Could not extract file stem: {}", expected_path.display()))?
-      .to_str()
-      .ok_or_else(|| format!("Path was not valid UTF-8: {}", expected_path.display()))?;
+      .ok_or_else(|| format!("Could not extract file stem: {}", expected_path))?;
 
     programs.push(program.to_owned());
   }
 
   let mut file = std::fs::File::create("tests/image_tests.rs")?;
 
-  writeln!(file, "use super::*;")?;
+  write!(file, "use super::*;")?;
 
   for program in programs {
     let identifier = program.replace(|c| !matches!(c, 'a'..='z' | '0'..='9'), "_");
 
     write!(
       file,
-      r#"#[test]
-fn {}() -> Result<()> {{
-  image_test("{}")
-}}
-"#,
+      indoc!(
+        "
+
+
+        #[test]
+        fn {}() -> Result<()> {{
+          image_test(\"{}\")
+        }}",
+      ),
       identifier, program
     )?;
   }
+
+  writeln!(file)?;
 
   Ok(())
 }
