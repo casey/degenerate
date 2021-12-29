@@ -27,17 +27,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     programs.push(program.to_owned());
   }
 
-  let mut file = std::fs::File::create("tests/image.rs")?;
+  let mut file = std::fs::File::create("tests/image_tests.rs")?;
 
-  write!(
-    file,
-    "{}",
-    r#"
-use shared::{Test, Result, image_test};
-
-mod shared;
-"#
-  )?;
+  writeln!(file, "use super::*;")?;
 
   for program in programs {
     let identifier = program.replace(|c| !matches!(c, 'a'..='z' | '0'..='9'), "_");

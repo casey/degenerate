@@ -2,4 +2,4 @@
 /output.png
 /output.txt
 /target
-/tests/image.rs
+/tests/image_tests.rs
