@@ -1,6 +1,7 @@
 use {
   executable_path::executable_path,
   pretty_assertions::assert_eq,
+  shared::{Result, Test},
   std::{
     fs,
     io::prelude::*,
@@ -8,106 +9,10 @@ use {
     str, thread,
     time::Duration,
   },
-  tempfile::TempDir,
   unindent::Unindent,
 };
 
-type Result<T, E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
-
-struct Test {
-  expected_status: i32,
-  expected_stderr: String,
-  expected_stdout: String,
-  program: String,
-  tempdir: TempDir,
-}
-
-impl Test {
-  fn new() -> Result<Self> {
-    Ok(Self {
-      expected_status: 0,
-      expected_stderr: String::new(),
-      expected_stdout: String::new(),
-      program: String::new(),
-      tempdir: TempDir::new()?,
-    })
-  }
-
-  fn program(self, program: impl AsRef<str>) -> Self {
-    Self {
-      program: program.as_ref().to_owned(),
-      ..self
-    }
-  }
-
-  fn expected_status(self, expected_status: i32) -> Self {
-    Self {
-      expected_status,
-      ..self
-    }
-  }
-
-  fn expected_stderr(self, expected_stderr: &str) -> Self {
-    Self {
-      expected_stderr: expected_stderr.unindent(),
-      ..self
-    }
-  }
-
-  fn expected_stdout(self, expected_stdout: &str) -> Self {
-    Self {
-      expected_stdout: expected_stdout.unindent(),
-      ..self
-    }
-  }
-
-  fn run(self) -> Result<()> {
-    self.run_and_return_tempdir().map(|_| ())
-  }
-
-  fn run_with_timeout(self, timeout: Duration) -> Result<()> {
-    let mut child = Command::new(executable_path("degenerate"))
-      .current_dir(&self.tempdir)
-      .args(self.program.split_whitespace())
-      .spawn()?;
-
-    thread::sleep(timeout);
-
-    if let Some(status) = child.try_wait()? {
-      panic!(
-        "program `{}` exited before timeout elapsed: {}",
-        self.program, status
-      );
-    }
-
-    child.kill()?;
-
-    Ok(())
-  }
-
-  fn run_and_return_tempdir(self) -> Result<TempDir> {
-    let output = Command::new(executable_path("degenerate"))
-      .current_dir(&self.tempdir)
-      .args(self.program.split_whitespace())
-      .output()?;
-
-    let stderr = str::from_utf8(&output.stderr)?;
-
-    assert_eq!(
-      output.status.code(),
-      Some(self.expected_status),
-      "Program `{}` failed: {}",
-      self.program,
-      stderr,
-    );
-
-    assert_eq!(stderr, self.expected_stderr);
-
-    assert_eq!(str::from_utf8(&output.stdout)?, self.expected_stdout);
-
-    Ok(self.tempdir)
-  }
-}
+mod shared;
 
 #[test]
 fn repl_returns_success_after_reaching_eol() -> Result<()> {
