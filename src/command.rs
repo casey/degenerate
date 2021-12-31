@@ -28,7 +28,6 @@ impl Command {
           for row in 0..state.matrix.nrows() {
             let i = Vector2::new(col, row);
             let v = i.coordinates(state.dimensions());
-            let v = state.rotation * v;
             let v = similarity * v;
             let i = v.pixel(state.dimensions());
             if filter.filter(state, i, v) {
@@ -98,7 +97,9 @@ impl Command {
       Self::Resize(dimensions) => {
         state.resize(*dimensions);
       }
-      Self::Rotate(turns) => state.rotation = Rotation2::new(turns * f64::consts::TAU),
+      Self::Rotate(turns) => state
+        .similarity
+        .append_rotation_mut(&UnitComplex::from_angle(turns * f64::consts::TAU)),
       Self::Save(path) => state
         .image()?
         .save(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,

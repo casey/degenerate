@@ -112,16 +112,9 @@ impl Test {
 }
 
 fn image_test(program: &str) -> Result<()> {
-  for result in std::fs::read_dir("images")? {
-    let path = result?.path();
-    if path
-      .to_str()
-      .ok_or_else(|| format!("Non-Unicode path: {}", path.display()))?
-      .ends_with(".actual-output.png")
-    {
-      fs::remove_file(path)?;
-    }
-  }
+  let destination = format!("images/{}.actual-output.png", program);
+
+  fs::remove_file(&destination).ok();
 
   let tempdir = Test::new()?.program(program).run_and_return_tempdir()?;
 
@@ -133,7 +126,6 @@ fn image_test(program: &str) -> Result<()> {
   let expected_image = image::open(&expected_path)?;
 
   if actual_image != expected_image {
-    let destination = format!("images/{}.actual-output.png", program);
     fs::rename(&actual_path, &destination)?;
     panic!(
       "Image test failed:\nExpected: {}\nActual:   {}",
