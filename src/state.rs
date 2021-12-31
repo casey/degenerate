@@ -7,8 +7,8 @@ pub(crate) struct State {
   pub(crate) program: Vec<Command>,
   pub(crate) program_counter: usize,
   pub(crate) rng: StdRng,
-  pub(crate) verbose: bool,
   pub(crate) similarity: Similarity2<f64>,
+  pub(crate) verbose: bool,
 }
 
 impl State {
