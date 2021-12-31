@@ -35,5 +35,5 @@ check-lockfile:
 forbid:
 	./bin/forbid
 
-watch +COMMAND='ltest':
-	cargo watch --clear --exec "{{COMMAND}}"
+watch +args='ltest':
+	cargo watch --clear --exec "{{args}}"

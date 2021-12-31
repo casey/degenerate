@@ -7,8 +7,8 @@ pub(crate) struct State {
   pub(crate) program: Vec<Command>,
   pub(crate) program_counter: usize,
   pub(crate) rng: StdRng,
+  pub(crate) similarity: Similarity2<f64>,
   pub(crate) verbose: bool,
-  pub(crate) rotation: Rotation2<f64>,
 }
 
 impl State {
@@ -41,7 +41,7 @@ impl State {
       program: Vec::new(),
       program_counter: 0,
       rng: StdRng::seed_from_u64(0),
-      rotation: Rotation2::identity(),
+      similarity: Similarity2::identity(),
       verbose: false,
     }
   }

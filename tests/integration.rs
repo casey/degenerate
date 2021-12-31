@@ -112,6 +112,10 @@ impl Test {
 }
 
 fn image_test(program: &str) -> Result<()> {
+  let destination = format!("images/{}.actual-output.png", program);
+
+  fs::remove_file(&destination).ok();
+
   let tempdir = Test::new()?.program(program).run_and_return_tempdir()?;
 
   let actual_path = tempdir.path().join("output.png");
@@ -122,7 +126,6 @@ fn image_test(program: &str) -> Result<()> {
   let expected_image = image::open(&expected_path)?;
 
   if actual_image != expected_image {
-    let destination = format!("images/{}.actual-output.png", program);
     fs::rename(&actual_path, &destination)?;
     panic!(
       "Image test failed:\nExpected: {}\nActual:   {}",

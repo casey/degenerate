@@ -13,6 +13,7 @@ pub(crate) enum Command {
   Resize((usize, usize)),
   Rotate(f64),
   Save(Option<PathBuf>),
+  Scale(f64),
   Seed(u64),
   Verbose,
 }
@@ -21,12 +22,13 @@ impl Command {
   pub(crate) fn apply(&self, state: &mut State) -> Result<()> {
     match self {
       Self::Filter(filter) => {
+        let similarity = state.similarity.inverse();
         let mut output = state.matrix.clone();
         for col in 0..state.matrix.ncols() {
           for row in 0..state.matrix.nrows() {
             let i = Vector2::new(col, row);
             let v = i.coordinates(state.dimensions());
-            let v = state.rotation * v;
+            let v = similarity * v;
             let i = v.pixel(state.dimensions());
             if filter.filter(state, i, v) {
               output[(row, col)] = state.operation.apply(
@@ -95,10 +97,15 @@ impl Command {
       Self::Resize(dimensions) => {
         state.resize(*dimensions);
       }
-      Self::Rotate(turns) => state.rotation = Rotation2::new(turns * f64::consts::TAU),
+      Self::Rotate(turns) => state
+        .similarity
+        .append_rotation_mut(&UnitComplex::from_angle(turns * f64::consts::TAU)),
       Self::Save(path) => state
         .image()?
         .save(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
+      Self::Scale(scaling) => {
+        state.similarity.append_scaling_mut(*scaling);
+      }
       Self::Seed(seed) => state.rng = StdRng::seed_from_u64(*seed),
       Self::Verbose => state.verbose = !state.verbose,
     }
@@ -139,6 +146,7 @@ impl FromStr for Command {
       })),
       ["save", path] => Ok(Self::Save(Some(path.parse()?))),
       ["save"] => Ok(Self::Save(None)),
+      ["scale", scaling] => Ok(Self::Scale(scaling.parse()?)),
       ["seed", seed] => Ok(Self::Seed(seed.parse()?)),
       ["square"] => Ok(Self::Filter(Filter::Square)),
       ["top"] => Ok(Self::Filter(Filter::Top)),
