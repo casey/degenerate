@@ -38,6 +38,7 @@ impl Command {
                   .cloned()
                   .unwrap_or_else(Vector3::zeros),
               );
+              state.pixel_operation_counter += 1;
             }
           }
         }

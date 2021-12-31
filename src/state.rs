@@ -4,6 +4,7 @@ pub(crate) struct State {
   pub(crate) loop_counter: usize,
   pub(crate) matrix: DMatrix<Vector3<u8>>,
   pub(crate) operation: Operation,
+  pub(crate) pixel_operation_counter: u64,
   pub(crate) program: Vec<Command>,
   pub(crate) program_counter: usize,
   pub(crate) rng: StdRng,
