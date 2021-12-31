@@ -22,13 +22,14 @@ impl Command {
   pub(crate) fn apply(&self, state: &mut State) -> Result<()> {
     match self {
       Self::Filter(filter) => {
+        let similarity = state.similarity.inverse();
         let mut output = state.matrix.clone();
         for col in 0..state.matrix.ncols() {
           for row in 0..state.matrix.nrows() {
             let i = Vector2::new(col, row);
             let v = i.coordinates(state.dimensions());
             let v = state.rotation * v;
-            let v = state.similarity * v;
+            let v = similarity * v;
             let i = v.pixel(state.dimensions());
             if filter.filter(state, i, v) {
               output[(row, col)] = state.operation.apply(
@@ -102,8 +103,8 @@ impl Command {
         .image()?
         .save(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
       Self::Scale(scaling) => {
-        state.similarity = Similarity2::from_scaling(*scaling).inverse();
-      },
+        state.similarity = Similarity2::from_scaling(*scaling);
+      }
       Self::Seed(seed) => state.rng = StdRng::seed_from_u64(*seed),
       Self::Verbose => state.verbose = !state.verbose,
     }
