@@ -5,7 +5,7 @@ use {
   },
   dirs::home_dir,
   image::{ImageBuffer, RgbImage},
-  nalgebra::{DMatrix, Rotation2, Rotation3, Vector2, Vector3},
+  nalgebra::{DMatrix, Rotation2, Rotation3, Vector2, Vector3, Similarity2},
   rand::Rng,
   rand::{rngs::StdRng, SeedableRng},
   rustyline::{error::ReadlineError, Editor},

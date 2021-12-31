@@ -13,6 +13,7 @@ pub(crate) enum Command {
   Resize((usize, usize)),
   Rotate(f64),
   Save(Option<PathBuf>),
+  Scale(f64),
   Seed(u64),
   Verbose,
 }
@@ -27,6 +28,7 @@ impl Command {
             let i = Vector2::new(col, row);
             let v = i.coordinates(state.dimensions());
             let v = state.rotation * v;
+            let v = state.similarity * v;
             let i = v.pixel(state.dimensions());
             if filter.filter(state, i, v) {
               output[(row, col)] = state.operation.apply(
@@ -99,6 +101,9 @@ impl Command {
       Self::Save(path) => state
         .image()?
         .save(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
+      Self::Scale(scaling) => {
+        state.similarity = Similarity2::from_scaling(*scaling).inverse();
+      },
       Self::Seed(seed) => state.rng = StdRng::seed_from_u64(*seed),
       Self::Verbose => state.verbose = !state.verbose,
     }
@@ -139,6 +144,7 @@ impl FromStr for Command {
       })),
       ["save", path] => Ok(Self::Save(Some(path.parse()?))),
       ["save"] => Ok(Self::Save(None)),
+      ["scale", scaling] => Ok(Self::Scale(scaling.parse()?)),
       ["seed", seed] => Ok(Self::Seed(seed.parse()?)),
       ["square"] => Ok(Self::Filter(Filter::Square)),
       ["top"] => Ok(Self::Filter(Filter::Top)),
