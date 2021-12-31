@@ -104,7 +104,7 @@ impl Command {
         .image()?
         .save(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
       Self::Scale(scaling) => {
-        state.similarity = Similarity2::from_scaling(*scaling);
+        state.similarity.append_scaling_mut(*scaling);
       }
       Self::Seed(seed) => state.rng = StdRng::seed_from_u64(*seed),
       Self::Verbose => state.verbose = !state.verbose,
