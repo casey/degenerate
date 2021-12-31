@@ -50,5 +50,5 @@ gallery:
 	cargo run --release resize:4096:4096 seed:19798 rotate-color:g:0.01 rotate:0.01 for:100 random-filter loop rotate-color:b:0.01 rotate:0.01 for:100 random-filter loop save:smear.png
 	cargo run --release resize:4096:4096 rotate-color:g:0.07 rotate:0.07 for:10 x loop rotate-color:b:0.09 rotate:0.09 for:10 x loop save:brilliance.png
 	cargo run --release resize:4096:4096 seed:12462 rotate-color:g:0.1 rotate:0.1 for:10 random-filter loop rotate-color:b:0.1 rotate:0.1 for:10 random-filter loop save:starburst.png
-	cargo run --release resize:4096:4096 rotate-color:red:0.083333 rotate:0.1 for:12 circle cross x save:compass.png loop
+	cargo run --release resize:4096:4096 rotate-color:red:0.083333 rotate:0.1 for:12 circle cross x loop save:compass.png
 	cargo run --release resize:4096:4096 scale:0.99 for:100 circle loop save:singularity.png
