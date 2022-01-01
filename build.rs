@@ -80,7 +80,7 @@ fn main() -> Result {
 
     for program in programs {
       writeln!(file)?;
-      writeln!(file, "$ degenerate {}", program)?;
+      writeln!(file, "```bash\n$ degenerate {}\n```", program)?;
       writeln!(file, "![{}](images/{}.png)", program, program)?;
     }
 
