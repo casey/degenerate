@@ -37,3 +37,6 @@ forbid:
 
 watch +args='ltest':
 	cargo watch --clear --exec "{{args}}"
+
+gallery:
+	sed -n '/## Gallery/q;p' README.md

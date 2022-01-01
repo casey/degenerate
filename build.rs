@@ -1,53 +1,89 @@
-use {camino::Utf8PathBuf, indoc::indoc, std::io::Write};
+use {
+  camino::Utf8PathBuf,
+  indoc::indoc,
+  std::{
+    fs::{self, File},
+    io::Write,
+  },
+};
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-  println!("cargo:rerun-if-changed=images");
+type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 
-  let mut file = std::fs::File::create("tests/image_tests.rs")?;
+fn main() -> Result {
+  let mut programs = Vec::new();
 
-  write!(file, "use super::*;")?;
+  {
+    println!("cargo:rerun-if-changed=images");
 
-  for result in std::fs::read_dir("images")? {
-    let entry = result?;
-    let expected_path = Utf8PathBuf::try_from(entry.path())?;
-    println!("cargo:rerun-if-changed={}", expected_path);
+    let mut file = fs::File::create("tests/image_tests.rs")?;
 
-    let filename = expected_path
-      .file_name()
-      .ok_or_else(|| format!("Could not extract file name: {}", expected_path))?;
+    write!(file, "use super::*;")?;
 
-    if !filename.ends_with(".png") || filename.ends_with(".actual-output.png") {
-      continue;
-    }
+    for result in fs::read_dir("images")? {
+      let entry = result?;
+      let expected_path = Utf8PathBuf::try_from(entry.path())?;
+      println!("cargo:rerun-if-changed={}", expected_path);
 
-    let program = expected_path
-      .file_stem()
-      .ok_or_else(|| format!("Could not extract file stem: {}", expected_path))?;
+      let filename = expected_path
+        .file_name()
+        .ok_or_else(|| format!("Could not extract file name: {}", expected_path))?;
 
-    let identifier = program.replace(|c: char| !c.is_alphanumeric(), "_");
+      if !filename.ends_with(".png") || filename.ends_with(".actual-output.png") {
+        continue;
+      }
 
-    write!(
-      file,
-      indoc!(
-        "
+      let program = expected_path
+        .file_stem()
+        .ok_or_else(|| format!("Could not extract file stem: {}", expected_path))?;
+
+      programs.push(program.to_owned());
+
+      let identifier = program.replace(|c: char| !c.is_alphanumeric(), "_");
+
+      write!(
+        file,
+        indoc!(
+          "
 
 
         #[test]{}
         fn {}() -> Result<()> {{
           image_test(\"{}\")
         }}",
-      ),
-      if program.contains("comment:ignore") {
-        "\n#[ignore]"
-      } else {
-        ""
-      },
-      identifier,
-      program
-    )?;
+        ),
+        if program.contains("comment:ignore") {
+          "\n#[ignore]"
+        } else {
+          ""
+        },
+        identifier,
+        program
+      )?;
+    }
+
+    writeln!(file)?;
   }
 
-  writeln!(file)?;
+  {
+    println!("cargo:rerun-if-changed=README.md");
+    let text = fs::read_to_string("README.md")?;
 
-  Ok(())
+    let mut file = File::create("README.md")?;
+
+    for line in text.lines() {
+      writeln!(file, "{}", line)?;
+
+      if line == "## Gallery" {
+        break;
+      }
+    }
+
+    for program in programs {
+      writeln!(file)?;
+      writeln!(file, "$ degenerate {}", program)?;
+      writeln!(file, "![{}](images/{}.png)", program, program)?;
+    }
+
+    Ok(())
+  }
 }
