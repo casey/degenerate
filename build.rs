@@ -17,6 +17,7 @@ fn main() -> Result {
 
     let mut file = fs::File::create("tests/image_tests.rs")?;
 
+    write!(file, "#![rustfmt::skip]")?;
     write!(file, "use super::*;")?;
 
     for result in fs::read_dir("images")? {
