@@ -25,6 +25,7 @@ unindent = "0.1.7"
 [build-dependencies]
 camino = "1.0.5"
 indoc = "1.0.3"
+urlencoding = "2.1.0"
 
 [[test]]
 name = "integration"
