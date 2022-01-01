@@ -17,7 +17,7 @@ fn main() -> Result {
 
     let mut file = fs::File::create("tests/image_tests.rs")?;
 
-    writeln!(file, "use super::*;")?;
+    write!(file, "use super::*;")?;
 
     for result in fs::read_dir("images")? {
       let entry = result?;
