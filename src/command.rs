@@ -2,6 +2,7 @@ use super::*;
 
 #[derive(Clone, Debug)]
 pub(crate) enum Command {
+  Comment,
   Filter(Filter),
   For(usize),
   Load(Option<PathBuf>),
@@ -21,6 +22,7 @@ pub(crate) enum Command {
 impl Command {
   pub(crate) fn apply(&self, state: &mut State) -> Result<()> {
     match self {
+      Self::Comment => {}
       Self::Filter(filter) => {
         let similarity = state.similarity.inverse();
         let mut output = state.matrix.clone();
@@ -121,6 +123,7 @@ impl FromStr for Command {
     match s.split(':').collect::<Vec<&str>>().as_slice() {
       ["all"] => Ok(Self::Filter(Filter::All)),
       ["circle"] => Ok(Self::Filter(Filter::Circle)),
+      ["comment", ..] => Ok(Self::Comment),
       ["cross"] => Ok(Self::Filter(Filter::Cross)),
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),

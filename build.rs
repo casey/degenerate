@@ -32,12 +32,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "
 
 
-        #[test]
+        #[test]{}
         fn {}() -> Result<()> {{
           image_test(\"{}\")
         }}",
       ),
-      identifier, program
+      if program.contains("comment:ignore") {
+        "\n#[ignore]"
+      } else {
+        ""
+      },
+      identifier,
+      program
     )?;
   }
 
