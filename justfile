@@ -36,4 +36,4 @@ forbid:
 	./bin/forbid
 
 watch +args='ltest':
-	cargo watch --clear --exec "{{args}}"
+	cargo watch --ignore README.md --clear --exec "{{args}}"

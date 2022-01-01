@@ -51,7 +51,7 @@ fn main() -> Result {
           image_test(\"{}\")
         }}",
         ),
-        if program.contains("comment:ignore") {
+        if program.contains("comment:slow") {
           "\n#[ignore]"
         } else {
           ""
