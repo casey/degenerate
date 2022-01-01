@@ -1,6 +1,7 @@
 # degenerate
 
-Degenerate is an algorithmic image generator inspired by [blaster](https://github.com/casey/blaster).
+Degenerate is an algorithmic image generator inspired by
+[blaster](https://github.com/casey/blaster).
 
 (N.B. blaster is written in idiosyncratic Objective-C++.)
 
