@@ -81,7 +81,12 @@ fn main() -> Result {
     for program in programs {
       writeln!(file)?;
       writeln!(file, "```bash\n$ degenerate {}\n```", program)?;
-      writeln!(file, "![{}](images/{}.png)", program, program)?;
+      writeln!(
+        file,
+        "![{}](images/{}.png)",
+        program,
+        urlencoding::encode(&program)
+      )?;
     }
 
     Ok(())
