@@ -11,7 +11,7 @@ $ degenerate [COMMAND]...
 ```
 
 `COMMAND`s may take zero or more `:`-separated arguments, and are currently
-undocumented. The best way to learn what they do is to peruse the [images
+undocumented. The best way to learn what they do is to peruse the [image
 tests](images). The name of each image is the `degenerate` program that
 produced it. The image tests are reproduced below, with each preceded by its
 `degenerate` invocation.
