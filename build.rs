@@ -78,14 +78,17 @@ fn main() -> Result {
       }
     }
 
-    for program in programs {
+    for (i, program) in programs.iter().enumerate() {
+      if i > 0 {
+        writeln!(file, "---")?;
+      }
       writeln!(file)?;
       writeln!(file, "```bash\n$ degenerate {}\n```", program)?;
       writeln!(
         file,
         "![{}](images/{}.png)",
         program,
-        urlencoding::encode(&program)
+        urlencoding::encode(program)
       )?;
     }
 
