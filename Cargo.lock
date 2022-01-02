@@ -168,6 +168,7 @@ dependencies = [
 name = "degenerate"
 version = "0.0.0"
 dependencies = [
+ "approx",
  "camino",
  "dirs",
  "executable-path",

@@ -10,6 +10,7 @@ pub(crate) struct State {
   pub(crate) rng: StdRng,
   pub(crate) similarity: Similarity2<f64>,
   pub(crate) verbose: bool,
+  pub(crate) wrap: bool,
 }
 
 impl State {
@@ -45,6 +46,7 @@ impl State {
       rng: StdRng::seed_from_u64(0),
       similarity: Similarity2::identity(),
       verbose: false,
+      wrap: false,
     }
   }
 
