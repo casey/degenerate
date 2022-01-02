@@ -2,6 +2,7 @@ use {super::*, num_traits::identities::Zero, std::env};
 
 pub(crate) struct State {
   pub(crate) loop_counter: usize,
+  pub(crate) mask: Mask,
   pub(crate) matrix: DMatrix<Vector3<u8>>,
   pub(crate) operation: Operation,
   pub(crate) program: Vec<Command>,
@@ -36,6 +37,7 @@ impl State {
   pub(crate) fn new() -> Self {
     Self {
       loop_counter: 0,
+      mask: Mask::All,
       matrix: DMatrix::zeros(0, 0),
       operation: Operation::Invert,
       program: Vec::new(),

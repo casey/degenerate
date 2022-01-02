@@ -2,6 +2,7 @@ use super::*;
 
 #[derive(Clone, Debug)]
 pub(crate) enum Command {
+  Apply,
   Comment,
   For(usize),
   Load(Option<PathBuf>),
@@ -22,6 +23,28 @@ pub(crate) enum Command {
 impl Command {
   pub(crate) fn apply(&self, state: &mut State) -> Result<()> {
     match self {
+      Self::Apply => {
+        let similarity = state.similarity.inverse();
+        let mut output = state.matrix.clone();
+        for col in 0..state.matrix.ncols() {
+          for row in 0..state.matrix.nrows() {
+            let i = Vector2::new(col, row);
+            let v = i.coordinates(state.dimensions());
+            let v = similarity * v;
+            let i = v.pixel(state.dimensions());
+            if state.mask.is_masked(state, i, v) {
+              output[(row, col)] = state.operation.apply(
+                state
+                  .matrix
+                  .get((i.y, i.x))
+                  .cloned()
+                  .unwrap_or_else(Vector3::zeros),
+              );
+            }
+          }
+        }
+        state.matrix = output;
+      }
       Self::Comment => {}
       Self::For(until) => {
         if state.loop_counter >= *until {
@@ -49,26 +72,7 @@ impl Command {
         state.loop_counter += 1;
       }
       Self::Mask(mask) => {
-        let similarity = state.similarity.inverse();
-        let mut output = state.matrix.clone();
-        for col in 0..state.matrix.ncols() {
-          for row in 0..state.matrix.nrows() {
-            let i = Vector2::new(col, row);
-            let v = i.coordinates(state.dimensions());
-            let v = similarity * v;
-            let i = v.pixel(state.dimensions());
-            if mask.is_masked(state, i, v) {
-              output[(row, col)] = state.operation.apply(
-                state
-                  .matrix
-                  .get((i.y, i.x))
-                  .cloned()
-                  .unwrap_or_else(Vector3::zeros),
-              );
-            }
-          }
-        }
-        state.matrix = output;
+        state.mask = mask.clone();
       }
       Self::Operation(operation) => state.operation = *operation,
       Self::Print => state.print()?,
@@ -122,6 +126,7 @@ impl FromStr for Command {
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     match s.split(':').collect::<Vec<&str>>().as_slice() {
       ["all"] => Ok(Self::Mask(Mask::All)),
+      ["apply"] => Ok(Self::Apply),
       ["circle"] => Ok(Self::Mask(Mask::Circle)),
       ["comment", ..] => Ok(Self::Comment),
       ["cross"] => Ok(Self::Mask(Mask::Cross)),
