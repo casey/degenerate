@@ -1,6 +1,6 @@
 use {
   crate::{
-    color_axis::ColorAxis, command::Command, coordinates::Coordinates, filter::Filter,
+    color_axis::ColorAxis, command::Command, coordinates::Coordinates, mask::Mask,
     operation::Operation, pixel::Pixel, state::State,
   },
   dirs::home_dir,
@@ -22,7 +22,7 @@ use {
 mod color_axis;
 mod command;
 mod coordinates;
-mod filter;
+mod mask;
 mod operation;
 mod pixel;
 mod state;

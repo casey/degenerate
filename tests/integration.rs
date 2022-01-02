@@ -142,7 +142,7 @@ fn repl_returns_success_after_reaching_eol() -> Result<()> {
 }
 
 #[test]
-fn repl_valid_filter() -> Result<()> {
+fn repl_valid_command() -> Result<()> {
   let mut command = Command::new(executable_path("degenerate"))
     .args(["resize:4:4", "repl"])
     .stdin(Stdio::piped())
@@ -161,7 +161,7 @@ fn repl_valid_filter() -> Result<()> {
 }
 
 #[test]
-fn repl_invalid_filter() -> Result<()> {
+fn repl_invalid_command() -> Result<()> {
   let mut command = Command::new(executable_path("degenerate"))
     .args(["resize:4:4", "repl"])
     .stdin(Stdio::piped())
@@ -203,7 +203,7 @@ fn verbose_toggles_step_status() -> Result<()> {
     .program("verbose square verbose square")
     .expected_stderr(
       "
-      PC 1 LC 0 Filter(Square)
+      PC 1 LC 0 Mask(Square)
       PC 2 LC 0 Verbose
       ",
     )
