@@ -21,7 +21,7 @@ pub(crate) enum Command {
 }
 
 impl Command {
-  pub(crate) fn apply(&self, state: &mut State) -> Result<()> {
+  pub(crate) fn run(&self, state: &mut State) -> Result<()> {
     match self {
       Self::Apply => {
         let similarity = state.similarity.inverse();
@@ -76,7 +76,7 @@ impl Command {
       }
       Self::Operation(operation) => state.operation = *operation,
       Self::Print => state.print()?,
-      Self::RandomMask => Self::Mask(state.rng.gen()).apply(state)?,
+      Self::RandomMask => Self::Mask(state.rng.gen()).run(state)?,
       Self::Repl => {
         let history = home_dir().unwrap_or_default().join(".degenerate_history");
 
@@ -91,7 +91,7 @@ impl Command {
 
           match line.parse::<Self>() {
             Ok(command) => {
-              command.apply(state)?;
+              command.run(state)?;
               state.print()?;
             }
             Err(err) => {

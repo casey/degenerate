@@ -27,7 +27,7 @@ impl State {
           state.program_counter, state.loop_counter, command
         );
       }
-      command.apply(&mut state)?;
+      command.run(&mut state)?;
       state.program_counter = state.program_counter.wrapping_add(1);
     }
 
