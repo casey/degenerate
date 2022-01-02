@@ -21,26 +21,6 @@ pub(crate) enum Command {
   Wrap,
 }
 
-// how to expose tiling:
-// - as a transformation: `circle apply all tile:n apply` where n is tiling factor
-// - as a toggle: `circle apply tile all apply`
-
-fn wrap(mut v: Vector2<f64>) -> Vector2<f64> {
-  v.x = (v.x + 1.0).rem_euclid(2.0) - 1.0;
-  v.y = (v.y + 1.0).rem_euclid(2.0) - 1.0;
-  v
-}
-
-#[test]
-fn wrap_test() {
-  approx::assert_ulps_eq!(wrap(Vector2::new(1.1, 1.1)), Vector2::new(-0.9, -0.9));
-  approx::assert_ulps_eq!(wrap(Vector2::new(-1.1, -1.1)), Vector2::new(0.9, 0.9));
-  approx::assert_ulps_eq!(wrap(Vector2::new(3.1, 3.1)), Vector2::new(-0.9, -0.9));
-  approx::assert_ulps_eq!(wrap(Vector2::new(-3.1, -3.1)), Vector2::new(0.9, 0.9));
-  approx::assert_ulps_eq!(wrap(Vector2::new(5.1, 5.1)), Vector2::new(-0.9, -0.9));
-  approx::assert_ulps_eq!(wrap(Vector2::new(-5.1, -5.1)), Vector2::new(0.9, 0.9));
-}
-
 impl Command {
   pub(crate) fn run(&self, state: &mut State) -> Result<()> {
     match self {
@@ -52,7 +32,7 @@ impl Command {
             let i = Vector2::new(col, row);
             let v = i.coordinates(state.dimensions());
             let v = similarity * v;
-            let v = if state.wrap { wrap(v) } else { v };
+            let v = if state.wrap { v.wrap() } else { v };
             let i = v.pixel(state.dimensions());
             if state.mask.is_masked(state, i, v) {
               output[(row, col)] = state.operation.apply(
