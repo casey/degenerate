@@ -137,6 +137,10 @@ impl FromStr for Command {
       ["print"] => Ok(Self::Print),
       ["random-filter"] => Ok(Self::RandomFilter),
       ["repl"] => Ok(Self::Repl),
+      ["resize", size] => {
+        let size = size.parse()?;
+        Ok(Self::Resize((size, size)))
+      }
       ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["rotate", turns] => Ok(Self::Rotate(turns.parse()?)),
       ["rotate-color", axis, turns] => Ok(Self::Operation(Operation::RotateColor(
