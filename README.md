@@ -165,9 +165,19 @@ $ degenerate resize:256 save
 ![resize:256 save](images/resize%3A256%20save.png)
 
 ```
+$ degenerate resize:256 scale:0.5 circle apply all scale:0.9 wrap apply save
+```
+![resize:256 scale:0.5 circle apply all scale:0.9 wrap apply save](images/resize%3A256%20scale%3A0.5%20circle%20apply%20all%20scale%3A0.9%20wrap%20apply%20save.png)
+
+```
 $ degenerate resize:256 scale:0.5 circle apply save
 ```
 ![resize:256 scale:0.5 circle apply save](images/resize%3A256%20scale%3A0.5%20circle%20apply%20save.png)
+
+```
+$ degenerate resize:256 scale:0.5 circle wrap apply save
+```
+![resize:256 scale:0.5 circle wrap apply save](images/resize%3A256%20scale%3A0.5%20circle%20wrap%20apply%20save.png)
 
 ```
 $ degenerate resize:256 scale:2 rotate:0.05 x apply save

@@ -18,6 +18,7 @@ pub(crate) enum Command {
   Scale(f64),
   Seed(u64),
   Verbose,
+  Wrap,
 }
 
 impl Command {
@@ -31,6 +32,7 @@ impl Command {
             let i = Vector2::new(col, row);
             let v = i.coordinates(state.dimensions());
             let v = similarity * v;
+            let v = if state.wrap { v.wrap() } else { v };
             let i = v.pixel(state.dimensions());
             if state.mask.is_masked(state, i, v) {
               output[(row, col)] = state.operation.apply(
@@ -114,6 +116,7 @@ impl Command {
       }
       Self::Seed(seed) => state.rng = StdRng::seed_from_u64(*seed),
       Self::Verbose => state.verbose = !state.verbose,
+      Self::Wrap => state.wrap = !state.wrap,
     }
 
     Ok(())
@@ -163,6 +166,7 @@ impl FromStr for Command {
       ["square"] => Ok(Self::Mask(Mask::Square)),
       ["top"] => Ok(Self::Mask(Mask::Top)),
       ["verbose"] => Ok(Self::Verbose),
+      ["wrap"] => Ok(Self::Wrap),
       ["x"] => Ok(Self::Mask(Mask::X)),
       _ => Err(format!("Invalid command: {}", s).into()),
     }
