@@ -20,34 +20,34 @@ produced it. The image tests are reproduced below, with each preceded by its
 ## Gallery
 
 ```
-$ degenerate comment:slow resize:256 rotate-color:g:0.07 rotate:0.07 for:10 x loop rotate-color:b:0.09 rotate:0.09 for:10 x loop save
+$ degenerate comment:slow resize:256 rotate-color:red:0.083333 rotate:0.1 for:12 circle apply cross apply x apply loop save
 ```
-![comment:slow resize:256 rotate-color:g:0.07 rotate:0.07 for:10 x loop rotate-color:b:0.09 rotate:0.09 for:10 x loop save](images/comment%3Aslow%20resize%3A256%20rotate-color%3Ag%3A0.07%20rotate%3A0.07%20for%3A10%20x%20loop%20rotate-color%3Ab%3A0.09%20rotate%3A0.09%20for%3A10%20x%20loop%20save.png)
+![comment:slow resize:256 rotate-color:red:0.083333 rotate:0.1 for:12 circle apply cross apply x apply loop save](images/comment%3Aslow%20resize%3A256%20rotate-color%3Ared%3A0.083333%20rotate%3A0.1%20for%3A12%20circle%20apply%20cross%20apply%20x%20apply%20loop%20save.png)
 
 ```
-$ degenerate comment:slow resize:256 rotate-color:red:0.083333 rotate:0.1 for:12 circle cross x loop save
+$ degenerate comment:slow resize:256 rotate:0.111 for:16 square apply circle apply loop save
 ```
-![comment:slow resize:256 rotate-color:red:0.083333 rotate:0.1 for:12 circle cross x loop save](images/comment%3Aslow%20resize%3A256%20rotate-color%3Ared%3A0.083333%20rotate%3A0.1%20for%3A12%20circle%20cross%20x%20loop%20save.png)
+![comment:slow resize:256 rotate:0.111 for:16 square apply circle apply loop save](images/comment%3Aslow%20resize%3A256%20rotate%3A0.111%20for%3A16%20square%20apply%20circle%20apply%20loop%20save.png)
 
 ```
-$ degenerate comment:slow resize:256 rotate:0.111 for:16 square circle loop save
+$ degenerate comment:slow resize:256 scale:0.99 circle for:100 apply loop save
 ```
-![comment:slow resize:256 rotate:0.111 for:16 square circle loop save](images/comment%3Aslow%20resize%3A256%20rotate%3A0.111%20for%3A16%20square%20circle%20loop%20save.png)
+![comment:slow resize:256 scale:0.99 circle for:100 apply loop save](images/comment%3Aslow%20resize%3A256%20scale%3A0.99%20circle%20for%3A100%20apply%20loop%20save.png)
 
 ```
-$ degenerate comment:slow resize:256 scale:0.99 for:100 circle loop save
+$ degenerate comment:slow resize:256 seed:12462 rotate-color:g:0.1 rotate:0.1 for:10 random-mask apply loop rotate-color:b:0.1 rotate:0.1 for:10 random-mask apply loop save
 ```
-![comment:slow resize:256 scale:0.99 for:100 circle loop save](images/comment%3Aslow%20resize%3A256%20scale%3A0.99%20for%3A100%20circle%20loop%20save.png)
+![comment:slow resize:256 seed:12462 rotate-color:g:0.1 rotate:0.1 for:10 random-mask apply loop rotate-color:b:0.1 rotate:0.1 for:10 random-mask apply loop save](images/comment%3Aslow%20resize%3A256%20seed%3A12462%20rotate-color%3Ag%3A0.1%20rotate%3A0.1%20for%3A10%20random-mask%20apply%20loop%20rotate-color%3Ab%3A0.1%20rotate%3A0.1%20for%3A10%20random-mask%20apply%20loop%20save.png)
 
 ```
-$ degenerate comment:slow resize:256 seed:12462 rotate-color:g:0.1 rotate:0.1 for:10 random-mask loop rotate-color:b:0.1 rotate:0.1 for:10 random-mask loop save
+$ degenerate comment:slow resize:256 seed:19798 rotate-color:g:0.01 rotate:0.01 for:100 random-mask apply loop rotate-color:b:0.01 rotate:0.01 for:100 random-mask apply loop save
 ```
-![comment:slow resize:256 seed:12462 rotate-color:g:0.1 rotate:0.1 for:10 random-mask loop rotate-color:b:0.1 rotate:0.1 for:10 random-mask loop save](images/comment%3Aslow%20resize%3A256%20seed%3A12462%20rotate-color%3Ag%3A0.1%20rotate%3A0.1%20for%3A10%20random-mask%20loop%20rotate-color%3Ab%3A0.1%20rotate%3A0.1%20for%3A10%20random-mask%20loop%20save.png)
+![comment:slow resize:256 seed:19798 rotate-color:g:0.01 rotate:0.01 for:100 random-mask apply loop rotate-color:b:0.01 rotate:0.01 for:100 random-mask apply loop save](images/comment%3Aslow%20resize%3A256%20seed%3A19798%20rotate-color%3Ag%3A0.01%20rotate%3A0.01%20for%3A100%20random-mask%20apply%20loop%20rotate-color%3Ab%3A0.01%20rotate%3A0.01%20for%3A100%20random-mask%20apply%20loop%20save.png)
 
 ```
-$ degenerate comment:slow resize:256 seed:19798 rotate-color:g:0.01 rotate:0.01 for:100 random-mask loop rotate-color:b:0.01 rotate:0.01 for:100 random-mask loop save
+$ degenerate comment:slow resize:256 x rotate-color:g:0.07 rotate:0.07 for:10 apply loop rotate-color:b:0.09 rotate:0.09 for:10 apply loop save
 ```
-![comment:slow resize:256 seed:19798 rotate-color:g:0.01 rotate:0.01 for:100 random-mask loop rotate-color:b:0.01 rotate:0.01 for:100 random-mask loop save](images/comment%3Aslow%20resize%3A256%20seed%3A19798%20rotate-color%3Ag%3A0.01%20rotate%3A0.01%20for%3A100%20random-mask%20loop%20rotate-color%3Ab%3A0.01%20rotate%3A0.01%20for%3A100%20random-mask%20loop%20save.png)
+![comment:slow resize:256 x rotate-color:g:0.07 rotate:0.07 for:10 apply loop rotate-color:b:0.09 rotate:0.09 for:10 apply loop save](images/comment%3Aslow%20resize%3A256%20x%20rotate-color%3Ag%3A0.07%20rotate%3A0.07%20for%3A10%20apply%20loop%20rotate-color%3Ab%3A0.09%20rotate%3A0.09%20for%3A10%20apply%20loop%20save.png)
 
 ```
 $ degenerate resize:256 all apply save
