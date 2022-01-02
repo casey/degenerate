@@ -147,12 +147,17 @@ fn image_test(program: &str) -> Result<()> {
     fs::rename(&actual_path, &destination)?;
 
     #[cfg(target_os = "macos")]
-    Command::new("xattr")
-      .args(["-wx", "com.apple.FinderInfo"])
-      .arg("0000000000000000000C00000000000000000000000000000000000000000000")
-      .arg(&destination)
-      .status()
-      .ok();
+    {
+      let status = Command::new("xattr")
+        .args(["-wx", "com.apple.FinderInfo"])
+        .arg("0000000000000000000C00000000000000000000000000000000000000000000")
+        .arg(&destination)
+        .status()?;
+
+      if !status.success() {
+        panic!("xattr failed: {}", status);
+      }
+    }
 
     panic!(
       "Image test failed:\nExpected: {}\nActual:   {}",
