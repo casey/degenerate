@@ -1,7 +1,7 @@
 use {super::*, rand_derive2::RandGen};
 
 #[derive(Clone, Debug, RandGen)]
-pub(crate) enum Filter {
+pub(crate) enum Mask {
   All,
   Circle,
   Cross,
@@ -12,8 +12,8 @@ pub(crate) enum Filter {
   X,
 }
 
-impl Filter {
-  pub(crate) fn filter(&self, state: &State, pixel: Vector2<usize>, v: Vector2<f64>) -> bool {
+impl Mask {
+  pub(crate) fn is_masked(&self, state: &State, pixel: Vector2<usize>, v: Vector2<f64>) -> bool {
     match self {
       Self::All => true,
       Self::Circle => v.norm() < 1.0,

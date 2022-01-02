@@ -2,14 +2,12 @@ use {
   camino::Utf8PathBuf,
   indoc::indoc,
   std::{
-    fs::{self, File},
-    io::Write,
+    fs::{self, DirEntry, File},
+    io::{self, Write},
   },
 };
 
-type Result = std::result::Result<(), Box<dyn std::error::Error>>;
-
-fn main() -> Result {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
   let mut programs = Vec::new();
 
   {
@@ -19,8 +17,10 @@ fn main() -> Result {
 
     write!(file, "use super::*;")?;
 
-    for result in fs::read_dir("images")? {
-      let entry = result?;
+    let mut entries = fs::read_dir("images")?.collect::<io::Result<Vec<DirEntry>>>()?;
+    entries.sort_by_key(|entry| entry.file_name());
+
+    for entry in entries {
       let expected_path = Utf8PathBuf::try_from(entry.path())?;
       println!("cargo:rerun-if-changed={}", expected_path);
 

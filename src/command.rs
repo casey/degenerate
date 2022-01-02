@@ -2,14 +2,15 @@ use super::*;
 
 #[derive(Clone, Debug)]
 pub(crate) enum Command {
+  Apply,
   Comment,
-  Filter(Filter),
   For(usize),
   Load(Option<PathBuf>),
   Loop,
+  Mask(Mask),
   Operation(Operation),
   Print,
-  RandomFilter,
+  RandomMask,
   Repl,
   Resize((usize, usize)),
   Rotate(f64),
@@ -20,10 +21,9 @@ pub(crate) enum Command {
 }
 
 impl Command {
-  pub(crate) fn apply(&self, state: &mut State) -> Result<()> {
+  pub(crate) fn run(&self, state: &mut State) -> Result<()> {
     match self {
-      Self::Comment => {}
-      Self::Filter(filter) => {
+      Self::Apply => {
         let similarity = state.similarity.inverse();
         let mut output = state.matrix.clone();
         for col in 0..state.matrix.ncols() {
@@ -32,7 +32,7 @@ impl Command {
             let v = i.coordinates(state.dimensions());
             let v = similarity * v;
             let i = v.pixel(state.dimensions());
-            if filter.filter(state, i, v) {
+            if state.mask.is_masked(state, i, v) {
               output[(row, col)] = state.operation.apply(
                 state
                   .matrix
@@ -45,6 +45,7 @@ impl Command {
         }
         state.matrix = output;
       }
+      Self::Comment => {}
       Self::For(until) => {
         if state.loop_counter >= *until {
           loop {
@@ -70,9 +71,12 @@ impl Command {
         }
         state.loop_counter += 1;
       }
+      Self::Mask(mask) => {
+        state.mask = mask.clone();
+      }
       Self::Operation(operation) => state.operation = *operation,
       Self::Print => state.print()?,
-      Self::RandomFilter => Self::Filter(state.rng.gen()).apply(state)?,
+      Self::RandomMask => Self::Mask(state.rng.gen()).run(state)?,
       Self::Repl => {
         let history = home_dir().unwrap_or_default().join(".degenerate_history");
 
@@ -87,7 +91,7 @@ impl Command {
 
           match line.parse::<Self>() {
             Ok(command) => {
-              command.apply(state)?;
+              command.run(state)?;
               state.print()?;
             }
             Err(err) => {
@@ -121,21 +125,22 @@ impl FromStr for Command {
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     match s.split(':').collect::<Vec<&str>>().as_slice() {
-      ["all"] => Ok(Self::Filter(Filter::All)),
-      ["circle"] => Ok(Self::Filter(Filter::Circle)),
+      ["all"] => Ok(Self::Mask(Mask::All)),
+      ["apply"] => Ok(Self::Apply),
+      ["circle"] => Ok(Self::Mask(Mask::Circle)),
       ["comment", ..] => Ok(Self::Comment),
-      ["cross"] => Ok(Self::Filter(Filter::Cross)),
+      ["cross"] => Ok(Self::Mask(Mask::Cross)),
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
       ["load", path] => Ok(Self::Load(Some(path.parse()?))),
       ["load"] => Ok(Self::Load(None)),
       ["loop"] => Ok(Self::Loop),
-      ["mod", divisor, remainder] => Ok(Self::Filter(Filter::Mod {
+      ["mod", divisor, remainder] => Ok(Self::Mask(Mask::Mod {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
       })),
       ["print"] => Ok(Self::Print),
-      ["random-filter"] => Ok(Self::RandomFilter),
+      ["random-mask"] => Ok(Self::RandomMask),
       ["repl"] => Ok(Self::Repl),
       ["resize", size] => {
         let size = size.parse()?;
@@ -147,7 +152,7 @@ impl FromStr for Command {
         axis.parse()?,
         turns.parse()?,
       ))),
-      ["rows", nrows, step] => Ok(Self::Filter(Filter::Rows {
+      ["rows", nrows, step] => Ok(Self::Mask(Mask::Rows {
         nrows: nrows.parse()?,
         step: step.parse()?,
       })),
@@ -155,10 +160,10 @@ impl FromStr for Command {
       ["save"] => Ok(Self::Save(None)),
       ["scale", scaling] => Ok(Self::Scale(scaling.parse()?)),
       ["seed", seed] => Ok(Self::Seed(seed.parse()?)),
-      ["square"] => Ok(Self::Filter(Filter::Square)),
-      ["top"] => Ok(Self::Filter(Filter::Top)),
+      ["square"] => Ok(Self::Mask(Mask::Square)),
+      ["top"] => Ok(Self::Mask(Mask::Top)),
       ["verbose"] => Ok(Self::Verbose),
-      ["x"] => Ok(Self::Filter(Filter::X)),
+      ["x"] => Ok(Self::Mask(Mask::X)),
       _ => Err(format!("Invalid command: {}", s).into()),
     }
   }

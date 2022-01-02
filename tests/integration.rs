@@ -4,6 +4,7 @@ use {
   std::{
     fs,
     io::prelude::*,
+    path::Path,
     process::{Command, Stdio},
     str, thread,
     time::Duration,
@@ -112,6 +113,23 @@ impl Test {
 }
 
 fn image_test(program: &str) -> Result<()> {
+  for result in fs::read_dir("images")? {
+    let entry = result?;
+    let file_name = entry
+      .file_name()
+      .to_str()
+      .ok_or_else(|| format!("File name was not valid unicode: {:?}", entry.file_name()))?
+      .to_owned();
+    if let Some(program) = file_name.strip_suffix(".actual-output.png") {
+      if !Path::new("images")
+        .join(format!("{}.png", program))
+        .is_file()
+      {
+        fs::remove_file(entry.path())?;
+      }
+    }
+  }
+
   let destination = format!("images/{}.actual-output.png", program);
 
   fs::remove_file(&destination).ok();
@@ -127,6 +145,20 @@ fn image_test(program: &str) -> Result<()> {
 
   if actual_image != expected_image {
     fs::rename(&actual_path, &destination)?;
+
+    #[cfg(target_os = "macos")]
+    {
+      let status = Command::new("xattr")
+        .args(["-wx", "com.apple.FinderInfo"])
+        .arg("0000000000000000000C00000000000000000000000000000000000000000000")
+        .arg(&destination)
+        .status()?;
+
+      if !status.success() {
+        panic!("xattr failed: {}", status);
+      }
+    }
+
     panic!(
       "Image test failed:\nExpected: {}\nActual:   {}",
       expected_path, destination,
@@ -142,7 +174,7 @@ fn repl_returns_success_after_reaching_eol() -> Result<()> {
 }
 
 #[test]
-fn repl_valid_filter() -> Result<()> {
+fn repl_valid_command() -> Result<()> {
   let mut command = Command::new(executable_path("degenerate"))
     .args(["resize:4:4", "repl"])
     .stdin(Stdio::piped())
@@ -150,18 +182,19 @@ fn repl_valid_filter() -> Result<()> {
     .stderr(Stdio::piped())
     .spawn()?;
 
-  write!(command.stdin.as_mut().unwrap(), "rows:1:1")?;
+  writeln!(command.stdin.as_mut().unwrap(), "rows:1:1")?;
+  writeln!(command.stdin.as_mut().unwrap(), "apply")?;
 
   assert_eq!(
     str::from_utf8(&command.wait_with_output()?.stdout)?,
-    "FFFF\n0000\nFFFF\n0000\n"
+    "0000\n0000\n0000\n0000\nFFFF\n0000\nFFFF\n0000\n"
   );
 
   Ok(())
 }
 
 #[test]
-fn repl_invalid_filter() -> Result<()> {
+fn repl_invalid_command() -> Result<()> {
   let mut command = Command::new(executable_path("degenerate"))
     .args(["resize:4:4", "repl"])
     .stdin(Stdio::piped())
@@ -203,7 +236,7 @@ fn verbose_toggles_step_status() -> Result<()> {
     .program("verbose square verbose square")
     .expected_stderr(
       "
-      PC 1 LC 0 Filter(Square)
+      PC 1 LC 0 Mask(Square)
       PC 2 LC 0 Verbose
       ",
     )
@@ -213,7 +246,7 @@ fn verbose_toggles_step_status() -> Result<()> {
 #[test]
 fn looping() -> Result<()> {
   Test::new()?
-    .program("resize:4:4 for:2 square print loop")
+    .program("resize:4:4 square for:2 apply print loop")
     .expected_stdout(
       "
       0000
@@ -232,7 +265,7 @@ fn looping() -> Result<()> {
 #[test]
 fn multiple_fors_reset_loop_counter() -> Result<()> {
   Test::new()?
-    .program("resize:4:4 for:2 square print loop for:1 rows:1:1 print loop")
+    .program("resize:4:4 for:2 square apply print loop for:1 rows:1:1 apply print loop")
     .expected_stdout(
       "
       0000
