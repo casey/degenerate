@@ -75,7 +75,23 @@ impl Command {
         state.loop_counter += 1;
       }
       Self::Open(path) => {
-        process::Command::new("open")
+        let default_command = {
+          if cfg!(target_os = "macos") {
+            Some("open")
+          } else if cfg!(target_os = "linux") {
+            Some("xdg-open")
+          } else {
+            None
+          }
+        };
+
+        let command = env::var("DEGENERATE_OPEN_COMMAND").unwrap_or(
+          default_command
+            .ok_or("Default command for 'open' not set for target os.")?
+            .to_string(),
+        );
+
+        process::Command::new(command)
           .arg(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))
           .spawn()?;
       }

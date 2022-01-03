@@ -2,7 +2,7 @@ use {
   executable_path::executable_path,
   pretty_assertions::assert_eq,
   std::{
-    fs,
+    env, fs,
     io::prelude::*,
     path::Path,
     process::{Command, Stdio},
@@ -260,6 +260,44 @@ fn looping() -> Result<()> {
     ",
     )
     .run()
+}
+
+#[test]
+fn open() -> Result<()> {
+  env::set_var("DEGENERATE_OPEN_COMMAND", "echo");
+
+  assert_eq!(
+    str::from_utf8(
+      &Command::new(executable_path("degenerate"))
+        .args(["resize:4:4", "save:test.png", "open:test.png"])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .output()?
+        .stdout
+    )?,
+    "test.png\n"
+  );
+
+  Ok(())
+}
+
+#[test]
+fn open_default() -> Result<()> {
+  env::set_var("DEGENERATE_OPEN_COMMAND", "echo");
+
+  assert_eq!(
+    str::from_utf8(
+      &Command::new(executable_path("degenerate"))
+        .args(["resize:4:4", "save", "open"])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .output()?
+        .stdout
+    )?,
+    "output.png\n"
+  );
+
+  Ok(())
 }
 
 #[test]
