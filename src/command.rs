@@ -8,6 +8,7 @@ pub(crate) enum Command {
   Load(Option<PathBuf>),
   Loop,
   Mask(Mask),
+  Open(Option<PathBuf>),
   Operation(Operation),
   Print,
   RandomMask,
@@ -72,6 +73,11 @@ impl Command {
           }
         }
         state.loop_counter += 1;
+      }
+      Self::Open(path) => {
+        process::Command::new("open")
+          .arg(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))
+          .spawn()?;
       }
       Self::Mask(mask) => {
         state.mask = mask.clone();
@@ -142,14 +148,16 @@ impl FromStr for Command {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
       })),
+      ["open", path] => Ok(Self::Open(Some(path.parse()?))),
+      ["open"] => Ok(Self::Open(None)),
       ["print"] => Ok(Self::Print),
       ["random-mask"] => Ok(Self::RandomMask),
       ["repl"] => Ok(Self::Repl),
+      ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["resize", size] => {
         let size = size.parse()?;
         Ok(Self::Resize((size, size)))
       }
-      ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["rotate", turns] => Ok(Self::Rotate(turns.parse()?)),
       ["rotate-color", axis, turns] => Ok(Self::Operation(Operation::RotateColor(
         axis.parse()?,
