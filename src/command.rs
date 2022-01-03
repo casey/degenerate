@@ -1,5 +1,7 @@
 use super::*;
 
+const DEFAULT_OUTPUT_PATH: &str = "output.png";
+
 #[derive(Clone, Debug)]
 pub(crate) enum Command {
   Apply,
@@ -60,7 +62,11 @@ impl Command {
           state.loop_counter = 0;
         }
       }
-      Self::Load(path) => state.load(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
+      Self::Load(path) => state.load(
+        path
+          .as_deref()
+          .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
+      )?,
       Self::Loop => {
         loop {
           state.program_counter = state.program_counter.wrapping_sub(1);
@@ -75,25 +81,20 @@ impl Command {
         state.loop_counter += 1;
       }
       Self::Open(path) => {
-        let default_command = {
-          if cfg!(target_os = "macos") {
-            Some("open")
-          } else if cfg!(target_os = "linux") {
-            Some("xdg-open")
-          } else {
-            None
-          }
-        };
-
-        let command = env::var("DEGENERATE_OPEN_COMMAND").unwrap_or(
-          default_command
-            .ok_or("Default command for 'open' not set for target os.")?
-            .to_string(),
-        );
-
-        process::Command::new(command)
-          .arg(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))
-          .spawn()?;
+        process::Command::new(
+          env::var("DEGENERATE_OPEN_COMMAND").unwrap_or(
+            {if cfg!(target_os = "macos") {
+              Ok("open")
+            } else if cfg!(target_os = "linux") {
+              Ok("xdg-open")
+            } else {
+              Err("Please supply an open command by setting the `DEGENERATE_OPEN_COMMAND` environment variable")
+            }
+            }?.to_string()
+          )
+        )
+        .arg(path.as_deref().unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()))
+        .spawn()?;
       }
       Self::Mask(mask) => {
         state.mask = mask.clone();
@@ -130,9 +131,11 @@ impl Command {
       Self::Rotate(turns) => state
         .similarity
         .append_rotation_mut(&UnitComplex::from_angle(turns * f64::consts::TAU)),
-      Self::Save(path) => state
-        .image()?
-        .save(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
+      Self::Save(path) => state.image()?.save(
+        path
+          .as_deref()
+          .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
+      )?,
       Self::Scale(scaling) => {
         state.similarity.append_scaling_mut(*scaling);
       }
