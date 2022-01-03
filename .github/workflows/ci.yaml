@@ -16,7 +16,13 @@ jobs:
   all:
     name: All
 
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+        - ubuntu-latest
+        - macos-latest
+
+    runs-on: ${{ matrix.os }}
 
     env:
       RUSTFLAGS: --deny warnings
@@ -46,6 +52,7 @@ jobs:
       run: cargo fmt --all -- --check
 
     - name: Check for Forbidden Words
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
         sudo apt-get update
         sudo apt-get install ripgrep
