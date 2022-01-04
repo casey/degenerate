@@ -83,14 +83,13 @@ impl Command {
       Self::Open(path) => {
         process::Command::new(
           env::var("DEGENERATE_OPEN_COMMAND").unwrap_or(
-            {if cfg!(target_os = "macos") {
-              Ok("open")
+            if cfg!(target_os = "macos") {
+              "open".to_string()
             } else if cfg!(target_os = "linux") {
-              Ok("xdg-open")
+              "xdg-open".to_string()
             } else {
-              Err("Please supply an open command by setting the `DEGENERATE_OPEN_COMMAND` environment variable")
+              return Err("Please supply an open command by setting the `DEGENERATE_OPEN_COMMAND` environment variable".into())
             }
-            }?.to_string()
           )
         )
         .arg(path.as_deref().unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()))
