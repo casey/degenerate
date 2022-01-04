@@ -276,7 +276,11 @@ fn open() -> Result<()> {
   Test::new()?
     .program("resize:4:4 save:test.png open:test.png")
     .env_var("DEGENERATE_OPEN_COMMAND", "echo")
-    .expected_stdout("test.png\n\n")
+    .expected_stdout(
+      "
+      test.png
+      ",
+    )
     .run()
 }
 
@@ -285,7 +289,11 @@ fn open_default() -> Result<()> {
   Test::new()?
     .program("resize:4:4 save open")
     .env_var("DEGENERATE_OPEN_COMMAND", "echo")
-    .expected_stdout("output.png\n\n")
+    .expected_stdout(
+      "
+      output.png
+      ",
+    )
     .run()
 }
 
