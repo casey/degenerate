@@ -10,7 +10,7 @@ use {
   rand::{rngs::StdRng, SeedableRng},
   rustyline::{error::ReadlineError, Editor},
   std::{
-    f64,
+    env, f64,
     io::{self, BufWriter, Write},
     path::{Path, PathBuf},
     process,

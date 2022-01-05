@@ -1,5 +1,7 @@
 use super::*;
 
+const DEFAULT_OUTPUT_PATH: &str = "output.png";
+
 #[derive(Clone, Debug)]
 pub(crate) enum Command {
   Apply,
@@ -8,6 +10,7 @@ pub(crate) enum Command {
   Load(Option<PathBuf>),
   Loop,
   Mask(Mask),
+  Open(Option<PathBuf>),
   Operation(Operation),
   Print,
   RandomMask,
@@ -59,7 +62,11 @@ impl Command {
           state.loop_counter = 0;
         }
       }
-      Self::Load(path) => state.load(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
+      Self::Load(path) => state.load(
+        path
+          .as_deref()
+          .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
+      )?,
       Self::Loop => {
         loop {
           state.program_counter = state.program_counter.wrapping_sub(1);
@@ -72,6 +79,21 @@ impl Command {
           }
         }
         state.loop_counter += 1;
+      }
+      Self::Open(path) => {
+        process::Command::new(
+          env::var("DEGENERATE_OPEN_COMMAND").unwrap_or(
+            if cfg!(target_os = "macos") {
+              "open".to_string()
+            } else if cfg!(target_os = "linux") {
+              "xdg-open".to_string()
+            } else {
+              return Err("Please supply an open command by setting the `DEGENERATE_OPEN_COMMAND` environment variable".into())
+            }
+          )
+        )
+        .arg(path.as_deref().unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()))
+        .spawn()?;
       }
       Self::Mask(mask) => {
         state.mask = mask.clone();
@@ -108,9 +130,11 @@ impl Command {
       Self::Rotate(turns) => state
         .similarity
         .append_rotation_mut(&UnitComplex::from_angle(turns * f64::consts::TAU)),
-      Self::Save(path) => state
-        .image()?
-        .save(path.as_deref().unwrap_or_else(|| "output.png".as_ref()))?,
+      Self::Save(path) => state.image()?.save(
+        path
+          .as_deref()
+          .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
+      )?,
       Self::Scale(scaling) => {
         state.similarity.append_scaling_mut(*scaling);
       }
@@ -142,14 +166,16 @@ impl FromStr for Command {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
       })),
+      ["open", path] => Ok(Self::Open(Some(path.parse()?))),
+      ["open"] => Ok(Self::Open(None)),
       ["print"] => Ok(Self::Print),
       ["random-mask"] => Ok(Self::RandomMask),
       ["repl"] => Ok(Self::Repl),
+      ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["resize", size] => {
         let size = size.parse()?;
         Ok(Self::Resize((size, size)))
       }
-      ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["rotate", turns] => Ok(Self::Rotate(turns.parse()?)),
       ["rotate-color", axis, turns] => Ok(Self::Operation(Operation::RotateColor(
         axis.parse()?,

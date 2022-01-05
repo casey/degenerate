@@ -17,7 +17,8 @@ mod image_tests;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
-struct Test {
+struct Test<'a> {
+  env_vars: Vec<(&'a str, &'a str)>,
   expected_status: i32,
   expected_stderr: String,
   expected_stdout: String,
@@ -25,9 +26,10 @@ struct Test {
   tempdir: TempDir,
 }
 
-impl Test {
+impl<'a> Test<'a> {
   fn new() -> Result<Self> {
     Ok(Self {
+      env_vars: Vec::new(),
       expected_status: 0,
       expected_stderr: String::new(),
       expected_stdout: String::new(),
@@ -64,12 +66,18 @@ impl Test {
     }
   }
 
+  fn env_var(mut self, key: &'a str, value: &'a str) -> Self {
+    self.env_vars.push((key, value));
+    self
+  }
+
   fn run(self) -> Result<()> {
     self.run_and_return_tempdir().map(|_| ())
   }
 
   fn run_with_timeout(self, timeout: Duration) -> Result<()> {
     let mut child = Command::new(executable_path("degenerate"))
+      .envs(self.env_vars)
       .current_dir(&self.tempdir)
       .args(self.program.split_whitespace())
       .spawn()?;
@@ -90,6 +98,7 @@ impl Test {
 
   fn run_and_return_tempdir(self) -> Result<TempDir> {
     let output = Command::new(executable_path("degenerate"))
+      .envs(self.env_vars)
       .current_dir(&self.tempdir)
       .args(self.program.split_whitespace())
       .output()?;
@@ -258,6 +267,32 @@ fn looping() -> Result<()> {
       0000
       0000
     ",
+    )
+    .run()
+}
+
+#[test]
+fn open() -> Result<()> {
+  Test::new()?
+    .program("resize:4:4 save:test.png open:test.png")
+    .env_var("DEGENERATE_OPEN_COMMAND", "echo")
+    .expected_stdout(
+      "
+      test.png
+      ",
+    )
+    .run()
+}
+
+#[test]
+fn open_default() -> Result<()> {
+  Test::new()?
+    .program("resize:4:4 save open")
+    .env_var("DEGENERATE_OPEN_COMMAND", "echo")
+    .expected_stdout(
+      "
+      output.png
+      ",
     )
     .run()
 }
