@@ -92,7 +92,7 @@ impl Command {
             }
           )
         )
-        .arg(path.as_deref().unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()))
+        .arg(path.as_deref().unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()).expand()?)
         .spawn()?;
       }
       Self::Mask(mask) => {
@@ -133,7 +133,8 @@ impl Command {
       Self::Save(path) => state.image()?.save(
         path
           .as_deref()
-          .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
+          .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref())
+          .expand()?,
       )?,
       Self::Scale(scaling) => {
         state.similarity.append_scaling_mut(*scaling);
