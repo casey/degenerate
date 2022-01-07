@@ -326,3 +326,17 @@ fn infinite_loop() -> Result<()> {
     .program("loop")
     .run_with_timeout(Duration::from_millis(250))
 }
+
+#[test]
+fn expand_tilde() -> Result<()> {
+  Test::new()?
+    .program("resize:4:4 open:~/output.png")
+    .env_var("DEGENERATE_OPEN_COMMAND", "echo")
+    .env_var("HOME", ".")
+    .expected_stdout(
+      "
+      ./output.png
+      ",
+    )
+    .run()
+}
