@@ -88,7 +88,7 @@ impl State {
     Ok(())
   }
 
-  pub(crate) fn load(&mut self, path: &Path) -> Result<()> {
+  pub(crate) fn load(&mut self, path: &PathBuf) -> Result<()> {
     let image = image::io::Reader::open(path)?
       .decode()?
       .as_rgb8()
