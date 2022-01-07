@@ -1,7 +1,7 @@
 use {
   crate::{
     color_axis::ColorAxis, command::Command, coordinates::Coordinates, mask::Mask,
-    operation::Operation, pixel::Pixel, state::State, wrap::Wrap, path_ext::PathExt,
+    operation::Operation, path_ext::PathExt, pixel::Pixel, state::State, wrap::Wrap,
   },
   dirs::home_dir,
   image::{ImageBuffer, RgbImage},
@@ -24,10 +24,10 @@ mod command;
 mod coordinates;
 mod mask;
 mod operation;
+mod path_ext;
 mod pixel;
 mod state;
 mod wrap;
-mod path_ext;
 
 type Error = Box<dyn std::error::Error>;
 type Result<T, E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
