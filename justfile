@@ -37,3 +37,15 @@ forbid:
 
 watch +args='ltest':
 	cargo watch --ignore README.md --clear --exec "{{args}}"
+
+generate:
+	#!/usr/bin/env bash
+	set -eou pipefail
+
+	cargo build --release
+
+	for i in 0 1 2 3 4 5 6 7 8 9 10; do
+		echo Generating image $i...
+		target/release/degenerate resize:512 seed:$i generate save:generate/$i.png
+	done
+
