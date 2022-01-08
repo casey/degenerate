@@ -64,16 +64,17 @@ impl Command {
         }
       }
       Self::Generate => {
-        let mut program = Vec::new();
-
-        program.push(Command::RandomMask);
-        program.push(Command::Scale(0.99));
-        program.push(Command::For(100));
-        program.push(Command::Apply);
-        program.push(Command::Loop);
-
-        state.program.splice(state.program_counter + 1..state.program_counter + 1, program);
-      },
+        state.program.splice(
+          state.program_counter + 1..state.program_counter + 1,
+          vec![
+            Command::RandomMask,
+            Command::Scale(0.99),
+            Command::For(100),
+            Command::Apply,
+            Command::Loop,
+          ],
+        );
+      }
       Self::Load(path) => state.load(
         path
           .as_deref()
