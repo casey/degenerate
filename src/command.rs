@@ -66,7 +66,7 @@ impl Command {
       Self::Generate => {
         state.program.splice(
           state.program_counter + 1..state.program_counter + 1,
-          vec![
+          [
             Command::RandomMask,
             Command::Scale(0.99),
             Command::For(100),
