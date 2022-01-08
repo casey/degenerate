@@ -245,8 +245,8 @@ fn verbose_toggles_step_status() -> Result<()> {
     .program("verbose square verbose square")
     .expected_stderr(
       "
-      PC 1 LC 0 Mask(Square)
-      PC 2 LC 0 Verbose
+      PC 1 LC 0 M All C Mask(Square)
+      PC 2 LC 0 M Square C Verbose
       ",
     )
     .run()

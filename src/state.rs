@@ -24,8 +24,8 @@ impl State {
     while let Some(command) = state.program.get(state.program_counter).cloned() {
       if state.verbose {
         eprintln!(
-          "PC {} LC {} {:?}",
-          state.program_counter, state.loop_counter, command
+          "PC {} LC {} M {:?} C {:?}",
+          state.program_counter, state.loop_counter, state.mask, command,
         );
       }
       command.run(&mut state)?;

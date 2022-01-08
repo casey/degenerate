@@ -20,6 +20,11 @@ produced it. The image tests are reproduced below, with each preceded by its
 ## Gallery
 
 ```
+$ degenerate comment:slow resize:256 generate save
+```
+![comment:slow resize:256 generate save](images/comment%3Aslow%20resize%3A256%20generate%20save.png)
+
+```
 $ degenerate comment:slow resize:256 rotate-color:red:0.083333 rotate:0.1 for:12 circle apply cross apply x apply loop save
 ```
 ![comment:slow resize:256 rotate-color:red:0.083333 rotate:0.1 for:12 circle apply cross apply x apply loop save](images/comment%3Aslow%20resize%3A256%20rotate-color%3Ared%3A0.083333%20rotate%3A0.1%20for%3A12%20circle%20apply%20cross%20apply%20x%20apply%20loop%20save.png)

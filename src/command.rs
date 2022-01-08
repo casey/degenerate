@@ -7,6 +7,7 @@ pub(crate) enum Command {
   Apply,
   Comment,
   For(usize),
+  Generate,
   Load(Option<PathBuf>),
   Loop,
   Mask(Mask),
@@ -61,6 +62,18 @@ impl Command {
           }
           state.loop_counter = 0;
         }
+      }
+      Self::Generate => {
+        state.program.splice(
+          state.program_counter + 1..state.program_counter + 1,
+          [
+            Command::RandomMask,
+            Command::Scale(0.99),
+            Command::For(100),
+            Command::Apply,
+            Command::Loop,
+          ],
+        );
       }
       Self::Load(path) => state.load(
         path
@@ -158,6 +171,7 @@ impl FromStr for Command {
       ["comment", ..] => Ok(Self::Comment),
       ["cross"] => Ok(Self::Mask(Mask::Cross)),
       ["for", count] => Ok(Self::For(count.parse()?)),
+      ["generate"] => Ok(Self::Generate),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
       ["load", path] => Ok(Self::Load(Some(path.parse()?))),
       ["load"] => Ok(Self::Load(None)),
