@@ -13,7 +13,7 @@ pub(crate) enum Mask {
 }
 
 impl Mask {
-  pub(crate) fn is_masked(&self, state: &State, pixel: Vector2<usize>, v: Vector2<f64>) -> bool {
+  pub(crate) fn is_masked(&self, state: &State, pixel: Vector2<isize>, v: Vector2<f64>) -> bool {
     match self {
       Self::All => true,
       Self::Circle => v.norm() < 1.0,

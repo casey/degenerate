@@ -1,14 +1,14 @@
 use super::*;
 
 pub(crate) trait Pixel {
-  fn pixel(self, dimensions: Vector2<usize>) -> Vector2<usize>;
+  fn pixel(self, dimensions: Vector2<usize>) -> Vector2<isize>;
 }
 
 impl Pixel for Vector2<f64> {
-  fn pixel(self, dimensions: Vector2<usize>) -> Vector2<usize> {
+  fn pixel(self, dimensions: Vector2<usize>) -> Vector2<isize> {
     Vector2::new(
-      ((self.x + 1.0) / 2.0 * dimensions.x as f64 - 0.5).round() as usize,
-      ((self.y + 1.0) / 2.0 * dimensions.y as f64 - 0.5).round() as usize,
+      ((self.x + 1.0) / 2.0 * dimensions.x as f64 - 0.5).round() as isize,
+      ((self.y + 1.0) / 2.0 * dimensions.y as f64 - 0.5).round() as isize,
     )
   }
 }
@@ -53,6 +53,38 @@ mod tests {
   fn lower_right() {
     assert_eq!(
       Vector2::new(1.0, 1.0).pixel(Vector2::new(2, 2)),
+      Vector2::new(2, 2)
+    );
+  }
+
+  #[test]
+  fn upper_left_oob() {
+    assert_eq!(
+      Vector2::new(-2.0, -2.0).pixel(Vector2::new(2, 2)),
+      Vector2::new(-1, -1)
+    );
+  }
+
+  #[test]
+  fn upper_right_oob() {
+    assert_eq!(
+      Vector2::new(2.0, -2.0).pixel(Vector2::new(2, 2)),
+      Vector2::new(2, 0)
+    );
+  }
+
+  #[test]
+  fn lower_left_oob() {
+    assert_eq!(
+      Vector2::new(-2.0, 2.0).pixel(Vector2::new(2, 2)),
+      Vector2::new(0, 2)
+    );
+  }
+
+  #[test]
+  fn lower_right_oob() {
+    assert_eq!(
+      Vector2::new(2.0, 2.0).pixel(Vector2::new(2, 2)),
       Vector2::new(2, 2)
     );
   }

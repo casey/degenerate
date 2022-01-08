@@ -6,6 +6,7 @@ const DEFAULT_OUTPUT_PATH: &str = "output.png";
 pub(crate) enum Command {
   Apply,
   Comment,
+  Default(Vector3<u8>),
   For(usize),
   Generate,
   Load(Option<PathBuf>),
@@ -40,11 +41,11 @@ impl Command {
             let i = v.pixel(state.dimensions());
             if state.mask.is_masked(state, i, v) {
               output[(row, col)] = state.operation.apply(
-                state
-                  .matrix
-                  .get((i.y, i.x))
-                  .cloned()
-                  .unwrap_or_else(Vector3::zeros),
+                if i.x >= 0 || i.y >= 0 || i.x < state.matrix.ncols() as isize || i.y < state.matrix.nrows() as isize {
+                  state.matrix[(i.y as usize, i.x as usize)]
+                } else {
+                  state.default
+                }
               );
             }
           }
@@ -52,6 +53,9 @@ impl Command {
         state.matrix = output;
       }
       Self::Comment => {}
+      Self::Default(default) => {
+        state.default = *default;
+      }
       Self::For(until) => {
         if state.loop_counter >= *until {
           loop {
@@ -170,6 +174,11 @@ impl FromStr for Command {
       ["circle"] => Ok(Self::Mask(Mask::Circle)),
       ["comment", ..] => Ok(Self::Comment),
       ["cross"] => Ok(Self::Mask(Mask::Cross)),
+      ["default", r, g, b] => Ok(Self::Default(Vector3::new(
+        r.parse()?,
+        g.parse()?,
+        b.parse()?,
+      ))),
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["generate"] => Ok(Self::Generate),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
