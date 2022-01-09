@@ -44,8 +44,9 @@ generate:
 
 	cargo build --release
 
+	rm -rf generate
+	mkdir generate
 	for i in {0..9}; do
 		echo Generating image $i...
 		target/release/degenerate resize:512 seed:$i generate save:generate/$i.png
 	done
-
