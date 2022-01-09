@@ -19,7 +19,11 @@ impl Mask {
       Self::Circle => v.norm() < 1.0,
       Self::Cross => v.x.abs() < 0.25 || v.y.abs() < 0.25,
       Self::Mod { divisor, remainder } => {
-        (pixel.x as usize * state.matrix.nrows() + pixel.y as usize) % *divisor == *remainder
+        ((pixel.x as usize)
+          .wrapping_mul(state.matrix.nrows())
+          .wrapping_add(pixel.y as usize))
+          % *divisor
+          == *remainder
       }
       Self::Rows { nrows, step } => pixel.y as usize % (nrows.saturating_add(*step)) < *nrows,
       Self::Square => v.abs() < Vector2::new(0.5, 0.5),
