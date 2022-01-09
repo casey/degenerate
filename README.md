@@ -255,6 +255,11 @@ $ degenerate resize:256 x apply save
 ![resize:256 x apply save](images/resize%3A256%20x%20apply%20save.png)
 
 ```
+$ degenerate resize:256 x apply scale:0.5 wrap identity all apply save
+```
+![resize:256 x apply scale:0.5 wrap identity all apply save](images/resize%3A256%20x%20apply%20scale%3A0.5%20wrap%20identity%20all%20apply%20save.png)
+
+```
 $ degenerate resize:3 default:0:255:0 scale:0.5 apply save
 ```
 ![resize:3 default:0:255:0 scale:0.5 apply save](images/resize%3A3%20default%3A0%3A255%3A0%20scale%3A0.5%20apply%20save.png)
