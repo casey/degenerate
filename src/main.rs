@@ -1,7 +1,7 @@
 use {
   crate::{
-    color_axis::ColorAxis, command::Command, coordinates::Coordinates, mask::Mask,
-    operation::Operation, pixel::Pixel, state::State, wrap::Wrap,
+    color_axis::ColorAxis, command::Command, coordinates::Coordinates, default_value::DefaultValue,
+    mask::Mask, operation::Operation, pixel::Pixel, state::State, wrap::Wrap,
   },
   dirs::home_dir,
   image::{ImageBuffer, RgbImage},
@@ -22,6 +22,7 @@ use {
 mod color_axis;
 mod command;
 mod coordinates;
+mod default_value;
 mod mask;
 mod operation;
 mod pixel;

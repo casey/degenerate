@@ -6,7 +6,7 @@ const DEFAULT_OUTPUT_PATH: &str = "output.png";
 pub(crate) enum Command {
   Apply,
   Comment,
-  Default(Vector3<u8>),
+  Default(DefaultValue),
   For(usize),
   Generate,
   Load(Option<PathBuf>),
@@ -57,8 +57,8 @@ impl Command {
         state.matrix = output;
       }
       Self::Comment => {}
-      Self::Default(default) => {
-        state.default = *default;
+      Self::Default(default_value) => {
+        state.default_value = *default_value;
       }
       Self::For(until) => {
         if state.loop_counter >= *until {
@@ -178,11 +178,12 @@ impl FromStr for Command {
       ["circle"] => Ok(Self::Mask(Mask::Circle)),
       ["comment", ..] => Ok(Self::Comment),
       ["cross"] => Ok(Self::Mask(Mask::Cross)),
-      ["default", r, g, b] => Ok(Self::Default(Vector3::new(
+      ["default", "coordinates"] => Ok(Self::Default(DefaultValue::Coordinates)),
+      ["default", r, g, b] => Ok(Self::Default(DefaultValue::Color(Vector3::new(
         r.parse()?,
         g.parse()?,
         b.parse()?,
-      ))),
+      )))),
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["generate"] => Ok(Self::Generate),
       ["identity"] => Ok(Self::Operation(Operation::Identity)),

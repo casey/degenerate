@@ -1,7 +1,7 @@
 use super::*;
 
 pub(crate) struct State {
-  pub(crate) default: Vector3<u8>,
+  pub(crate) default_value: DefaultValue,
   pub(crate) loop_counter: usize,
   pub(crate) mask: Mask,
   pub(crate) matrix: DMatrix<Vector3<u8>>,
@@ -38,7 +38,7 @@ impl State {
 
   pub(crate) fn new() -> Self {
     Self {
-      default: Vector3::new(0, 0, 0),
+      default_value: DefaultValue::Color(Vector3::new(0, 0, 0)),
       loop_counter: 0,
       mask: Mask::All,
       matrix: DMatrix::zeros(0, 0),

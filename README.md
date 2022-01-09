@@ -90,6 +90,11 @@ $ degenerate default:0:255:0 resize:256 save
 ![default:0:255:0 resize:256 save](images/default%3A0%3A255%3A0%20resize%3A256%20save.png)
 
 ```
+$ degenerate default:coordinates resize:256 save
+```
+![default:coordinates resize:256 save](images/default%3Acoordinates%20resize%3A256%20save.png)
+
+```
 $ degenerate resize:256 all apply save
 ```
 ![resize:256 all apply save](images/resize%3A256%20all%20apply%20save.png)
