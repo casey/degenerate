@@ -2,6 +2,7 @@ use super::*;
 
 #[derive(Copy, Clone, Debug)]
 pub(crate) enum Operation {
+  Identity,
   Invert,
   RotateColor(ColorAxis, f64),
 }
@@ -9,6 +10,7 @@ pub(crate) enum Operation {
 impl Operation {
   pub(crate) fn apply(self, element: Vector3<u8>) -> Vector3<u8> {
     match self {
+      Self::Identity => element,
       Self::Invert => element.map(|scalar| !scalar),
       Self::RotateColor(axis, turns) => {
         let v = Rotation3::new(axis.vector() * turns * f64::consts::TAU)

@@ -185,6 +185,7 @@ impl FromStr for Command {
       ))),
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["generate"] => Ok(Self::Generate),
+      ["identity"] => Ok(Self::Operation(Operation::Identity)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
       ["load", path] => Ok(Self::Load(Some(path.parse()?))),
       ["load"] => Ok(Self::Load(None)),
