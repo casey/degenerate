@@ -113,7 +113,13 @@ impl<'a> Test<'a> {
       stderr,
     );
 
-    assert_eq!(stderr, self.expected_stderr);
+    if self.expected_stderr.is_empty() {
+      if !stderr.is_empty() {
+        panic!("Expected empty stderr:\n{}", stderr);
+      }
+    } else {
+      assert_eq!(stderr, self.expected_stderr);
+    }
 
     assert_eq!(str::from_utf8(&output.stdout)?, self.expected_stdout);
 

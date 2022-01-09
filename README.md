@@ -55,6 +55,11 @@ $ degenerate comment:slow resize:256 x rotate-color:g:0.07 rotate:0.07 for:10 ap
 ![comment:slow resize:256 x rotate-color:g:0.07 rotate:0.07 for:10 apply loop rotate-color:b:0.09 rotate:0.09 for:10 apply loop save](images/comment%3Aslow%20resize%3A256%20x%20rotate-color%3Ag%3A0.07%20rotate%3A0.07%20for%3A10%20apply%20loop%20rotate-color%3Ab%3A0.09%20rotate%3A0.09%20for%3A10%20apply%20loop%20save.png)
 
 ```
+$ degenerate default:0:255:0 resize:256 save
+```
+![default:0:255:0 resize:256 save](images/default%3A0%3A255%3A0%20resize%3A256%20save.png)
+
+```
 $ degenerate resize:256 all apply save
 ```
 ![resize:256 all apply save](images/resize%3A256%20all%20apply%20save.png)
@@ -218,6 +223,11 @@ $ degenerate resize:256 top apply save
 $ degenerate resize:256 x apply save
 ```
 ![resize:256 x apply save](images/resize%3A256%20x%20apply%20save.png)
+
+```
+$ degenerate resize:3 default:0:255:0 scale:0.5 apply save
+```
+![resize:3 default:0:255:0 scale:0.5 apply save](images/resize%3A3%20default%3A0%3A255%3A0%20scale%3A0.5%20apply%20save.png)
 
 ```
 $ degenerate resize:512:256 all apply save all apply load
