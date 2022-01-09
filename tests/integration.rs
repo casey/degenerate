@@ -28,13 +28,17 @@ struct Test<'a> {
 
 impl<'a> Test<'a> {
   fn new() -> Result<Self> {
+    let tempdir = TempDir::new()?;
+
+    fs::write(tempdir.path().join("program.degen"), "x apply")?;
+
     Ok(Self {
       env_vars: Vec::new(),
       expected_status: 0,
       expected_stderr: String::new(),
       expected_stdout: String::new(),
       program: String::new(),
-      tempdir: TempDir::new()?,
+      tempdir,
     })
   }
 
@@ -76,11 +80,7 @@ impl<'a> Test<'a> {
   }
 
   fn run_with_timeout(self, timeout: Duration) -> Result<()> {
-    let mut child = Command::new(executable_path("degenerate"))
-      .envs(self.env_vars)
-      .current_dir(&self.tempdir)
-      .args(self.program.split_whitespace())
-      .spawn()?;
+    let mut child = self.command().spawn()?;
 
     thread::sleep(timeout);
 
@@ -96,12 +96,19 @@ impl<'a> Test<'a> {
     Ok(())
   }
 
-  fn run_and_return_tempdir(self) -> Result<TempDir> {
-    let output = Command::new(executable_path("degenerate"))
-      .envs(self.env_vars)
+  fn command(&self) -> Command {
+    let mut command = Command::new(executable_path("degenerate"));
+
+    command
+      .envs(self.env_vars.iter().cloned())
       .current_dir(&self.tempdir)
-      .args(self.program.split_whitespace())
-      .output()?;
+      .args(self.program.split_whitespace());
+
+    command
+  }
+
+  fn run_and_return_tempdir(self) -> Result<TempDir> {
+    let output = self.command().output()?;
 
     let stderr = str::from_utf8(&output.stderr)?;
 

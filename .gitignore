@@ -1,6 +1,7 @@
+/README.md
+/generate
 /images/*.actual-output.png
 /output.png
 /output.txt
 /target
 /tests/image_tests.rs
-/generate

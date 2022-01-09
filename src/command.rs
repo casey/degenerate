@@ -16,6 +16,7 @@ pub(crate) enum Command {
   Operation(Operation),
   Print,
   RandomMask,
+  Read,
   Repl,
   Resize((usize, usize)),
   Rotate(f64),
@@ -122,6 +123,20 @@ impl Command {
       Self::Operation(operation) => state.operation = *operation,
       Self::Print => state.print()?,
       Self::RandomMask => Self::Mask(state.rng.gen()).run(state)?,
+      Self::Read => {
+        let source = fs::read_to_string("program.degen")?;
+
+        let mut program = Vec::new();
+
+        for word in source.split_whitespace() {
+          program.push(word.parse()?);
+        }
+
+        state.program.splice(
+          state.program_counter + 1..state.program_counter + 1,
+          program,
+        );
+      }
       Self::Repl => {
         let history = home_dir().unwrap_or_default().join(".degenerate_history");
 
@@ -198,6 +213,7 @@ impl FromStr for Command {
       ["open"] => Ok(Self::Open(None)),
       ["print"] => Ok(Self::Print),
       ["random-mask"] => Ok(Self::RandomMask),
+      ["read"] => Ok(Self::Read),
       ["repl"] => Ok(Self::Repl),
       ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["resize", size] => {
