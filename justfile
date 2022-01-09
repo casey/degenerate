@@ -48,4 +48,3 @@ generate:
 		echo Generating image $i...
 		target/release/degenerate resize:512 seed:$i generate save:generate/$i.png
 	done
-
