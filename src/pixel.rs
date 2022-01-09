@@ -29,7 +29,7 @@ mod tests {
   fn upper_left() {
     assert_eq!(
       Vector2::new(-1.0, -1.0).pixel(Vector2::new(2, 2)),
-      Vector2::new(0, 0)
+      Vector2::new(-1, -1)
     );
   }
 
@@ -37,7 +37,7 @@ mod tests {
   fn upper_right() {
     assert_eq!(
       Vector2::new(1.0, -1.0).pixel(Vector2::new(2, 2)),
-      Vector2::new(2, 0)
+      Vector2::new(2, -1)
     );
   }
 
@@ -45,7 +45,7 @@ mod tests {
   fn lower_left() {
     assert_eq!(
       Vector2::new(-1.0, 1.0).pixel(Vector2::new(2, 2)),
-      Vector2::new(0, 2)
+      Vector2::new(-1, 2)
     );
   }
 
@@ -61,7 +61,7 @@ mod tests {
   fn upper_left_oob() {
     assert_eq!(
       Vector2::new(-2.0, -2.0).pixel(Vector2::new(2, 2)),
-      Vector2::new(-1, -1)
+      Vector2::new(-2, -2)
     );
   }
 
@@ -69,7 +69,7 @@ mod tests {
   fn upper_right_oob() {
     assert_eq!(
       Vector2::new(2.0, -2.0).pixel(Vector2::new(2, 2)),
-      Vector2::new(2, 0)
+      Vector2::new(3, -2)
     );
   }
 
@@ -77,7 +77,7 @@ mod tests {
   fn lower_left_oob() {
     assert_eq!(
       Vector2::new(-2.0, 2.0).pixel(Vector2::new(2, 2)),
-      Vector2::new(0, 2)
+      Vector2::new(-2, 3)
     );
   }
 
@@ -85,7 +85,7 @@ mod tests {
   fn lower_right_oob() {
     assert_eq!(
       Vector2::new(2.0, 2.0).pixel(Vector2::new(2, 2)),
-      Vector2::new(2, 2)
+      Vector2::new(3, 3)
     );
   }
 

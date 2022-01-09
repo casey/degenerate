@@ -41,7 +41,7 @@ impl Command {
             let i = v.pixel(state.dimensions());
             if state.mask.is_masked(state, i, v) {
               output[(row, col)] = state.operation.apply(
-                if i.x >= 0 || i.y >= 0 || i.x < state.matrix.ncols() as isize || i.y < state.matrix.nrows() as isize {
+                if i.x >= 0 && i.y >= 0 && i.x < state.matrix.ncols() as isize && i.y < state.matrix.nrows() as isize {
                   state.matrix[(i.y as usize, i.x as usize)]
                 } else {
                   state.default
