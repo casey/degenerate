@@ -20,6 +20,16 @@ produced it. The image tests are reproduced below, with each preceded by its
 ## Gallery
 
 ```
+$ degenerate comment:slow resize:256 circle scale:0.5 for:8 apply loop save
+```
+![comment:slow resize:256 circle scale:0.5 for:8 apply loop save](images/comment%3Aslow%20resize%3A256%20circle%20scale%3A0.5%20for%3A8%20apply%20loop%20save.png)
+
+```
+$ degenerate comment:slow resize:256 circle scale:0.5 for:8 apply wrap loop save
+```
+![comment:slow resize:256 circle scale:0.5 for:8 apply wrap loop save](images/comment%3Aslow%20resize%3A256%20circle%20scale%3A0.5%20for%3A8%20apply%20wrap%20loop%20save.png)
+
+```
 $ degenerate comment:slow resize:256 generate save
 ```
 ![comment:slow resize:256 generate save](images/comment%3Aslow%20resize%3A256%20generate%20save.png)
@@ -65,6 +75,16 @@ $ degenerate comment:slow resize:256 x rotate-color:g:0.07 rotate:0.07 for:10 ap
 ![comment:slow resize:256 x rotate-color:g:0.07 rotate:0.07 for:10 apply loop rotate-color:b:0.09 rotate:0.09 for:10 apply loop save](images/comment%3Aslow%20resize%3A256%20x%20rotate-color%3Ag%3A0.07%20rotate%3A0.07%20for%3A10%20apply%20loop%20rotate-color%3Ab%3A0.09%20rotate%3A0.09%20for%3A10%20apply%20loop%20save.png)
 
 ```
+$ degenerate comment:slow resize:256 x scale:0.5 for:8 apply loop save
+```
+![comment:slow resize:256 x scale:0.5 for:8 apply loop save](images/comment%3Aslow%20resize%3A256%20x%20scale%3A0.5%20for%3A8%20apply%20loop%20save.png)
+
+```
+$ degenerate comment:slow resize:256 x scale:0.5 for:8 apply wrap loop save
+```
+![comment:slow resize:256 x scale:0.5 for:8 apply wrap loop save](images/comment%3Aslow%20resize%3A256%20x%20scale%3A0.5%20for%3A8%20apply%20wrap%20loop%20save.png)
+
+```
 $ degenerate default:0:255:0 resize:256 save
 ```
 ![default:0:255:0 resize:256 save](images/default%3A0%3A255%3A0%20resize%3A256%20save.png)
@@ -83,16 +103,6 @@ $ degenerate resize:256 apply save
 $ degenerate resize:256 circle apply save
 ```
 ![resize:256 circle apply save](images/resize%3A256%20circle%20apply%20save.png)
-
-```
-$ degenerate resize:256 circle scale:0.5 for:8 apply loop save
-```
-![resize:256 circle scale:0.5 for:8 apply loop save](images/resize%3A256%20circle%20scale%3A0.5%20for%3A8%20apply%20loop%20save.png)
-
-```
-$ degenerate resize:256 circle scale:0.5 for:8 apply wrap loop save
-```
-![resize:256 circle scale:0.5 for:8 apply wrap loop save](images/resize%3A256%20circle%20scale%3A0.5%20for%3A8%20apply%20wrap%20loop%20save.png)
 
 ```
 $ degenerate resize:256 comment:foo save
@@ -243,16 +253,6 @@ $ degenerate resize:256 top apply save
 $ degenerate resize:256 x apply save
 ```
 ![resize:256 x apply save](images/resize%3A256%20x%20apply%20save.png)
-
-```
-$ degenerate resize:256 x scale:0.5 for:8 apply loop save
-```
-![resize:256 x scale:0.5 for:8 apply loop save](images/resize%3A256%20x%20scale%3A0.5%20for%3A8%20apply%20loop%20save.png)
-
-```
-$ degenerate resize:256 x scale:0.5 for:8 apply wrap loop save
-```
-![resize:256 x scale:0.5 for:8 apply wrap loop save](images/resize%3A256%20x%20scale%3A0.5%20for%3A8%20apply%20wrap%20loop%20save.png)
 
 ```
 $ degenerate resize:3 default:0:255:0 scale:0.5 apply save
