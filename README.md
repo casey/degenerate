@@ -20,9 +20,29 @@ produced it. The image tests are reproduced below, with each preceded by its
 ## Gallery
 
 ```
+$ degenerate comment:slow resize:256 circle scale:0.5 for:8 apply loop save
+```
+![comment:slow resize:256 circle scale:0.5 for:8 apply loop save](images/comment%3Aslow%20resize%3A256%20circle%20scale%3A0.5%20for%3A8%20apply%20loop%20save.png)
+
+```
+$ degenerate comment:slow resize:256 circle scale:0.5 for:8 apply wrap loop save
+```
+![comment:slow resize:256 circle scale:0.5 for:8 apply wrap loop save](images/comment%3Aslow%20resize%3A256%20circle%20scale%3A0.5%20for%3A8%20apply%20wrap%20loop%20save.png)
+
+```
 $ degenerate comment:slow resize:256 generate save
 ```
 ![comment:slow resize:256 generate save](images/comment%3Aslow%20resize%3A256%20generate%20save.png)
+
+```
+$ degenerate comment:slow resize:256 rotate-color:g:0.05 circle scale:0.5 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop save
+```
+![comment:slow resize:256 rotate-color:g:0.05 circle scale:0.5 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop save](images/comment%3Aslow%20resize%3A256%20rotate-color%3Ag%3A0.05%20circle%20scale%3A0.5%20wrap%20for%3A8%20apply%20loop%20rotate-color%3Ab%3A0.05%20for%3A8%20apply%20loop%20save.png)
+
+```
+$ degenerate comment:slow resize:256 rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop save
+```
+![comment:slow resize:256 rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop save](images/comment%3Aslow%20resize%3A256%20rotate-color%3Ag%3A0.05%20circle%20scale%3A0.75%20wrap%20for%3A8%20apply%20loop%20rotate-color%3Ab%3A0.05%20for%3A8%20apply%20loop%20save.png)
 
 ```
 $ degenerate comment:slow resize:256 rotate-color:red:0.083333 rotate:0.1 for:12 circle apply cross apply x apply loop save
@@ -53,6 +73,16 @@ $ degenerate comment:slow resize:256 seed:19798 rotate-color:g:0.01 rotate:0.01 
 $ degenerate comment:slow resize:256 x rotate-color:g:0.07 rotate:0.07 for:10 apply loop rotate-color:b:0.09 rotate:0.09 for:10 apply loop save
 ```
 ![comment:slow resize:256 x rotate-color:g:0.07 rotate:0.07 for:10 apply loop rotate-color:b:0.09 rotate:0.09 for:10 apply loop save](images/comment%3Aslow%20resize%3A256%20x%20rotate-color%3Ag%3A0.07%20rotate%3A0.07%20for%3A10%20apply%20loop%20rotate-color%3Ab%3A0.09%20rotate%3A0.09%20for%3A10%20apply%20loop%20save.png)
+
+```
+$ degenerate comment:slow resize:256 x scale:0.5 for:8 apply loop save
+```
+![comment:slow resize:256 x scale:0.5 for:8 apply loop save](images/comment%3Aslow%20resize%3A256%20x%20scale%3A0.5%20for%3A8%20apply%20loop%20save.png)
+
+```
+$ degenerate comment:slow resize:256 x scale:0.5 for:8 apply wrap loop save
+```
+![comment:slow resize:256 x scale:0.5 for:8 apply wrap loop save](images/comment%3Aslow%20resize%3A256%20x%20scale%3A0.5%20for%3A8%20apply%20wrap%20loop%20save.png)
 
 ```
 $ degenerate default:0:255:0 resize:256 save
@@ -223,6 +253,11 @@ $ degenerate resize:256 top apply save
 $ degenerate resize:256 x apply save
 ```
 ![resize:256 x apply save](images/resize%3A256%20x%20apply%20save.png)
+
+```
+$ degenerate resize:256 x apply scale:0.5 wrap identity all apply save
+```
+![resize:256 x apply scale:0.5 wrap identity all apply save](images/resize%3A256%20x%20apply%20scale%3A0.5%20wrap%20identity%20all%20apply%20save.png)
 
 ```
 $ degenerate resize:3 default:0:255:0 scale:0.5 apply save
