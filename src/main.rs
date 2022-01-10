@@ -3,7 +3,7 @@ use {
     color_axis::ColorAxis, command::Command, coordinates::Coordinates, mask::Mask,
     operation::Operation, pixel::Pixel, state::State, wrap::Wrap,
   },
-  colored::Colorize,
+  ansi_term::{Colour::Red, Style},
   dirs::home_dir,
   image::{ImageBuffer, RgbImage},
   nalgebra::{DMatrix, Rotation3, Similarity2, UnitComplex, Vector2, Vector3},
@@ -40,7 +40,12 @@ fn main() {
       return;
     }
 
-    eprintln!("{}{}", "error".red(), format!(": {}", error).bold());
+    eprintln!(
+      "{}{}",
+      Red.bold().paint("error"),
+      Style::new().bold().paint(format!(": {}", error))
+    );
+
     process::exit(1);
   }
 }
