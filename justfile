@@ -67,4 +67,3 @@ gallery:
 		target/release/degenerate $PROGRAM
 		mv output.png "gallery/$PROGRAM.png"
 	done
-	
