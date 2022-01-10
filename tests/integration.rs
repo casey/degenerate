@@ -113,7 +113,13 @@ impl<'a> Test<'a> {
       stderr,
     );
 
-    assert_eq!(stderr, self.expected_stderr);
+    if self.expected_stderr.is_empty() {
+      if !stderr.is_empty() {
+        panic!("Expected empty stderr:\n{}", stderr);
+      }
+    } else {
+      assert_eq!(stderr, self.expected_stderr);
+    }
 
     assert_eq!(str::from_utf8(&output.stdout)?, self.expected_stdout);
 
@@ -245,8 +251,8 @@ fn verbose_toggles_step_status() -> Result<()> {
     .program("verbose square verbose square")
     .expected_stderr(
       "
-      PC 1 LC 0 Mask(Square)
-      PC 2 LC 0 Verbose
+      PC 1 LC 0 M All C Mask(Square)
+      PC 2 LC 0 M Square C Verbose
       ",
     )
     .run()

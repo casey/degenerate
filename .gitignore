@@ -1,3 +1,5 @@
+/gallery
+/generate
 /images/*.actual-output.png
 /output.png
 /output.txt
