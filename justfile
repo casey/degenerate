@@ -49,3 +49,19 @@ generate:
 		target/release/degenerate resize:512 seed:$i generate save:generate/$i.png
 	done
 
+gallery:
+	#!/usr/bin/env bash
+	set -eou pipefail
+
+	cargo build --release
+
+	rm -rf gallery
+	mkdir gallery
+	for IMAGE in images/*; do
+		FILENAME=`basename -- "$IMAGE"`
+		PROGRAM=${FILENAME%.*}
+		PROGRAM=`echo $PROGRAM | sed 's/resize:[^ ]*/resize:4096/'`
+		echo Generating $PROGRAM...
+		target/release/degenerate $PROGRAM
+		mv output.png "gallery/$PROGRAM.png"
+	done
