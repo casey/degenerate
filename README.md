@@ -20,6 +20,21 @@ produced it. The image tests are reproduced below, with each preceded by its
 ## Gallery
 
 ```
+$ degenerate autosave resize:256 load:0.png x apply load:1.png save
+```
+![autosave resize:256 load:0.png x apply load:1.png save](images/autosave%20resize%3A256%20load%3A0.png%20x%20apply%20load%3A1.png%20save.png)
+
+```
+$ degenerate autosave resize:256 x apply cross apply load:1.png save
+```
+![autosave resize:256 x apply cross apply load:1.png save](images/autosave%20resize%3A256%20x%20apply%20cross%20apply%20load%3A1.png%20save.png)
+
+```
+$ degenerate autosave resize:256 x apply load:0.png save
+```
+![autosave resize:256 x apply load:0.png save](images/autosave%20resize%3A256%20x%20apply%20load%3A0.png%20save.png)
+
+```
 $ degenerate comment:slow resize:256 circle scale:0.5 for:8 apply loop save
 ```
 ![comment:slow resize:256 circle scale:0.5 for:8 apply loop save](images/comment%3Aslow%20resize%3A256%20circle%20scale%3A0.5%20for%3A8%20apply%20loop%20save.png)
@@ -45,6 +60,11 @@ $ degenerate comment:slow resize:256 rotate-color:g:0.05 circle scale:0.75 wrap 
 ![comment:slow resize:256 rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop save](images/comment%3Aslow%20resize%3A256%20rotate-color%3Ag%3A0.05%20circle%20scale%3A0.75%20wrap%20for%3A8%20apply%20loop%20rotate-color%3Ab%3A0.05%20for%3A8%20apply%20loop%20save.png)
 
 ```
+$ degenerate comment:slow resize:256 rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate:0.8333 rotate-color:b:0.05 for:8 apply loop save
+```
+![comment:slow resize:256 rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate:0.8333 rotate-color:b:0.05 for:8 apply loop save](images/comment%3Aslow%20resize%3A256%20rotate-color%3Ag%3A0.05%20circle%20scale%3A0.75%20wrap%20for%3A8%20apply%20loop%20rotate%3A0.8333%20rotate-color%3Ab%3A0.05%20for%3A8%20apply%20loop%20save.png)
+
+```
 $ degenerate comment:slow resize:256 rotate-color:red:0.083333 rotate:0.1 for:12 circle apply cross apply x apply loop save
 ```
 ![comment:slow resize:256 rotate-color:red:0.083333 rotate:0.1 for:12 circle apply cross apply x apply loop save](images/comment%3Aslow%20resize%3A256%20rotate-color%3Ared%3A0.083333%20rotate%3A0.1%20for%3A12%20circle%20apply%20cross%20apply%20x%20apply%20loop%20save.png)
@@ -53,6 +73,11 @@ $ degenerate comment:slow resize:256 rotate-color:red:0.083333 rotate:0.1 for:12
 $ degenerate comment:slow resize:256 rotate:0.111 for:16 square apply circle apply loop save
 ```
 ![comment:slow resize:256 rotate:0.111 for:16 square apply circle apply loop save](images/comment%3Aslow%20resize%3A256%20rotate%3A0.111%20for%3A16%20square%20apply%20circle%20apply%20loop%20save.png)
+
+```
+$ degenerate comment:slow resize:256 rotate:0.3333 rotate-color:g:0.05 circle scale:0.5 wrap for:8 apply loop rotate:0.8333 rotate-color:b:0.05 for:8 apply loop save
+```
+![comment:slow resize:256 rotate:0.3333 rotate-color:g:0.05 circle scale:0.5 wrap for:8 apply loop rotate:0.8333 rotate-color:b:0.05 for:8 apply loop save](images/comment%3Aslow%20resize%3A256%20rotate%3A0.3333%20rotate-color%3Ag%3A0.05%20circle%20scale%3A0.5%20wrap%20for%3A8%20apply%20loop%20rotate%3A0.8333%20rotate-color%3Ab%3A0.05%20for%3A8%20apply%20loop%20save.png)
 
 ```
 $ degenerate comment:slow resize:256 scale:0.99 circle for:100 apply loop save

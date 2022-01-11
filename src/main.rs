@@ -29,7 +29,7 @@ mod state;
 mod wrap;
 
 type Error = Box<dyn std::error::Error>;
-type Result<T, E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
+type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
 fn main() {
   if let Err(error) = State::run() {
