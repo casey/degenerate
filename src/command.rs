@@ -5,6 +5,7 @@ const DEFAULT_OUTPUT_PATH: &str = "output.png";
 #[derive(Clone, Debug)]
 pub(crate) enum Command {
   Apply,
+  Autosave,
   Comment,
   Default(Vector3<u8>),
   For(usize),
@@ -55,7 +56,9 @@ impl Command {
           }
         }
         state.matrix = output;
+        state.autosave()?;
       }
+      Self::Autosave => state.autosave = !state.autosave,
       Self::Comment => {}
       Self::Default(default) => {
         state.default = *default;
@@ -147,6 +150,7 @@ impl Command {
       }
       Self::Resize(dimensions) => {
         state.resize(*dimensions);
+        state.autosave()?;
       }
       Self::Rotate(turns) => state
         .similarity
@@ -175,6 +179,7 @@ impl FromStr for Command {
     match s.split(':').collect::<Vec<&str>>().as_slice() {
       ["all"] => Ok(Self::Mask(Mask::All)),
       ["apply"] => Ok(Self::Apply),
+      ["autosave"] => Ok(Self::Autosave),
       ["circle"] => Ok(Self::Mask(Mask::Circle)),
       ["comment", ..] => Ok(Self::Comment),
       ["cross"] => Ok(Self::Mask(Mask::Cross)),

@@ -1,7 +1,9 @@
 use super::*;
 
 pub(crate) struct State {
+  pub(crate) autosave: bool,
   pub(crate) default: Vector3<u8>,
+  pub(crate) frame: u64,
   pub(crate) loop_counter: usize,
   pub(crate) mask: Mask,
   pub(crate) matrix: DMatrix<Vector3<u8>>,
@@ -38,7 +40,9 @@ impl State {
 
   pub(crate) fn new() -> Self {
     Self {
+      autosave: false,
       default: Vector3::new(0, 0, 0),
+      frame: 0,
       loop_counter: 0,
       mask: Mask::All,
       matrix: DMatrix::zeros(0, 0),
@@ -50,6 +54,14 @@ impl State {
       verbose: false,
       wrap: false,
     }
+  }
+
+  pub(crate) fn autosave(&mut self) -> Result {
+    if self.autosave {
+      self.image()?.save(format!("{}.png", self.frame))?;
+      self.frame += 1;
+    }
+    Ok(())
   }
 
   pub(crate) fn dimensions(&self) -> Vector2<usize> {
