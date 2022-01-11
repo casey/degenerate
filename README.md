@@ -150,6 +150,11 @@ $ degenerate resize:256 random-mask apply save
 ![resize:256 random-mask apply save](images/resize%3A256%20random-mask%20apply%20save.png)
 
 ```
+$ degenerate resize:256 read save
+```
+![resize:256 read save](images/resize%3A256%20read%20save.png)
+
+```
 $ degenerate resize:256 rotate-color:b:0.5 all apply save
 ```
 ![resize:256 rotate-color:b:0.5 all apply save](images/resize%3A256%20rotate-color%3Ab%3A0.5%20all%20apply%20save.png)

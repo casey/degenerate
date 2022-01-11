@@ -11,7 +11,7 @@ use {
   rand::{rngs::StdRng, SeedableRng},
   rustyline::{error::ReadlineError, Editor},
   std::{
-    env, f64,
+    env, f64, fs,
     io::{self, BufWriter, Write},
     path::{Path, PathBuf},
     process,
