@@ -342,7 +342,7 @@ fn errors_printed_in_red_and_bold() -> Result<()> {
     .output()?;
 
   assert!(str::from_utf8(&output.stderr)?.contains("\u{1b}[1;31merror\u{1b}[0m\u{1b}[1m: "));
-  
+
   Ok(())
 }
 
