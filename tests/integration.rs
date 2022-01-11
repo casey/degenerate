@@ -234,7 +234,7 @@ fn save_invalid_format() -> Result {
     .expected_status(1)
     .expected_stderr(
       "
-      error: The file extension `.\"txt\"` was not recognized as an image format
+      \u{1b}[1;31merror\u{1b}[0m\u{1b}[1m: The file extension `.\"txt\"` was not recognized as an image format\u{1b}[0m
       ",
     )
     .run()
@@ -331,6 +331,19 @@ fn infinite_loop() -> Result {
   Test::new()?
     .program("loop")
     .run_with_timeout(Duration::from_millis(250))
+}
+
+#[test]
+fn errors_printed_in_red_and_bold() -> Result<()> {
+  let output = Command::new(executable_path("degenerate"))
+    .args(["resize:2:2", "invalid"])
+    .stdout(Stdio::piped())
+    .stderr(Stdio::piped())
+    .output()?;
+
+  assert!(str::from_utf8(&output.stderr)?.contains("\u{1b}[1;31merror\u{1b}[0m\u{1b}[1m: "));
+
+  Ok(())
 }
 
 #[test]
