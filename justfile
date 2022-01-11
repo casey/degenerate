@@ -68,6 +68,7 @@ gallery:
 		fi
 		echo Generating $PROGRAM...
 		target/release/degenerate $PROGRAM
-		mkdir "gallery/$PROGRAM"
+		mv output.png "gallery/$PROGRAM.png"
+		mkdir -p "gallery/$PROGRAM"
 		mv *.png "gallery/$PROGRAM"
 	done
