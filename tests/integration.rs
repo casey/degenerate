@@ -82,7 +82,6 @@ impl<'a> Test<'a> {
   fn run_with_timeout(self, timeout: Duration) -> Result<()> {
     let mut child = self.command().spawn()?;
 
-
     thread::sleep(timeout);
 
     if let Some(status) = child.try_wait()? {
