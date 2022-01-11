@@ -63,7 +63,11 @@ gallery:
 		FILENAME=`basename -- "$IMAGE"`
 		PROGRAM=${FILENAME%.*}
 		PROGRAM=`echo $PROGRAM | sed 's/resize:[^ ]*/resize:4096/'`
+		if [[ $PROGRAM != *autosave* ]]; then
+			PROGRAM="autosave $PROGRAM"
+		fi
 		echo Generating $PROGRAM...
 		target/release/degenerate $PROGRAM
-		mv output.png "gallery/$PROGRAM.png"
+		mkdir "gallery/$PROGRAM"
+		mv *.png "gallery/$PROGRAM"
 	done

@@ -86,11 +86,15 @@ impl Command {
           ],
         );
       }
-      Self::Load(path) => state.load(
-        path
-          .as_deref()
-          .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
-      )?,
+      Self::Load(path) => {
+        state.load(
+          path
+            .as_deref()
+            .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
+        )?;
+        state.autosave()?;
+      }
+
       Self::Loop => {
         loop {
           state.program_counter = state.program_counter.wrapping_sub(1);
