@@ -335,11 +335,21 @@ fn infinite_loop() -> Result {
 
 #[test]
 fn autosave_toggles() -> Result {
-  let tempdir = Test::new()?
-    .program("autosave autosave resize:256")
-    .run_and_return_tempdir()?;
+  {
+    let tempdir = Test::new()?
+      .program("autosave resize:256")
+      .run_and_return_tempdir()?;
 
-  assert!(!tempdir.path().join("0.png").is_file());
+    assert!(tempdir.path().join("0.png").is_file());
+  }
+
+  {
+    let tempdir = Test::new()?
+      .program("autosave autosave resize:256")
+      .run_and_return_tempdir()?;
+
+    assert!(!tempdir.path().join("0.png").is_file());
+  }
 
   Ok(())
 }
