@@ -20,6 +20,11 @@ produced it. The image tests are reproduced below, with each preceded by its
 ## Gallery
 
 ```
+$ degenerate autosave resize:256 load:0.png x apply load:1.png save
+```
+![autosave resize:256 load:0.png x apply load:1.png save](images/autosave%20resize%3A256%20load%3A0.png%20x%20apply%20load%3A1.png%20save.png)
+
+```
 $ degenerate autosave resize:256 x apply cross apply load:1.png save
 ```
 ![autosave resize:256 x apply cross apply load:1.png save](images/autosave%20resize%3A256%20x%20apply%20cross%20apply%20load%3A1.png%20save.png)
