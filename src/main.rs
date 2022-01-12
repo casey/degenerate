@@ -3,7 +3,6 @@ use {
     color_axis::ColorAxis, command::Command, coordinates::Coordinates, mask::Mask,
     operation::Operation, path_ext::PathExt, pixel::Pixel, state::State, wrap::Wrap,
   },
-  shellexpand::tilde,
   ansi_term::{Colour::Red, Style},
   dirs::home_dir,
   image::{ImageBuffer, RgbImage},
@@ -11,6 +10,7 @@ use {
   rand::Rng,
   rand::{rngs::StdRng, SeedableRng},
   rustyline::{error::ReadlineError, Editor},
+  shellexpand::tilde,
   std::{
     env, f64, fs,
     io::{self, BufWriter, Write},
