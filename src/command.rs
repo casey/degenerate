@@ -4,6 +4,7 @@ const DEFAULT_OUTPUT_PATH: &str = "output.png";
 
 #[derive(Clone, Debug)]
 pub(crate) enum Command {
+  Alpha(f64),
   Apply,
   Autosave,
   Comment,
@@ -31,6 +32,7 @@ pub(crate) enum Command {
 impl Command {
   pub(crate) fn run(&self, state: &mut State) -> Result<()> {
     match self {
+      Self::Alpha(alpha) => state.alpha = *alpha,
       Self::Apply => {
         let similarity = state.similarity.inverse();
         let mut output = state.matrix.clone();
@@ -42,7 +44,7 @@ impl Command {
             let v = if state.wrap { v.wrap() } else { v };
             let i = v.pixel(state.dimensions());
             if state.mask.is_masked(state, i, v) {
-              output[(row, col)] = state.operation.apply(
+              let over = state.operation.apply(
                 if i.x >= 0
                   && i.y >= 0
                   && i.x < state.matrix.ncols() as isize
@@ -53,6 +55,12 @@ impl Command {
                   state.default
                 },
               );
+              let over = over.map(|c| c as f64);
+              let under = state.matrix[(row, col)];
+              let under = under.map(|c| c as f64);
+              let combined = (over * state.alpha + under * (1.0 - state.alpha))
+                / (state.alpha + (1.0 - state.alpha));
+              output[(row, col)] = combined.map(|c| c as u8);
             }
           }
         }
@@ -198,6 +206,7 @@ impl FromStr for Command {
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     match s.split(':').collect::<Vec<&str>>().as_slice() {
       ["all"] => Ok(Self::Mask(Mask::All)),
+      ["alpha", alpha] => Ok(Self::Alpha(alpha.parse()?)),
       ["apply"] => Ok(Self::Apply),
       ["autosave"] => Ok(Self::Autosave),
       ["circle"] => Ok(Self::Mask(Mask::Circle)),

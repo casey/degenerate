@@ -2,7 +2,7 @@ bt := '0'
 
 export RUST_BACKTRACE := bt
 
-all: check-lockfile test clippy fmt-check forbid
+ci: check-lockfile (test '--include-ignored') clippy fmt-check forbid
 
 build:
 	cargo build --release

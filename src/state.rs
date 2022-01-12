@@ -1,6 +1,7 @@
 use super::*;
 
 pub(crate) struct State {
+  pub(crate) alpha: f64,
   pub(crate) autosave: bool,
   pub(crate) default: Vector3<u8>,
   pub(crate) frame: u64,
@@ -40,6 +41,7 @@ impl State {
 
   pub(crate) fn new() -> Self {
     Self {
+      alpha: 1.0,
       autosave: false,
       default: Vector3::new(0, 0, 0),
       frame: 0,
