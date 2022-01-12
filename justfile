@@ -5,7 +5,7 @@ export RUST_BACKTRACE := bt
 all: check-lockfile test clippy fmt-check forbid
 
 build:
-	cargo build
+	cargo build --release
 
 test *args:
 	cargo test -- {{args}}
@@ -38,11 +38,9 @@ forbid:
 watch +args='ltest':
 	cargo watch --ignore README.md --clear --exec "{{args}}"
 
-generate:
+generate: build
 	#!/usr/bin/env bash
 	set -eou pipefail
-
-	cargo build --release
 
 	rm -rf generate
 	mkdir generate
@@ -51,11 +49,9 @@ generate:
 		target/release/degenerate resize:512 seed:$i generate save:generate/$i.png
 	done
 
-gallery:
+gallery: build
 	#!/usr/bin/env bash
 	set -eou pipefail
-
-	cargo build --release
 
 	rm -rf gallery
 	mkdir gallery
@@ -63,7 +59,12 @@ gallery:
 		FILENAME=`basename -- "$IMAGE"`
 		PROGRAM=${FILENAME%.*}
 		PROGRAM=`echo $PROGRAM | sed 's/resize:[^ ]*/resize:4096/'`
+		if [[ $PROGRAM != *autosave* ]]; then
+			PROGRAM="autosave $PROGRAM"
+		fi
 		echo Generating $PROGRAM...
 		target/release/degenerate $PROGRAM
 		mv output.png "gallery/$PROGRAM.png"
+		mkdir -p "gallery/$PROGRAM"
+		mv *.png "gallery/$PROGRAM"
 	done

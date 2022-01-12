@@ -168,6 +168,7 @@ dependencies = [
 name = "degenerate"
 version = "0.0.0"
 dependencies = [
+ "ansi_term",
  "approx",
  "camino",
  "dirs",

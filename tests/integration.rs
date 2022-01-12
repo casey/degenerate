@@ -15,7 +15,7 @@ use {
 
 mod image_tests;
 
-type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 struct Test<'a> {
   env_vars: Vec<(&'a str, &'a str)>,
@@ -28,13 +28,17 @@ struct Test<'a> {
 
 impl<'a> Test<'a> {
   fn new() -> Result<Self> {
+    let tempdir = TempDir::new()?;
+
+    fs::write(tempdir.path().join("program.degen"), "x apply")?;
+
     Ok(Self {
       env_vars: Vec::new(),
       expected_status: 0,
       expected_stderr: String::new(),
       expected_stdout: String::new(),
       program: String::new(),
-      tempdir: TempDir::new()?,
+      tempdir,
     })
   }
 
@@ -71,16 +75,12 @@ impl<'a> Test<'a> {
     self
   }
 
-  fn run(self) -> Result<()> {
+  fn run(self) -> Result {
     self.run_and_return_tempdir().map(|_| ())
   }
 
   fn run_with_timeout(self, timeout: Duration) -> Result<()> {
-    let mut child = Command::new(executable_path("degenerate"))
-      .envs(self.env_vars)
-      .current_dir(&self.tempdir)
-      .args(self.program.split_whitespace())
-      .spawn()?;
+    let mut child = self.command().spawn()?;
 
     thread::sleep(timeout);
 
@@ -96,12 +96,19 @@ impl<'a> Test<'a> {
     Ok(())
   }
 
-  fn run_and_return_tempdir(self) -> Result<TempDir> {
-    let output = Command::new(executable_path("degenerate"))
-      .envs(self.env_vars)
+  fn command(&self) -> Command {
+    let mut command = Command::new(executable_path("degenerate"));
+
+    command
+      .envs(self.env_vars.iter().cloned())
       .current_dir(&self.tempdir)
-      .args(self.program.split_whitespace())
-      .output()?;
+      .args(self.program.split_whitespace());
+
+    command
+  }
+
+  fn run_and_return_tempdir(self) -> Result<TempDir> {
+    let output = self.command().output()?;
 
     let stderr = str::from_utf8(&output.stderr)?;
 
@@ -127,7 +134,7 @@ impl<'a> Test<'a> {
   }
 }
 
-fn image_test(program: &str) -> Result<()> {
+fn image_test(program: &str) -> Result {
   for result in fs::read_dir("images")? {
     let entry = result?;
     let file_name = entry
@@ -184,12 +191,12 @@ fn image_test(program: &str) -> Result<()> {
 }
 
 #[test]
-fn repl_returns_success_after_reaching_eol() -> Result<()> {
+fn repl_returns_success_after_reaching_eol() -> Result {
   Test::new()?.program("repl").run()
 }
 
 #[test]
-fn repl_valid_command() -> Result<()> {
+fn repl_valid_command() -> Result {
   let mut command = Command::new(executable_path("degenerate"))
     .args(["resize:4:4", "repl"])
     .stdin(Stdio::piped())
@@ -209,7 +216,7 @@ fn repl_valid_command() -> Result<()> {
 }
 
 #[test]
-fn repl_invalid_command() -> Result<()> {
+fn repl_invalid_command() -> Result {
   let mut command = Command::new(executable_path("degenerate"))
     .args(["resize:4:4", "repl"])
     .stdin(Stdio::piped())
@@ -228,25 +235,25 @@ fn repl_invalid_command() -> Result<()> {
 }
 
 #[test]
-fn save_invalid_format() -> Result<()> {
+fn save_invalid_format() -> Result {
   Test::new()?
     .program("resize:4:4 top save:output.txt")
     .expected_status(1)
     .expected_stderr(
       "
-      error: The file extension `.\"txt\"` was not recognized as an image format
+      \u{1b}[1;31merror\u{1b}[0m\u{1b}[1m: The file extension `.\"txt\"` was not recognized as an image format\u{1b}[0m
       ",
     )
     .run()
 }
 
 #[test]
-fn default_size_is_empty() -> Result<()> {
+fn default_size_is_empty() -> Result {
   Test::new()?.program("print").run()
 }
 
 #[test]
-fn verbose_toggles_step_status() -> Result<()> {
+fn verbose_toggles_step_status() -> Result {
   Test::new()?
     .program("verbose square verbose square")
     .expected_stderr(
@@ -259,7 +266,7 @@ fn verbose_toggles_step_status() -> Result<()> {
 }
 
 #[test]
-fn looping() -> Result<()> {
+fn looping() -> Result {
   Test::new()?
     .program("resize:4:4 square for:2 apply print loop")
     .expected_stdout(
@@ -278,7 +285,7 @@ fn looping() -> Result<()> {
 }
 
 #[test]
-fn open() -> Result<()> {
+fn open() -> Result {
   Test::new()?
     .program("resize:4:4 save:test.png open:test.png")
     .env_var("DEGENERATE_OPEN_COMMAND", "echo")
@@ -291,7 +298,7 @@ fn open() -> Result<()> {
 }
 
 #[test]
-fn open_default() -> Result<()> {
+fn open_default() -> Result {
   Test::new()?
     .program("resize:4:4 save open")
     .env_var("DEGENERATE_OPEN_COMMAND", "echo")
@@ -304,7 +311,7 @@ fn open_default() -> Result<()> {
 }
 
 #[test]
-fn multiple_fors_reset_loop_counter() -> Result<()> {
+fn multiple_fors_reset_loop_counter() -> Result {
   Test::new()?
     .program("resize:4:4 for:2 square apply print loop for:1 rows:1:1 apply print loop")
     .expected_stdout(
@@ -327,22 +334,42 @@ fn multiple_fors_reset_loop_counter() -> Result<()> {
 }
 
 #[test]
-fn infinite_loop() -> Result<()> {
+fn infinite_loop() -> Result {
   Test::new()?
     .program("loop")
     .run_with_timeout(Duration::from_millis(250))
 }
 
 #[test]
-fn expand_tilde() -> Result<()> {
-  Test::new()?
-    .program("resize:4:4 open:~/output.png")
-    .env_var("DEGENERATE_OPEN_COMMAND", "echo")
-    .env_var("HOME", ".")
-    .expected_stdout(
-      "
-      ./output.png
-      ",
-    )
-    .run()
+fn errors_printed_in_red_and_bold() -> Result<()> {
+  let output = Command::new(executable_path("degenerate"))
+    .args(["resize:2:2", "invalid"])
+    .stdout(Stdio::piped())
+    .stderr(Stdio::piped())
+    .output()?;
+
+  assert!(str::from_utf8(&output.stderr)?.contains("\u{1b}[1;31merror\u{1b}[0m\u{1b}[1m: "));
+
+  Ok(())
+}
+
+#[test]
+fn autosave_toggles() -> Result {
+  {
+    let tempdir = Test::new()?
+      .program("autosave resize:256")
+      .run_and_return_tempdir()?;
+
+    assert!(tempdir.path().join("0.png").is_file());
+  }
+
+  {
+    let tempdir = Test::new()?
+      .program("autosave autosave resize:256")
+      .run_and_return_tempdir()?;
+
+    assert!(!tempdir.path().join("0.png").is_file());
+  }
+
+  Ok(())
 }
