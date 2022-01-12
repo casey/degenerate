@@ -35,6 +35,16 @@ $ degenerate autosave resize:256 x apply load:0.png save
 ![autosave resize:256 x apply load:0.png save](images/autosave%20resize%3A256%20x%20apply%20load%3A0.png%20save.png)
 
 ```
+$ degenerate comment:slow alpha:0.5 resize:256 rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate:0.8333 rotate-color:b:0.05 for:8 apply loop save
+```
+![comment:slow alpha:0.5 resize:256 rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate:0.8333 rotate-color:b:0.05 for:8 apply loop save](images/comment%3Aslow%20alpha%3A0.5%20resize%3A256%20rotate-color%3Ag%3A0.05%20circle%20scale%3A0.75%20wrap%20for%3A8%20apply%20loop%20rotate%3A0.8333%20rotate-color%3Ab%3A0.05%20for%3A8%20apply%20loop%20save.png)
+
+```
+$ degenerate comment:slow alpha:0.75 resize:256 circle scale:0.5 for:8 apply wrap loop save
+```
+![comment:slow alpha:0.75 resize:256 circle scale:0.5 for:8 apply wrap loop save](images/comment%3Aslow%20alpha%3A0.75%20resize%3A256%20circle%20scale%3A0.5%20for%3A8%20apply%20wrap%20loop%20save.png)
+
+```
 $ degenerate comment:slow resize:256 circle scale:0.5 for:8 apply loop save
 ```
 ![comment:slow resize:256 circle scale:0.5 for:8 apply loop save](images/comment%3Aslow%20resize%3A256%20circle%20scale%3A0.5%20for%3A8%20apply%20loop%20save.png)
@@ -263,6 +273,11 @@ $ degenerate resize:256 scale:2 x apply save
 $ degenerate resize:256 seed:2 random-mask apply save
 ```
 ![resize:256 seed:2 random-mask apply save](images/resize%3A256%20seed%3A2%20random-mask%20apply%20save.png)
+
+```
+$ degenerate resize:256 square apply alpha:0.25 x apply save
+```
+![resize:256 square apply alpha:0.25 x apply save](images/resize%3A256%20square%20apply%20alpha%3A0.25%20x%20apply%20save.png)
 
 ```
 $ degenerate resize:256 square apply save
