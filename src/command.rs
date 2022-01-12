@@ -29,24 +29,6 @@ pub(crate) enum Command {
   Wrap,
 }
 
-trait Foo {
-  fn bar(self) -> Vector3<f64>;
-}
-
-impl Foo for Vector3<u8> {
-  fn bar(self) -> Vector3<f64> {
-    self.map(|component| component as f64 / 255.0)
-  }
-}
-
-fn f64_to_u8(v: Vector3<f64>) -> Vector3<u8> {
-  Vector3::new(
-    (v.x * 255.0) as u8,
-    (v.y * 255.0) as u8,
-    (v.z * 255.0) as u8,
-  )
-}
-
 impl Command {
   pub(crate) fn run(&self, state: &mut State) -> Result<()> {
     match self {
@@ -73,11 +55,12 @@ impl Command {
                   state.default
                 },
               );
+              let over = over.map(|c| c as f64);
               let under = state.matrix[(row, col)];
-              output[(row, col)] = f64_to_u8(
-                (over.bar() * state.alpha + under.bar() * (1.0 - state.alpha))
-                  / (state.alpha + (1.0 - state.alpha)),
-              );
+              let under = under.map(|c| c as f64);
+              let combined = (over * state.alpha + under * (1.0 - state.alpha))
+                / (state.alpha + (1.0 - state.alpha));
+              output[(row, col)] = combined.map(|c| c as u8);
             }
           }
         }
