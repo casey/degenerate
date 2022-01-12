@@ -35,6 +35,11 @@ $ degenerate autosave resize:256 x apply load:0.png save
 ![autosave resize:256 x apply load:0.png save](images/autosave%20resize%3A256%20x%20apply%20load%3A0.png%20save.png)
 
 ```
+$ degenerate comment:slow alpha:0.75 resize:256 circle scale:0.5 for:8 apply wrap loop save
+```
+![comment:slow alpha:0.75 resize:256 circle scale:0.5 for:8 apply wrap loop save](images/comment%3Aslow%20alpha%3A0.75%20resize%3A256%20circle%20scale%3A0.5%20for%3A8%20apply%20wrap%20loop%20save.png)
+
+```
 $ degenerate comment:slow resize:256 circle scale:0.5 for:8 apply loop save
 ```
 ![comment:slow resize:256 circle scale:0.5 for:8 apply loop save](images/comment%3Aslow%20resize%3A256%20circle%20scale%3A0.5%20for%3A8%20apply%20loop%20save.png)
@@ -113,6 +118,11 @@ $ degenerate default:0:255:0 resize:256 save
 $ degenerate resize:256 all apply save
 ```
 ![resize:256 all apply save](images/resize%3A256%20all%20apply%20save.png)
+
+```
+$ degenerate resize:256 alpha:0.5 x apply save
+```
+![resize:256 alpha:0.5 x apply save](images/resize%3A256%20alpha%3A0.5%20x%20apply%20save.png)
 
 ```
 $ degenerate resize:256 apply save
