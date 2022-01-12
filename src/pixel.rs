@@ -6,7 +6,6 @@ pub(crate) trait Pixel {
 
 impl Pixel for Vector2<f64> {
   fn pixel(self, dimensions: Vector2<usize>) -> Vector2<isize> {
-    // todo: rewrite using map
     Vector2::new(
       ((self.x + 1.0) / 2.0 * dimensions.x as f64 - 0.5).round() as isize,
       ((self.y + 1.0) / 2.0 * dimensions.y as f64 - 0.5).round() as isize,

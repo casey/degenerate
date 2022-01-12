@@ -6,7 +6,6 @@ pub(crate) trait Coordinates {
 
 impl Coordinates for Vector2<usize> {
   fn coordinates(self, dimensions: Vector2<usize>) -> Vector2<f64> {
-    // todo: rewrite using map
     Vector2::new(
       ((self.x as f64 + 0.5) / dimensions.x as f64) * 2.0 - 1.0,
       ((self.y as f64 + 0.5) / dimensions.y as f64) * 2.0 - 1.0,
