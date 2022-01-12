@@ -174,9 +174,7 @@ impl State {
         .arg(path.as_deref().unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()))
         .spawn()?;
       }
-      Command::Mask(mask) => {
-        self.mask = mask.clone();
-      }
+      Command::Mask(mask) => self.mask = mask,
       Command::Operation(operation) => self.operation = operation,
       Command::Print => self.print()?,
       Command::RandomMask => {
