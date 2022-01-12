@@ -6,13 +6,13 @@ pub(crate) trait PathExt {
 
 impl PathExt for Path {
   fn expand(&self) -> Result<PathBuf> {
-    match self.starts_with("~/") {
-      true => Ok(
-        home_dir()
-          .unwrap_or_default()
-          .join(self.strip_prefix("~/")?),
-      ),
-      false => Ok(self.to_path_buf()),
-    }
+    Ok(PathBuf::from(
+      tilde(
+        self
+          .to_str()
+          .ok_or_else(|| format!("Path was not valid unicode: {}", self.display()))?,
+      )
+      .to_string(),
+    ))
   }
 }

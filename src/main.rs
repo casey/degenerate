@@ -3,6 +3,7 @@ use {
     color_axis::ColorAxis, command::Command, coordinates::Coordinates, mask::Mask,
     operation::Operation, path_ext::PathExt, pixel::Pixel, state::State, wrap::Wrap,
   },
+  shellexpand::tilde,
   ansi_term::{Colour::Red, Style},
   dirs::home_dir,
   image::{ImageBuffer, RgbImage},

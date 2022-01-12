@@ -181,9 +181,9 @@ dependencies = [
  "rand",
  "rand_derive2",
  "rustyline",
+ "shellexpand",
  "strum",
  "tempfile",
- "tilde",
  "unindent",
  "urlencoding",
 ]
@@ -780,6 +780,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d29ab0c6d3fc0ee92fe66e2d99f700eab17a8d57d1c1d3b748380fb20baa78cd"
 
 [[package]]
+name = "shellexpand"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "83bdb7831b2d85ddf4a7b148aa19d0587eddbe8671a436b7bd1182eaad0f2829"
+dependencies = [
+ "dirs-next",
+]
+
+[[package]]
 name = "simba"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -861,12 +870,6 @@ dependencies = [
  "miniz_oxide 0.4.4",
  "weezl",
 ]
-
-[[package]]
-name = "tilde"
-version = "0.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2430b50993aa69c5acf4d59d9cb30f9646a601f9643f0038603c612ec8d65a82"
 
 [[package]]
 name = "typenum"
