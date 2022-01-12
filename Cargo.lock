@@ -183,6 +183,7 @@ dependencies = [
  "rustyline",
  "strum",
  "tempfile",
+ "tilde",
  "unindent",
  "urlencoding",
 ]
@@ -860,6 +861,12 @@ dependencies = [
  "miniz_oxide 0.4.4",
  "weezl",
 ]
+
+[[package]]
+name = "tilde"
+version = "0.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2430b50993aa69c5acf4d59d9cb30f9646a601f9643f0038603c612ec8d65a82"
 
 [[package]]
 name = "typenum"

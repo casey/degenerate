@@ -89,7 +89,7 @@ impl Command {
       }
       Self::Load(path) => {
         state.load(
-          path
+          &path
             .as_deref()
             .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref())
             .expand()?,

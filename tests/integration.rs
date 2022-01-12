@@ -373,3 +373,43 @@ fn autosave_toggles() -> Result {
 
   Ok(())
 }
+
+#[test]
+fn open_expand_tilde() -> Result<()> {
+  Test::new()?
+    .program("resize:2:2 open:~/output.png")
+    .env_var("DEGENERATE_OPEN_COMMAND", "echo")
+    .env_var("HOME", ".")
+    .expected_stdout(
+      "
+      ./output.png
+      ",
+    )
+    .run()
+}
+
+#[test]
+fn save_expand_tilde() -> Result<()> {
+  let tempdir = Test::new()?
+    .program("resize:2:2 save:~/output.png")
+    .env_var("HOME", ".")
+    .run_and_return_tempdir()?;
+
+  assert!(tempdir.path().join("output.png").is_file());
+
+  Ok(())
+}
+
+#[test]
+fn load_expand_tilde() -> Result<()> {
+  Test::new()?
+    .program("resize:2:2 save:~/output.png load:~/output.png print")
+    .env_var("HOME", ".")
+    .expected_stdout(
+      "
+      00
+      00
+      ",
+    )
+    .run()
+}
