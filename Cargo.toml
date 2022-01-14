@@ -6,9 +6,6 @@ edition = "2021"
 license = "CC0-1.0"
 autotests = false
 
-[features]
-window_tests = []
-
 [dependencies]
 ansi_term = "0.12.1"
 bevy = "0.6.0"
