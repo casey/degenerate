@@ -26,6 +26,7 @@ pub(crate) enum Command {
   Scale(f64),
   Seed(u64),
   Verbose,
+  Window,
   Wrap,
 }
 
@@ -192,6 +193,11 @@ impl Command {
       }
       Self::Seed(seed) => state.rng = StdRng::seed_from_u64(*seed),
       Self::Verbose => state.verbose = !state.verbose,
+      Self::Window => {
+        bevy::app::App::new()
+          .add_plugins(bevy::DefaultPlugins)
+          .run();
+      }
       Self::Wrap => state.wrap = !state.wrap,
     }
 
@@ -254,6 +260,7 @@ impl FromStr for Command {
       ["square"] => Ok(Self::Mask(Mask::Square)),
       ["top"] => Ok(Self::Mask(Mask::Top)),
       ["verbose"] => Ok(Self::Verbose),
+      ["window"] => Ok(Self::Window),
       ["wrap"] => Ok(Self::Wrap),
       ["x"] => Ok(Self::Mask(Mask::X)),
       _ => Err(format!("Invalid command: {}", s).into()),

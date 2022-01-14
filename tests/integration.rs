@@ -14,6 +14,7 @@ use {
 };
 
 mod image_tests;
+mod window_tests;
 
 type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
