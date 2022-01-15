@@ -210,6 +210,16 @@ $ degenerate resize:256 rotate:0.05 scale:2 x apply save
 ![resize:256 rotate:0.05 scale:2 x apply save](images/resize%3A256%20rotate%3A0.05%20scale%3A2%20x%20apply%20save.png)
 
 ```
+$ degenerate resize:256 rotate:0.05 square for:2 apply loop save
+```
+![resize:256 rotate:0.05 square for:2 apply loop save](images/resize%3A256%20rotate%3A0.05%20square%20for%3A2%20apply%20loop%20save.png)
+
+```
+$ degenerate resize:256 rotate:0.05 square for:2 apply loop x for:1 apply loop save
+```
+![resize:256 rotate:0.05 square for:2 apply loop x for:1 apply loop save](images/resize%3A256%20rotate%3A0.05%20square%20for%3A2%20apply%20loop%20x%20for%3A1%20apply%20loop%20save.png)
+
+```
 $ degenerate resize:256 rotate:0.05 x apply save
 ```
 ![resize:256 rotate:0.05 x apply save](images/resize%3A256%20rotate%3A0.05%20x%20apply%20save.png)
