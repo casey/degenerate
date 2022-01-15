@@ -267,25 +267,6 @@ fn verbose_toggles_step_status() -> Result {
 }
 
 #[test]
-fn looping() -> Result {
-  Test::new()?
-    .program("resize:4:4 square for:2 apply print loop")
-    .expected_stdout(
-      "
-      0000
-      0FF0
-      0FF0
-      0000
-      0000
-      0000
-      0000
-      0000
-    ",
-    )
-    .run()
-}
-
-#[test]
 fn open() -> Result {
   Test::new()?
     .program("resize:4:4 save:test.png open:test.png")
@@ -306,29 +287,6 @@ fn open_default() -> Result {
     .expected_stdout(
       "
       output.png
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn multiple_fors_reset_loop_counter() -> Result {
-  Test::new()?
-    .program("resize:4:4 for:2 square apply print loop for:1 rows:1:1 apply print loop")
-    .expected_stdout(
-      "
-      0000
-      0FF0
-      0FF0
-      0000
-      0000
-      0000
-      0000
-      0000
-      FFFF
-      0000
-      FFFF
-      0000
       ",
     )
     .run()
