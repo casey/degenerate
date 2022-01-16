@@ -337,7 +337,7 @@ fn autosave_toggles() -> Result {
 }
 
 #[test]
-#[cfg(not(features = "window"))]
+#[cfg(not(feature = "window"))]
 fn window_command_returns_error() -> Result {
   Test::new()?
     .program("window")

@@ -193,13 +193,13 @@ impl Command {
       }
       Self::Seed(seed) => state.rng = StdRng::seed_from_u64(*seed),
       Self::Verbose => state.verbose = !state.verbose,
-      #[cfg(features = "window")]
+      #[cfg(feature = "window")]
       Self::Window => {
         bevy::app::App::new()
           .add_plugins(bevy::DefaultPlugins)
           .run();
       }
-      #[cfg(not(features = "window"))]
+      #[cfg(not(feature = "window"))]
       Self::Window => {
         return Err(
           "The `window` command is only supported if the optional `window` feature is enabled."
