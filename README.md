@@ -35,19 +35,19 @@ $ degenerate apply save
 ![apply save](images/apply%20save.png)
 
 ```
-$ degenerate autosave load:0.png x apply load:1.png save
+$ degenerate autosave resize:256 x apply load:0.png save
 ```
-![autosave load:0.png x apply load:1.png save](images/autosave%20load%3A0.png%20x%20apply%20load%3A1.png%20save.png)
+![autosave resize:256 x apply load:0.png save](images/autosave%20resize%3A256%20x%20apply%20load%3A0.png%20save.png)
 
 ```
-$ degenerate autosave x apply cross apply load:1.png save
+$ degenerate autosave square apply load:0.png x apply load:1.png save
 ```
-![autosave x apply cross apply load:1.png save](images/autosave%20x%20apply%20cross%20apply%20load%3A1.png%20save.png)
+![autosave square apply load:0.png x apply load:1.png save](images/autosave%20square%20apply%20load%3A0.png%20x%20apply%20load%3A1.png%20save.png)
 
 ```
-$ degenerate autosave x apply load:0.png save
+$ degenerate autosave x apply cross apply load:0.png save
 ```
-![autosave x apply load:0.png save](images/autosave%20x%20apply%20load%3A0.png%20save.png)
+![autosave x apply cross apply load:0.png save](images/autosave%20x%20apply%20cross%20apply%20load%3A0.png%20save.png)
 
 ```
 $ degenerate circle apply save
@@ -140,9 +140,9 @@ $ degenerate cross apply save
 ![cross apply save](images/cross%20apply%20save.png)
 
 ```
-$ degenerate default:0:255:0 resize:256 save
+$ degenerate default:0:255:0 resize:512 save
 ```
-![default:0:255:0 resize:256 save](images/default%3A0%3A255%3A0%20resize%3A256%20save.png)
+![default:0:255:0 resize:512 save](images/default%3A0%3A255%3A0%20resize%3A512%20save.png)
 
 ```
 $ degenerate mod:3:0 apply save
