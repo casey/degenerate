@@ -36,13 +36,6 @@ jobs:
         components: clippy, rustfmt
         toolchain: stable
 
-    - name: Install Linux Dependencies
-      if: ${{ matrix.os == 'ubuntu-latest' }}
-      run: |
-        sudo apt-get update
-        # for bin/forbid
-        sudo apt-get install ripgrep
-
     - uses: Swatinem/rust-cache@v1
 
     - name: Check Lockfile
@@ -64,4 +57,7 @@ jobs:
 
     - name: Check for Forbidden Words
       if: ${{ matrix.os == 'ubuntu-latest' }}
-      run: ./bin/forbid
+      run: |
+        sudo apt-get update
+        sudo apt-get install ripgrep
+        ./bin/forbid
