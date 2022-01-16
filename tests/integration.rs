@@ -79,7 +79,7 @@ impl<'a> Test<'a> {
     self.run_and_return_tempdir().map(|_| ())
   }
 
-  fn run_with_timeout(self, timeout: Duration) -> Result<()> {
+  fn run_with_timeout(self, timeout: Duration) -> Result {
     let mut child = self.command().spawn()?;
 
     thread::sleep(timeout);
@@ -248,11 +248,6 @@ fn save_invalid_format() -> Result {
 }
 
 #[test]
-fn default_size_is_empty() -> Result {
-  Test::new()?.program("print").run()
-}
-
-#[test]
 fn verbose_toggles_step_status() -> Result {
   Test::new()?
     .program("verbose square verbose square")
@@ -299,7 +294,7 @@ fn infinite_loop() -> Result {
 }
 
 #[test]
-fn errors_printed_in_red_and_bold() -> Result<()> {
+fn errors_printed_in_red_and_bold() -> Result {
   let output = Command::new(executable_path("degenerate"))
     .args(["resize:2:2", "invalid"])
     .stdout(Stdio::piped())

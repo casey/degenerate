@@ -49,7 +49,7 @@ impl State {
       frame: 0,
       loop_counter: 0,
       mask: Mask::All,
-      matrix: DMatrix::zeros(0, 0),
+      matrix: DMatrix::zeros(256, 256),
       operation: Operation::Invert,
       program: Vec::new(),
       program_counter: 0,
