@@ -165,6 +165,11 @@ $ degenerate resize:3 default:0:255:0 scale:0.5 apply save
 ![resize:3 default:0:255:0 scale:0.5 apply save](images/resize%3A3%20default%3A0%3A255%3A0%20scale%3A0.5%20apply%20save.png)
 
 ```
+$ degenerate resize:512 save
+```
+![resize:512 save](images/resize%3A512%20save.png)
+
+```
 $ degenerate resize:512:256 all apply save all apply load
 ```
 ![resize:512:256 all apply save all apply load](images/resize%3A512%3A256%20all%20apply%20save%20all%20apply%20load.png)
