@@ -52,9 +52,12 @@ jobs:
         cargo update --locked --package degenerate
 
     - name: Test
+      run: cargo test --all -- --include-ignored
+
+    - name: Test All Features
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: cargo test --all -- --include-ignored
+        run: cargo test --all --all-features -- --include-ignored
 
     - name: Clippy
       run: cargo clippy --all --all-targets
