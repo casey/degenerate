@@ -55,9 +55,8 @@ jobs:
       run: cargo test --all -- --include-ignored
 
     - name: Test All Features
-      uses: GabrielBB/xvfb-action@v1
-      with:
-        run: cargo test --all --all-features -- --include-ignored
+      if: ${{ matrix.os == 'macos-latest' }}
+      run: cargo test --all --all-features -- --include-ignored
 
     - name: Clippy
       run: cargo clippy --all --all-targets
