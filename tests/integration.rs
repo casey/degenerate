@@ -327,7 +327,6 @@ fn autosave_toggles() -> Result {
   Ok(())
 }
 
-
 #[test]
 fn print() -> Result {
   Test::new()?
