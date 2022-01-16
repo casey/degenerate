@@ -40,11 +40,19 @@ fn main() {
       return;
     }
 
-    eprintln!(
-      "{}{}",
-      Red.bold().paint("error"),
-      Style::new().bold().paint(format!(": {}", error))
-    );
+    if atty::is(atty::Stream::Stderr)
+      || env::var("CLICOLOR_FORCE")
+        .map(|val| val != "0")
+        .unwrap_or_default()
+    {
+      eprintln!(
+        "{}{}",
+        Red.bold().paint("error"),
+        Style::new().bold().paint(format!(": {}", error))
+      );
+    } else {
+      eprintln!("error: {}", error);
+    }
 
     process::exit(1);
   }

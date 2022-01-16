@@ -14,6 +14,8 @@ use {
 };
 
 mod image_tests;
+
+#[cfg(feature = "window")]
 mod window_tests;
 
 type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -242,7 +244,7 @@ fn save_invalid_format() -> Result {
     .expected_status(1)
     .expected_stderr(
       "
-      \u{1b}[1;31merror\u{1b}[0m\u{1b}[1m: The file extension `.\"txt\"` was not recognized as an image format\u{1b}[0m
+      error: The file extension `.\"txt\"` was not recognized as an image format
       ",
     )
     .run()
@@ -343,15 +345,16 @@ fn infinite_loop() -> Result {
 
 #[test]
 fn errors_printed_in_red_and_bold() -> Result<()> {
-  let output = Command::new(executable_path("degenerate"))
-    .args(["resize:2:2", "invalid"])
-    .stdout(Stdio::piped())
-    .stderr(Stdio::piped())
-    .output()?;
-
-  assert!(str::from_utf8(&output.stderr)?.contains("\u{1b}[1;31merror\u{1b}[0m\u{1b}[1m: "));
-
-  Ok(())
+  Test::new()?
+    .program("resize:2:2 invalid")
+    .env_var("CLICOLOR_FORCE", "1")
+    .expected_status(1)
+    .expected_stderr(
+      "
+      \u{1b}[1;31merror\u{1b}[0m\u{1b}[1m: Invalid command: invalid\u{1b}[0m
+      ",
+    )
+    .run()
 }
 
 #[test]
@@ -373,4 +376,18 @@ fn autosave_toggles() -> Result {
   }
 
   Ok(())
+}
+
+#[test]
+#[cfg(not(features = "window"))]
+fn window_command_returns_error() -> Result {
+  Test::new()?
+    .program("window")
+    .expected_status(1)
+    .expected_stderr(
+      "
+      error: The `window` command is only supported if the optional `window` feature is enabled.
+      ",
+    )
+    .run()
 }
