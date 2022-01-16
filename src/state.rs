@@ -41,7 +41,7 @@ impl State {
     Ok(())
   }
 
-  pub(crate) fn new() -> Self {
+  fn new() -> Self {
     Self {
       alpha: 1.0,
       autosave: false,
@@ -49,7 +49,7 @@ impl State {
       frame: 0,
       loop_counter: 0,
       mask: Mask::All,
-      matrix: DMatrix::zeros(0, 0),
+      matrix: DMatrix::zeros(256, 256),
       operation: Operation::Invert,
       program: Vec::new(),
       program_counter: 0,
@@ -60,7 +60,7 @@ impl State {
     }
   }
 
-  pub(crate) fn autosave(&mut self) -> Result {
+  fn autosave(&mut self) -> Result {
     if self.autosave {
       self.image()?.save(format!("{}.png", self.frame))?;
       self.frame += 1;
@@ -68,11 +68,11 @@ impl State {
     Ok(())
   }
 
-  pub(crate) fn dimensions(&self) -> Vector2<usize> {
+  fn dimensions(&self) -> Vector2<usize> {
     Vector2::new(self.matrix.ncols(), self.matrix.nrows())
   }
 
-  pub(crate) fn execute(&mut self, command: Command) -> Result<()> {
+  fn execute(&mut self, command: Command) -> Result<()> {
     match command {
       Command::Alpha(alpha) => self.alpha = alpha,
       Command::Apply => {
@@ -240,13 +240,13 @@ impl State {
     Ok(())
   }
 
-  pub(crate) fn resize(&mut self, dimensions: (usize, usize)) {
+  fn resize(&mut self, dimensions: (usize, usize)) {
     self
       .matrix
       .resize_mut(dimensions.0, dimensions.1, self.default)
   }
 
-  pub(crate) fn image(&self) -> Result<RgbImage> {
+  fn image(&self) -> Result<RgbImage> {
     ImageBuffer::from_raw(
       self.matrix.ncols().try_into()?,
       self.matrix.nrows().try_into()?,
@@ -255,7 +255,7 @@ impl State {
     .ok_or_else(|| "State is not a valid image".into())
   }
 
-  pub(crate) fn print(&self) -> Result<()> {
+  fn print(&self) -> Result<()> {
     let mut w = BufWriter::new(io::stdout());
 
     for row in self.matrix.row_iter() {
@@ -274,7 +274,7 @@ impl State {
     Ok(())
   }
 
-  pub(crate) fn load(&mut self, path: &Path) -> Result<()> {
+  fn load(&mut self, path: &Path) -> Result<()> {
     let image = image::io::Reader::open(path)?
       .decode()?
       .as_rgb8()
