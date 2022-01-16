@@ -42,8 +42,6 @@ jobs:
         sudo apt-get update
         # for bin/forbid
         sudo apt-get install ripgrep
-        # bevy dependencies
-        sudo apt-get install libasound2-dev libudev-dev
 
     - uses: Swatinem/rust-cache@v1
 
