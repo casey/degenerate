@@ -82,7 +82,7 @@ impl<'a> Test<'a> {
     self.run_and_return_tempdir().map(|_| ())
   }
 
-  fn run_with_timeout(self, timeout: Duration) -> Result<()> {
+  fn run_with_timeout(self, timeout: Duration) -> Result {
     let mut child = self.command().spawn()?;
 
     thread::sleep(timeout);
@@ -251,11 +251,6 @@ fn save_invalid_format() -> Result {
 }
 
 #[test]
-fn default_size_is_empty() -> Result {
-  Test::new()?.program("print").run()
-}
-
-#[test]
 fn verbose_toggles_step_status() -> Result {
   Test::new()?
     .program("verbose square verbose square")
@@ -304,7 +299,7 @@ fn infinite_loop() -> Result {
 #[test]
 fn errors_printed_in_red_and_bold() -> Result<()> {
   Test::new()?
-    .program("resize:2:2 invalid")
+    .program("invalid")
     .env_var("CLICOLOR_FORCE", "1")
     .expected_status(1)
     .expected_stderr(
@@ -345,6 +340,21 @@ fn window_command_returns_error() -> Result {
     .expected_stderr(
       "
       error: The `window` command is only supported if the optional `window` feature is enabled.
+      ",
+    )
+    .run()
+}
+
+#[test]
+fn print() -> Result {
+  Test::new()?
+    .program("resize:4 print")
+    .expected_stdout(
+      "
+      0000
+      0000
+      0000
+      0000
       ",
     )
     .run()
