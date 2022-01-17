@@ -24,6 +24,7 @@ pub(crate) enum Command {
   Scale(f64),
   Seed(u64),
   Verbose,
+  Window,
   Wrap,
 }
 
@@ -82,6 +83,7 @@ impl FromStr for Command {
       ["square"] => Ok(Self::Mask(Mask::Square)),
       ["top"] => Ok(Self::Mask(Mask::Top)),
       ["verbose"] => Ok(Self::Verbose),
+      ["window"] => Ok(Self::Window),
       ["wrap"] => Ok(Self::Wrap),
       ["x"] => Ok(Self::Mask(Mask::X)),
       _ => Err(format!("Invalid command: {}", s).into()),

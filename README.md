@@ -5,6 +5,11 @@ Degenerate is an algorithmic image generator inspired by
 
 (N.B. blaster is written in idiosyncratic Objective-C++.)
 
+## Compiling
+
+`degenerate` can render to a terminal or to a window. To render to a window,
+`degenerate` must be built with the optional `window` feature.
+
 ## Usage
 
 ```bash

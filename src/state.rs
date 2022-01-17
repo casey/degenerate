@@ -234,6 +234,19 @@ impl State {
       }
       Command::Seed(seed) => self.rng = StdRng::seed_from_u64(seed),
       Command::Verbose => self.verbose = !self.verbose,
+      #[cfg(feature = "window")]
+      Command::Window => {
+        bevy::app::App::new()
+          .add_plugins(bevy::DefaultPlugins)
+          .run();
+      }
+      #[cfg(not(feature = "window"))]
+      Command::Window => {
+        return Err(
+          "The `window` command is only supported if the optional `window` feature is enabled"
+            .into(),
+        );
+      }
       Command::Wrap => self.wrap = !self.wrap,
     }
 
