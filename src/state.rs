@@ -243,7 +243,7 @@ impl State {
       #[cfg(not(feature = "window"))]
       Command::Window => {
         return Err(
-          "The `window` command is only supported if the optional `window` feature is enabled."
+          "The `window` command is only supported if the optional `window` feature is enabled"
             .into(),
         );
       }

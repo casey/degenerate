@@ -339,7 +339,7 @@ fn window_command_returns_error() -> Result {
     .expected_status(1)
     .expected_stderr(
       "
-      error: The `window` command is only supported if the optional `window` feature is enabled.
+      error: The `window` command is only supported if the optional `window` feature is enabled
       ",
     )
     .run()
