@@ -58,16 +58,15 @@ gallery: build
 
 	rm -rf gallery
 	mkdir gallery
+	echo x apply > program.degen
 	for IMAGE in images/*; do
 		FILENAME=`basename -- "$IMAGE"`
 		PROGRAM=${FILENAME%.*}
-		PROGRAM=`echo $PROGRAM | sed 's/resize:[^ ]*/resize:4096/'`
-		if [[ $PROGRAM != *autosave* ]]; then
-			PROGRAM="autosave $PROGRAM"
+		if [[ $PROGRAM != *resize* ]]; then
+			PROGRAM="resize:4096 $PROGRAM"
 		fi
 		echo Generating $PROGRAM...
 		target/release/degenerate $PROGRAM
 		mv output.png "gallery/$PROGRAM.png"
-		mkdir -p "gallery/$PROGRAM"
-		mv *.png "gallery/$PROGRAM"
 	done
+	rm program.degen
