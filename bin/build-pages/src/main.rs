@@ -47,7 +47,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
   let gallery = Path::new("gallery");
 
-  fs::remove_dir_all(&gallery)?;
+  if gallery.is_dir() {
+    fs::remove_dir_all(&gallery)?;
+  }
   fs::create_dir(&gallery)?;
 
   let bin = env::current_dir()?.join("target/release/degenerate");
