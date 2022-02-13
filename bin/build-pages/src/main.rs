@@ -43,8 +43,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     programs.push(program);
   }
 
-  programs.sort();
-
   let gallery = Path::new("gallery");
 
   if gallery.is_dir() {
