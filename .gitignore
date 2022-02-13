@@ -1,8 +1,8 @@
 /*.png
-/gallery
 /generate
 /images/*.actual-output.png
 /output.txt
+/pages
 /program.degen
 /target
 /tests/image_tests.rs

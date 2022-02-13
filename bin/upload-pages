@@ -8,7 +8,7 @@ else
   COMMIT=$GITHUB_SHA
 fi
 
-cd gallery
+cd pages
 git init --initial-branch pages
 if [[ ! -z ${GITHUB_ACTIONS+x} ]]; then
   git config user.email '<>'
