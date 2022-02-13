@@ -52,21 +52,5 @@ generate: build
 		target/release/degenerate resize:512 seed:$i generate save:generate/$i.png
 	done
 
-gallery: build
-	#!/usr/bin/env bash
-	set -eou pipefail
-
-	rm -rf gallery
-	mkdir gallery
-	echo x apply > program.degen
-	for IMAGE in images/*; do
-		FILENAME=`basename -- "$IMAGE"`
-		PROGRAM=${FILENAME%.*}
-		if [[ $PROGRAM != *resize* ]]; then
-			PROGRAM="resize:4096 $PROGRAM"
-		fi
-		echo Generating $PROGRAM...
-		target/release/degenerate $PROGRAM
-		mv output.png "gallery/$PROGRAM.png"
-	done
-	rm program.degen
+gallery:
+	cargo run --package build-pages

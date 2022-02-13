@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -euxo pipefail
+
+export GIT_AUTHOR_NAME='GitHub Actions'
+export GIT_AUTHOR_EMAIL='<>'
+
+COMMIT=${GITHUB_SHA:-`git rev-parse HEAD`}
+
+cd gallery
+git init
+git add .
+git commit --message "Pages build commit $COMMIT"
+git push --force git@github.com:casey/degenerate.git:pages

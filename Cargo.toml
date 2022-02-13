@@ -6,6 +6,9 @@ edition = "2021"
 license = "CC0-1.0"
 autotests = false
 
+[workspace]
+members = [".", "bin/build-pages"]
+
 [features]
 window = ["bevy"]
 
