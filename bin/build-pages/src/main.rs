@@ -56,7 +56,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     fs::write(tempdir.path().join("program.degen"), "x apply")?;
     eprintln!("+ {}", program.join(" "));
     run!(&bin, program, CurrentDir(tempdir.path()),);
-
     fs::rename(
       tempdir.path().join("output.png"),
       gallery.join(format!("{i}.png")),
