@@ -2,14 +2,18 @@
 
 set -euxo pipefail
 
-export GIT_AUTHOR_NAME='GitHub Actions'
-export GIT_AUTHOR_EMAIL='<>'
-
-COMMIT=${GITHUB_SHA:-`git rev-parse HEAD`}
+if [ -z ${GITHUB_ACTIONS+x} ]; then
+  echo "var is unset"
+  COMMIT=`git rev-parse HEAD`
+else
+  export GIT_AUTHOR_NAME='GitHub Actions'
+  export GIT_AUTHOR_EMAIL='<>'
+  COMMIT=$GITHUB_SHA
+fi
 
 cd gallery
 git init --initial-branch pages
 touch .nojekyll
 git add .
-git commit --message "Pages build commit $COMMIT"
+git commit --message "Pages build $COMMIT"
 git push --force git@github.com:casey/degenerate.git
