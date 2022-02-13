@@ -24,3 +24,5 @@ jobs:
 
     - name: Upload Pages
       run: ./bin/upload-pages
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
