@@ -9,6 +9,7 @@ COMMIT=${GITHUB_SHA:-`git rev-parse HEAD`}
 
 cd gallery
 git init --initial-branch pages
+touch .nojekyll
 git add .
 git commit --message "Pages build commit $COMMIT"
 git push --force git@github.com:casey/degenerate.git
