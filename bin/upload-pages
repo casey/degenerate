@@ -18,4 +18,4 @@ touch .nojekyll
 git add .
 git commit --message "Pages build $COMMIT"
 git remote add origin 'https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/casey/degenerate'
-git push --force origin
+git push --force origin pages
