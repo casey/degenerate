@@ -11,4 +11,4 @@ cd gallery
 git init
 git add .
 git commit --message "Pages build commit $COMMIT"
-git push --force git@github.com:casey/degenerate.git:pages
+git push --force git@github.com:casey/degenerate.git master:pages
