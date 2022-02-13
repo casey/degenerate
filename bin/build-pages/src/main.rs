@@ -53,7 +53,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   fs::create_dir(&gallery)?;
 
   let bin = env::current_dir()?.join("target/release/degenerate");
-  for (i, program) in programs.iter().enumerate() {
+  for (i, program) in programs.iter().enumerate().take(1) {
     let tempdir = tempfile::tempdir()?;
     fs::write(tempdir.path().join("program.degen"), "x apply")?;
     eprintln!("+ {}", program.join(" "));

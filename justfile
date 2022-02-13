@@ -52,5 +52,5 @@ generate: build
 		target/release/degenerate resize:512 seed:$i generate save:generate/$i.png
 	done
 
-gallery:
+build-pages:
 	cargo run --package build-pages
