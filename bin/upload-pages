@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -euxo pipefail
+
+if [[ -z ${GITHUB_ACTIONS+x} ]]; then
+  COMMIT=`git rev-parse HEAD`
+else
+  COMMIT=$GITHUB_SHA
+fi
+
+cd pages
+git init --initial-branch pages
+if [[ ! -z ${GITHUB_ACTIONS+x} ]]; then
+  git config user.email '<>'
+  git config user.name 'GitHub Actions'
+fi
+touch .nojekyll
+git add .
+git commit --message "Pages build $COMMIT"
+git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/casey/degenerate"
+git push --force origin pages

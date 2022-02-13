@@ -1,0 +1,28 @@
+name: Pages
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  all:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Rust Toolchain Components
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+
+    - uses: Swatinem/rust-cache@v1
+
+    - name: Build Pages
+      run: cargo run --package build-pages
+
+    - name: Upload Pages
+      run: ./bin/upload-pages
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

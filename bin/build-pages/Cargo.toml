@@ -1,0 +1,10 @@
+[package]
+name = "build-pages"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+camino = "1.0.7"
+cradle = "0.2.1"
+tempfile = "3.3.0"
