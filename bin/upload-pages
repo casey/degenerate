@@ -19,4 +19,4 @@ fi
 touch .nojekyll
 git add .
 git commit --message "Pages build $COMMIT"
-git push --force git@github.com:casey/degenerate.git
+git push --force https://github.com/casey/degenerate
