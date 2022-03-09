@@ -25,7 +25,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
       .file_name()
       .ok_or_else(|| format!("Could not extract file name: {}", expected_path))?;
 
-    if !filename.ends_with(".png") || filename.ends_with(".actual-output.png") {
+    if !filename.ends_with(".png") || filename.ends_with(".actual-memory.png") {
       continue;
     }
 
@@ -57,7 +57,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     eprintln!("+ {}", program.join(" "));
     run!(&bin, program, CurrentDir(tempdir.path()),);
     fs::rename(
-      tempdir.path().join("output.png"),
+      tempdir.path().join("memory.png"),
       pages.join(format!("{i}.png")),
     )?;
   }
