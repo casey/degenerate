@@ -301,8 +301,7 @@ impl Computer {
       height,
       image
         .rows()
-        .map(|row| row.map(|pixel| Vector3::new(pixel[0], pixel[1], pixel[2])))
-        .flatten(),
+        .flat_map(|row| row.map(|pixel| Vector3::new(pixel[0], pixel[1], pixel[2]))),
     )
     .transpose();
 
