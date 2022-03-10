@@ -145,7 +145,7 @@ fn image_test(program: &str) -> Result {
       .to_str()
       .ok_or_else(|| format!("File name was not valid unicode: {:?}", entry.file_name()))?
       .to_owned();
-    if let Some(program) = file_name.strip_suffix(".actual-output.png") {
+    if let Some(program) = file_name.strip_suffix(".actual-memory.png") {
       if !Path::new("images")
         .join(format!("{}.png", program))
         .is_file()
@@ -155,13 +155,13 @@ fn image_test(program: &str) -> Result {
     }
   }
 
-  let destination = format!("images/{}.actual-output.png", program);
+  let destination = format!("images/{}.actual-memory.png", program);
 
   fs::remove_file(&destination).ok();
 
   let tempdir = Test::new()?.program(program).run_and_return_tempdir()?;
 
-  let actual_path = tempdir.path().join("output.png");
+  let actual_path = tempdir.path().join("memory.png");
 
   let actual_image = image::open(&actual_path)?;
 
@@ -283,7 +283,7 @@ fn open_default() -> Result {
     .env_var("DEGENERATE_OPEN_COMMAND", "echo")
     .expected_stdout(
       "
-      output.png
+      memory.png
       ",
     )
     .run()

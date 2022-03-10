@@ -19,10 +19,6 @@ clippy:
 run *args:
 	cargo run --release -- {{args}}
 
-image *args:
-	cargo run -- --output output.png {{args}}
-	open output.png
-
 fmt:
 	cargo fmt
 

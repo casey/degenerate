@@ -1,7 +1,7 @@
 use {
   crate::{
-    color_axis::ColorAxis, command::Command, coordinates::Coordinates, mask::Mask,
-    operation::Operation, pixel::Pixel, state::State, wrap::Wrap,
+    color_axis::ColorAxis, command::Command, computer::Computer, coordinates::Coordinates,
+    mask::Mask, operation::Operation, pixel::Pixel, wrap::Wrap,
   },
   ansi_term::{Colour::Red, Style},
   dirs::home_dir,
@@ -22,18 +22,18 @@ use {
 
 mod color_axis;
 mod command;
+mod computer;
 mod coordinates;
 mod mask;
 mod operation;
 mod pixel;
-mod state;
 mod wrap;
 
 type Error = Box<dyn std::error::Error>;
 type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
 fn main() {
-  if let Err(error) = State::run() {
+  if let Err(error) = Computer::run() {
     if let Some(ReadlineError::Eof | ReadlineError::Interrupted) =
       error.downcast_ref::<ReadlineError>()
     {

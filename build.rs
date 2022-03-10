@@ -28,7 +28,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .file_name()
         .ok_or_else(|| format!("Could not extract file name: {}", expected_path))?;
 
-      if !filename.ends_with(".png") || filename.ends_with(".actual-output.png") {
+      if !filename.ends_with(".png") || filename.ends_with(".actual-memory.png") {
         continue;
       }
 
