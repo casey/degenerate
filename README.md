@@ -190,6 +190,11 @@ $ degenerate resize:512:256 save
 ![resize:512:256 save](images/resize%3A512%3A256%20save.png)
 
 ```
+$ degenerate resize:512:256 x fit apply save
+```
+![resize:512:256 x fit apply save](images/resize%3A512%3A256%20x%20fit%20apply%20save.png)
+
+```
 $ degenerate rotate-color:b:0.5 all apply save
 ```
 ![rotate-color:b:0.5 all apply save](images/rotate-color%3Ab%3A0.5%20all%20apply%20save.png)
