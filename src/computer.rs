@@ -16,8 +16,8 @@ pub(crate) struct Computer {
   rng: StdRng,
   similarity: Similarity2<f64>,
   verbose: bool,
+  viewport: Viewport,
   wrap: bool,
-  fit: bool,
 }
 
 impl Computer {
@@ -58,7 +58,7 @@ impl Computer {
       similarity: Similarity2::identity(),
       verbose: false,
       wrap: false,
-      fit: false,
+      viewport: Viewport::Stretch,
     }
   }
 
@@ -80,7 +80,7 @@ impl Computer {
     for col in 0..self.memory.ncols() {
       for row in 0..self.memory.nrows() {
         let i = Vector2::new(col, row);
-        let v = i.coordinates(self.dimensions(), self.fit);
+        let v = self.viewport.coordinates(self.dimensions(), i);
         let v = similarity * v;
         let v = if self.wrap { v.wrap() } else { v };
         let i = v.pixel(self.dimensions());
@@ -119,9 +119,7 @@ impl Computer {
       Command::Default(default) => {
         self.default = default;
       }
-      Command::Fit => {
-        self.fit = true;
-      }
+      Command::Viewport(viewport) => self.viewport = viewport,
       Command::For(until) => {
         if self.loop_counter >= until {
           loop {

@@ -180,6 +180,16 @@ $ degenerate resize:512:256 all apply save all apply load
 ![resize:512:256 all apply save all apply load](images/resize%3A512%3A256%20all%20apply%20save%20all%20apply%20load.png)
 
 ```
+$ degenerate resize:512:256 fit stretch x apply save
+```
+![resize:512:256 fit stretch x apply save](images/resize%3A512%3A256%20fit%20stretch%20x%20apply%20save.png)
+
+```
+$ degenerate resize:512:256 fit x apply save
+```
+![resize:512:256 fit x apply save](images/resize%3A512%3A256%20fit%20x%20apply%20save.png)
+
+```
 $ degenerate resize:512:256 rotate:0.05 x apply save load save
 ```
 ![resize:512:256 rotate:0.05 x apply save load save](images/resize%3A512%3A256%20rotate%3A0.05%20x%20apply%20save%20load%20save.png)
@@ -190,9 +200,14 @@ $ degenerate resize:512:256 save
 ![resize:512:256 save](images/resize%3A512%3A256%20save.png)
 
 ```
-$ degenerate resize:512:256 x fit apply save
+$ degenerate resize:512:256 stretch x apply save
 ```
-![resize:512:256 x fit apply save](images/resize%3A512%3A256%20x%20fit%20apply%20save.png)
+![resize:512:256 stretch x apply save](images/resize%3A512%3A256%20stretch%20x%20apply%20save.png)
+
+```
+$ degenerate resize:512:256 x apply save
+```
+![resize:512:256 x apply save](images/resize%3A512%3A256%20x%20apply%20save.png)
 
 ```
 $ degenerate rotate-color:b:0.5 all apply save

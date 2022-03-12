@@ -1,7 +1,7 @@
 use {
   crate::{
-    color_axis::ColorAxis, command::Command, computer::Computer, coordinates::Coordinates,
-    mask::Mask, operation::Operation, pixel::Pixel, wrap::Wrap,
+    color_axis::ColorAxis, command::Command, computer::Computer, mask::Mask, operation::Operation,
+    pixel::Pixel, viewport::Viewport, wrap::Wrap,
   },
   ansi_term::{Colour::Red, Style},
   dirs::home_dir,
@@ -23,10 +23,10 @@ use {
 mod color_axis;
 mod command;
 mod computer;
-mod coordinates;
 mod mask;
 mod operation;
 mod pixel;
+mod viewport;
 mod wrap;
 
 type Error = Box<dyn std::error::Error>;
