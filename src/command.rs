@@ -47,6 +47,7 @@ impl FromStr for Command {
         b.parse()?,
       ))),
       ["fit"] => Ok(Self::Viewport(Viewport::Fit)),
+      ["fill"] => Ok(Self::Viewport(Viewport::Fill)),
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["generate"] => Ok(Self::Generate),
       ["identity"] => Ok(Self::Operation(Operation::Identity)),

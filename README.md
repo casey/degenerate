@@ -180,6 +180,11 @@ $ degenerate resize:512:256 all apply save all apply load
 ![resize:512:256 all apply save all apply load](images/resize%3A512%3A256%20all%20apply%20save%20all%20apply%20load.png)
 
 ```
+$ degenerate resize:512:256 fill x apply save
+```
+![resize:512:256 fill x apply save](images/resize%3A512%3A256%20fill%20x%20apply%20save.png)
+
+```
 $ degenerate resize:512:256 fit stretch x apply save
 ```
 ![resize:512:256 fit stretch x apply save](images/resize%3A512%3A256%20fit%20stretch%20x%20apply%20save.png)
