@@ -1,0 +1,14 @@
+comment:slow
+rotate-color:g:0.05
+circle
+scale:0.75
+wrap
+for:8
+apply
+loop
+rotate:0.8333
+rotate-color:b:0.05
+for:8
+apply
+loop
+save

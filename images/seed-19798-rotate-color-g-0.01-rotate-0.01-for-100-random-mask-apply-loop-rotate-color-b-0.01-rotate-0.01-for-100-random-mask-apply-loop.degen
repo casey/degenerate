@@ -1,0 +1,15 @@
+comment:slow
+seed:19798
+rotate-color:g:0.01
+rotate:0.01
+for:100
+random-mask
+apply
+loop
+rotate-color:b:0.01
+rotate:0.01
+for:100
+random-mask
+apply
+loop
+save

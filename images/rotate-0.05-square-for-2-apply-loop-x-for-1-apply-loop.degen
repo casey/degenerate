@@ -1,0 +1,10 @@
+rotate:0.05
+square
+for:2
+apply
+loop
+x
+for:1
+apply
+loop
+save
