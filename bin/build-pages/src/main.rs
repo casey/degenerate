@@ -43,10 +43,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     programs.push(program);
   }
 
-  let output = Path::new("target/pages");
+  let target = Path::new("target/pages");
 
-  if output.exists() {
-    fs::remove_dir_all(&output)?;
+  if target.exists() {
+    fs::remove_dir_all(&target)?;
   }
 
   run!(%"cp -r pages target/pages");
@@ -59,7 +59,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     run!(&bin, program, CurrentDir(tempdir.path()),);
     fs::rename(
       tempdir.path().join("memory.png"),
-      output.join(format!("{i}.png")),
+      target.join(format!("{i}.png")),
     )?;
   }
 
@@ -71,7 +71,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     index.push_str(&format!("<img src=\"{i}.png\">\n"));
   }
 
-  fs::write(output.join("index.html"), index)?;
+  fs::write(target.join("index.html"), index)?;
 
   Ok(())
 }
