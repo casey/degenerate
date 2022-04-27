@@ -43,12 +43,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     programs.push(program);
   }
 
-  let pages = Path::new("pages");
+  let output = Path::new("target/pages");
 
-  if pages.is_dir() {
-    fs::remove_dir_all(&pages)?;
+  if output.exists() {
+    fs::remove_dir_all(&output)?;
   }
-  fs::create_dir(&pages)?;
+
+  run!(%"cp -r pages target/pages");
 
   let bin = env::current_dir()?.join("target/release/degenerate");
   for (i, program) in programs.iter().enumerate() {
@@ -58,7 +59,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     run!(&bin, program, CurrentDir(tempdir.path()),);
     fs::rename(
       tempdir.path().join("memory.png"),
-      pages.join(format!("{i}.png")),
+      output.join(format!("{i}.png")),
     )?;
   }
 
@@ -70,7 +71,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     index.push_str(&format!("<img src=\"{i}.png\">\n"));
   }
 
-  fs::write(pages.join("index.html"), index)?;
+  fs::write(output.join("index.html"), index)?;
 
   Ok(())
 }
