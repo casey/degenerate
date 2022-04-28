@@ -1,9 +1,0 @@
-comment:slow
-rotate:0.111
-for:16
-square
-apply
-circle
-apply
-loop
-save

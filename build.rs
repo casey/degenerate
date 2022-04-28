@@ -32,9 +32,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         continue;
       }
 
-      let program = expected_path
+      let filestem = expected_path
         .file_stem()
         .ok_or_else(|| format!("Could not extract file stem: {}", expected_path))?;
+
+      let program = fs::read_to_string(format!("images/{}.degen", filestem))?;
 
       programs.push(program.to_owned());
 
@@ -49,7 +51,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         #[test]{}
         #[rustfmt::skip]
         fn {}() -> Result<()> {{
-          image_test(\"{}\")
+          image_test(\"{}\", \"{}\")
         }}",
         ),
         if program.contains("comment:slow") {
@@ -58,7 +60,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
           ""
         },
         identifier,
-        program
+        program,
+        filestem
       )?;
     }
 

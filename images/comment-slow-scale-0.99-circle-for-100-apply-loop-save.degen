@@ -1,7 +1,0 @@
-comment:slow
-scale:0.99
-circle
-for:100
-apply
-loop
-save

@@ -137,7 +137,7 @@ impl<'a> Test<'a> {
   }
 }
 
-fn image_test(program: &str) -> Result {
+fn image_test(program: &str, name: &str) -> Result {
   for result in fs::read_dir("images")? {
     let entry = result?;
     let file_name = entry
@@ -147,7 +147,7 @@ fn image_test(program: &str) -> Result {
       .to_owned();
     if let Some(program) = file_name.strip_suffix(".actual-memory.png") {
       if !Path::new("images")
-        .join(format!("{}.png", program))
+        .join(format!("{}.png", name))
         .is_file()
       {
         fs::remove_file(entry.path())?;
@@ -155,7 +155,7 @@ fn image_test(program: &str) -> Result {
     }
   }
 
-  let destination = format!("images/{}.actual-memory.png", program);
+  let destination = format!("images/{}.actual-memory.png", name);
 
   fs::remove_file(&destination).ok();
 
@@ -165,7 +165,7 @@ fn image_test(program: &str) -> Result {
 
   let actual_image = image::open(&actual_path)?;
 
-  let expected_path = format!("images/{}.png", program);
+  let expected_path = format!("images/{}.png", name);
   let expected_image = image::open(&expected_path)?;
 
   if actual_image != expected_image {

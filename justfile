@@ -20,6 +20,7 @@ run *args:
 	cargo run --release -- {{args}}
 
 fmt:
+	yapf --in-place --recursive .
 	cargo fmt
 
 fmt-check:
