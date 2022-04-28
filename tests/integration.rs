@@ -147,7 +147,7 @@ fn image_test(program: &str, name: &str) -> Result {
       .to_owned();
     if let Some(program) = file_name.strip_suffix(".actual-memory.png") {
       if !Path::new("images")
-        .join(format!("{}.png", name))
+        .join(format!("{}.png", program))
         .is_file()
       {
         fs::remove_file(entry.path())?;
