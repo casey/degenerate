@@ -32,15 +32,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         continue;
       }
 
-      let filestem = expected_path
+      let name = expected_path
         .file_stem()
-        .ok_or_else(|| format!("Could not extract file stem: {}", expected_path))?;
+        .ok_or_else(|| format!("Could not extract file stem: {}", expected_path))?
+        .to_owned();
 
-      let program = fs::read_to_string(format!("images/{}.degen", filestem))?;
+      let program = fs::read_to_string(format!("images/{}.degen", name))?
+        .trim()
+        .to_owned();
 
-      programs.push((program.to_owned(), filestem.to_owned()));
+      programs.push((name.clone(), program.clone()));
 
-      let identifier = format!("test_{}", filestem);
+      let identifier = format!("image{}", name);
 
       write!(
         file,
@@ -60,7 +63,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
           ""
         },
         identifier,
-        filestem
+        name
       )?;
     }
 
@@ -81,10 +84,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
       }
     }
 
-    for (program, filestem) in programs {
+    for (name, program) in programs {
       writeln!(file)?;
       writeln!(file, "```\n$ degenerate {}\n```", program)?;
-      writeln!(file, "![{}](images/{}.png)", program, filestem)?;
+      writeln!(file, "![{}](images/{}.png)", program, name)?;
     }
 
     Ok(())
