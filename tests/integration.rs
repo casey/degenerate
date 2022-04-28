@@ -137,7 +137,7 @@ impl<'a> Test<'a> {
   }
 }
 
-fn image_test(program: &str, name: &str) -> Result {
+fn image_test(name: &str) -> Result {
   for result in fs::read_dir("images")? {
     let entry = result?;
     let file_name = entry
@@ -154,6 +154,8 @@ fn image_test(program: &str, name: &str) -> Result {
       }
     }
   }
+
+  let program = fs::read_to_string(format!("images/{}.degen", name))?;
 
   let destination = format!("images/{}.actual-memory.png", name);
 
