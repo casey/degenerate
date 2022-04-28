@@ -38,7 +38,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
       let program = fs::read_to_string(format!("images/{}.degen", filestem))?;
 
-      programs.push(program.to_owned());
+      programs.push((program.to_owned(), filestem.to_owned()));
 
       let identifier = format!("test_{}", filestem);
 
@@ -81,15 +81,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
       }
     }
 
-    for program in programs {
+    for (program, filestem) in programs {
       writeln!(file)?;
       writeln!(file, "```\n$ degenerate {}\n```", program)?;
-      writeln!(
-        file,
-        "![{}](images/{}.png)",
-        program,
-        urlencoding::encode(&program)
-      )?;
+      writeln!(file, "![{}](images/{}.png)", program, filestem)?;
     }
 
     Ok(())
