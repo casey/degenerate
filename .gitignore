@@ -4,4 +4,5 @@
 /output.txt
 /program.degen
 /target
+/docs/man
 /tests/image_tests.rs
