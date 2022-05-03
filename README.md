@@ -14,7 +14,7 @@ save
 
 And this is the image it generates:
 
-<img src='readme.jpeg'>
+<img src='example.jpg'>
 
 ## Compiling
 
