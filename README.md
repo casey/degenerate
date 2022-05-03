@@ -2,7 +2,7 @@
 
 Degenerate is a generative image language.
 
-Below is a sample image made with degenerate:
+This is a Degenerate program:
 
 ```
 rotate-color:g:0.05 circle scale:0.5 wrap
@@ -12,9 +12,9 @@ for:8 apply loop
 save
 ```
 
-<div align='center'>
-  <img src='readme.jpeg'/>
-</div>
+And this is the image it generates:
+
+<img src='readme.jpeg'>
 
 ## Compiling
 
