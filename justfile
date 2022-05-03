@@ -51,3 +51,18 @@ generate: build
 
 build-pages:
 	cargo run --package build-pages
+
+rename-image-tests:
+	#!/usr/bin/env bash
+	set -euo pipefail
+
+	cd images
+
+	for ((i=31; i<=61; i+=1)); do
+		echo $i:
+		open $i.png
+		cat $i.degen
+		read -p "name: " name
+		mv $i.degen $name.degen
+		mv $i.png $name.png
+	done
