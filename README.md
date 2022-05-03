@@ -1,9 +1,20 @@
 # degenerate
 
-Degenerate is an algorithmic image generator inspired by
-[blaster](https://github.com/casey/blaster).
+Degenerate is a generative image language.
 
-(N.B. blaster is written in idiosyncratic Objective-C++.)
+This is a Degenerate program:
+
+```
+rotate-color:g:0.05 circle scale:0.5 wrap
+for:8 apply loop
+rotate-color:b:0.05
+for:8 apply loop
+save
+```
+
+And this is the image it generates:
+
+![gorgeous example image](example.jpg)
 
 ## Compiling
 
@@ -21,3 +32,9 @@ undocumented. The best way to learn what they do is to peruse the [image
 tests](images). The name of each image is the `degenerate` program that
 produced it. The image tests are reproduced below, with each preceded by its
 `degenerate` invocation.
+
+## Prior Art
+
+Degenerate builds on the techniques used in
+[casey/blaster](https://github.com/casey/blaster), an audio-reactive visuals
+engine.
