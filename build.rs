@@ -42,7 +42,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     programs.push((name.clone(), program.clone()));
 
-    let identifier = format!("image{}", name);
+    let identifier = if name.len() == 2 {
+      format!("image{}", name)
+    } else {
+      name.clone()
+    };
 
     write!(
       file,
