@@ -1,8 +1,8 @@
 /*.png
+/docs/man
 /generate
 /images/*.actual-output.png
 /output.txt
 /program.degen
 /target
-/docs/man
 /tests/image_tests.rs
