@@ -58,11 +58,15 @@ rename-image-tests:
 
 	cd images
 
-	for ((i=31; i<=61; i+=1)); do
+	for ((i=48; i<=61; i+=1)); do
 		echo $i:
 		open $i.png
 		cat $i.degen
 		read -p "name: " name
+		if [[ -e $name.degen ]]; then
+			echo $name.degen already exists
+			break
+		fi
 		mv $i.degen $name.degen
 		mv $i.png $name.png
 	done
