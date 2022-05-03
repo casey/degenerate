@@ -2,6 +2,16 @@
 
 Degenerate is a generative image language.
 
+Below is a sample image made with degenerate:
+
+![](./images/44.png)
+
+with the corresponding program:
+
+```
+$ degenerate rotate-color:g:0.05 circle scale:0.5 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop save
+```
+
 ## Compiling
 
 `degenerate` can render to a terminal or to a window. To render to a window,
