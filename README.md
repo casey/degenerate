@@ -14,7 +14,7 @@ save
 
 And this is the image it generates:
 
-<img src='example.jpg'>
+![gorgeous example image](example.jpg)
 
 ## Compiling
 
