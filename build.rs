@@ -42,12 +42,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     programs.push((name.clone(), program.clone()));
 
-    let identifier = if name.len() == 2 {
-      format!("image{}", name)
-    } else {
-      name.clone()
-    };
-
     write!(
       file,
       indoc!(
@@ -65,7 +59,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
       } else {
         ""
       },
-      identifier,
+      name,
       name
     )?;
   }
