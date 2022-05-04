@@ -1,37 +1,36 @@
-# degenerate
+<h1 align="center"><code>degenerate</code></h1>
 
-Degenerate is a generative image language.
+`degenerate` is a generative image language.
 
-This is a Degenerate program:
+## Quick Start
 
-```
-rotate-color:g:0.05 circle scale:0.5 wrap
-for:8 apply loop
-rotate-color:b:0.05
-for:8 apply loop
-save
-```
+- Install `rustup` by following the instructions [here](https://rustup.rs/).
+- Run `cargo install degenerate`
+- Run a degenerate program:
+  ```
+    degenerate resize:1024 rotate-color:g:0.05 circle scale:0.5 wrap \
+    for:8 apply loop \
+    rotate-color:b:0.05 \
+    for:8 apply loop \
+    save
+  ```
+- Open `memory.png`, which should look like this:
 
-And this is the image it generates:
+  ![gorgeous example image](example.jpg)
 
-![gorgeous example image](example.jpg)
+Please consulte the
+[Degenerate Programmer's Manual](https://degenerate.computer/man) for more
+information.
 
 ## Compiling
 
 `degenerate` can render to a terminal or to a window. To render to a window,
 `degenerate` must be built with the optional `window` feature.
 
-## Usage
+## Credits
 
-```bash
-$ degenerate [COMMAND]...
-```
-
-`COMMAND`s may take zero or more `:`-separated arguments, and are currently
-undocumented. The best way to learn what they do is to peruse the [image
-tests](images). The name of each image is the `degenerate` program that
-produced it. The image tests are reproduced below, with each preceded by its
-`degenerate` invocation.
+`degenerate` is written by [Casey Rodarmor](https://rodarmor.com) and
+[Liam Scalzulli](https://liam.rs).
 
 ## Prior Art
 
