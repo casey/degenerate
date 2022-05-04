@@ -1,5 +1,5 @@
 /*.png
-/docs/man
+/www/man
 /generate
 /images/*.actual-output.png
 /output.txt

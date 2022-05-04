@@ -5,4 +5,4 @@ src = "src"
 title = "Degenerate Computer Programmer's Manual"
 
 [build]
-build-dir = "../docs/man"
+build-dir = "../www/man"
