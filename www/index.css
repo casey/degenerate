@@ -30,7 +30,7 @@ a:hover {
   text-shadow: 0 0 5px #fff;
 }
 
-body {
+main {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   margin-bottom: var(--margin-vertical);
@@ -39,11 +39,11 @@ body {
   margin-top: var(--margin-vertical);
 }
 
-body > * {
+main > * {
   width: var(--size);
 }
 
-body > a {
+main > a {
   align-items: center;
   display: flex;
   font-size: calc(var(--size) / 9);
@@ -52,11 +52,11 @@ body > a {
   line-height: calc(var(--size) / 9);
 }
 
-body > div {
+main > div {
   height: var(--size);
   text-shadow: 0 0 5px #fff;
 }
 
-body > div:hover {
+main > div:hover {
   filter: blur(4px);
 }
