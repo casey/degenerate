@@ -6,7 +6,7 @@
     <img src="https://img.shields.io/crates/v/degenerate.svg" alt="crates.io version">
   </a>
   <a href="https://github.com/casey/degenerate/actions">
-    <img src="https://github.com/casey/degenerate/workflows/Build/badge.svg" alt="build status">
+    <img src="https://github.com/casey/degenerate/workflows/CI/badge.svg" alt="build status">
   </a>
   <a href="https://github.com/casey/degenerate/releases">
     <img src="https://img.shields.io/github/downloads/casey/degenerate/total.svg" alt="downloads">
