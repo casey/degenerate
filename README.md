@@ -1,6 +1,5 @@
 <h1 align="center"><code>degenerate</code></h1>
-
-`degenerate` is a generative image language.
+<div align="center">A generative image programming language</div>
 
 ## Quick Start
 
