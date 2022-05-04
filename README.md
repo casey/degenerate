@@ -1,5 +1,18 @@
 <h1 align="center"><code>degenerate</code></h1>
 <div align="center">A generative image programming language</div>
+<br>
+<div align="center">
+  <a href="https://crates.io/crates/degenerate">
+    <img src="https://img.shields.io/crates/v/degenerate.svg" alt="crates.io version">
+  </a>
+  <a href="https://github.com/casey/degenerate/actions">
+    <img src="https://github.com/casey/degenerate/workflows/Build/badge.svg" alt="build status">
+  </a>
+  <a href="https://github.com/casey/degenerate/releases">
+    <img src="https://img.shields.io/github/downloads/casey/degenerate/total.svg" alt="downloads">
+  </a>
+</div>
+<br>
 
 ## Quick Start
 
