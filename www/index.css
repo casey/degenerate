@@ -26,6 +26,10 @@ a {
   text-decoration: none;
 }
 
+a:hover {
+  text-shadow: 0 0 5px #fff;
+}
+
 main {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -51,10 +55,6 @@ main > a {
   height: calc(var(--size) / 2);
   justify-content: center;
   line-height: calc(var(--size) / 9);
-}
-
-a:hover {
-  text-shadow: 0 0 5px #fff;
 }
 
 #d:after        { content: 'D'; }
