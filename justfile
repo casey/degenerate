@@ -49,5 +49,5 @@ generate: build
 		target/release/degenerate resize:512 seed:$i generate save:generate/$i.png
 	done
 
-build-pages:
-	cargo run --package build-pages
+build-manual:
+	mdbook build man
