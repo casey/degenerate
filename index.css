@@ -1,0 +1,79 @@
+:root {
+  --width-target: calc(100vw / 6);
+  --height-target: calc(100vh / 4);
+  --size: min(var(--width-target), var(--height-target));
+  --margin-vertical: calc((100vh - var(--size) * 2.5) / 2);
+  --margin-horizontal: calc((100vw - var(--size) * 5) / 2);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: black;
+  color: white;
+  font-family: sans-serif;
+  font-size: var(--size);
+  line-height: var(--size);
+  overflow: hidden;
+  text-align: center;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+main {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  margin-bottom: var(--margin-vertical);
+  margin-left: var(--margin-horizontal);
+  margin-right: var(--margin-horizontal);
+  margin-top: var(--margin-vertical);
+}
+
+main > * {
+  width: var(--size);
+}
+
+main > div {
+  height: var(--size);
+  text-shadow: 0 0 5px #fff;
+}
+
+main > a {
+  align-items: center;
+  display: flex;
+  font-size: calc(var(--size) / 9);
+  height: calc(var(--size) / 2);
+  justify-content: center;
+  line-height: calc(var(--size) / 9);
+}
+
+a:hover {
+  text-shadow: 0 0 5px #fff;
+}
+
+#d:after        { content: 'D'; }
+#d:hover:after  { content: 'd'; }
+#e0:after       { content: 'E'; }
+#e0:hover:after { content: 'e'; }
+#g:after        { content: 'G'; }
+#g:hover:after  { content: 'g'; }
+#e1:after       { content: 'E'; }
+#e1:hover:after { content: 'e'; }
+#n:after        { content: 'N'; }
+#n:hover:after  { content: 'n'; }
+#e2:after       { content: 'E'; }
+#e2:hover:after { content: 'e'; }
+#r:after        { content: 'R'; }
+#r:hover:after  { content: 'r'; }
+#a:after        { content: 'A'; }
+#a:hover:after  { content: 'a'; }
+#t:after        { content: 'T'; }
+#t:hover:after  { content: 't'; }
+#e3:after       { content: 'E'; }
+#e3:hover:after { content: 'e'; }
