@@ -30,7 +30,7 @@
 
   ![gorgeous example image](example.jpg)
 
-Please consulte the
+Please consult the
 [Degenerate Programmer's Manual](https://degenerate.computer/man) for more
 information.
 
