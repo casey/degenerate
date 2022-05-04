@@ -67,7 +67,7 @@ jobs:
       run: mdbook build man
 
     - name: Record Git Revision
-      run: git rev-parse --verify HEAD > www/commit
+      run: git rev-parse --verify HEAD > www/commit.txt
 
     - name: Deploy Pages
       uses: peaceiris/actions-gh-pages@v3
