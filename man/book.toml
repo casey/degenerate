@@ -1,0 +1,8 @@
+[book]
+language = "en"
+multilingual = false
+src = "src"
+title = "Degenerate Computer Programmer's Manual"
+
+[build]
+build-dir = "../www/man"
