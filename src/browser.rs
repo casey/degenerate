@@ -1,6 +1,5 @@
-use super::*;
-
 use {
+  super::*,
   wasm_bindgen::{closure::Closure, JsCast},
   web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, HtmlTextAreaElement},
 };

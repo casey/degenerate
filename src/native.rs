@@ -1,6 +1,5 @@
-use super::*;
-
 use {
+  super::*,
   ansi_term::{Colour::Red, Style},
   rustyline::error::ReadlineError,
 };
