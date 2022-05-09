@@ -7,9 +7,7 @@ license = "CC0-1.0"
 autotests = false
 
 [dependencies]
-ansi_term = "0.12.1"
 atty = "0.2.14"
-dirs = "4.0.0"
 getrandom = { version = "0.2.6", features = ["js"] }
 image = "0.24.1"
 nalgebra = "0.31.0"
@@ -18,7 +16,13 @@ rand = { version = "0.8.4" }
 rand_derive2 = "0.1.17"
 strum = { version = "0.24.0", features = ["derive"] }
 
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2.80"
+web-sys = { version = "0.3.57", features = ["console", "Window", "Document", "HtmlCollection", "Element", "HtmlElement", "InputEvent", "HtmlTextAreaElement"] }
+
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+ansi_term = "0.12.1"
+dirs = "4.0.0"
 rustyline = "9.1.1"
 
 [dev-dependencies]

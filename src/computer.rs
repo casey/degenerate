@@ -20,11 +20,11 @@ pub(crate) struct Computer {
 }
 
 impl Computer {
-  pub(crate) fn run() -> Result<()> {
+  pub(crate) fn run(words: impl IntoIterator<Item = impl AsRef<str>>) -> Result<()> {
     let mut computer = Self::new();
 
-    for arg in env::args().skip(1) {
-      computer.program.push(arg.parse()?);
+    for arg in words {
+      computer.program.push(arg.as_ref().parse()?);
     }
 
     while let Some(command) = computer.program.get(computer.program_counter).cloned() {
