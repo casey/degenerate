@@ -17,6 +17,7 @@ pub(crate) enum Command {
   Print,
   RandomMask,
   Read,
+  #[cfg(not(target_arch = "wasm32"))]
   Repl,
   Resize((usize, usize)),
   Rotate(f64),
@@ -60,6 +61,7 @@ impl FromStr for Command {
       ["print"] => Ok(Self::Print),
       ["random-mask"] => Ok(Self::RandomMask),
       ["read"] => Ok(Self::Read),
+      #[cfg(not(target_arch = "wasm32"))]
       ["repl"] => Ok(Self::Repl),
       ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["resize", size] => {

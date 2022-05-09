@@ -194,6 +194,7 @@ impl Computer {
           .program
           .splice(self.program_counter + 1..self.program_counter + 1, program);
       }
+      #[cfg(not(target_arch = "wasm32"))]
       Command::Repl => {
         let history = home_dir().unwrap_or_default().join(".degenerate_history");
 

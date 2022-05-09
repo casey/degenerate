@@ -1,8 +1,9 @@
 /*.png
-/www/man
+/dist
 /generate
 /images/*.actual-output.png
 /output.txt
 /program.degen
 /target
 /tests/image_tests.rs
+/www/man

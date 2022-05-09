@@ -197,6 +197,7 @@ dependencies = [
  "camino",
  "dirs",
  "executable-path",
+ "getrandom",
  "image",
  "indoc",
  "nalgebra",

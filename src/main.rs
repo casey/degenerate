@@ -9,7 +9,6 @@ use {
   nalgebra::{DMatrix, Rotation3, Similarity2, UnitComplex, Vector2, Vector3},
   rand::Rng,
   rand::{rngs::StdRng, SeedableRng},
-  rustyline::{error::ReadlineError, Editor},
   std::{
     env, f64, fs,
     io::{self, BufWriter, Write},
@@ -19,6 +18,9 @@ use {
   },
   strum::EnumString,
 };
+
+#[cfg(not(target_arch = "wasm32"))]
+use rustyline::{error::ReadlineError, Editor};
 
 mod color_axis;
 mod command;
@@ -32,6 +34,10 @@ mod wrap;
 type Error = Box<dyn std::error::Error>;
 type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
+#[cfg(target_arch = "wasm32")]
+fn main() {}
+
+#[cfg(not(target_arch = "wasm32"))]
 fn main() {
   if let Err(error) = Computer::run() {
     if let Some(ReadlineError::Eof | ReadlineError::Interrupted) =
