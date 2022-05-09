@@ -72,14 +72,13 @@ fn main() {
 
 #[cfg(not(target_arch = "wasm32"))]
 use {
+  ansi_term::{Colour::Red, Style},
   dirs::home_dir,
   rustyline::{error::ReadlineError, Editor},
 };
 
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
-  use ansi_term::{Colour::Red, Style};
-
   if let Err(error) = Computer::run(env::args().skip(1)) {
     if let Some(ReadlineError::Eof | ReadlineError::Interrupted) =
       error.downcast_ref::<ReadlineError>()
