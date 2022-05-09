@@ -65,3 +65,6 @@ publish:
   cargo publish
   cd ../..
   rm -rf tmp/release
+
+serve:
+	python3 -m http.server --directory dist

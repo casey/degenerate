@@ -61,8 +61,17 @@ impl FromStr for Command {
       ["print"] => Ok(Self::Print),
       ["random-mask"] => Ok(Self::RandomMask),
       ["read"] => Ok(Self::Read),
-      #[cfg(not(target_arch = "wasm32"))]
-      ["repl"] => Ok(Self::Repl),
+      ["repl"] => {
+        #[cfg(target_arch = "wasm32")]
+        {
+          Err("`repl` command is not supported in browser".into())
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+          Ok(Self::Repl)
+        }
+      }
       ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["resize", size] => {
         let size = size.parse()?;

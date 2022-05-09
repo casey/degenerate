@@ -21,14 +21,12 @@ pub(crate) struct Computer {
 
 impl Computer {
   pub(crate) fn run(
+    display: &Display,
     words: impl IntoIterator<Item = impl AsRef<str>>,
-    context: &web_sys::CanvasRenderingContext2d,
   ) -> Result<()> {
     let mut computer = Self::new();
 
-    let canvas = context.canvas().unwrap();
-
-    computer.resize((canvas.height().try_into()?, canvas.width().try_into()?));
+    computer.resize(display.dimensions());
 
     for arg in words {
       computer.program.push(arg.as_ref().parse()?);
@@ -45,24 +43,12 @@ impl Computer {
       computer.program_counter = computer.program_counter.wrapping_add(1);
     }
 
-    let mut pixels = Vec::new();
-
-    for pixel in &computer.memory.transpose() {
-      pixels.extend_from_slice(&[pixel.x, pixel.y, pixel.z, 255]);
-    }
-
-    let image_data = web_sys::ImageData::new_with_u8_clamped_array(
-      wasm_bindgen::Clamped(&pixels),
-      computer.memory.ncols().try_into()?,
-    )
-    .unwrap();
-
-    context.put_image_data(&image_data, 0.0, 0.0).unwrap();
+    display.render(&computer.memory);
 
     Ok(())
   }
 
-  fn new() -> Self {
+  pub(crate) fn new() -> Self {
     Self {
       alpha: 1.0,
       autosave: false,
@@ -70,7 +56,7 @@ impl Computer {
       frame: 0,
       loop_counter: 0,
       mask: Mask::All,
-      memory: DMatrix::zeros(256, 256),
+      memory: DMatrix::zeros(0, 0),
       operation: Operation::Invert,
       program: Vec::new(),
       program_counter: 0,
@@ -217,6 +203,8 @@ impl Computer {
       }
       #[cfg(not(target_arch = "wasm32"))]
       Command::Repl => {
+        use {dirs::home_dir, rustyline::Editor};
+
         let history = home_dir().unwrap_or_default().join(".degenerate_history");
 
         let mut editor = Editor::<()>::new();
