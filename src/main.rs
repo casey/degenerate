@@ -30,38 +30,61 @@ type Error = Box<dyn std::error::Error>;
 type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
 #[cfg(target_arch = "wasm32")]
+use {
+  wasm_bindgen::{closure::Closure, JsCast, JsValue},
+  web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, HtmlTextAreaElement},
+};
+
+#[cfg(target_arch = "wasm32")]
 fn main() {
-  use {
-    wasm_bindgen::{closure::Closure, JsCast, JsValue},
-    web_sys::{HtmlTextAreaElement, InputEvent},
-  };
-
-  fn render(event: InputEvent) -> Result<(), JsValue> {
-    let text_area = event
-      .current_target()
-      .unwrap()
-      .dyn_into::<HtmlTextAreaElement>()
-      .unwrap();
-
-    Computer::run(text_area.value().split_whitespace()).map_err(|err| format!("error: {err}"))?;
-
-    Ok(())
-  }
+  console_error_panic_hook::set_once();
 
   let window = web_sys::window().unwrap();
 
   let document = window.document().unwrap();
 
-  let cb = Closure::wrap(
-    Box::new(|event: InputEvent| render(event)) as Box<dyn FnMut(_) -> Result<(), JsValue>>
-  );
-
-  document
-    .get_elements_by_tag_name("textarea")
-    .item(0)
+  let textarea = document
+    .query_selector("textarea")
+    .unwrap()
     .unwrap()
     .dyn_into::<HtmlTextAreaElement>()
+    .unwrap();
+
+  let canvas = document
+    .query_selector("canvas")
     .unwrap()
+    .unwrap()
+    .dyn_into::<HtmlCanvasElement>()
+    .unwrap();
+
+  let context = canvas
+    .get_context("2d")
+    .unwrap()
+    .unwrap()
+    .dyn_into::<CanvasRenderingContext2d>()
+    .unwrap();
+
+  struct Foo {
+    textarea: HtmlTextAreaElement,
+    context: CanvasRenderingContext2d,
+  }
+
+  impl Foo {
+    fn render(&self) -> Result<(), JsValue> {
+      Computer::run(self.textarea.value().split_whitespace(), &self.context)
+        .map_err(|err| format!("error: {err}"))?;
+      Ok(())
+    }
+  }
+
+  let foo = Foo {
+    textarea: textarea.clone(),
+    context,
+  };
+
+  let cb = Closure::wrap(Box::new(move || foo.render()) as Box<dyn FnMut() -> Result<(), JsValue>>);
+
+  textarea
     .add_event_listener_with_callback("input", &cb.as_ref().unchecked_ref())
     .unwrap();
 

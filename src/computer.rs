@@ -20,8 +20,15 @@ pub(crate) struct Computer {
 }
 
 impl Computer {
-  pub(crate) fn run(words: impl IntoIterator<Item = impl AsRef<str>>) -> Result<()> {
+  pub(crate) fn run(
+    words: impl IntoIterator<Item = impl AsRef<str>>,
+    context: &web_sys::CanvasRenderingContext2d,
+  ) -> Result<()> {
     let mut computer = Self::new();
+
+    let canvas = context.canvas().unwrap();
+
+    computer.resize((canvas.height().try_into()?, canvas.width().try_into()?));
 
     for arg in words {
       computer.program.push(arg.as_ref().parse()?);
@@ -37,6 +44,20 @@ impl Computer {
       computer.execute(command)?;
       computer.program_counter = computer.program_counter.wrapping_add(1);
     }
+
+    let mut pixels = Vec::new();
+
+    for pixel in &computer.memory.transpose() {
+      pixels.extend_from_slice(&[pixel.x, pixel.y, pixel.z, 255]);
+    }
+
+    let image_data = web_sys::ImageData::new_with_u8_clamped_array(
+      wasm_bindgen::Clamped(&pixels),
+      computer.memory.ncols().try_into()?,
+    )
+    .unwrap();
+
+    context.put_image_data(&image_data, 0.0, 0.0).unwrap();
 
     Ok(())
   }
