@@ -5,10 +5,11 @@ use {
 };
 
 // todo:
-// - decide canvas layout
+// - hide <main> somehow
 // - surface errors to user
 // - deploy to pages
 // - remove unwraps
+// - hide textarea outline
 
 pub(crate) mod display;
 

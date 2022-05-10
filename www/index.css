@@ -43,13 +43,12 @@ html {
 }
 
 main {
+  position: absolute;
   mix-blend-mode: difference;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  padding-bottom: var(--padding-vertical);
-  padding-left: var(--padding-horizontal);
-  padding-right: var(--padding-horizontal);
-  padding-top: var(--padding-vertical);
+  left: var(--padding-horizontal);
+  top: var(--padding-vertical);
   z-index: 1;
 }
 
@@ -86,5 +85,5 @@ textarea {
   z-index: 0;
   background-color: transparent;
   border: 0;
-  padding: 0;
+  padding: 1em;
 }
