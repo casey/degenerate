@@ -4,7 +4,9 @@ use {
   rustyline::error::ReadlineError,
 };
 
-pub(crate) mod display;
+pub(crate) use display::Display;
+
+mod display;
 
 pub(crate) fn run() {
   if let Err(error) = Computer::run(&Display, env::args().skip(1)) {

@@ -1,4 +1,5 @@
 use {
+  self::{cast::Cast, get_document::GetDocument, select::Select, stderr::Stderr, window::window},
   super::*,
   wasm_bindgen::{closure::Closure, JsCast},
   web_sys::{
@@ -6,6 +7,8 @@ use {
     Window,
   },
 };
+
+pub(crate) use display::Display;
 
 // todo:
 // - fade out <main>
@@ -22,75 +25,17 @@ use {
 //
 // - lou manattis deep dish pizza
 
-pub(crate) mod display;
+mod cast;
+mod display;
+mod get_document;
+mod select;
+mod stderr;
+mod window;
 
 pub(crate) fn run() {
   if let Err(err) = run_inner() {
-    set_error(err);
+    Stderr::get().unwrap().set(err.as_ref());
   }
-}
-
-fn set_error(err: Error) {
-  window()
-    .get_document()
-    .select("#stderr")
-    .unwrap()
-    .cast::<Node>()
-    .unwrap()
-    .set_text_content(Some(&err.as_ref().to_string()));
-}
-
-fn clear_error() {
-  window()
-    .get_document()
-    .select("#stderr")
-    .unwrap()
-    .cast::<Node>()
-    .unwrap()
-    .set_text_content(None)
-}
-
-trait Select {
-  fn select(&self, selector: &str) -> Result<Element>;
-}
-
-impl Select for Document {
-  fn select(&self, selector: &str) -> Result<Element> {
-    Ok(
-      self
-        .query_selector(selector)
-        .map_err(|err| format!("`select` failed: {:?}", err))?
-        .ok_or_else(|| format!("selector `{}` returned no elements", selector))?,
-    )
-  }
-}
-
-trait Cast {
-  fn cast<T: JsCast>(self) -> Result<T>;
-}
-
-impl<V: JsCast + std::fmt::Debug> Cast for V {
-  fn cast<T: JsCast>(self) -> Result<T> {
-    Ok(
-      self
-        .dyn_into::<T>()
-        .map_err(|err| format!("`cast` failed: {:?}", err))?,
-    )
-  }
-}
-
-trait GetDocument {
-  fn get_document(&self) -> Document;
-}
-
-impl GetDocument for Window {
-  fn get_document(&self) -> Document {
-    self.document().expect("`window.document` missing")
-  }
-}
-
-fn window() -> Window {
-  web_sys::window().expect("`window` missing")
 }
 
 fn run_inner() -> Result {
@@ -103,6 +48,8 @@ fn run_inner() -> Result {
   let textarea = document.select("textarea")?.cast::<HtmlTextAreaElement>()?;
 
   let canvas = document.select("canvas")?.cast::<HtmlCanvasElement>()?;
+
+  let stderr = Stderr::get()?;
 
   let css_pixel_height: f64 = canvas.client_height().try_into()?;
   let css_pixel_width: f64 = canvas.client_width().try_into()?;
@@ -140,8 +87,8 @@ fn run_inner() -> Result {
       .set_class_name("display-none");
 
     match Computer::run(&display, textarea_clone.value().split_whitespace()) {
-      Err(err) => set_error(err),
-      Ok(()) => clear_error(),
+      Err(err) => stderr.set(err.as_ref()),
+      Ok(()) => stderr.clear(),
     }
   }) as Box<dyn FnMut()>);
 

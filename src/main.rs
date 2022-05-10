@@ -18,10 +18,10 @@ use {
 };
 
 #[cfg(target_arch = "wasm32")]
-use crate::browser::{display::Display, run};
+use crate::browser::{run, Display};
 
 #[cfg(not(target_arch = "wasm32"))]
-use crate::native::{display::Display, run};
+use crate::native::{run, Display};
 
 #[cfg(target_arch = "wasm32")]
 mod browser;
