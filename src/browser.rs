@@ -7,7 +7,7 @@ use {
 // todo:
 // - decide canvas layout
 // - surface errors to user
-// - remove unwraps
+// - deploy to pages
 
 pub(crate) mod display;
 
