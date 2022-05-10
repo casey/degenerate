@@ -8,13 +8,19 @@ use {
 };
 
 // todo:
-// - hide <main> with animation?
+// - fade out <main>
 // - hide when text area is selected?
+// - select textarea when page opens
 // - deploy to pages
 // - remove unwraps
 // - hide textarea outline
 // - semantic error element
 // - render in background thread?
+// - copy static assets
+// - deploy with manual
+// - download dash docs: rust, mdn
+//
+// - lou manattis deep dish pizza
 
 pub(crate) mod display;
 
@@ -73,11 +79,11 @@ impl<V: JsCast + std::fmt::Debug> Cast for V {
   }
 }
 
-trait WindowDocument {
+trait GetDocument {
   fn get_document(&self) -> Document;
 }
 
-impl WindowDocument for Window {
+impl GetDocument for Window {
   fn get_document(&self) -> Document {
     self.document().expect("`window.document` missing")
   }
