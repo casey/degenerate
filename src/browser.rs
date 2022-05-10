@@ -5,9 +5,9 @@ use {
 };
 
 // todo:
-// - remove unwraps
-// - surface errors to user
 // - decide canvas layout
+// - surface errors to user
+// - remove unwraps
 
 pub(crate) mod display;
 
@@ -21,7 +21,12 @@ trait Select {
 
 impl Select for Document {
   fn select(&self, selector: &str) -> Result<Element> {
-    Ok(self.query_selector(selector).unwrap().unwrap())
+    Ok(
+      self
+        .query_selector(selector)
+        .map_err(|err| format!("`select` failed: {:?}", err))?
+        .ok_or_else(|| format!("selector `{}` returned no elements", selector))?,
+    )
   }
 }
 
@@ -31,18 +36,22 @@ trait Cast {
 
 impl<V: JsCast + std::fmt::Debug> Cast for V {
   fn cast<T: JsCast>(self) -> Result<T> {
-    Ok(self.dyn_into::<T>().unwrap())
+    Ok(
+      self
+        .dyn_into::<T>()
+        .map_err(|err| format!("`cast` failed: {:?}", err))?,
+    )
   }
 }
 
-fn run_inner() -> Result<(), Error> {
+fn run_inner() -> Result {
   console_error_panic_hook::set_once();
 
-  let window = web_sys::window().ok_or_else(|| "window missing".to_string())?;
+  let window = web_sys::window().ok_or_else(|| "`window` missing".to_string())?;
 
   let document = window
     .document()
-    .ok_or_else(|| "window.document missing".to_string())?;
+    .ok_or_else(|| "`window.document` missing".to_string())?;
 
   let textarea = document.select("textarea")?.cast::<HtmlTextAreaElement>()?;
 
@@ -50,8 +59,8 @@ fn run_inner() -> Result<(), Error> {
 
   let context = canvas
     .get_context("2d")
-    .unwrap()
-    .unwrap()
+    .map_err(|err| format!("`canvas.get_context(\"2d\")` failed: {:?}", err))?
+    .ok_or_else(|| format!("failed to retrieve context"))?
     .cast::<CanvasRenderingContext2d>()?;
 
   let display = Display { context };

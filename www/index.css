@@ -6,9 +6,17 @@
   --margin-horizontal: calc((100vw - var(--size) * 5) / 2);
 }
 
-* {
+a {
+  color: white;
+  text-decoration: none;
+}
+
+a:hover {
+  text-shadow: 0 0 5px #fff;
+}
+
+body {
   margin: 0;
-  padding: 0;
 }
 
 html {
@@ -19,15 +27,6 @@ html {
   line-height: var(--size);
   overflow: hidden;
   text-align: center;
-}
-
-a {
-  color: white;
-  text-decoration: none;
-}
-
-a:hover {
-  text-shadow: 0 0 5px #fff;
 }
 
 main {
