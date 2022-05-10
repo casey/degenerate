@@ -132,6 +132,18 @@ impl Computer {
           self.loop_counter = 0;
         }
       }
+      Command::Generate => {
+        self.program.splice(
+          self.program_counter + 1..self.program_counter + 1,
+          [
+            Command::RandomMask,
+            Command::Scale(0.99),
+            Command::For(100),
+            Command::Apply,
+            Command::Loop,
+          ],
+        );
+      }
       Command::Load(path) => {
         self.load(
           path
