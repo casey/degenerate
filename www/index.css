@@ -38,7 +38,7 @@ html {
   height: 100%;
 }
 
-main {
+nav {
   position: absolute;
   mix-blend-mode: difference;
   display: grid;
@@ -48,11 +48,11 @@ main {
   z-index: 3;
 }
 
-main > * {
+nav > * {
   width: var(--size);
 }
 
-main > a {
+nav > a {
   align-items: center;
   display: flex;
   font-size: calc(var(--size) / 9);
@@ -61,7 +61,7 @@ main > a {
   line-height: calc(var(--size) / 9);
 }
 
-main > div {
+nav > div {
   overflow: hidden;
   text-align: center;
   height: var(--size);
@@ -70,7 +70,7 @@ main > div {
   font-size: var(--size);
 }
 
-main > div:hover {
+nav > div:hover {
   filter: blur(4px);
 }
 

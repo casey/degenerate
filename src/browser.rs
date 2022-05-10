@@ -72,7 +72,7 @@ fn run_inner() -> Result {
   let textarea_clone = textarea.clone();
   let cb = Closure::wrap(Box::new(move || {
     document
-      .select("main")
+      .select("nav")
       .unwrap()
       .cast::<Element>()
       .unwrap()
