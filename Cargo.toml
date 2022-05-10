@@ -6,25 +6,9 @@ edition = "2021"
 license = "CC0-1.0"
 autotests = false
 
-[dependencies]
-atty = "0.2.14"
-getrandom = { version = "0.2.6", features = ["js"] }
-image = "0.24.1"
-nalgebra = "0.31.0"
-num-traits = "0.2.14"
-rand = { version = "0.8.4" }
-rand_derive2 = "0.1.17"
-strum = { version = "0.24.0", features = ["derive"] }
-
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen = "0.2.80"
-web-sys = { version = "0.3.57", features = ["console", "Window", "Document", "HtmlCollection", "Element", "HtmlElement", "InputEvent", "HtmlTextAreaElement", "HtmlCanvasElement", "CanvasRenderingContext2d", "ImageData"] }
-console_error_panic_hook = "0.1.7"
-
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-ansi_term = "0.12.1"
-dirs = "4.0.0"
-rustyline = "9.1.1"
+[[test]]
+name = "integration"
+path = "tests/integration.rs"
 
 [dev-dependencies]
 approx = "0.5.0"
@@ -38,6 +22,37 @@ camino = "1.0.5"
 indoc = "1.0.3"
 urlencoding = "2.1.0"
 
-[[test]]
-name = "integration"
-path = "tests/integration.rs"
+[dependencies]
+atty = "0.2.14"
+getrandom = { version = "0.2.6", features = ["js"] }
+image = "0.24.1"
+nalgebra = "0.31.0"
+num-traits = "0.2.14"
+rand = { version = "0.8.4" }
+rand_derive2 = "0.1.17"
+strum = { version = "0.24.0", features = ["derive"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2.80"
+console_error_panic_hook = "0.1.7"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.web-sys]
+version = "0.3.57"
+features = [
+  "CanvasRenderingContext2d",
+  "Document",
+  "Element",
+  "HtmlCanvasElement",
+  "HtmlCollection",
+  "HtmlElement",
+  "HtmlTextAreaElement",
+  "ImageData",
+  "InputEvent",
+  "Window",
+  "console",
+]
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+ansi_term = "0.12.1"
+dirs = "4.0.0"
+rustyline = "9.1.1"

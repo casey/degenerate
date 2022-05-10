@@ -4,6 +4,8 @@ use {
   rustyline::error::ReadlineError,
 };
 
+pub(crate) mod display;
+
 pub(crate) fn run() {
   if let Err(error) = Computer::run(&Display, env::args().skip(1)) {
     if let Some(ReadlineError::Eof | ReadlineError::Interrupted) =
@@ -27,15 +29,5 @@ pub(crate) fn run() {
     }
 
     process::exit(1);
-  }
-}
-
-pub(crate) struct Display;
-
-impl Display {
-  pub(crate) fn render(&self, _memory: &DMatrix<Vector3<u8>>) {}
-
-  pub(crate) fn dimensions(&self) -> (usize, usize) {
-    (256, 256)
   }
 }
