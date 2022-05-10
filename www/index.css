@@ -43,13 +43,14 @@ html {
 }
 
 main {
+  mix-blend-mode: difference;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   padding-bottom: var(--padding-vertical);
   padding-left: var(--padding-horizontal);
   padding-right: var(--padding-horizontal);
   padding-top: var(--padding-vertical);
-  z-index: 0;
+  z-index: 1;
 }
 
 main > * {
@@ -72,4 +73,18 @@ main > div {
 
 main > div:hover {
   filter: blur(4px);
+}
+
+textarea {
+  mix-blend-mode: difference;
+  color: white;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background-color: transparent;
+  border: 0;
+  padding: 0;
 }
