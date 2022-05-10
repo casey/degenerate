@@ -1,3 +1,0 @@
-[build]
-target = "www/index.html"
-dist = "dist"

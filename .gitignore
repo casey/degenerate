@@ -6,4 +6,5 @@
 /program.degen
 /target
 /tests/image_tests.rs
-/www/man
+/www/degenerate.js
+/www/degenerate_bg.wasm

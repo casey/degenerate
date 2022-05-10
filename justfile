@@ -70,4 +70,8 @@ doc:
 	cargo doc --open --target wasm32-unknown-unknown
 
 serve:
-	python3 -m http.server --directory dist
+	python3 -m http.server --directory www
+
+build-web:
+	cargo build --target wasm32-unknown-unknown
+	wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/debug/degenerate.wasm --out-dir www

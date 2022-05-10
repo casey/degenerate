@@ -4,8 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>D E G E N E R A T E</title>
-    <link data-trunk rel="rust" href="..">
-    <link data-trunk rel="css" href="index.css">
+    <link rel="stylesheet" href="index.css">
   </head>
   <body>
     <canvas></canvas>
@@ -27,5 +26,9 @@
       <a href="man/">manual</a>
       <a href="https://crates.io/crates/degenerate">crates.io</a>
     </main>
+    <script type="module">
+      import init from './degenerate.js';
+      init('degenerate_bg.wasm');
+    </script>
   </body>
 </html>
