@@ -11,13 +11,8 @@ use {
 pub(crate) use display::Display;
 
 // todo:
-// - fade out <main>
-// - hide when text area is selected?
-// - select textarea when page opens
 // - deploy to pages
 // - remove unwraps
-// - hide textarea outline
-// - semantic error element
 // - render in background thread?
 // - copy static assets
 // - deploy with manual
@@ -84,7 +79,7 @@ fn run_inner() -> Result {
       .unwrap()
       .cast::<Element>()
       .unwrap()
-      .set_class_name("display-none");
+      .set_class_name("fade-out");
 
     match Computer::run(&display, textarea_clone.value().split_whitespace()) {
       Err(err) => stderr.set(err.as_ref()),

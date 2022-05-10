@@ -5,7 +5,7 @@ pub(crate) struct Stderr(Node);
 impl Stderr {
   pub(crate) fn get() -> Result<Self> {
     Ok(Self(
-      window().get_document().select("#stderr")?.cast::<Node>()?,
+      window().get_document().select("samp")?.cast::<Node>()?,
     ))
   }
 

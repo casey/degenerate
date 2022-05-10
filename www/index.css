@@ -74,6 +74,16 @@ main > div:hover {
   filter: blur(4px);
 }
 
+samp {
+  mix-blend-mode: difference;
+  color: red;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  z-index: 2;
+  padding: 1em;
+}
+
 textarea {
   mix-blend-mode: difference;
   color: white;
@@ -86,19 +96,11 @@ textarea {
   background-color: transparent;
   border: 0;
   padding: 1em;
+  outline: none;
 }
 
-#stderr {
-  font-family: monospace;
-  mix-blend-mode: difference;
-  color: red;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  z-index: 2;
-  padding: 1em;
-}
-
-.display-none {
-  display: none;
+.fade-out {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 1s, opacity 1s linear;
 }
