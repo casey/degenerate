@@ -211,6 +211,7 @@ dependencies = [
  "getrandom",
  "image",
  "indoc",
+ "js-sys",
  "nalgebra",
  "num-traits",
  "pretty_assertions",

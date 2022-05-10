@@ -26,6 +26,7 @@ urlencoding = "2.1.0"
 atty = "0.2.14"
 getrandom = { version = "0.2.6", features = ["js"] }
 image = "0.24.1"
+js-sys = "0.3.57"
 nalgebra = "0.31.0"
 num-traits = "0.2.14"
 rand = { version = "0.8.4" }
