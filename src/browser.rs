@@ -10,13 +10,6 @@ use {
 
 pub(crate) use display::Display;
 
-// todo:
-// - deploy to pages
-// - remove unwraps
-// - render in background thread?
-// - copy static assets
-// - deploy with manual
-
 mod cast;
 mod display;
 mod get_document;
