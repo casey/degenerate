@@ -60,8 +60,20 @@ fn run_inner() -> Result {
   let css_pixel_height: f64 = canvas.client_height().try_into()?;
   let css_pixel_width: f64 = canvas.client_width().try_into()?;
   let device_pixel_ratio = window.device_pixel_ratio();
-  canvas.set_height((css_pixel_height * device_pixel_ratio).ceil() as u32);
-  canvas.set_width((css_pixel_width * device_pixel_ratio).ceil() as u32);
+  let device_pixel_height = (css_pixel_height * device_pixel_ratio).ceil();
+  let device_pixel_width = (css_pixel_width * device_pixel_ratio).ceil();
+  let height = if cfg!(debug_assertions) {
+    device_pixel_height / 32.0
+  } else {
+    device_pixel_height
+  };
+  let width = if cfg!(debug_assertions) {
+    device_pixel_width / 32.0
+  } else {
+    device_pixel_width
+  };
+  canvas.set_height(height as u32);
+  canvas.set_width(width as u32);
 
   let context = canvas
     .get_context("2d")
