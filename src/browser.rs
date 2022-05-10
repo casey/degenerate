@@ -16,9 +16,6 @@ pub(crate) use display::Display;
 // - render in background thread?
 // - copy static assets
 // - deploy with manual
-// - download dash docs: rust, mdn
-//
-// - lou manattis deep dish pizza
 
 mod cast;
 mod display;
