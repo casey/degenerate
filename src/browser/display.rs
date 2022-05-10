@@ -29,7 +29,10 @@ impl Display {
   }
 
   pub(crate) fn dimensions(&self) -> Result<(usize, usize)> {
-    let canvas = self.context.canvas().unwrap();
+    let canvas = self
+      .context
+      .canvas()
+      .ok_or_else(|| "failed to get context canvas".to_string())?;
 
     Ok((canvas.height().try_into()?, canvas.width().try_into()?))
   }
