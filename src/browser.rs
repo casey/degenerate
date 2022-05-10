@@ -8,6 +8,7 @@ use {
 // - decide canvas layout
 // - surface errors to user
 // - deploy to pages
+// - remove unwraps
 
 pub(crate) mod display;
 
