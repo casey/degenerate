@@ -20,13 +20,10 @@ pub(crate) struct Computer {
 }
 
 impl Computer {
-  pub(crate) fn run(
-    display: &Display,
-    words: impl IntoIterator<Item = impl AsRef<str>>,
-  ) -> Result<()> {
+  pub(crate) fn run(display: &Display, words: impl IntoIterator<Item = impl AsRef<str>>) -> Result {
     let mut computer = Self::new();
 
-    computer.resize(display.dimensions());
+    computer.resize(display.dimensions()?);
 
     for arg in words {
       computer.program.push(arg.as_ref().parse()?);
@@ -43,7 +40,7 @@ impl Computer {
       computer.program_counter = computer.program_counter.wrapping_add(1);
     }
 
-    display.render(&computer.memory);
+    display.render(&computer.memory)?;
 
     Ok(())
   }
