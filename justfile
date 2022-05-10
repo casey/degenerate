@@ -69,6 +69,11 @@ publish:
 doc:
 	cargo doc --open --target wasm32-unknown-unknown
 
+clean:
+	cargo clean
+	rm -f www/degenerate.js
+	rm -f www/degenerate_bg.wasm
+
 serve:
 	python3 -m http.server --directory www
 
