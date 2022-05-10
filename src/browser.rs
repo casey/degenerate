@@ -30,7 +30,7 @@ pub(crate) fn run() {
   }
 }
 
-fn set_error(err: impl AsRef<dyn std::error::Error>) {
+fn set_error(err: Error) {
   window()
     .get_document()
     .select("#stderr")
