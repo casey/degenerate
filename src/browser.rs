@@ -1,7 +1,10 @@
 use {
   super::*,
   wasm_bindgen::{closure::Closure, JsCast},
-  web_sys::{CanvasRenderingContext2d, Document, Element, HtmlCanvasElement, HtmlTextAreaElement},
+  web_sys::{
+    CanvasRenderingContext2d, Document, Element, HtmlCanvasElement, HtmlTextAreaElement, Node,
+    Window,
+  },
 };
 
 // todo:
@@ -10,11 +13,34 @@ use {
 // - deploy to pages
 // - remove unwraps
 // - hide textarea outline
+// - semantic error element
 
 pub(crate) mod display;
 
 pub(crate) fn run() {
-  run_inner().unwrap();
+  if let Err(err) = run_inner() {
+    set_error(err);
+  }
+}
+
+fn set_error(err: impl AsRef<dyn std::error::Error>) {
+  window()
+    .get_document()
+    .select("#stderr")
+    .unwrap()
+    .cast::<Node>()
+    .unwrap()
+    .set_text_content(Some(&err.as_ref().to_string()));
+}
+
+fn clear_error() {
+  window()
+    .get_document()
+    .select("#stderr")
+    .unwrap()
+    .cast::<Node>()
+    .unwrap()
+    .set_text_content(None)
 }
 
 trait Select {
@@ -46,14 +72,26 @@ impl<V: JsCast + std::fmt::Debug> Cast for V {
   }
 }
 
+trait WindowDocument {
+  fn get_document(&self) -> Document;
+}
+
+impl WindowDocument for Window {
+  fn get_document(&self) -> Document {
+    self.document().expect("`window.document` missing")
+  }
+}
+
+fn window() -> Window {
+  web_sys::window().expect("`window` missing")
+}
+
 fn run_inner() -> Result {
   console_error_panic_hook::set_once();
 
-  let window = web_sys::window().ok_or_else(|| "`window` missing".to_string())?;
+  let window = window();
 
-  let document = window
-    .document()
-    .ok_or_else(|| "`window.document` missing".to_string())?;
+  let document = window.get_document();
 
   let textarea = document.select("textarea")?.cast::<HtmlTextAreaElement>()?;
 
@@ -87,7 +125,10 @@ fn run_inner() -> Result {
 
   let textarea_clone = textarea.clone();
   let cb = Closure::wrap(Box::new(move || {
-    Computer::run(&display, textarea_clone.value().split_whitespace()).unwrap();
+    match Computer::run(&display, textarea_clone.value().split_whitespace()) {
+      Err(err) => set_error(err),
+      Ok(()) => clear_error(),
+    }
   }) as Box<dyn FnMut()>);
 
   textarea
@@ -95,8 +136,6 @@ fn run_inner() -> Result {
     .unwrap();
 
   cb.forget();
-
-  web_sys::console::log_1(&"hello".into());
 
   Ok(())
 }
