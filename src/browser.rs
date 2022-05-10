@@ -57,6 +57,12 @@ fn run_inner() -> Result {
 
   let canvas = document.select("canvas")?.cast::<HtmlCanvasElement>()?;
 
+  let css_pixel_height: f64 = canvas.client_height().try_into()?;
+  let css_pixel_width: f64 = canvas.client_width().try_into()?;
+  let device_pixel_ratio = window.device_pixel_ratio();
+  canvas.set_height((css_pixel_height * device_pixel_ratio).ceil() as u32);
+  canvas.set_width((css_pixel_width * device_pixel_ratio).ceil() as u32);
+
   let context = canvas
     .get_context("2d")
     .map_err(|err| format!("`canvas.get_context(\"2d\")` failed: {:?}", err))?
