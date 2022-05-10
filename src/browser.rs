@@ -8,12 +8,13 @@ use {
 };
 
 // todo:
-// - hide <main> somehow
-// - surface errors to user
+// - hide <main> with animation?
+// - hide when text area is selected?
 // - deploy to pages
 // - remove unwraps
 // - hide textarea outline
 // - semantic error element
+// - render in background thread?
 
 pub(crate) mod display;
 
@@ -125,6 +126,13 @@ fn run_inner() -> Result {
 
   let textarea_clone = textarea.clone();
   let cb = Closure::wrap(Box::new(move || {
+    document
+      .select("main")
+      .unwrap()
+      .cast::<Element>()
+      .unwrap()
+      .set_class_name("display-none");
+
     match Computer::run(&display, textarea_clone.value().split_whitespace()) {
       Err(err) => set_error(err),
       Ok(()) => clear_error(),
@@ -132,8 +140,8 @@ fn run_inner() -> Result {
   }) as Box<dyn FnMut()>);
 
   textarea
-    .add_event_listener_with_callback("input", &cb.as_ref().unchecked_ref())
-    .unwrap();
+    .add_event_listener_with_callback("input", &cb.as_ref().dyn_ref().unwrap())
+    .map_err(|err| format!("failed to set textarea listener: {:?}", err))?;
 
   cb.forget();
 

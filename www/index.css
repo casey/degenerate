@@ -98,3 +98,7 @@ textarea {
   z-index: 2;
   padding: 1em;
 }
+
+.display-none {
+  display: none;
+}

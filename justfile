@@ -66,5 +66,8 @@ publish:
   cd ../..
   rm -rf tmp/release
 
+doc:
+	cargo doc --open --target wasm32-unknown-unknown
+
 serve:
 	python3 -m http.server --directory dist
