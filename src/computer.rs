@@ -45,7 +45,7 @@ impl Computer {
     Ok(())
   }
 
-  pub(crate) fn new() -> Self {
+  fn new() -> Self {
     Self {
       alpha: 1.0,
       autosave: false,
