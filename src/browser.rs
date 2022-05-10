@@ -62,15 +62,11 @@ fn run_inner() -> Result {
 
   let display = Display { context };
 
+  let nav = document.select("nav")?.cast::<Element>()?;
+
   let textarea_clone = textarea.clone();
   let cb = Closure::wrap(Box::new(move || {
-    document
-      .select("nav")
-      .unwrap()
-      .cast::<Element>()
-      .unwrap()
-      .set_class_name("fade-out");
-
+    nav.set_class_name("fade-out");
     match Computer::run(&display, textarea_clone.value().split_whitespace()) {
       Err(err) => stderr.set(err.as_ref()),
       Ok(()) => stderr.clear(),
