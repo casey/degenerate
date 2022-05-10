@@ -2,8 +2,8 @@
   --width-target: calc(100vw / 6);
   --height-target: calc(100vh / 4);
   --size: min(var(--width-target), var(--height-target));
-  --margin-vertical: calc((100vh - var(--size) * 2.5) / 2);
-  --margin-horizontal: calc((100vw - var(--size) * 5) / 2);
+  --padding-vertical: calc((100vh - var(--size) * 2.5) / 2);
+  --padding-horizontal: calc((100vw - var(--size) * 5) / 2);
 }
 
 a {
@@ -33,7 +33,7 @@ canvas {
 
 html {
   background-color: black;
-  color: red;
+  color: white;
   font-family: sans-serif;
   font-size: var(--size);
   line-height: var(--size);
@@ -43,15 +43,12 @@ html {
 }
 
 main {
-  position: absolute;
-  left: 0;
-  top: 0;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  margin-bottom: var(--margin-vertical);
-  margin-left: var(--margin-horizontal);
-  margin-right: var(--margin-horizontal);
-  margin-top: var(--margin-vertical);
+  padding-bottom: var(--padding-vertical);
+  padding-left: var(--padding-horizontal);
+  padding-right: var(--padding-horizontal);
+  padding-top: var(--padding-vertical);
   z-index: 0;
 }
 
