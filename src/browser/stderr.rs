@@ -1,11 +1,15 @@
 use super::*;
 
-pub(crate) struct Stderr(Node);
+#[derive(Clone)]
+pub(crate) struct Stderr(HtmlElement);
 
 impl Stderr {
   pub(crate) fn get() -> Result<Self> {
     Ok(Self(
-      window().get_document().select("samp")?.cast::<Node>()?,
+      window()
+        .get_document()
+        .select("samp")?
+        .cast::<HtmlElement>()?,
     ))
   }
 
