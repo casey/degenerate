@@ -18,23 +18,6 @@ macro_rules! image_test {
 }
 
 fn image_test(name: &str, program: &str) -> Result {
-  for result in fs::read_dir("images")? {
-    let entry = result?;
-    let file_name = entry
-      .file_name()
-      .to_str()
-      .ok_or_else(|| format!("File name was not valid unicode: {:?}", entry.file_name()))?
-      .to_owned();
-    if let Some(program) = file_name.strip_suffix(".actual-memory.png") {
-      if !Path::new("images")
-        .join(format!("{}.png", program))
-        .is_file()
-      {
-        fs::remove_file(entry.path())?;
-      }
-    }
-  }
-
   let destination = format!("images/{}.actual-memory.png", name);
 
   fs::remove_file(&destination).ok();
