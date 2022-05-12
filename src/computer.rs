@@ -62,7 +62,7 @@ impl Computer {
       similarity: Similarity2::identity(),
       verbose: false,
       wrap: false,
-      viewport: Viewport::Stretch,
+      viewport: Viewport::Fill,
     }
   }
 
