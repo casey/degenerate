@@ -1,4 +1,4 @@
-use {super::*, std::ops::Deref, web_sys::EventTarget};
+use super::*;
 
 pub(crate) struct App {
   canvas: HtmlCanvasElement,
@@ -7,30 +7,6 @@ pub(crate) struct App {
   window: Window,
   textarea: HtmlTextAreaElement,
   display: Display,
-}
-
-trait AddEventListenerWithFunction {
-  fn add_event_listener_with_function(
-    &self,
-    event: &str,
-    function: impl FnMut() + 'static,
-  ) -> Result;
-}
-
-impl<T: Deref<Target = EventTarget>> AddEventListenerWithFunction for T {
-  fn add_event_listener_with_function(
-    &self,
-    event: &str,
-    function: impl FnMut() + 'static,
-  ) -> Result {
-    let closure = Closure::wrap(Box::new(function) as Box<dyn FnMut()>);
-    self
-      .deref()
-      .add_event_listener_with_callback(event, &closure.as_ref().dyn_ref().unwrap())
-      .map_err(|err| format!("Failed to set event listener: {:?}", err))?;
-    closure.forget();
-    Ok(())
-  }
 }
 
 impl App {
@@ -63,14 +39,12 @@ impl App {
     }));
 
     let local = app.clone();
-    window.add_event_listener_with_function("resize", move || local.lock().unwrap().on_resize())?;
+    window.add_event_listener("resize", move || local.lock().unwrap().on_resize())?;
 
     let local = app.clone();
-    textarea.add_event_listener_with_function("input", move || {
-      match local.lock().unwrap().on_input() {
-        Err(err) => stderr.set(err.as_ref()),
-        Ok(()) => stderr.clear(),
-      }
+    textarea.add_event_listener("input", move || match local.lock().unwrap().on_input() {
+      Err(err) => stderr.set(err.as_ref()),
+      Ok(()) => stderr.clear(),
     })?;
 
     Ok(())
