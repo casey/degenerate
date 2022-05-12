@@ -1,4 +1,7 @@
-use super::*;
+use {
+  super::*,
+  std::{ffi::OsStr, sync::Once},
+};
 
 macro_rules! image_test {
   (name: $name:ident, program: $program:literal $(,)?) => {
@@ -18,6 +21,18 @@ macro_rules! image_test {
 }
 
 fn image_test(name: &str, program: &str) -> Result {
+  static CLEAN: Once = Once::new();
+
+  CLEAN.call_once(|| {
+    for result in fs::read_dir("images").unwrap() {
+      let entry = result.unwrap();
+      let path = entry.path();
+      if path.extension() == Some(OsStr::new(".actual-memory.png")) {
+        fs::remove_file(path).unwrap();
+      }
+    }
+  });
+
   let destination = format!("images/{}.actual-memory.png", name);
 
   fs::remove_file(&destination).ok();
