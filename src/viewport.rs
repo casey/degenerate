@@ -14,20 +14,27 @@ impl Viewport {
     let d = dimensions.map(|element| element as f64);
     let c = i.map(|element| element as f64);
 
-    let mut stretch =
+    let stretch =
       (c + Vector2::from_element(0.5)).component_div(&d) * 2.0 - Vector2::from_element(1.0);
+
+    let aspect = d.x / d.y;
+
+    let landscape = d.x > d.y;
 
     match self {
       Self::Fill => {
-        if d.x > d.y {
-          stretch.x *= d.x / d.y;
+        if landscape {
+          Vector2::new(stretch.x, stretch.y / aspect)
         } else {
-          stretch.y *= d.y / d.x;
+          Vector2::new(stretch.x * aspect, stretch.y)
         }
-        stretch
       }
       Self::Fit => {
-        stretch.component_mul(&Vector2::from_element(d.x.min(d.y)).component_div(&d.yx()))
+        if landscape {
+          Vector2::new(stretch.x * aspect, stretch.y)
+        } else {
+          Vector2::new(stretch.x, stretch.y / aspect)
+        }
       }
       Self::Stretch => stretch,
     }
@@ -38,60 +45,36 @@ impl Viewport {
 mod tests {
   use super::*;
 
+  fn case(
+    dimensions: (usize, usize),
+    coordinates: (usize, usize),
+    fill: (f64, f64),
+    fit: (f64, f64),
+    stretch: (f64, f64),
+  ) {
+    let dimensions = Vector2::new(dimensions.0, dimensions.1);
+    let coordinates = Vector2::new(coordinates.0, coordinates.1);
+    assert_eq!(
+      Viewport::Fill.coordinates(dimensions, coordinates),
+      Vector2::new(fill.0, fill.1)
+    );
+    assert_eq!(
+      Viewport::Fit.coordinates(dimensions, coordinates),
+      Vector2::new(fit.0, fit.1)
+    );
+    assert_eq!(
+      Viewport::Stretch.coordinates(dimensions, coordinates),
+      Vector2::new(stretch.0, stretch.1)
+    );
+  }
+
   #[test]
   fn center_pixel_is_at_origin() {
-    assert_eq!(
-      Viewport::Stretch.coordinates(Vector2::new(1, 1), Vector2::new(0, 0)),
-      Vector2::new(0.0, 0.0)
-    );
+    case((1, 1), (0, 0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0));
   }
 
   #[test]
   fn coordinates_are_in_center_of_pixel() {
-    assert_eq!(
-      Viewport::Stretch.coordinates(Vector2::new(2, 2), Vector2::new(0, 0)),
-      Vector2::new(-0.5, -0.5)
-    )
-  }
-
-  #[test]
-  fn stretch() {
-    assert_eq!(
-      Viewport::Stretch.coordinates(Vector2::new(2, 1), Vector2::new(0, 0)),
-      Vector2::new(-0.5, 0.0)
-    );
-  }
-
-  #[test]
-  fn fit() {
-    assert_eq!(
-      Viewport::Fit.coordinates(Vector2::new(4, 2), Vector2::new(0, 0)),
-      Vector2::new(-0.75, -0.25)
-    );
-    assert_eq!(
-      Viewport::Fit.coordinates(Vector2::new(2, 4), Vector2::new(0, 0)),
-      Vector2::new(-0.25, -0.75)
-    );
-  }
-
-  //         ....
-  // xxxx    xxxx
-  // xxxx -> xxxx
-  //         ....
-
-  #[test]
-  fn fill() {
-    assert_eq!(
-      Viewport::Fill.coordinates(Vector2::new(4, 2), Vector2::new(0, 0)),
-      Vector2::new(-1.5, -0.5)
-    );
-    // assert_eq!(
-    //   Viewport::Fill.coordinates(Vector2::new(2, 4), Vector2::new(0, 0)),
-    //   Vector2::new(-0.5, -1.5)
-    // );
-    // assert_eq!(
-    //   Viewport::Fit.coordinates(Vector2::new(2, 4), Vector2::new(0, 0)),
-    //   Vector2::new(-0.25, -0.75)
-    // );
+    case((2, 2), (0, 0), (-0.5, -0.5), (-0.5, -0.5), (-0.5, -0.5));
   }
 }
