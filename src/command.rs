@@ -16,6 +16,7 @@ pub(crate) enum Command {
   Print,
   RandomMask,
   Read,
+  #[cfg(not(target_arch = "wasm32"))]
   Repl,
   Resize((usize, usize)),
   Rotate(f64),
@@ -23,7 +24,6 @@ pub(crate) enum Command {
   Scale(f64),
   Seed(u64),
   Verbose,
-  Window,
   Wrap,
 }
 
@@ -59,7 +59,17 @@ impl FromStr for Command {
       ["print"] => Ok(Self::Print),
       ["random-mask"] => Ok(Self::RandomMask),
       ["read"] => Ok(Self::Read),
-      ["repl"] => Ok(Self::Repl),
+      ["repl"] => {
+        #[cfg(target_arch = "wasm32")]
+        {
+          Err("`repl` command is not supported in browser".into())
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+          Ok(Self::Repl)
+        }
+      }
       ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["resize", size] => {
         let size = size.parse()?;
@@ -81,7 +91,6 @@ impl FromStr for Command {
       ["square"] => Ok(Self::Mask(Mask::Square)),
       ["top"] => Ok(Self::Mask(Mask::Top)),
       ["verbose"] => Ok(Self::Verbose),
-      ["window"] => Ok(Self::Window),
       ["wrap"] => Ok(Self::Wrap),
       ["x"] => Ok(Self::Mask(Mask::X)),
       _ => Err(format!("Invalid command: {}", s).into()),

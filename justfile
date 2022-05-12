@@ -65,3 +65,22 @@ publish:
   cargo publish
   cd ../..
   rm -rf tmp/release
+
+clean:
+	cargo clean
+	rm -f www/degenerate.js
+	rm -f www/degenerate_bg.wasm
+
+doc-web:
+	cargo doc --open --target wasm32-unknown-unknown
+
+serve:
+	python3 -m http.server --directory www
+
+build-web:
+	cargo build --target wasm32-unknown-unknown
+	wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/debug/degenerate.wasm --out-dir www
+
+build-web-release:
+	cargo build --release --target wasm32-unknown-unknown
+	wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/release/degenerate.wasm --out-dir www

@@ -34,11 +34,6 @@ Please consult the
 [Degenerate Programmer's Manual](https://degenerate.computer/man) for more
 information.
 
-## Compiling
-
-`degenerate` can render to a terminal or to a window. To render to a window,
-`degenerate` must be built with the optional `window` feature.
-
 ## Credits
 
 `degenerate` is written by [Casey Rodarmor](https://rodarmor.com) and

@@ -15,9 +15,6 @@ use {
 
 mod image_tests;
 
-#[cfg(feature = "window")]
-mod window_tests;
-
 type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 struct Test<'a> {
@@ -331,20 +328,6 @@ fn autosave_toggles() -> Result {
   }
 
   Ok(())
-}
-
-#[test]
-#[cfg(not(feature = "window"))]
-fn window_command_returns_error() -> Result {
-  Test::new()?
-    .program("window")
-    .expected_status(1)
-    .expected_stderr(
-      "
-      error: The `window` command is only supported if the optional `window` feature is enabled
-      ",
-    )
-    .run()
 }
 
 #[test]

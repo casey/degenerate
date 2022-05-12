@@ -20,11 +20,13 @@ pub(crate) struct Computer {
 }
 
 impl Computer {
-  pub(crate) fn run() -> Result<()> {
+  pub(crate) fn run(display: &Display, words: impl IntoIterator<Item = impl AsRef<str>>) -> Result {
     let mut computer = Self::new();
 
-    for arg in env::args().skip(1) {
-      computer.program.push(arg.parse()?);
+    computer.resize(display.dimensions()?);
+
+    for arg in words {
+      computer.program.push(arg.as_ref().parse()?);
     }
 
     while let Some(command) = computer.program.get(computer.program_counter).cloned() {
@@ -38,6 +40,8 @@ impl Computer {
       computer.program_counter = computer.program_counter.wrapping_add(1);
     }
 
+    display.render(&computer.memory)?;
+
     Ok(())
   }
 
@@ -49,7 +53,7 @@ impl Computer {
       frame: 0,
       loop_counter: 0,
       mask: Mask::All,
-      memory: DMatrix::zeros(256, 256),
+      memory: DMatrix::zeros(0, 0),
       operation: Operation::Invert,
       program: Vec::new(),
       program_counter: 0,
@@ -182,7 +186,10 @@ impl Computer {
           .program
           .splice(self.program_counter + 1..self.program_counter + 1, program);
       }
+      #[cfg(not(target_arch = "wasm32"))]
       Command::Repl => {
+        use {dirs::home_dir, rustyline::Editor};
+
         let history = home_dir().unwrap_or_default().join(".degenerate_history");
 
         let mut editor = Editor::<()>::new();
@@ -222,19 +229,6 @@ impl Computer {
       }
       Command::Seed(seed) => self.rng = StdRng::seed_from_u64(seed),
       Command::Verbose => self.verbose = !self.verbose,
-      #[cfg(feature = "window")]
-      Command::Window => {
-        bevy::app::App::new()
-          .add_plugins(bevy::DefaultPlugins)
-          .run();
-      }
-      #[cfg(not(feature = "window"))]
-      Command::Window => {
-        return Err(
-          "The `window` command is only supported if the optional `window` feature is enabled"
-            .into(),
-        );
-      }
       Command::Wrap => self.wrap = !self.wrap,
     }
 
