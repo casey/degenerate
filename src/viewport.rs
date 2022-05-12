@@ -10,7 +10,7 @@ pub(crate) enum Viewport {
 }
 
 impl Viewport {
-  pub(crate) fn coordinatess(self, dimensions: Vector2<usize>, i: Vector2<usize>) -> Vector2<f64> {
+  pub(crate) fn coordinates(self, dimensions: Vector2<usize>, i: Vector2<usize>) -> Vector2<f64> {
     let d = dimensions.map(|element| element as f64);
     let c = i.map(|element| element as f64);
 
