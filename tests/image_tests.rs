@@ -46,6 +46,29 @@ fn image_test(name: &str, program: &str) -> Result {
   let actual_image = image::open(&actual_path)?;
 
   let expected_path = format!("images/{}.png", name);
+
+  if !Path::new(&expected_path).is_file() {
+    fs::rename(&actual_path, &destination)?;
+
+    #[cfg(target_os = "macos")]
+    {
+      let status = Command::new("xattr")
+        .args(["-wx", "com.apple.FinderInfo"])
+        .arg("0000000000000000000C00000000000000000000000000000000000000000000")
+        .arg(&destination)
+        .status()?;
+
+      if !status.success() {
+        panic!("xattr failed: {}", status);
+      }
+    }
+
+    panic!(
+      "Image test failed:\nExpected memory missing: {}",
+      expected_path,
+    );
+  }
+
   let expected_image = image::open(&expected_path)?;
 
   if actual_image != expected_image {
@@ -366,6 +389,11 @@ image_test! {
 }
 
 image_test! {
+  name: viewport_fill_square,
+  program: "fill x apply save",
+}
+
+image_test! {
   name: viewport_fill_landscape,
   program: "resize:512:256 fill x apply save",
 }
@@ -373,6 +401,11 @@ image_test! {
 image_test! {
   name: viewport_fill_portrait,
   program: "resize:256:512 fill x apply save",
+}
+
+image_test! {
+  name: viewport_fit_square,
+  program: "fit x apply save",
 }
 
 image_test! {
@@ -388,6 +421,11 @@ image_test! {
 image_test! {
   name: viewport_override,
   program: "resize:512:256 fit stretch x apply save",
+}
+
+image_test! {
+  name: viewport_stretch_square,
+  program: "stretch x apply save",
 }
 
 image_test! {

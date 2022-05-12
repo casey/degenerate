@@ -2,11 +2,6 @@ use super::*;
 
 // todo:
 // - make fit or fill default
-// - iterate over programs when building tests
-// - if no memory is available, still generate actual memory
-// - inline degenerate programs in tests and stop auto-generating
-// - test fit fill and stretch in square aspect ratio
-// - fix watch issue
 
 #[derive(Copy, Clone, Debug)]
 pub(crate) enum Viewport {
