@@ -41,8 +41,7 @@ impl App {
     let local = app.clone();
     window.add_event_listener("resize", move || local.lock().unwrap().on_resize())?;
 
-    let local = app.clone();
-    textarea.add_event_listener("input", move || match local.lock().unwrap().on_input() {
+    textarea.add_event_listener("input", move || match app.lock().unwrap().on_input() {
       Err(err) => stderr.set(err.as_ref()),
       Ok(()) => stderr.clear(),
     })?;
