@@ -1,4 +1,4 @@
-use super::*;
+use {super::*, std::ops::Deref, web_sys::EventTarget};
 
 pub(crate) struct App {
   canvas: HtmlCanvasElement,
@@ -7,6 +7,30 @@ pub(crate) struct App {
   window: Window,
   textarea: HtmlTextAreaElement,
   display: Display,
+}
+
+trait AddEventListenerWithFunction {
+  fn add_event_listener_with_function(
+    &self,
+    event: &str,
+    function: impl FnMut() + 'static,
+  ) -> Result;
+}
+
+impl<T: Deref<Target = EventTarget>> AddEventListenerWithFunction for T {
+  fn add_event_listener_with_function(
+    &self,
+    event: &str,
+    function: impl FnMut() + 'static,
+  ) -> Result {
+    let closure = Closure::wrap(Box::new(function) as Box<dyn FnMut()>);
+    self
+      .deref()
+      .add_event_listener_with_callback(event, &closure.as_ref().dyn_ref().unwrap())
+      .map_err(|err| format!("Failed to set event listener: {:?}", err))?;
+    closure.forget();
+    Ok(())
+  }
 }
 
 impl App {
@@ -39,21 +63,15 @@ impl App {
     }));
 
     let local = app.clone();
-    let cb = Closure::wrap(Box::new(move || local.lock().unwrap().on_resize()) as Box<dyn FnMut()>);
-    window
-      .add_event_listener_with_callback("resize", &cb.as_ref().dyn_ref().unwrap())
-      .map_err(|err| format!("failed to set textarea listener: {:?}", err))?;
-    cb.forget();
+    window.add_event_listener_with_function("resize", move || local.lock().unwrap().on_resize())?;
 
     let local = app.clone();
-    let cb = Closure::wrap(Box::new(move || match local.lock().unwrap().on_input() {
-      Err(err) => stderr.set(err.as_ref()),
-      Ok(()) => stderr.clear(),
-    }) as Box<dyn FnMut()>);
-    textarea
-      .add_event_listener_with_callback("input", &cb.as_ref().dyn_ref().unwrap())
-      .map_err(|err| format!("failed to set textarea listener: {:?}", err))?;
-    cb.forget();
+    textarea.add_event_listener_with_function("input", move || {
+      match local.lock().unwrap().on_input() {
+        Err(err) => stderr.set(err.as_ref()),
+        Ok(()) => stderr.clear(),
+      }
+    })?;
 
     Ok(())
   }
