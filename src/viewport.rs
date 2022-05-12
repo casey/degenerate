@@ -1,7 +1,5 @@
 use super::*;
 
-// todo: make fit or fill default
-
 #[derive(Copy, Clone, Debug)]
 pub(crate) enum Viewport {
   Fill,

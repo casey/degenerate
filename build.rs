@@ -49,7 +49,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 
         #[test]{}
-        #[rustfmt::skip]
         fn {}() -> Result<()> {{
           image_test(\"{}\")
         }}",
