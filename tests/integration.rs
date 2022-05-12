@@ -134,62 +134,6 @@ impl<'a> Test<'a> {
   }
 }
 
-fn image_test(name: &str, program: &str) -> Result {
-  for result in fs::read_dir("images")? {
-    let entry = result?;
-    let file_name = entry
-      .file_name()
-      .to_str()
-      .ok_or_else(|| format!("File name was not valid unicode: {:?}", entry.file_name()))?
-      .to_owned();
-    if let Some(program) = file_name.strip_suffix(".actual-memory.png") {
-      if !Path::new("images")
-        .join(format!("{}.png", program))
-        .is_file()
-      {
-        fs::remove_file(entry.path())?;
-      }
-    }
-  }
-
-  let destination = format!("images/{}.actual-memory.png", name);
-
-  fs::remove_file(&destination).ok();
-
-  let tempdir = Test::new()?.program(program).run_and_return_tempdir()?;
-
-  let actual_path = tempdir.path().join("memory.png");
-
-  let actual_image = image::open(&actual_path)?;
-
-  let expected_path = format!("images/{}.png", name);
-  let expected_image = image::open(&expected_path)?;
-
-  if actual_image != expected_image {
-    fs::rename(&actual_path, &destination)?;
-
-    #[cfg(target_os = "macos")]
-    {
-      let status = Command::new("xattr")
-        .args(["-wx", "com.apple.FinderInfo"])
-        .arg("0000000000000000000C00000000000000000000000000000000000000000000")
-        .arg(&destination)
-        .status()?;
-
-      if !status.success() {
-        panic!("xattr failed: {}", status);
-      }
-    }
-
-    panic!(
-      "Image test failed:\nExpected: {}\nActual:   {}",
-      expected_path, destination,
-    );
-  }
-
-  Ok(())
-}
-
 #[test]
 fn repl_returns_success_after_reaching_eol() -> Result {
   Test::new()?.program("repl").run()
