@@ -20,20 +20,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   entries.sort_by_key(|entry| entry.file_name());
 
   for entry in entries {
-    let expected_path = Utf8PathBuf::try_from(entry.path())?;
-    println!("cargo:rerun-if-changed={}", expected_path);
+    let path = Utf8PathBuf::try_from(entry.path())?;
+    println!("cargo:rerun-if-changed={}", path);
 
-    let filename = expected_path
+    let filename = path
       .file_name()
-      .ok_or_else(|| format!("Could not extract file name: {}", expected_path))?;
+      .ok_or_else(|| format!("Could not extract file name: {}", path))?;
+
+    if filename.ends_with(".degen") && !path.with_extension("png").is_file() {
+      panic!("Image for program `{}` missing.", filename);
+    }
 
     if !filename.ends_with(".png") || filename.ends_with(".actual-memory.png") {
       continue;
     }
 
-    let name = expected_path
+    let name = path
       .file_stem()
-      .ok_or_else(|| format!("Could not extract file stem: {}", expected_path))?
+      .ok_or_else(|| format!("Could not extract file stem: {}", path))?
       .to_owned();
 
     let program = fs::read_to_string(format!("images/{}.degen", name))?

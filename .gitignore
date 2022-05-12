@@ -1,5 +1,5 @@
 /generate
-/images/*.actual-output.png
+/images/*.actual-memmory.png
 /memory.png
 /output.txt
 /program.degen
