@@ -1,0 +1,106 @@
+:root {
+  --width-target: calc(100vw / 6);
+  --height-target: calc(100vh / 4);
+  --size: min(var(--width-target), var(--height-target));
+  --padding-vertical: calc((100vh - var(--size) * 2.5) / 2);
+  --padding-horizontal: calc((100vw - var(--size) * 5) / 2);
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+a:hover {
+  text-shadow: 0 0 5px #fff;
+}
+
+body {
+  position: relative;
+  margin: 0;
+  height: 100%;
+  top: 0;
+}
+
+canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+html {
+  background-color: black;
+  color: white;
+  font-family: sans-serif;
+  height: 100%;
+}
+
+nav {
+  position: absolute;
+  mix-blend-mode: difference;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  left: var(--padding-horizontal);
+  top: var(--padding-vertical);
+  z-index: 3;
+}
+
+nav > * {
+  width: var(--size);
+}
+
+nav > a {
+  align-items: center;
+  display: flex;
+  font-size: calc(var(--size) / 9);
+  height: calc(var(--size) / 2);
+  justify-content: center;
+  line-height: calc(var(--size) / 9);
+}
+
+nav > div {
+  overflow: hidden;
+  text-align: center;
+  height: var(--size);
+  line-height: var(--size);
+  text-shadow: 0 0 5px #fff;
+  font-size: var(--size);
+}
+
+nav > div:hover {
+  filter: blur(4px);
+}
+
+samp {
+  mix-blend-mode: difference;
+  color: red;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  z-index: 2;
+  padding: 1em;
+}
+
+textarea {
+  mix-blend-mode: difference;
+  color: white;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background-color: transparent;
+  border: 0;
+  padding: 1em;
+  outline: none;
+}
+
+.fade-out {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 1s, opacity 1s linear;
+}

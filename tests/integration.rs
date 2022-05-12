@@ -15,9 +15,6 @@ use {
 
 mod image_tests;
 
-#[cfg(feature = "window")]
-mod window_tests;
-
 type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 struct Test<'a> {
@@ -137,7 +134,7 @@ impl<'a> Test<'a> {
   }
 }
 
-fn image_test(program: &str) -> Result {
+fn image_test(name: &str) -> Result {
   for result in fs::read_dir("images")? {
     let entry = result?;
     let file_name = entry
@@ -155,7 +152,9 @@ fn image_test(program: &str) -> Result {
     }
   }
 
-  let destination = format!("images/{}.actual-memory.png", program);
+  let program = fs::read_to_string(format!("images/{}.degen", name))?;
+
+  let destination = format!("images/{}.actual-memory.png", name);
 
   fs::remove_file(&destination).ok();
 
@@ -165,7 +164,7 @@ fn image_test(program: &str) -> Result {
 
   let actual_image = image::open(&actual_path)?;
 
-  let expected_path = format!("images/{}.png", program);
+  let expected_path = format!("images/{}.png", name);
   let expected_image = image::open(&expected_path)?;
 
   if actual_image != expected_image {
@@ -329,20 +328,6 @@ fn autosave_toggles() -> Result {
   }
 
   Ok(())
-}
-
-#[test]
-#[cfg(not(feature = "window"))]
-fn window_command_returns_error() -> Result {
-  Test::new()?
-    .program("window")
-    .expected_status(1)
-    .expected_stderr(
-      "
-      error: The `window` command is only supported if the optional `window` feature is enabled
-      ",
-    )
-    .run()
 }
 
 #[test]

@@ -34,6 +34,7 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         components: clippy, rustfmt
+        target: wasm32-unknown-unknown
         toolchain: stable
 
     - uses: Swatinem/rust-cache@v1
@@ -57,3 +58,34 @@ jobs:
         sudo apt-get update
         sudo apt-get install ripgrep
         ./bin/forbid
+
+    - name: Install `mdbook`
+      uses: peaceiris/actions-mdbook@v1
+      with:
+        mdbook-version: latest
+
+    - name: Build Book
+      run: mdbook build man
+
+    - name: Install `wasm-bindgen`
+      uses: jetli/wasm-bindgen-action@v0.1.0
+
+    - name: Build WASM
+      run: |
+        cargo build --release --target wasm32-unknown-unknown
+        wasm-bindgen \
+          --target web \
+          --no-typescript \
+          --out-dir www \
+          target/wasm32-unknown-unknown/release/degenerate.wasm
+
+    - name: Record Git Revision
+      run: git rev-parse --verify HEAD > www/commit.txt
+
+    - name: Deploy Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest'
+      with:
+        github_token: ${{secrets.GITHUB_TOKEN}}
+        publish_branch: gh-pages
+        publish_dir: www

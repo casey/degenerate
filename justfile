@@ -20,6 +20,7 @@ run *args:
 	cargo run --release -- {{args}}
 
 fmt:
+	yapf --in-place --recursive .
 	cargo fmt
 
 fmt-check:
@@ -48,5 +49,38 @@ generate: build
 		target/release/degenerate resize:512 seed:$i generate save:generate/$i.png
 	done
 
-build-pages:
-	cargo run --package build-pages
+build-manual:
+	mdbook build man
+
+# publish current GitHub master branch
+publish:
+  #!/usr/bin/env bash
+  set -euxo pipefail
+  rm -rf tmp/release
+  git clone git@github.com:casey/degenerate.git tmp/release
+  VERSION=`sed -En 's/version[[:space:]]*=[[:space:]]*"([^"]+)"/\1/p' Cargo.toml | head -1`
+  cd tmp/release
+  git tag -a $VERSION -m "Release $VERSION"
+  git push origin $VERSION
+  cargo publish
+  cd ../..
+  rm -rf tmp/release
+
+clean:
+	cargo clean
+	rm -f www/degenerate.js
+	rm -f www/degenerate_bg.wasm
+
+doc-web:
+	cargo doc --open --target wasm32-unknown-unknown
+
+serve:
+	python3 -m http.server --directory www
+
+build-web:
+	cargo build --target wasm32-unknown-unknown
+	wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/debug/degenerate.wasm --out-dir www
+
+build-web-release:
+	cargo build --release --target wasm32-unknown-unknown
+	wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/release/degenerate.wasm --out-dir www

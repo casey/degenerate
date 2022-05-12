@@ -8,7 +8,6 @@ pub(crate) enum Command {
   Comment,
   Default(Vector3<u8>),
   For(usize),
-  Generate,
   Load(Option<PathBuf>),
   Loop,
   Mask(Mask),
@@ -17,6 +16,7 @@ pub(crate) enum Command {
   Print,
   RandomMask,
   Read,
+  #[cfg(not(target_arch = "wasm32"))]
   Repl,
   Resize((usize, usize)),
   Rotate(f64),
@@ -25,7 +25,6 @@ pub(crate) enum Command {
   Seed(u64),
   Verbose,
   Viewport(Viewport),
-  Window,
   Wrap,
 }
 
@@ -49,7 +48,6 @@ impl FromStr for Command {
       ["fit"] => Ok(Self::Viewport(Viewport::Fit)),
       ["fill"] => Ok(Self::Viewport(Viewport::Fill)),
       ["for", count] => Ok(Self::For(count.parse()?)),
-      ["generate"] => Ok(Self::Generate),
       ["identity"] => Ok(Self::Operation(Operation::Identity)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
       ["load", path] => Ok(Self::Load(Some(path.parse()?))),
@@ -64,7 +62,17 @@ impl FromStr for Command {
       ["print"] => Ok(Self::Print),
       ["random-mask"] => Ok(Self::RandomMask),
       ["read"] => Ok(Self::Read),
-      ["repl"] => Ok(Self::Repl),
+      ["repl"] => {
+        #[cfg(target_arch = "wasm32")]
+        {
+          Err("`repl` command is not supported in browser".into())
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+          Ok(Self::Repl)
+        }
+      }
       ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["resize", size] => {
         let size = size.parse()?;
@@ -87,7 +95,6 @@ impl FromStr for Command {
       ["stretch"] => Ok(Self::Viewport(Viewport::Stretch)),
       ["top"] => Ok(Self::Mask(Mask::Top)),
       ["verbose"] => Ok(Self::Verbose),
-      ["window"] => Ok(Self::Window),
       ["wrap"] => Ok(Self::Wrap),
       ["x"] => Ok(Self::Mask(Mask::X)),
       _ => Err(format!("Invalid command: {}", s).into()),
