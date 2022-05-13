@@ -106,6 +106,8 @@ impl App {
   }
 
   fn on_animation_frame(&mut self, timestamp: f64) -> Result {
+    self.animation_frame_pending = false;
+
     log::trace!("Animation frame timestamp {}s", timestamp);
 
     if self.resize {
@@ -131,10 +133,10 @@ impl App {
 
     if self.input {
       self.nav.set_class_name("fade-out");
-      Computer::run(&self.display, self.textarea.value().split_whitespace())?;
+      let program = self.textarea.value();
+      log::trace!("Program: {}", program);
+      Computer::run(&self.display, program.split_whitespace())?;
     }
-
-    self.animation_frame_pending = false;
 
     Ok(())
   }

@@ -23,7 +23,9 @@ impl Stderr {
   }
 
   pub(crate) fn set(&self, err: &dyn std::error::Error) {
-    self.0.set_text_content(Some(&err.to_string()));
+    let message = err.to_string();
+    log::error!("{}", message);
+    self.0.set_text_content(Some(&message));
   }
 
   pub(crate) fn clear(&self) {
