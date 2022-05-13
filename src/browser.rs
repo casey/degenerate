@@ -17,10 +17,6 @@ use {
 
 pub(crate) use display::Display;
 
-macro_rules! log {
-  ($($t:tt)*) => (web_sys::console::log_1(&format_args!($($t)*).to_string().into()))
-}
-
 mod add_event_listener;
 mod app;
 mod cast;

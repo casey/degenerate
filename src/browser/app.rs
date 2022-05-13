@@ -68,14 +68,12 @@ impl App {
   }
 
   pub(super) fn on_resize(&mut self) -> Result {
-    log!("resize");
     self.resize = true;
     self.request_animation_frame()?;
     Ok(())
   }
 
   pub(super) fn on_input(&mut self) -> Result {
-    log!("input");
     self.input = true;
     self.request_animation_frame()?;
     Ok(())
@@ -98,7 +96,6 @@ impl App {
   }
 
   fn on_animation_frame(&mut self) -> Result {
-    log!("animation frame");
     if self.resize {
       let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
       let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
