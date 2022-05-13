@@ -4,13 +4,15 @@ use super::*;
 pub(crate) struct Stderr(HtmlElement);
 
 impl Stderr {
-  pub(crate) fn get() -> Result<Self> {
-    Ok(Self(
+  pub(crate) fn get() -> Self {
+    Self(
       window()
         .get_document()
-        .select("samp")?
-        .cast::<HtmlElement>()?,
-    ))
+        .select("samp")
+        .unwrap()
+        .cast::<HtmlElement>()
+        .unwrap(),
+    )
   }
 
   pub(crate) fn update(&self, result: Result) {

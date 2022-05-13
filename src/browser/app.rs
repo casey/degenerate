@@ -24,7 +24,7 @@ impl App {
 
     let nav = document.select("nav")?.cast::<HtmlElement>()?;
 
-    let stderr = Stderr::get()?;
+    let stderr = Stderr::get();
 
     let context = canvas
       .get_context("2d")
