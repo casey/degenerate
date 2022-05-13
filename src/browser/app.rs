@@ -1,15 +1,15 @@
 use super::*;
 
 pub(crate) struct App {
+  animation_frame_callback: Option<Closure<dyn FnMut()>>,
   canvas: HtmlCanvasElement,
-  nav: HtmlElement,
-  resize: bool,
-  window: Window,
-  textarea: HtmlTextAreaElement,
   display: Display,
   input: bool,
-  animation_frame_callback: Option<Closure<dyn FnMut()>>,
+  nav: HtmlElement,
+  resize: bool,
   stderr: Stderr,
+  textarea: HtmlTextAreaElement,
+  window: Window,
 }
 
 impl App {
@@ -33,15 +33,15 @@ impl App {
       .cast::<CanvasRenderingContext2d>()?;
 
     let app = Arc::new(Mutex::new(Self {
-      window: window.clone(),
-      resize: true,
-      display: Display { context },
-      textarea: textarea.clone(),
-      input: false,
       animation_frame_callback: None,
-      stderr: stderr.clone(),
-      nav,
       canvas,
+      display: Display { context },
+      input: false,
+      nav,
+      resize: true,
+      stderr: stderr.clone(),
+      textarea: textarea.clone(),
+      window: window.clone(),
     }));
 
     let local = app.clone();
