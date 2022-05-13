@@ -1,10 +1,9 @@
 /generate
-/images/*.actual-output.png
+/images/*.actual-memory.png
 /memory.png
 /output.txt
 /program.degen
 /target
-/tests/image_tests.rs
 /www/degenerate.js
 /www/degenerate_bg.wasm
 /www/man

@@ -24,6 +24,7 @@ pub(crate) enum Command {
   Scale(f64),
   Seed(u64),
   Verbose,
+  Viewport(Viewport),
   Wrap,
 }
 
@@ -44,6 +45,8 @@ impl FromStr for Command {
         g.parse()?,
         b.parse()?,
       ))),
+      ["fit"] => Ok(Self::Viewport(Viewport::Fit)),
+      ["fill"] => Ok(Self::Viewport(Viewport::Fill)),
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["identity"] => Ok(Self::Operation(Operation::Identity)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
@@ -89,6 +92,7 @@ impl FromStr for Command {
       ["scale", scaling] => Ok(Self::Scale(scaling.parse()?)),
       ["seed", seed] => Ok(Self::Seed(seed.parse()?)),
       ["square"] => Ok(Self::Mask(Mask::Square)),
+      ["stretch"] => Ok(Self::Viewport(Viewport::Stretch)),
       ["top"] => Ok(Self::Mask(Mask::Top)),
       ["verbose"] => Ok(Self::Verbose),
       ["wrap"] => Ok(Self::Wrap),
