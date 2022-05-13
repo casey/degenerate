@@ -83,3 +83,6 @@ build-web:
 build-web-release:
 	cargo build --release --target wasm32-unknown-unknown
 	wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/release/degenerate.wasm --out-dir www
+
+open:
+	open http://localhost:8000
