@@ -32,8 +32,5 @@ mod window;
 
 pub(crate) fn run() {
   console_error_panic_hook::set_once();
-
-  if let Err(err) = App::init() {
-    Stderr::get().unwrap().set(err.as_ref());
-  }
+  Stderr::get().update(App::init());
 }
