@@ -1,7 +1,7 @@
 use {
   crate::{
     color_axis::ColorAxis, command::Command, computer::Computer, mask::Mask, operation::Operation,
-    pixel::Pixel, viewport::Viewport, wrap::Wrap,
+    viewport::Viewport, wrap::Wrap,
   },
   image::{ImageBuffer, RgbImage},
   nalgebra::{DMatrix, Rotation3, Similarity2, UnitComplex, Vector2, Vector3},
@@ -32,7 +32,6 @@ mod mask;
 #[cfg(not(target_arch = "wasm32"))]
 mod native;
 mod operation;
-mod pixel;
 mod viewport;
 mod wrap;
 

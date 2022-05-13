@@ -88,7 +88,7 @@ impl Computer {
         let v = self.viewport.coordinates(dimensions, i);
         let v = similarity * v;
         let v = if self.wrap { v.wrap() } else { v };
-        let i = v.pixel(dimensions);
+        let i = self.viewport.pixel(dimensions, v);
         if self.mask.is_masked(dimensions, i, v) {
           let input = if i.x >= 0
             && i.y >= 0
