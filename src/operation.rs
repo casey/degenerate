@@ -12,9 +12,9 @@ impl Operation {
   pub(crate) fn apply(self, coordinates: Vector2<f64>, element: Vector3<u8>) -> Vector3<u8> {
     match self {
       Self::Debug => Vector3::new(
-        ((coordinates.x + 1.0) / 2.0 * 255.0) as u8,
+        ((coordinates.x + 1.0) / 2.0 * 255.0) as u8 & 0b11110000,
         0,
-        ((coordinates.y + 1.0) / 2.0 * 255.0) as u8,
+        ((coordinates.y + 1.0) / 2.0 * 255.0) as u8 & 0b11110000,
       ),
       Self::Identity => element,
       Self::Invert => element.map(|scalar| !scalar),
