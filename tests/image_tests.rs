@@ -1,7 +1,4 @@
-use {
-  super::*,
-  std::{ffi::OsStr, sync::Once},
-};
+use {super::*, std::sync::Once};
 
 macro_rules! image_test {
   (name: $name:ident, program: $program:literal $(,)?) => {
@@ -27,7 +24,13 @@ fn image_test(name: &str, program: &str) -> Result {
     for result in fs::read_dir("images").unwrap() {
       let entry = result.unwrap();
       let path = entry.path();
-      if path.extension() == Some(OsStr::new(".actual-memory.png")) {
+      if path
+        .file_name()
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .ends_with(".actual-memory.png")
+      {
         fs::remove_file(path).unwrap();
       }
     }
@@ -437,6 +440,11 @@ image_test! {
 image_test! {
   name: x_wrap,
   program: "x apply scale:0.5 wrap identity all apply save",
+}
+
+image_test! {
+  name: debug_operation,
+  program: "debug apply save",
 }
 
 image_test! {

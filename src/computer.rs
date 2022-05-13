@@ -89,17 +89,16 @@ impl Computer {
         let v = if self.wrap { v.wrap() } else { v };
         let i = v.pixel(self.dimensions());
         if self.mask.is_masked(self.dimensions(), i, v) {
-          let over = self.operation.apply(
-            if i.x >= 0
-              && i.y >= 0
-              && i.x < self.memory.ncols() as isize
-              && i.y < self.memory.nrows() as isize
-            {
-              self.memory[(i.y as usize, i.x as usize)]
-            } else {
-              self.default
-            },
-          );
+          let input = if i.x >= 0
+            && i.y >= 0
+            && i.x < self.memory.ncols() as isize
+            && i.y < self.memory.nrows() as isize
+          {
+            self.memory[(i.y as usize, i.x as usize)]
+          } else {
+            self.default
+          };
+          let over = self.operation.apply(v, input);
           let over = over.map(|c| c as f64);
           let under = self.memory[(row, col)];
           let under = under.map(|c| c as f64);
