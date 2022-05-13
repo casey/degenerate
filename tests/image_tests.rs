@@ -438,3 +438,8 @@ image_test! {
   name: x_wrap,
   program: "x apply scale:0.5 wrap identity all apply save",
 }
+
+image_test! {
+  name: double_x_apply_bug,
+  program: "resize:512:256 x apply apply save",
+}
