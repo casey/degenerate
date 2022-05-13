@@ -125,6 +125,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "console_log"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "501a375961cef1a0d44767200e66e4a559283097e91d0730b1d75dfb2f8a1494"
+dependencies = [
+ "log",
+ "web-sys",
+]
+
+[[package]]
 name = "crc32fast"
 version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -206,12 +216,14 @@ dependencies = [
  "atty",
  "camino",
  "console_error_panic_hook",
+ "console_log",
  "dirs",
  "executable-path",
  "getrandom",
  "image",
  "indoc",
  "js-sys",
+ "log",
  "nalgebra",
  "num-traits",
  "pretty_assertions",

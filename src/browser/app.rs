@@ -1,7 +1,8 @@
 use super::*;
 
 pub(crate) struct App {
-  animation_frame_callback: Option<Closure<dyn FnMut()>>,
+  animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
+  animation_frame_pending: bool,
   canvas: HtmlCanvasElement,
   display: Display,
   input: bool,
@@ -34,6 +35,7 @@ impl App {
 
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
+      animation_frame_pending: false,
       canvas,
       display: Display { context },
       input: false,
@@ -45,11 +47,12 @@ impl App {
     }));
 
     let local = app.clone();
-    app.lock().unwrap().animation_frame_callback = Some(Closure::wrap(Box::new(move || {
+    app.lock().unwrap().animation_frame_callback = Some(Closure::wrap(Box::new(move |timestamp| {
       let mut app = local.lock().unwrap();
-      let result = app.on_animation_frame();
+      let result = app.on_animation_frame(timestamp);
       app.stderr.update(result);
-    }) as Box<dyn FnMut()>));
+    })
+      as Box<dyn FnMut(f64)>));
 
     let local = app.clone();
     window.add_event_listener("resize", move || {
@@ -79,7 +82,11 @@ impl App {
     Ok(())
   }
 
-  fn request_animation_frame(&self) -> Result {
+  fn request_animation_frame(&mut self) -> Result {
+    if self.animation_frame_pending {
+      return Ok(());
+    }
+
     self
       .window
       .request_animation_frame(
@@ -92,10 +99,15 @@ impl App {
           .unwrap(),
       )
       .map_err(|err| format!("`window.requestAnimationFrame` failed: {:?}", err))?;
+
+    self.animation_frame_pending = true;
+
     Ok(())
   }
 
-  fn on_animation_frame(&mut self) -> Result {
+  fn on_animation_frame(&mut self, timestamp: f64) -> Result {
+    log::trace!("Animation frame timestamp {}s", timestamp);
+
     if self.resize {
       let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
       let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
@@ -121,6 +133,8 @@ impl App {
       self.nav.set_class_name("fade-out");
       Computer::run(&self.display, self.textarea.value().split_whitespace())?;
     }
+
+    self.animation_frame_pending = false;
 
     Ok(())
   }
