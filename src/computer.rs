@@ -80,15 +80,16 @@ impl Computer {
 
   fn apply(&mut self) -> Result {
     let similarity = self.similarity.inverse();
+    let dimensions = self.dimensions();
     let mut output = self.memory.clone();
     for col in 0..self.memory.ncols() {
       for row in 0..self.memory.nrows() {
         let i = Vector2::new(col, row);
-        let v = self.viewport.coordinates(self.dimensions(), i);
+        let v = self.viewport.coordinates(dimensions, i);
         let v = similarity * v;
         let v = if self.wrap { v.wrap() } else { v };
-        let i = v.pixel(self.dimensions());
-        if self.mask.is_masked(self.dimensions(), i, v) {
+        let i = v.pixel(dimensions);
+        if self.mask.is_masked(dimensions, i, v) {
           let input = if i.x >= 0
             && i.y >= 0
             && i.x < self.memory.ncols() as isize
