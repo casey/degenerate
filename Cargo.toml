@@ -37,6 +37,7 @@ strum = { version = "0.24.0", features = ["derive"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 console_error_panic_hook = "0.1.7"
+# Keep this in sync with `.github/workflows/ci.yaml`
 wasm-bindgen = "0.2.80"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.web-sys]
