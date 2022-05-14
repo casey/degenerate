@@ -158,19 +158,26 @@ impl Computer {
         self.loop_counter += 1;
       }
       Command::Open(path) => {
-        process::Command::new(
-          env::var("DEGENERATE_OPEN_COMMAND").unwrap_or(
-            if cfg!(target_os = "macos") {
-              "open".to_string()
-            } else if cfg!(target_os = "linux") {
-              "xdg-open".to_string()
-            } else {
-              return Err("Please supply an open command by setting the `DEGENERATE_OPEN_COMMAND` environment variable".into())
-            }
+        let open_command = if let Some(open_command) = env::var_os("DEGENERATE_OPEN_COMMAND") {
+          open_command
+        } else {
+          if cfg!(target_os = "macos") {
+            "open".into()
+          } else if cfg!(target_os = "linux") {
+            "xdg-open".into()
+          } else if cfg!(target_os = "windows") {
+            "explorer".into()
+          } else {
+            return Err("Please supply an open command by setting the `DEGENERATE_OPEN_COMMAND` environment variable".into());
+          }
+        };
+        process::Command::new(open_command)
+          .arg(
+            path
+              .as_deref()
+              .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
           )
-        )
-        .arg(path.as_deref().unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()))
-        .spawn()?;
+          .spawn()?;
       }
       Command::Mask(mask) => self.mask = mask,
       Command::Operation(operation) => self.operation = operation,
