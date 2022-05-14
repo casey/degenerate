@@ -4,7 +4,7 @@ use {
     viewport::Viewport, wrap::Wrap,
   },
   image::{ImageBuffer, RgbImage},
-  nalgebra::{DMatrix, Rotation3, Similarity2, UnitComplex, Vector2, Vector3},
+  nalgebra::{DMatrix, Matrix3, Point2, Rotation3, Similarity2, UnitComplex, Vector2, Vector3},
   rand::Rng,
   rand::{rngs::StdRng, SeedableRng},
   std::{

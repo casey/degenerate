@@ -81,14 +81,18 @@ impl Computer {
   fn apply(&mut self) -> Result {
     let similarity = self.similarity.inverse();
     let dimensions = self.dimensions();
+    let transform = self.viewport.transform(dimensions);
+    let inverse = transform.try_inverse().unwrap();
     let mut output = self.memory.clone();
     for col in 0..self.memory.ncols() {
       for row in 0..self.memory.nrows() {
-        let i = Vector2::new(col, row);
-        let v = self.viewport.coordinates(dimensions, i);
-        let v = similarity * v;
+        let i = Point2::new(col as f64, row as f64);
+        let v = transform.transform_point(&i);
+        let v = similarity.transform_point(&v);
         let v = if self.wrap { v.wrap() } else { v };
-        let i = self.viewport.pixel(dimensions, v);
+        let i = inverse
+          .transform_point(&v)
+          .map(|element| element.round() as isize);
         if self.mask.is_masked(dimensions, i, v) {
           let input = if i.x >= 0
             && i.y >= 0
