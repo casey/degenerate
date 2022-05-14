@@ -1,14 +1,15 @@
 use {
   self::{
     add_event_listener::AddEventListener, app::App, cast::Cast, get_document::GetDocument,
-    select::Select, stderr::Stderr, window::window,
+    js_value_error::JsValueError, select::Select, stderr::Stderr, window::window,
   },
   super::*,
   std::{
+    fmt::{self, Formatter},
     ops::Deref,
     sync::{Arc, Mutex},
   },
-  wasm_bindgen::{closure::Closure, JsCast},
+  wasm_bindgen::{closure::Closure, JsCast, JsValue},
   web_sys::{
     CanvasRenderingContext2d, Document, Element, EventTarget, HtmlCanvasElement, HtmlElement,
     HtmlTextAreaElement, Window,
@@ -22,6 +23,7 @@ mod app;
 mod cast;
 mod display;
 mod get_document;
+mod js_value_error;
 mod select;
 mod stderr;
 mod window;

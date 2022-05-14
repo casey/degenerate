@@ -29,7 +29,7 @@ impl App {
 
     let context = canvas
       .get_context("2d")
-      .map_err(|err| format!("`canvas.get_context(\"2d\")` failed: {:?}", err))?
+      .map_err(JsValueError)?
       .ok_or_else(|| format!("failed to retrieve context"))?
       .cast::<CanvasRenderingContext2d>()?;
 
@@ -98,7 +98,7 @@ impl App {
           .dyn_ref()
           .unwrap(),
       )
-      .map_err(|err| format!("`window.requestAnimationFrame` failed: {:?}", err))?;
+      .map_err(JsValueError)?;
 
     self.animation_frame_pending = true;
 
