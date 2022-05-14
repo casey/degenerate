@@ -160,16 +160,14 @@ impl Computer {
       Command::Open(path) => {
         let open_command = if let Some(open_command) = env::var_os("DEGENERATE_OPEN_COMMAND") {
           open_command
+        } else if cfg!(target_os = "macos") {
+          "open".into()
+        } else if cfg!(target_os = "linux") {
+          "xdg-open".into()
+        } else if cfg!(target_os = "windows") {
+          "explorer".into()
         } else {
-          if cfg!(target_os = "macos") {
-            "open".into()
-          } else if cfg!(target_os = "linux") {
-            "xdg-open".into()
-          } else if cfg!(target_os = "windows") {
-            "explorer".into()
-          } else {
-            return Err("Please supply an open command by setting the `DEGENERATE_OPEN_COMMAND` environment variable".into());
-          }
+          return Err("Please supply an open command by setting the `DEGENERATE_OPEN_COMMAND` environment variable".into());
         };
         process::Command::new(open_command)
           .arg(
