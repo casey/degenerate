@@ -1,7 +1,6 @@
 use {
-  async_std::task, base64::decode, chromiumoxide::browser::BrowserConfig,
-  executable_path::executable_path, futures::StreamExt, image::io::Reader as ImageReader,
-  std::process::Command, tempfile::TempDir,
+  chromiumoxide::browser::BrowserConfig, futures::StreamExt, image::io::Reader as ImageReader,
+  tokio::task,
 };
 
 const URL: &'static str = "https://degenerate.computer";
@@ -10,7 +9,7 @@ type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 struct Browser {
   inner: chromiumoxide::Browser,
-  _handle: task::JoinHandle<()>,
+  handle: task::JoinHandle<()>,
 }
 
 impl Browser {
@@ -28,28 +27,34 @@ impl Browser {
       }
     });
 
-    Ok(Browser {
-      inner,
-      _handle: handle,
-    })
+    Ok(Browser { inner, handle })
   }
 }
 
-struct Test<'a> {
-  env_vars: Vec<(&'a str, &'a str)>,
-  program: String,
-  tempdir: TempDir,
+impl Drop for Browser {
+  fn drop(&mut self) {
+    self.handle.abort();
+  }
 }
 
-impl<'a> Test<'a> {
-  fn new() -> Result<Self> {
-    let tempdir = TempDir::new()?;
+struct Test {
+  filename: String,
+  program: String,
+}
 
-    Ok(Self {
-      env_vars: Vec::new(),
+impl Test {
+  fn new() -> Self {
+    Self {
+      filename: String::new(),
       program: String::new(),
-      tempdir,
-    })
+    }
+  }
+
+  fn filename(self, filename: impl AsRef<str>) -> Self {
+    Self {
+      filename: filename.as_ref().to_owned(),
+      ..self
+    }
   }
 
   fn program(self, program: impl AsRef<str>) -> Self {
@@ -59,58 +64,38 @@ impl<'a> Test<'a> {
     }
   }
 
-  fn command(&self) -> Result {
-    let mut command = Command::new(executable_path("degenerate"));
-
-    command
-      .envs(self.env_vars.iter().cloned())
-      .current_dir(&self.tempdir)
-      .args(self.program.split_whitespace())
-      .spawn()?;
-
-    Ok(())
-  }
-
   async fn run(&self) -> Result {
     let page = Browser::new().await?.inner.new_page(URL).await?;
 
     page
-      .find_elements("textarea")
+      .evaluate(format!(
+        "document.getElementsByTagName('textarea')[0].innerHTML = '{}'",
+        self.program
+      ))
       .await?
-      .first()
-      .ok_or("Could not find `textarea` element")?
-      .click()
-      .await?
-      .type_str(self.program.clone())
-      .await?;
+      .into_value::<String>()?;
 
     let data_url = page
       .evaluate("document.getElementsByTagName('canvas')[0].toDataURL()")
       .await?
       .into_value::<String>()?;
 
-    let have = image::load_from_memory(&decode(&data_url[22..])?)?;
+    eprintln!("testing");
 
-    self.command()?;
-
-    let want = ImageReader::open(self.tempdir.path().join("memory.png"))
-      .unwrap()
-      .decode()?;
-
-    assert_eq!(have, want);
+    assert_eq!(
+      image::load_from_memory(&base64::decode(&data_url[22..])?)?,
+      ImageReader::open(format!("images/{}.png", self.filename))?.decode()?
+    );
 
     Ok(())
   }
 }
 
-#[test]
-fn circle() {
-  task::block_on(async {
-    Test::new()
-      .unwrap()
-      .program("circle apply save")
-      .run()
-      .await
-      .unwrap();
-  })
+#[tokio::test]
+async fn circle() -> Result {
+  Test::new()
+    .filename("circle")
+    .program("circle apply save")
+    .run()
+    .await
 }
