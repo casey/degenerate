@@ -71,10 +71,8 @@ impl Viewport {
       Self::Stretch => coordinates,
     };
 
-    Vector2::new(
-      ((stretch.x + 1.0) / 2.0 * dimensions.x as f64 - 0.5).round() as isize,
-      ((stretch.y + 1.0) / 2.0 * dimensions.y as f64 - 0.5).round() as isize,
-    )
+    (((stretch + Vector2::from_element(1.0)) / 2.0).component_mul(&d) - Vector2::from_element(0.5))
+      .map(|element| element.round() as isize)
   }
 }
 
