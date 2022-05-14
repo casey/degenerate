@@ -70,7 +70,7 @@ jobs:
     - name: Install `wasm-bindgen`
       uses: jetli/wasm-bindgen-action@v0.1.0
       with:
-        # Keep this in sync with `Cargo.toml`
+        # keep in sync with `Cargo.toml`
         version: 0.2.80
 
     - name: Build WASM
