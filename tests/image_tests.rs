@@ -453,46 +453,46 @@ image_test! {
 }
 
 image_test! {
-  name: double_x_apply_bug_fill_landscape,
+  name: double_apply_fill_landscape,
   program: "resize:512:256 fill x apply apply save",
 }
 
 image_test! {
-  name: double_x_apply_bug_fit_landscape,
+  name: double_apply_fit_landscape,
   program: "resize:512:256 fit x apply apply save",
 }
 
 image_test! {
-  name: double_x_apply_bug_stretch_landscape,
+  name: double_apply_stretch_landscape,
   program: "resize:512:256 stretch x apply apply save",
 }
 
 image_test! {
-  name: double_x_apply_bug_fill_portrait,
+  name: double_apply_fill_portrait,
   program: "resize:256:512 fill x apply apply save",
 }
 
 image_test! {
-  name: double_x_apply_bug_fit_portrait,
+  name: double_apply_fit_portrait,
   program: "resize:256:512 fit x apply apply save",
 }
 
 image_test! {
-  name: double_x_apply_bug_stretch_portrait,
+  name: double_apply_stretch_portrait,
   program: "resize:256:512 stretch x apply apply save",
 }
 
 image_test! {
-  name: double_x_apply_bug_fill_square,
+  name: double_apply_fill_square,
   program: "fill x apply apply save",
 }
 
 image_test! {
-  name: double_x_apply_bug_fit_square,
+  name: double_apply_fit_square,
   program: "fit x apply apply save",
 }
 
 image_test! {
-  name: double_x_apply_bug_stretch_square,
+  name: double_apply_stretch_square,
   program: "stretch x apply apply save",
 }
