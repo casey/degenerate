@@ -158,8 +158,8 @@ impl Computer {
         self.loop_counter += 1;
       }
       Command::Open(path) => {
-        let open_command = if let Some(open_command) = env::var_os("DEGENERATE_OPEN_COMMAND") {
-          open_command
+        let command = if let Some(command) = env::var_os("DEGENERATE_OPEN_COMMAND") {
+          command
         } else if cfg!(target_os = "macos") {
           "open".into()
         } else if cfg!(target_os = "linux") {
@@ -169,7 +169,7 @@ impl Computer {
         } else {
           return Err("Please supply an open command by setting the `DEGENERATE_OPEN_COMMAND` environment variable".into());
         };
-        process::Command::new(open_command)
+        process::Command::new(command)
           .arg(
             path
               .as_deref()
