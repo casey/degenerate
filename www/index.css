@@ -82,6 +82,7 @@ samp {
   width: 100%;
   z-index: 2;
   padding: 1em;
+  box-sizing: border-box;
 }
 
 textarea {
@@ -97,6 +98,8 @@ textarea {
   border: 0;
   padding: 1em;
   outline: none;
+  box-sizing: border-box;
+  resize: none;
 }
 
 .fade-out {
