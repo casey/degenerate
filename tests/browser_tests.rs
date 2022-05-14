@@ -1,9 +1,13 @@
 use {
-  chromiumoxide::browser::BrowserConfig, futures::StreamExt, image::io::Reader as ImageReader,
+  chromiumoxide::browser::BrowserConfig,
+  chromiumoxide::cdp::browser_protocol::log::EventEntryAdded,
+  futures::StreamExt,
+  image::io::Reader as ImageReader,
+  std::{thread::sleep, time::Duration},
   tokio::task,
 };
 
-const URL: &'static str = "https://degenerate.computer";
+const URL: &'static str = "http://localhost:8001";
 
 type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -65,27 +69,57 @@ impl Test {
   }
 
   async fn run(&self) -> Result {
-    let page = Browser::new().await?.inner.new_page(URL).await?;
+    eprintln!("Launching browser...");
+
+    let browser = Browser::new().await?;
+
+    eprintln!("Creating page...");
+
+    let page = browser.inner.new_page(URL).await?;
+
+    eprintln!("Setting event listener...");
+
+    let mut events = page.event_listener::<EventEntryAdded>().await?;
+
+    eprintln!("Logging to console...");
 
     page
-      .evaluate(format!(
-        "document.getElementsByTagName('textarea')[0].innerHTML = '{}'",
-        self.program
-      ))
+      .evaluate("console.log('foo')")
+      .await?;
+
+    eprintln!("Setting text on textarea...");
+
+    page
+      .find_elements("textarea")
       .await?
-      .into_value::<String>()?;
+      .first()
+      .ok_or("Could not find textarea")?
+      .click()
+      .await?
+      .type_str(self.program.clone())
+      .await?;
+
+    sleep(Duration::from_secs(10));
+
+    eprintln!("Going through event entries...");
+
+    while let Some(event) = events.next().await {
+      eprintln!("{:?}", event);
+    }
+
+    eprintln!("Grabbing data url from canvas...");
 
     let data_url = page
       .evaluate("document.getElementsByTagName('canvas')[0].toDataURL()")
       .await?
       .into_value::<String>()?;
 
-    eprintln!("testing");
+    let have = image::load_from_memory(&base64::decode(&data_url[22..])?)?;
+    have.save("actual-image.png")?;
 
-    assert_eq!(
-      image::load_from_memory(&base64::decode(&data_url[22..])?)?,
-      ImageReader::open(format!("images/{}.png", self.filename))?.decode()?
-    );
+    let want = ImageReader::open(format!("images/{}.png", self.filename))?.decode()?;
+
+    assert_eq!(have, want);
 
     Ok(())
   }
