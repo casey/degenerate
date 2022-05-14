@@ -9,7 +9,7 @@ impl<V: JsCast + std::fmt::Debug> Cast for V {
     Ok(
       self
         .dyn_into::<T>()
-        .map_err(|err| format!("`cast` failed: {:?}", err))?,
+        .map_err(|value| format!("`cast` failed for value: {:?}", value))?,
     )
   }
 }
