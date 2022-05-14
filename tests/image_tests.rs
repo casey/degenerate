@@ -448,6 +448,11 @@ image_test! {
 }
 
 image_test! {
+  name: debug_operation_landscape,
+  program: "resize:512:256 debug apply save",
+}
+
+image_test! {
   name: double_x_apply_bug_fill_landscape,
   program: "resize:512:256 fill x apply apply save",
 }

@@ -47,9 +47,33 @@ impl Viewport {
     dimensions: Vector2<usize>,
     coordinates: Vector2<f64>,
   ) -> Vector2<isize> {
+    let d = dimensions.map(|element| element as f64);
+
+    let aspect = d.x / d.y;
+
+    let landscape = d.x > d.y;
+
+    let stretch = match self {
+      Self::Fill => {
+        if landscape {
+          Vector2::new(coordinates.x, coordinates.y * aspect)
+        } else {
+          Vector2::new(coordinates.x / aspect, coordinates.y)
+        }
+      }
+      Self::Fit => {
+        if landscape {
+          Vector2::new(coordinates.x / aspect, coordinates.y)
+        } else {
+          Vector2::new(coordinates.x, coordinates.y * aspect)
+        }
+      }
+      Self::Stretch => coordinates,
+    };
+
     Vector2::new(
-      ((coordinates.x + 1.0) / 2.0 * dimensions.x as f64 - 0.5).round() as isize,
-      ((coordinates.y + 1.0) / 2.0 * dimensions.y as f64 - 0.5).round() as isize,
+      ((stretch.x + 1.0) / 2.0 * dimensions.x as f64 - 0.5).round() as isize,
+      ((stretch.y + 1.0) / 2.0 * dimensions.y as f64 - 0.5).round() as isize,
     )
   }
 }
