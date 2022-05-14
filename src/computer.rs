@@ -80,26 +80,26 @@ impl Computer {
 
   fn apply(&mut self) -> Result {
     let similarity = self.similarity.inverse();
+    let dimensions = self.dimensions();
     let mut output = self.memory.clone();
     for col in 0..self.memory.ncols() {
       for row in 0..self.memory.nrows() {
         let i = Vector2::new(col, row);
-        let v = self.viewport.coordinates(self.dimensions(), i);
+        let v = self.viewport.coordinates(dimensions, i);
         let v = similarity * v;
         let v = if self.wrap { v.wrap() } else { v };
-        let i = v.pixel(self.dimensions());
-        if self.mask.is_masked(self.dimensions(), i, v) {
-          let over = self.operation.apply(
-            if i.x >= 0
-              && i.y >= 0
-              && i.x < self.memory.ncols() as isize
-              && i.y < self.memory.nrows() as isize
-            {
-              self.memory[(i.y as usize, i.x as usize)]
-            } else {
-              self.default
-            },
-          );
+        let i = self.viewport.pixel(dimensions, v);
+        if self.mask.is_masked(dimensions, i, v) {
+          let input = if i.x >= 0
+            && i.y >= 0
+            && i.x < self.memory.ncols() as isize
+            && i.y < self.memory.nrows() as isize
+          {
+            self.memory[(i.y as usize, i.x as usize)]
+          } else {
+            self.default
+          };
+          let over = self.operation.apply(v, input);
           let over = over.map(|c| c as f64);
           let under = self.memory[(row, col)];
           let under = under.map(|c| c as f64);

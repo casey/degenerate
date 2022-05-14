@@ -2,14 +2,20 @@ use super::*;
 
 #[derive(Copy, Clone, Debug)]
 pub(crate) enum Operation {
+  Debug,
   Identity,
   Invert,
   RotateColor(ColorAxis, f64),
 }
 
 impl Operation {
-  pub(crate) fn apply(self, element: Vector3<u8>) -> Vector3<u8> {
+  pub(crate) fn apply(self, coordinates: Vector2<f64>, element: Vector3<u8>) -> Vector3<u8> {
     match self {
+      Self::Debug => Vector3::new(
+        ((coordinates.x + 1.0) / 2.0 * 255.0) as u8 & 0b11110000,
+        0,
+        ((coordinates.y + 1.0) / 2.0 * 255.0) as u8 & 0b11110000,
+      ),
       Self::Identity => element,
       Self::Invert => element.map(|scalar| !scalar),
       Self::RotateColor(axis, turns) => {

@@ -1,7 +1,4 @@
-use {
-  super::*,
-  std::{ffi::OsStr, sync::Once},
-};
+use {super::*, std::sync::Once};
 
 macro_rules! image_test {
   (name: $name:ident, program: $program:literal $(,)?) => {
@@ -27,7 +24,13 @@ fn image_test(name: &str, program: &str) -> Result {
     for result in fs::read_dir("images").unwrap() {
       let entry = result.unwrap();
       let path = entry.path();
-      if path.extension() == Some(OsStr::new(".actual-memory.png")) {
+      if path
+        .file_name()
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .ends_with(".actual-memory.png")
+      {
         fs::remove_file(path).unwrap();
       }
     }
@@ -437,4 +440,64 @@ image_test! {
 image_test! {
   name: x_wrap,
   program: "x apply scale:0.5 wrap identity all apply save",
+}
+
+image_test! {
+  name: debug_operation,
+  program: "debug apply save",
+}
+
+image_test! {
+  name: debug_operation_landscape,
+  program: "resize:512:256 debug apply save",
+}
+
+image_test! {
+  name: double_apply_fill_landscape,
+  program: "resize:512:256 fill x apply apply save",
+}
+
+image_test! {
+  name: double_apply_fit_landscape,
+  program: "resize:512:256 fit x apply apply save",
+}
+
+image_test! {
+  name: double_apply_stretch_landscape,
+  program: "resize:512:256 stretch x apply apply save",
+}
+
+image_test! {
+  name: double_apply_fill_portrait,
+  program: "resize:256:512 fill x apply apply save",
+}
+
+image_test! {
+  name: double_apply_fit_portrait,
+  program: "resize:256:512 fit x apply apply save",
+}
+
+image_test! {
+  name: double_apply_stretch_portrait,
+  program: "resize:256:512 stretch x apply apply save",
+}
+
+image_test! {
+  name: double_apply_fill_square,
+  program: "fill x apply apply save",
+}
+
+image_test! {
+  name: double_apply_fit_square,
+  program: "fit x apply apply save",
+}
+
+image_test! {
+  name: double_apply_stretch_square,
+  program: "stretch x apply apply save",
+}
+
+image_test! {
+  name: double_apply_with_scale,
+  program: "resize:512:256 scale:0.5 x apply apply save",
 }

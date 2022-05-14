@@ -40,6 +40,7 @@ impl FromStr for Command {
       ["circle"] => Ok(Self::Mask(Mask::Circle)),
       ["comment", ..] => Ok(Self::Comment),
       ["cross"] => Ok(Self::Mask(Mask::Cross)),
+      ["debug"] => Ok(Self::Operation(Operation::Debug)),
       ["default", r, g, b] => Ok(Self::Default(Vector3::new(
         r.parse()?,
         g.parse()?,
