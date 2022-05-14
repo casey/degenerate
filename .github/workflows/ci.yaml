@@ -19,8 +19,9 @@ jobs:
     strategy:
       matrix:
         os:
-        - ubuntu-latest
         - macos-latest
+        - ubuntu-latest
+        - windows-latest
 
     runs-on: ${{ matrix.os }}
 
@@ -44,7 +45,7 @@ jobs:
         cargo update --locked --package degenerate
 
     - name: Test
-      run: cargo test --all -- --include-ignored
+      run: cargo test --all --release -- --include-ignored
 
     - name: Clippy
       run: cargo clippy --all --all-targets
