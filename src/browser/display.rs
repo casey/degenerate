@@ -18,12 +18,12 @@ impl Display {
       wasm_bindgen::Clamped(&pixels),
       memory.ncols().try_into()?,
     )
-    .map_err(|err| format!("failed to create image data: {:?}", err))?;
+    .map_err(JsValueError)?;
 
     self
       .context
       .put_image_data(&image_data, 0.0, 0.0)
-      .map_err(|err| format!("failed to put image data: {:?}", err))?;
+      .map_err(JsValueError)?;
 
     Ok(())
   }
