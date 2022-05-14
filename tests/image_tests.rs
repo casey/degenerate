@@ -496,3 +496,8 @@ image_test! {
   name: double_apply_stretch_square,
   program: "stretch x apply apply save",
 }
+
+image_test! {
+  name: double_apply_with_scale,
+  program: "resize:512:256 scale:0.5 x apply apply save",
+}
