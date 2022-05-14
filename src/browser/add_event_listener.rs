@@ -10,7 +10,7 @@ impl<T: Deref<Target = EventTarget>> AddEventListener for T {
     self
       .deref()
       .add_event_listener_with_callback(event, &closure.as_ref().dyn_ref().unwrap())
-      .map_err(|err| format!("Failed to set event listener: {:?}", err))?;
+      .map_err(JsValueError)?;
     closure.forget();
     Ok(())
   }
