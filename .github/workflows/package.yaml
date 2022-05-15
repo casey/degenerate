@@ -96,9 +96,14 @@ jobs:
         TARGET_RUSTFLAGS: ${{ matrix.target_rustflags }}
       run: ./bin/package
 
-    - name: Prerelease Check
-      id: is_prerelease
-      run: cargo run --package prerelease -- --reference ${{ github.ref }}
+    - name: Release Check
+      id: release
+      run: |
+        if [[ '${{ github.ref }}' =~ '^refs/tags/[[:digit:]]+[.][[:digit:]]+[.][[:digit:]]+$' ]]; then
+          echo "::set-output name=value::true"
+        else
+          echo "::set-output name=value::false"
+        fi
 
     - name: Publish
       uses: softprops/action-gh-release@v0.1.5
@@ -106,6 +111,6 @@ jobs:
       with:
         draft: false
         files: ${{ steps.package.outputs.archive }}
-        prerelease: ${{ steps.is_prerelease.outputs.value }}
+        prerelease: ${{ !steps.release.outputs.value }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
