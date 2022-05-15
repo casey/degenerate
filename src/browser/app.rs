@@ -5,12 +5,14 @@ pub(crate) struct App {
   animation_frame_pending: bool,
   canvas: HtmlCanvasElement,
   display: Display,
+  program: Vec<Command>,
   input: bool,
   nav: HtmlElement,
   resize: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
   window: Window,
+  computer: Computer,
 }
 
 impl App {
@@ -44,6 +46,8 @@ impl App {
       stderr: stderr.clone(),
       textarea: textarea.clone(),
       window: window.clone(),
+      computer: Computer::new(),
+      program: Vec::new(),
     }));
 
     let local = app.clone();
@@ -133,9 +137,27 @@ impl App {
 
     if self.input {
       self.nav.set_class_name("fade-out");
-      let program = self.textarea.value();
-      log::trace!("Program: {}", program);
-      Computer::run(&self.display, program.split_whitespace())?;
+
+      let program = self
+        .textarea
+        .value()
+        .split_whitespace()
+        .into_iter()
+        .map(Command::from_str)
+        .collect::<Result<Vec<Command>>>()?;
+
+      log::trace!("Program: {:?}", program);
+
+      if program != self.program {
+        self.computer = Computer::with_program(&program);
+        self.program = program;
+      }
+
+      self.computer.step(&self.display)?;
+
+      if !self.computer.done() {
+        self.request_animation_frame()?;
+      }
     }
 
     Ok(())

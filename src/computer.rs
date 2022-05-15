@@ -46,7 +46,31 @@ impl Computer {
     Ok(())
   }
 
-  fn new() -> Self {
+  pub(crate) fn step(&mut self, display: &Display) -> Result {
+    while let Some(command) = self.program.get(self.program_counter).cloned() {
+      if self.verbose {
+        eprintln!(
+          "PC {} LC {} M {:?} C {:?}",
+          self.program_counter, self.loop_counter, self.mask, command,
+        );
+      }
+      self.execute(command.clone())?;
+      self.program_counter = self.program_counter.wrapping_add(1);
+
+      if command == Command::Apply {
+        display.render(&self.memory)?;
+        break;
+      }
+    }
+
+    Ok(())
+  }
+
+  pub(crate) fn done(&self) -> bool {
+    self.program_counter >= self.program.len()
+  }
+
+  pub(crate) fn with_program(program: &[Command]) -> Self {
     Self {
       alpha: 1.0,
       autosave: false,
@@ -56,7 +80,7 @@ impl Computer {
       mask: Mask::All,
       memory: DMatrix::zeros(0, 0),
       operation: Operation::Invert,
-      program: Vec::new(),
+      program: program.into(),
       program_counter: 0,
       rng: StdRng::seed_from_u64(0),
       similarity: Similarity2::identity(),
@@ -64,6 +88,10 @@ impl Computer {
       wrap: false,
       viewport: Viewport::Fill,
     }
+  }
+
+  pub(crate) fn new() -> Self {
+    Self::with_program(&[])
   }
 
   fn autosave(&mut self) -> Result {
