@@ -47,6 +47,10 @@ impl Computer {
   }
 
   pub(crate) fn step(&mut self, display: &Display) -> Result {
+    if self.program_counter == 0 {
+      self.resize(display.dimensions()?);
+    }
+
     while let Some(command) = self.program.get(self.program_counter).cloned() {
       if self.verbose {
         eprintln!(
