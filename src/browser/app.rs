@@ -149,14 +149,20 @@ impl App {
       log::trace!("Program: {:?}", program);
 
       if program != self.program {
-        self.computer = Computer::with_program(&program);
+        let mut computer = Computer::new();
+        computer.load_program(&program);
+        computer.resize(self.display.dimensions()?);
+        self.computer = computer;
         self.program = program;
       }
 
-      self.computer.step(&self.display)?;
-
       if !self.computer.done() {
-        self.request_animation_frame()?;
+        self.computer.run(true)?;
+        self.computer.render(&self.display)?;
+
+        if !self.computer.done() {
+          self.request_animation_frame()?;
+        }
       }
     }
 

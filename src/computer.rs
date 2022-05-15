@@ -21,36 +21,7 @@ pub(crate) struct Computer {
 }
 
 impl Computer {
-  pub(crate) fn run(display: &Display, words: impl IntoIterator<Item = impl AsRef<str>>) -> Result {
-    let mut computer = Self::new();
-
-    computer.resize(display.dimensions()?);
-
-    for arg in words {
-      computer.program.push(arg.as_ref().parse()?);
-    }
-
-    while let Some(command) = computer.program.get(computer.program_counter).cloned() {
-      if computer.verbose {
-        eprintln!(
-          "PC {} LC {} M {:?} C {:?}",
-          computer.program_counter, computer.loop_counter, computer.mask, command,
-        );
-      }
-      computer.execute(command)?;
-      computer.program_counter = computer.program_counter.wrapping_add(1);
-    }
-
-    display.render(&computer.memory)?;
-
-    Ok(())
-  }
-
-  pub(crate) fn step(&mut self, display: &Display) -> Result {
-    if self.program_counter == 0 {
-      self.resize(display.dimensions()?);
-    }
-
+  pub(crate) fn run(&mut self, iterative: bool) -> Result {
     while let Some(command) = self.program.get(self.program_counter).cloned() {
       if self.verbose {
         eprintln!(
@@ -61,8 +32,7 @@ impl Computer {
       self.execute(command.clone())?;
       self.program_counter = self.program_counter.wrapping_add(1);
 
-      if command == Command::Apply {
-        display.render(&self.memory)?;
+      if iterative && command == Command::Apply {
         break;
       }
     }
@@ -70,11 +40,20 @@ impl Computer {
     Ok(())
   }
 
+  pub(crate) fn render(&self, display: &Display) -> Result {
+    display.render(&self.memory)
+  }
+
   pub(crate) fn done(&self) -> bool {
     self.program_counter >= self.program.len()
   }
 
-  pub(crate) fn with_program(program: &[Command]) -> Self {
+  pub(crate) fn load_program(&mut self, program: &[Command]) {
+    self.program = program.into();
+    self.program_counter = 0;
+  }
+
+  pub(crate) fn new() -> Self {
     Self {
       alpha: 1.0,
       autosave: false,
@@ -84,7 +63,7 @@ impl Computer {
       mask: Mask::All,
       memory: DMatrix::zeros(0, 0),
       operation: Operation::Invert,
-      program: program.into(),
+      program: Vec::new(),
       program_counter: 0,
       rng: StdRng::seed_from_u64(0),
       similarity: Similarity2::identity(),
@@ -92,10 +71,6 @@ impl Computer {
       wrap: false,
       viewport: Viewport::Fill,
     }
-  }
-
-  pub(crate) fn new() -> Self {
-    Self::with_program(&[])
   }
 
   fn autosave(&mut self) -> Result {
@@ -278,7 +253,7 @@ impl Computer {
     Ok(())
   }
 
-  fn resize(&mut self, dimensions: (usize, usize)) {
+  pub(crate) fn resize(&mut self, dimensions: (usize, usize)) {
     self
       .memory
       .resize_mut(dimensions.0, dimensions.1, self.default)

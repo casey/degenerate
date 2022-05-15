@@ -9,7 +9,7 @@ pub(crate) use display::Display;
 mod display;
 
 pub(crate) fn run() {
-  if let Err(error) = Computer::run(&Display, env::args().skip(1)) {
+  if let Err(error) = run_inner() {
     if let Some(ReadlineError::Eof | ReadlineError::Interrupted) =
       error.downcast_ref::<ReadlineError>()
     {
@@ -32,4 +32,20 @@ pub(crate) fn run() {
 
     process::exit(1);
   }
+}
+
+fn run_inner() -> Result {
+  let program = env::args()
+    .skip(1)
+    .into_iter()
+    .map(|word| word.parse())
+    .collect::<Result<Vec<Command>>>()?;
+
+  let mut computer = Computer::new();
+
+  computer.resize((256, 256));
+  computer.load_program(&program);
+  computer.run(false);
+
+  Ok(())
 }
