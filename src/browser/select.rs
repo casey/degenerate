@@ -9,7 +9,7 @@ impl Select for Document {
     Ok(
       self
         .query_selector(selector)
-        .map_err(|err| format!("`select` failed: {:?}", err))?
+        .map_err(JsValueError)?
         .ok_or_else(|| format!("selector `{}` returned no elements", selector))?,
     )
   }
