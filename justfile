@@ -34,7 +34,7 @@ check-lockfile:
 forbid:
 	./bin/forbid
 
-watch +args='ltest':
+watch +args='ltest --release -- --include-ignored':
 	cargo watch --ignore README.md --clear --exec "{{args}}"
 
 generate: build
