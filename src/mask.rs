@@ -24,11 +24,15 @@ impl Mask {
       Self::Circle => v.coords.norm() < 1.0,
       Self::Cross => v.x.abs() < 0.25 || v.y.abs() < 0.25,
       Self::Mod { divisor, remainder } => {
-        ((pixel.x as usize)
-          .wrapping_mul(dimensions.y)
-          .wrapping_add(pixel.y as usize))
-          % *divisor
-          == *remainder
+        if *divisor == 0 {
+          false
+        } else {
+          ((pixel.x as usize)
+            .wrapping_mul(dimensions.y)
+            .wrapping_add(pixel.y as usize))
+            % *divisor
+            == *remainder
+        }
       }
       Self::Rows { nrows, step } => pixel.y as usize % (nrows.saturating_add(*step)) < *nrows,
       Self::Square => v.coords.abs() < Vector2::new(0.5, 0.5),
