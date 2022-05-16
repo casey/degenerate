@@ -31,7 +31,7 @@ impl App {
     let context = canvas
       .get_context("2d")
       .map_err(JsValueError)?
-      .ok_or_else(|| format!("failed to retrieve context"))?
+      .ok_or("failed to retrieve context")?
       .cast::<CanvasRenderingContext2d>()?;
 
     let app = Arc::new(Mutex::new(Self {
@@ -92,7 +92,7 @@ impl App {
     self
       .window
       .request_animation_frame(
-        &self
+        self
           .animation_frame_callback
           .as_ref()
           .unwrap()
