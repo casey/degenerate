@@ -46,7 +46,7 @@ impl Drop for Browser {
   }
 }
 
-struct Test {
+pub struct Test {
   filename: String,
   program: String,
 }
@@ -95,6 +95,13 @@ impl Test {
 
     sleep(Duration::from_secs(3));
 
+    let errors = page
+      .evaluate("window.errors ?? 0")
+      .await?
+      .into_value::<u32>()?;
+
+    assert_eq!(errors, 0);
+
     eprintln!("Grabbing data url from canvas...");
 
     let data_url = page
@@ -103,23 +110,22 @@ impl Test {
       .into_value::<String>()?;
 
     let have = image::load_from_memory(&base64::decode(&data_url[22..])?)?;
-    have.save("have.png")?;
 
-    let want = ImageReader::open(format!("images/{}.png", self.filename))?
-      .decode()?;
-    want.save("want.png")?;
+    let want = ImageReader::open(format!("images/{}.png", self.filename))?.decode()?;
 
-    assert_eq!(have, want);
+    if have != want {
+      panic!("Images aren't the same");
+    }
 
     Ok(())
   }
 }
 
-#[tokio::test]
-async fn circle() -> Result {
+pub async fn browser_test(name: &str, program: &str) -> Result {
   Test::new()
-    .filename("circle")
-    .program("circle apply")
+    .filename(name)
+    .program(program)
     .run()
     .await
 }
+

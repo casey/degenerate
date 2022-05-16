@@ -1,10 +1,21 @@
 use {super::*, std::sync::Once};
 
+mod browser_tests;
+
 macro_rules! image_test {
   (name: $name:ident, program: $program:literal $(,)?) => {
-    #[test]
-    fn $name() -> Result {
-      image_test(stringify!($name), $program)
+    mod $name {
+      use super::*;
+
+      #[test]
+      fn native() -> Result {
+        image_test(stringify!($name), $program)
+      }
+
+      #[tokio::test]
+      async fn browser() -> Result {
+        browser_tests::browser_test(stringify!($name), $program).await
+      }
     }
   };
 }
