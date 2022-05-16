@@ -7,14 +7,6 @@ macro_rules! image_test {
       image_test(stringify!($name), $program)
     }
   };
-
-  (name: $name:ident, program: $program:literal, ignore: true $(,)?) => {
-    #[test]
-    #[ignore]
-    fn $name() -> Result {
-      image_test(stringify!($name), $program)
-    }
-  };
 }
 
 fn image_test(name: &str, program: &str) -> Result {
@@ -96,13 +88,11 @@ image_test! {
 image_test! {
   name: brilliance,
   program: "x rotate-color:g:0.07 rotate:0.07 for:10 apply loop rotate-color:b:0.09 rotate:0.09 for:10 apply loop save",
-  ignore: true,
 }
 
 image_test! {
   name: carpet,
   program: "circle scale:0.5 for:8 apply wrap loop save",
-  ignore: true,
 }
 
 image_test! {
@@ -118,7 +108,6 @@ image_test! {
 image_test! {
   name: concentric_circles,
   program: "scale:0.99 circle for:100 apply loop save",
-  ignore: true,
 }
 
 image_test! {
@@ -134,19 +123,16 @@ image_test! {
 image_test! {
   name: diamonds,
   program: "rotate:0.3333 rotate-color:g:0.05 circle scale:0.5 wrap for:8 apply loop rotate:0.8333 rotate-color:b:0.05 for:8 apply loop save",
-  ignore: true,
 }
 
 image_test! {
   name: grain,
   program: "rotate:0.111 for:16 square apply circle apply loop save",
-  ignore: true,
 }
 
 image_test! {
   name: kaleidoscope,
   program: "rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate:0.8333 rotate-color:b:0.05 for:8 apply loop save",
-  ignore: true,
 }
 
 image_test! {
@@ -157,13 +143,11 @@ image_test! {
 image_test! {
   name: orbs,
   program: "rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop save",
-  ignore: true,
 }
 
 image_test! {
   name: pattern,
   program: "alpha:0.75 circle scale:0.5 for:8 apply wrap loop save",
-  ignore: true,
 }
 
 image_test! {
@@ -294,7 +278,6 @@ image_test! {
 image_test! {
   name: rug,
   program: "rotate-color:g:0.05 circle scale:0.5 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop save",
-  ignore: true,
 }
 
 image_test! {
@@ -315,7 +298,6 @@ image_test! {
 image_test! {
   name: scale_circle_for,
   program: "circle scale:0.5 for:8 apply loop save",
-  ignore: true,
 }
 
 image_test! {
@@ -341,7 +323,6 @@ image_test! {
 image_test! {
   name: smear,
   program: "seed:19798 rotate-color:g:0.01 rotate:0.01 for:100 random-mask apply loop rotate-color:b:0.01 rotate:0.01 for:100 random-mask apply loop save",
-  ignore: true,
 }
 
 image_test! {
@@ -357,7 +338,6 @@ image_test! {
 image_test! {
   name: starburst,
   program: "seed:12462 rotate-color:g:0.1 rotate:0.1 for:10 random-mask apply loop rotate-color:b:0.1 rotate:0.1 for:10 random-mask apply loop save",
-  ignore: true,
 }
 
 image_test! {
@@ -428,13 +408,11 @@ image_test! {
 image_test! {
   name: x_loop,
   program: "x scale:0.5 for:8 apply wrap loop save",
-  ignore: true,
 }
 
 image_test! {
   name: x_scale,
   program: "x scale:0.5 for:8 apply loop save",
-  ignore: true,
 }
 
 image_test! {
