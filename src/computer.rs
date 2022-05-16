@@ -21,7 +21,7 @@ pub(crate) struct Computer {
 }
 
 impl Computer {
-  pub(crate) fn run(&mut self, iterative: bool) -> Result {
+  pub(crate) fn run(&mut self, incremental: bool) -> Result {
     while let Some(command) = self.program.get(self.program_counter).cloned() {
       if self.verbose {
         eprintln!(
@@ -32,7 +32,7 @@ impl Computer {
       self.execute(command.clone())?;
       self.program_counter = self.program_counter.wrapping_add(1);
 
-      if iterative && command == Command::Apply {
+      if incremental && command == Command::Apply {
         break;
       }
     }
