@@ -112,6 +112,8 @@ impl App {
 
     log::trace!("Animation frame timestamp {}s", timestamp);
 
+    let resize = self.resize;
+
     if self.resize {
       let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
       let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
@@ -146,7 +148,7 @@ impl App {
 
       log::trace!("Program: {:?}", program);
 
-      if program != self.computer.program() {
+      if resize || program != self.computer.program() {
         let mut computer = Computer::new();
         computer.load_program(&program);
 
