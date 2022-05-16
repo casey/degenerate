@@ -96,7 +96,7 @@ impl Computer {
     let similarity = self.similarity.inverse();
     let dimensions = self.dimensions();
     let transform = self.viewport.transform(dimensions);
-    let inverse = transform.try_inverse().unwrap();
+    let inverse = transform.inverse();
     let mut output = self.memory.clone();
     for col in 0..self.memory.ncols() {
       for row in 0..self.memory.nrows() {

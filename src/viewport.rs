@@ -8,7 +8,7 @@ pub(crate) enum Viewport {
 }
 
 impl Viewport {
-  pub(crate) fn transform(self, dimensions: Vector2<usize>) -> Matrix3<f64> {
+  pub(crate) fn transform(self, dimensions: Vector2<usize>) -> Affine2<f64> {
     let d = dimensions.map(|element| element as f64);
     let aspect = d.x / d.y;
     let landscape = d.x > d.y;
@@ -37,7 +37,7 @@ impl Viewport {
       Self::Stretch => Vector2::new(1.0, 1.0),
     };
 
-    m.append_nonuniform_scaling(&scale)
+    Affine2::from_matrix_unchecked(m.append_nonuniform_scaling(&scale))
   }
 }
 
@@ -63,8 +63,7 @@ mod tests {
   ) -> Vector2<isize> {
     viewport
       .transform(dimensions)
-      .try_inverse()
-      .unwrap()
+      .inverse()
       .transform_point(&coordinates.into())
       .map(|element| element.round() as isize)
       .coords
