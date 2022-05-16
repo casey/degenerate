@@ -48,7 +48,9 @@ jobs:
       run: cargo test --all --release -- --include-ignored
 
     - name: Clippy
-      run: cargo clippy --all --all-targets
+      run: |
+        cargo clippy --all --all-targets
+        cargo clippy --all --all-targets --target wasm32-unknown-unknown
 
     - name: Format
       run: cargo fmt --all -- --check
