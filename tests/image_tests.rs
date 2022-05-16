@@ -488,5 +488,4 @@ image_test! {
 image_test! {
   name: square_colors,
   program: "rotate:0.01 rotate-color:g:0.1 square for:10 apply loop save",
-  ignore: true,
 }
