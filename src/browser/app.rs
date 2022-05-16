@@ -148,7 +148,9 @@ impl App {
 
       log::trace!("Program: {:?}", program);
 
-      if resize || program != self.computer.program() {
+      let program_changed = program != self.computer.program();
+
+      if resize || program_changed {
         let mut computer = Computer::new();
         computer.load_program(&program);
 
@@ -160,9 +162,13 @@ impl App {
         self.computer = computer;
       }
 
-      if !self.computer.done() {
-        self.computer.run(true)?;
+      let done = self.computer.done();
 
+      if !done {
+        self.computer.run(true)?;
+      }
+
+      if resize || program_changed || !done {
         let mut pixels = Vec::new();
 
         for pixel in &self.computer.memory().transpose() {
