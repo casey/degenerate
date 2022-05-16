@@ -1,6 +1,5 @@
 use {
   chromiumoxide::browser::BrowserConfig,
-  chromiumoxide::cdp::browser_protocol::log::EventEntryAdded,
   chromiumoxide::handler::viewport::Viewport,
   futures::StreamExt,
   image::io::Reader as ImageReader,
@@ -22,13 +21,11 @@ impl Browser {
     let (inner, mut handler) = chromiumoxide::Browser::launch(
       BrowserConfig::builder()
         .arg("--allow-insecure-localhost")
-        // .window_size(256, 256)
         .viewport(Viewport {
           width: 256,
           height: 256,
           ..Viewport::default()
         })
-        .with_head()
         .build()?,
     )
     .await?;
@@ -86,31 +83,6 @@ impl Test {
     let page = browser.inner.new_page(URL).await?;
     page.wait_for_navigation().await?;
 
-    // eprintln!("Setting canvas size to 256 x 256...");
-
-    // page
-    //   .evaluate("document.getElementsByTagName('canvas')[0].width = 256")
-    //   .await?
-    //   .into_value::<u32>()?;
-
-    // page
-    //   .evaluate("document.getElementsByTagName('canvas')[0].height = 256")
-    //   .await?
-    //   .into_value::<u32>()?;
-
-    // let width = page
-    //   .evaluate("document.getElementsByTagName('canvas')[0].width")
-    //   .await?
-    //   .into_value::<u32>()?;
-
-    // let height = page
-    //   .evaluate("document.getElementsByTagName('canvas')[0].height")
-    //   .await?
-    //   .into_value::<u32>()?;
-
-    // assert_eq!(width, 256);
-    // assert_eq!(height, 256);
-
     eprintln!("Setting program on textarea...");
 
     page
@@ -133,7 +105,8 @@ impl Test {
     let have = image::load_from_memory(&base64::decode(&data_url[22..])?)?;
     have.save("have.png")?;
 
-    let want = ImageReader::open(format!("images/{}.png", self.filename))?.decode()?;
+    let want = ImageReader::open(format!("images/{}.png", self.filename))?
+      .decode()?;
     want.save("want.png")?;
 
     assert_eq!(have, want);

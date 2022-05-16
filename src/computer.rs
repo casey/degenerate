@@ -270,11 +270,17 @@ impl Computer {
       .resize_mut(dimensions.0, dimensions.1, self.default)
   }
 
-  fn image(&self) -> Result<RgbImage> {
+  fn image(&self) -> Result<RgbaImage> {
+    let mut pixels = Vec::new();
+
+    for pixel in &self.memory.transpose() {
+      pixels.extend_from_slice(&[pixel.x, pixel.y, pixel.z, 255]);
+    }
+
     ImageBuffer::from_raw(
       self.memory.ncols().try_into()?,
       self.memory.nrows().try_into()?,
-      self.memory.transpose().iter().flatten().cloned().collect(),
+      pixels
     )
     .ok_or_else(|| "Memory is not a valid image".into())
   }
@@ -301,7 +307,7 @@ impl Computer {
   fn load(&mut self, path: &Path) -> Result<()> {
     let image = image::io::Reader::open(path)?
       .decode()?
-      .as_rgb8()
+      .as_rgba8()
       .ok_or_else(|| format!("{} is not a valid rgb8 image", path.display()))?
       .to_owned();
 
