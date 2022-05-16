@@ -16,12 +16,12 @@ impl Mask {
   pub(crate) fn is_masked(
     &self,
     dimensions: Vector2<usize>,
-    pixel: Vector2<isize>,
-    v: Vector2<f64>,
+    pixel: Point2<isize>,
+    v: Point2<f64>,
   ) -> bool {
     match self {
       Self::All => true,
-      Self::Circle => v.norm() < 1.0,
+      Self::Circle => v.coords.norm() < 1.0,
       Self::Cross => v.x.abs() < 0.25 || v.y.abs() < 0.25,
       Self::Mod { divisor, remainder } => {
         if *divisor == 0 {
@@ -35,7 +35,7 @@ impl Mask {
         }
       }
       Self::Rows { nrows, step } => pixel.y as usize % (nrows.saturating_add(*step)) < *nrows,
-      Self::Square => v.abs() < Vector2::new(0.5, 0.5),
+      Self::Square => v.coords.abs() < Vector2::new(0.5, 0.5),
       Self::Top => v.y < 0.0,
       Self::X => (v.x - v.y).abs() < 0.25 || (v.x + v.y).abs() < 0.25,
     }
