@@ -87,12 +87,12 @@ image_test! {
 
 image_test! {
   name: brilliance,
-  program: "comment:slow x rotate-color:g:0.07 rotate:0.07 for:10 apply loop rotate-color:b:0.09 rotate:0.09 for:10 apply loop save",
+  program: "x rotate-color:g:0.07 rotate:0.07 for:10 apply loop rotate-color:b:0.09 rotate:0.09 for:10 apply loop save",
 }
 
 image_test! {
   name: carpet,
-  program: "comment:slow circle scale:0.5 for:8 apply wrap loop save",
+  program: "circle scale:0.5 for:8 apply wrap loop save",
 }
 
 image_test! {
@@ -107,7 +107,7 @@ image_test! {
 
 image_test! {
   name: concentric_circles,
-  program: "comment:slow scale:0.99 circle for:100 apply loop save",
+  program: "scale:0.99 circle for:100 apply loop save",
 }
 
 image_test! {
@@ -122,17 +122,18 @@ image_test! {
 
 image_test! {
   name: diamonds,
-  program: "comment:slow rotate:0.3333 rotate-color:g:0.05 circle scale:0.5 wrap for:8 apply loop rotate:0.8333 rotate-color:b:0.05 for:8 apply loop save",
+  program: "rotate:0.3333 rotate-color:g:0.05 circle scale:0.5 wrap for:8 apply loop rotate:0.8333 rotate-color:b:0.05 for:8 apply loop save",
+
 }
 
 image_test! {
   name: grain,
-  program: "comment:slow rotate:0.111 for:16 square apply circle apply loop save",
+  program: "rotate:0.111 for:16 square apply circle apply loop save",
 }
 
 image_test! {
   name: kaleidoscope,
-  program: "comment:slow rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate:0.8333 rotate-color:b:0.05 for:8 apply loop save",
+  program: "rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate:0.8333 rotate-color:b:0.05 for:8 apply loop save",
 }
 
 image_test! {
@@ -142,12 +143,12 @@ image_test! {
 
 image_test! {
   name: orbs,
-  program: "comment:slow rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop save",
+  program: "rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop save",
 }
 
 image_test! {
   name: pattern,
-  program: "comment:slow alpha:0.75 circle scale:0.5 for:8 apply wrap loop save",
+  program: "alpha:0.75 circle scale:0.5 for:8 apply wrap loop save",
 }
 
 image_test! {
@@ -277,7 +278,7 @@ image_test! {
 
 image_test! {
   name: rug,
-  program: "comment:slow rotate-color:g:0.05 circle scale:0.5 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop save",
+  program: "rotate-color:g:0.05 circle scale:0.5 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop save",
 }
 
 image_test! {
@@ -297,7 +298,7 @@ image_test! {
 
 image_test! {
   name: scale_circle_for,
-  program: "comment:slow circle scale:0.5 for:8 apply loop save",
+  program: "circle scale:0.5 for:8 apply loop save",
 }
 
 image_test! {
@@ -322,7 +323,7 @@ image_test! {
 
 image_test! {
   name: smear,
-  program: "comment:slow seed:19798 rotate-color:g:0.01 rotate:0.01 for:100 random-mask apply loop rotate-color:b:0.01 rotate:0.01 for:100 random-mask apply loop save",
+  program: "seed:19798 rotate-color:g:0.01 rotate:0.01 for:100 random-mask apply loop rotate-color:b:0.01 rotate:0.01 for:100 random-mask apply loop save",
 }
 
 image_test! {
@@ -337,7 +338,7 @@ image_test! {
 
 image_test! {
   name: starburst,
-  program: "comment:slow seed:12462 rotate-color:g:0.1 rotate:0.1 for:10 random-mask apply loop rotate-color:b:0.1 rotate:0.1 for:10 random-mask apply loop save",
+  program: "seed:12462 rotate-color:g:0.1 rotate:0.1 for:10 random-mask apply loop rotate-color:b:0.1 rotate:0.1 for:10 random-mask apply loop save",
 }
 
 image_test! {
@@ -407,12 +408,12 @@ image_test! {
 
 image_test! {
   name: x_loop,
-  program: "comment:slow x scale:0.5 for:8 apply wrap loop save",
+  program: "x scale:0.5 for:8 apply wrap loop save",
 }
 
 image_test! {
   name: x_scale,
-  program: "comment:slow x scale:0.5 for:8 apply loop save",
+  program: "x scale:0.5 for:8 apply loop save",
 }
 
 image_test! {
@@ -478,4 +479,9 @@ image_test! {
 image_test! {
   name: double_apply_with_scale,
   program: "resize:512:256 scale:0.5 x apply apply save",
+}
+
+image_test! {
+  name: mod_zero_is_always_false,
+  program: "mod:0:1 apply save",
 }
