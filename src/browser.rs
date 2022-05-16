@@ -12,16 +12,13 @@ use {
   wasm_bindgen::{closure::Closure, JsCast, JsValue},
   web_sys::{
     CanvasRenderingContext2d, Document, Element, EventTarget, HtmlCanvasElement, HtmlElement,
-    HtmlTextAreaElement, Window,
+    HtmlTextAreaElement, ImageData, Window,
   },
 };
-
-pub(crate) use display::Display;
 
 mod add_event_listener;
 mod app;
 mod cast;
-mod display;
 mod get_document;
 mod js_value_error;
 mod select;
