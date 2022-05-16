@@ -370,10 +370,6 @@ async function init(input) {
         const ret = getObject(arg0) instanceof CanvasRenderingContext2D;
         return ret;
     };
-    imports.wbg.__wbg_canvas_8e50f761d25da2d6 = function(arg0) {
-        const ret = getObject(arg0).canvas;
-        return isLikeNone(ret) ? 0 : addHeapObject(ret);
-    };
     imports.wbg.__wbg_putImageData_fad983ad6d58ee62 = function() { return handleError(function (arg0, arg1, arg2, arg3) {
         getObject(arg0).putImageData(getObject(arg1), arg2, arg3);
     }, arguments) };
@@ -451,11 +447,11 @@ async function init(input) {
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm0(arg0, arg1));
     };
-    imports.wbg.__wbindgen_closure_wrapper221 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper229 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 128, __wbg_adapter_18);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper222 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper230 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 128, __wbg_adapter_21);
         return addHeapObject(ret);
     };
