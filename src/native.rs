@@ -4,10 +4,6 @@ use {
   rustyline::error::ReadlineError,
 };
 
-pub(crate) use display::Display;
-
-mod display;
-
 pub(crate) fn run() {
   if let Err(error) = run_inner() {
     if let Some(ReadlineError::Eof | ReadlineError::Interrupted) =

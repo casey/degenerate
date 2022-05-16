@@ -40,8 +40,8 @@ impl Computer {
     Ok(())
   }
 
-  pub(crate) fn render(&self, display: &Display) -> Result {
-    display.render(&self.memory)
+  pub(crate) fn memory(&self) -> &DMatrix<Vector3<u8>> {
+    &self.memory
   }
 
   pub(crate) fn done(&self) -> bool {

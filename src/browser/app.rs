@@ -4,14 +4,14 @@ pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
   animation_frame_pending: bool,
   canvas: HtmlCanvasElement,
-  display: Display,
+  computer: Computer,
+  context: CanvasRenderingContext2d,
   input: bool,
   nav: HtmlElement,
   resize: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
   window: Window,
-  computer: Computer,
 }
 
 impl App {
@@ -37,8 +37,8 @@ impl App {
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
       animation_frame_pending: false,
+      context,
       canvas,
-      display: Display { context },
       input: false,
       nav,
       resize: true,
@@ -149,13 +149,34 @@ impl App {
       if program != self.computer.program() {
         let mut computer = Computer::new();
         computer.load_program(&program);
-        computer.resize(self.display.dimensions()?);
+
+        computer.resize((
+          self.canvas.height().try_into()?,
+          self.canvas.width().try_into()?,
+        ));
+
         self.computer = computer;
       }
 
       if !self.computer.done() {
         self.computer.run(true)?;
-        self.computer.render(&self.display)?;
+
+        let mut pixels = Vec::new();
+
+        for pixel in &self.computer.memory().transpose() {
+          pixels.extend_from_slice(&[pixel.x, pixel.y, pixel.z, 255]);
+        }
+
+        let image_data = ImageData::new_with_u8_clamped_array(
+          wasm_bindgen::Clamped(&pixels),
+          self.computer.memory().ncols().try_into()?,
+        )
+        .map_err(JsValueError)?;
+
+        self
+          .context
+          .put_image_data(&image_data, 0.0, 0.0)
+          .map_err(JsValueError)?;
 
         if !self.computer.done() {
           self.request_animation_frame()?;

@@ -18,12 +18,6 @@ use {
 };
 
 #[cfg(target_arch = "wasm32")]
-use crate::browser::{run, Display};
-
-#[cfg(not(target_arch = "wasm32"))]
-use crate::native::{run, Display};
-
-#[cfg(target_arch = "wasm32")]
 mod browser;
 mod color_axis;
 mod command;
@@ -39,5 +33,9 @@ type Error = Box<dyn std::error::Error>;
 type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
 fn main() {
-  run();
+  #[cfg(target_arch = "wasm32")]
+  crate::browser::run();
+
+  #[cfg(not(target_arch = "wasm32"))]
+  crate::native::run();
 }
