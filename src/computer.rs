@@ -21,32 +21,46 @@ pub(crate) struct Computer {
 }
 
 impl Computer {
-  pub(crate) fn run(display: &Display, words: impl IntoIterator<Item = impl AsRef<str>>) -> Result {
-    let mut computer = Self::new();
-
-    computer.resize(display.dimensions()?);
-
-    for arg in words {
-      computer.program.push(arg.as_ref().parse()?);
-    }
-
-    while let Some(command) = computer.program.get(computer.program_counter).cloned() {
-      if computer.verbose {
+  pub(crate) fn run(&mut self, incremental: bool) -> Result {
+    while let Some(command) = self.program.get(self.program_counter).cloned() {
+      if self.verbose {
         eprintln!(
           "PC {} LC {} M {:?} C {:?}",
-          computer.program_counter, computer.loop_counter, computer.mask, command,
+          self.program_counter, self.loop_counter, self.mask, command,
         );
       }
-      computer.execute(command)?;
-      computer.program_counter = computer.program_counter.wrapping_add(1);
-    }
+      self.execute(command.clone())?;
+      self.program_counter = self.program_counter.wrapping_add(1);
 
-    display.render(&computer.memory)?;
+      if incremental && command == Command::Apply {
+        break;
+      }
+    }
 
     Ok(())
   }
 
-  fn new() -> Self {
+  #[cfg(target_arch = "wasm32")]
+  pub(crate) fn memory(&self) -> &DMatrix<Vector3<u8>> {
+    &self.memory
+  }
+
+  #[cfg(target_arch = "wasm32")]
+  pub(crate) fn done(&self) -> bool {
+    self.program_counter >= self.program.len()
+  }
+
+  pub(crate) fn load_program(&mut self, program: &[Command]) {
+    self.program = program.into();
+    self.program_counter = 0;
+  }
+
+  #[cfg(target_arch = "wasm32")]
+  pub(crate) fn program(&self) -> &[Command] {
+    &self.program
+  }
+
+  pub(crate) fn new() -> Self {
     Self {
       alpha: 1.0,
       autosave: false,
@@ -246,7 +260,7 @@ impl Computer {
     Ok(())
   }
 
-  fn resize(&mut self, dimensions: (usize, usize)) {
+  pub(crate) fn resize(&mut self, dimensions: (usize, usize)) {
     self
       .memory
       .resize_mut(dimensions.0, dimensions.1, self.default)
