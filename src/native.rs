@@ -41,7 +41,7 @@ fn run_inner() -> Result {
 
   computer.resize((256, 256));
   computer.load_program(&program);
-  computer.run(false);
+  computer.run(false)?;
 
   Ok(())
 }
