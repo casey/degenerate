@@ -9,7 +9,7 @@ pub(crate) enum Operation {
 }
 
 impl Operation {
-  pub(crate) fn apply(self, coordinates: Vector2<f64>, element: Vector3<u8>) -> Vector3<u8> {
+  pub(crate) fn apply(self, coordinates: Point2<f64>, element: Vector3<u8>) -> Vector3<u8> {
     match self {
       Self::Debug => Vector3::new(
         ((coordinates.x + 1.0) / 2.0 * 255.0) as u8 & 0b11110000,
