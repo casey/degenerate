@@ -506,3 +506,9 @@ image_test! {
   name: mod_zero_is_always_false,
   program: "mod:0:1 apply save",
 }
+
+image_test! {
+  name: square_colors,
+  program: "rotate:0.01 rotate-color:g:0.1 square for:10 apply loop save",
+  ignore: true,
+}
