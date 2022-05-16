@@ -4,7 +4,8 @@ pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
   animation_frame_pending: bool,
   canvas: HtmlCanvasElement,
-  display: Display,
+  computer: Computer,
+  context: CanvasRenderingContext2d,
   input: bool,
   nav: HtmlElement,
   resize: bool,
@@ -30,20 +31,21 @@ impl App {
     let context = canvas
       .get_context("2d")
       .map_err(JsValueError)?
-      .ok_or_else(|| format!("failed to retrieve context"))?
+      .ok_or("failed to retrieve context")?
       .cast::<CanvasRenderingContext2d>()?;
 
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
       animation_frame_pending: false,
+      context,
       canvas,
-      display: Display { context },
       input: false,
       nav,
       resize: true,
       stderr: stderr.clone(),
       textarea: textarea.clone(),
       window: window.clone(),
+      computer: Computer::new(),
     }));
 
     let local = app.clone();
@@ -90,7 +92,7 @@ impl App {
     self
       .window
       .request_animation_frame(
-        &self
+        self
           .animation_frame_callback
           .as_ref()
           .unwrap()
@@ -109,6 +111,8 @@ impl App {
     self.animation_frame_pending = false;
 
     log::trace!("Animation frame timestamp {}s", timestamp);
+
+    let resize = self.resize;
 
     if self.resize {
       let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
@@ -133,9 +137,59 @@ impl App {
 
     if self.input {
       self.nav.set_class_name("fade-out");
-      let program = self.textarea.value();
-      log::trace!("Program: {}", program);
-      Computer::run(&self.display, program.split_whitespace())?;
+
+      let program = self
+        .textarea
+        .value()
+        .split_whitespace()
+        .into_iter()
+        .map(Command::from_str)
+        .collect::<Result<Vec<Command>>>()?;
+
+      log::trace!("Program: {:?}", program);
+
+      let program_changed = program != self.computer.program();
+
+      if resize || program_changed {
+        let mut computer = Computer::new();
+        computer.load_program(&program);
+
+        computer.resize((
+          self.canvas.height().try_into()?,
+          self.canvas.width().try_into()?,
+        ));
+
+        self.computer = computer;
+      }
+
+      let run = !self.computer.done();
+
+      if run {
+        self.computer.run(true)?;
+      }
+
+      if resize || program_changed || run {
+        let mut pixels = Vec::new();
+
+        for pixel in &self.computer.memory().transpose() {
+          pixels.extend_from_slice(&[pixel.x, pixel.y, pixel.z, 255]);
+        }
+
+        let image_data = ImageData::new_with_u8_clamped_array(
+          wasm_bindgen::Clamped(&pixels),
+          self.computer.memory().ncols().try_into()?,
+        )
+        .map_err(JsValueError)?;
+
+        self
+          .context
+          .put_image_data(&image_data, 0.0, 0.0)
+          .map_err(JsValueError)?;
+
+        if !self.computer.done() {
+          self.request_animation_frame()?;
+        }
+      }
     }
 
     Ok(())
