@@ -2,19 +2,16 @@ bt := '0'
 
 export RUST_BACKTRACE := bt
 
-ci: check-lockfile (test '--include-ignored') (test-all-features '--include-ignored') clippy fmt-check forbid
+ci: check-lockfile test clippy fmt-check forbid
 
 build:
 	cargo build --release
 
 test *args:
-	cargo test -- {{args}}
-
-test-all-features *args:
-	cargo test --all-features -- {{args}}
+	cargo test --release -- {{args}}
 
 clippy:
-  cargo clippy --all-targets --all-features
+  cargo clippy --all-targets
 
 run *args:
 	cargo run --release -- {{args}}
@@ -34,7 +31,7 @@ check-lockfile:
 forbid:
 	./bin/forbid
 
-watch +args='ltest --release -- --include-ignored':
+watch +args='ltest --release':
 	cargo watch --ignore README.md --clear --exec "{{args}}"
 
 generate: build
