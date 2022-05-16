@@ -1,13 +1,14 @@
 use {
   chromiumoxide::browser::BrowserConfig,
   chromiumoxide::cdp::browser_protocol::log::EventEntryAdded,
+  chromiumoxide::handler::viewport::Viewport,
   futures::StreamExt,
   image::io::Reader as ImageReader,
   std::{thread::sleep, time::Duration},
   tokio::task,
 };
 
-const URL: &'static str = "http://localhost:8001";
+const URL: &'static str = "http://localhost:8000";
 
 type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -21,6 +22,13 @@ impl Browser {
     let (inner, mut handler) = chromiumoxide::Browser::launch(
       BrowserConfig::builder()
         .arg("--allow-insecure-localhost")
+        // .window_size(256, 256)
+        .viewport(Viewport {
+          width: 256,
+          height: 256,
+          ..Viewport::default()
+        })
+        .with_head()
         .build()?,
     )
     .await?;
@@ -76,36 +84,44 @@ impl Test {
     eprintln!("Creating page...");
 
     let page = browser.inner.new_page(URL).await?;
+    page.wait_for_navigation().await?;
 
-    eprintln!("Setting event listener...");
+    // eprintln!("Setting canvas size to 256 x 256...");
 
-    let mut events = page.event_listener::<EventEntryAdded>().await?;
+    // page
+    //   .evaluate("document.getElementsByTagName('canvas')[0].width = 256")
+    //   .await?
+    //   .into_value::<u32>()?;
 
-    eprintln!("Logging to console...");
+    // page
+    //   .evaluate("document.getElementsByTagName('canvas')[0].height = 256")
+    //   .await?
+    //   .into_value::<u32>()?;
 
-    page
-      .evaluate("console.log('foo')")
-      .await?;
+    // let width = page
+    //   .evaluate("document.getElementsByTagName('canvas')[0].width")
+    //   .await?
+    //   .into_value::<u32>()?;
 
-    eprintln!("Setting text on textarea...");
+    // let height = page
+    //   .evaluate("document.getElementsByTagName('canvas')[0].height")
+    //   .await?
+    //   .into_value::<u32>()?;
+
+    // assert_eq!(width, 256);
+    // assert_eq!(height, 256);
+
+    eprintln!("Setting program on textarea...");
 
     page
       .find_elements("textarea")
       .await?
       .first()
       .ok_or("Could not find textarea")?
-      .click()
-      .await?
       .type_str(self.program.clone())
       .await?;
 
-    sleep(Duration::from_secs(10));
-
-    eprintln!("Going through event entries...");
-
-    while let Some(event) = events.next().await {
-      eprintln!("{:?}", event);
-    }
+    sleep(Duration::from_secs(3));
 
     eprintln!("Grabbing data url from canvas...");
 
@@ -115,9 +131,10 @@ impl Test {
       .into_value::<String>()?;
 
     let have = image::load_from_memory(&base64::decode(&data_url[22..])?)?;
-    have.save("actual-image.png")?;
+    have.save("have.png")?;
 
     let want = ImageReader::open(format!("images/{}.png", self.filename))?.decode()?;
+    want.save("want.png")?;
 
     assert_eq!(have, want);
 
@@ -129,7 +146,7 @@ impl Test {
 async fn circle() -> Result {
   Test::new()
     .filename("circle")
-    .program("circle apply save")
+    .program("circle apply")
     .run()
     .await
 }
