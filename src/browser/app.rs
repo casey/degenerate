@@ -162,13 +162,13 @@ impl App {
         self.computer = computer;
       }
 
-      let done = self.computer.done();
+      let run = !self.computer.done();
 
-      if !done {
+      if run {
         self.computer.run(true)?;
       }
 
-      if resize || program_changed || !done {
+      if resize || program_changed || run {
         let mut pixels = Vec::new();
 
         for pixel in &self.computer.memory().transpose() {
