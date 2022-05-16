@@ -5,7 +5,6 @@ pub(crate) struct App {
   animation_frame_pending: bool,
   canvas: HtmlCanvasElement,
   display: Display,
-  program: Vec<Command>,
   input: bool,
   nav: HtmlElement,
   resize: bool,
@@ -47,7 +46,6 @@ impl App {
       textarea: textarea.clone(),
       window: window.clone(),
       computer: Computer::new(),
-      program: Vec::new(),
     }));
 
     let local = app.clone();
@@ -148,12 +146,11 @@ impl App {
 
       log::trace!("Program: {:?}", program);
 
-      if program != self.program {
+      if program != self.computer.program() {
         let mut computer = Computer::new();
         computer.load_program(&program);
         computer.resize(self.display.dimensions()?);
         self.computer = computer;
-        self.program = program;
       }
 
       if !self.computer.done() {

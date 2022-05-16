@@ -53,6 +53,10 @@ impl Computer {
     self.program_counter = 0;
   }
 
+  pub(crate) fn program(&self) -> &[Command] {
+    &self.program
+  }
+
   pub(crate) fn new() -> Self {
     Self {
       alpha: 1.0,
