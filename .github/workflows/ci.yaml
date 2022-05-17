@@ -44,9 +44,16 @@ jobs:
       run: |
         cargo update --locked --package degenerate
 
+    - name: Install `wasm-bindgen`
+      uses: jetli/wasm-bindgen-action@v0.1.0
+      with:
+        # keep in sync with `Cargo.toml`
+        version: 0.2.80
+
     - name: Test
       run: |
         cargo test --all --release
+        rm -f www/degenerate.js
         rm -f www/degenerate_bg.wasm
 
     - name: Clippy
@@ -72,12 +79,6 @@ jobs:
 
     - name: Build Book
       run: mdbook build man
-
-    - name: Install `wasm-bindgen`
-      uses: jetli/wasm-bindgen-action@v0.1.0
-      with:
-        # keep in sync with `Cargo.toml`
-        version: 0.2.80
 
     - name: Build WASM
       run: |
