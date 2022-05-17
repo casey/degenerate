@@ -26,4 +26,3 @@ pub fn test(name: &str, program: &str) -> Result {
 
   Ok(())
 }
-
