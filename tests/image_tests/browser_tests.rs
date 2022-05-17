@@ -21,7 +21,7 @@ use {
 
 type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
-static TRACING: Once = Once::new();
+static SETUP: Once = Once::new();
 
 async fn handle_error(err: io::Error) -> impl IntoResponse {
   (
@@ -38,13 +38,30 @@ struct Browser {
 
 impl Browser {
   async fn new() -> Result<Self> {
-    TRACING.call_once(|| {
+    SETUP.call_once(|| {
       tracing_subscriber::registry()
         .with(tracing_subscriber::EnvFilter::new(
           std::env::var("RUST_LOG").unwrap_or_else(|_| "".into()),
         ))
         .with(tracing_subscriber::fmt::layer())
         .init();
+
+      Command::new("cargo")
+        .args(["build", "--release", "--target", "wasm32-unknown-unknown"])
+        .spawn()
+        .unwrap();
+
+      Command::new("wasm-bindgen")
+        .args([
+          "--target",
+          "web",
+          "--no-typescript",
+          "target/wasm32-unknown-unknown/release/degenerate.wasm",
+          "--out-dir",
+          "www",
+        ])
+        .spawn()
+        .unwrap();
     });
 
     let (inner, mut handler) = chromiumoxide::Browser::launch(
