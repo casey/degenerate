@@ -131,12 +131,7 @@ pub async fn test(name: &str, program: &str) -> Result {
   eprintln!("Waiting for module to load...");
 
   loop {
-    if page
-      .evaluate(format!("window.test"))
-      .await?
-      .value()
-      .is_some()
-    {
+    if page.evaluate("window.test").await?.value().is_some() {
       break;
     }
 
