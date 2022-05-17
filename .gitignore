@@ -1,5 +1,5 @@
 /generate
-/images/*.actual-memory.png
+/images/*.native-actual-memory.png
 /images/*.browser-actual-memory.png
 /memory.png
 /output.txt

@@ -52,7 +52,7 @@ fn clean() {
       let path = entry.path();
       let file_name = path.file_name().unwrap().to_str().unwrap().to_string();
 
-      if file_name.ends_with(".actual-memory.png")
+      if file_name.ends_with(".native-actual-memory.png")
         || file_name.ends_with(".browser-actual-memory.png")
       {
         fs::remove_file(path).unwrap();
@@ -62,7 +62,7 @@ fn clean() {
 }
 
 fn image_test(name: &str, program: &str) -> Result {
-  let destination = format!("images/{}.actual-memory.png", name);
+  let destination = format!("images/{}.native-actual-memory.png", name);
 
   fs::remove_file(&destination).ok();
 
