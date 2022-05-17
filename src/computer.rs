@@ -1,15 +1,16 @@
 use super::*;
 
 const DEFAULT_OUTPUT_PATH: &str = "memory.png";
+const ALPHA_OPAQUE: u8 = 255;
 
 pub(crate) struct Computer {
   alpha: f64,
   autosave: bool,
-  default: Vector3<u8>,
+  default: Vector4<u8>,
   frame: u64,
   loop_counter: usize,
   mask: Mask,
-  memory: DMatrix<Vector3<u8>>,
+  memory: DMatrix<Vector4<u8>>,
   operation: Operation,
   program: Vec<Command>,
   program_counter: usize,
@@ -41,7 +42,7 @@ impl Computer {
   }
 
   #[cfg(target_arch = "wasm32")]
-  pub(crate) fn memory(&self) -> &DMatrix<Vector3<u8>> {
+  pub(crate) fn memory(&self) -> &DMatrix<Vector4<u8>> {
     &self.memory
   }
 
@@ -64,7 +65,7 @@ impl Computer {
     Self {
       alpha: 1.0,
       autosave: false,
-      default: Vector3::new(0, 0, 0),
+      default: Vector4::new(0, 0, 0, ALPHA_OPAQUE),
       frame: 0,
       loop_counter: 0,
       mask: Mask::All,
@@ -117,13 +118,16 @@ impl Computer {
           } else {
             self.default
           };
-          let over = self.operation.apply(v, input);
-          let over = over.map(|c| c as f64);
-          let under = self.memory[(row, col)];
-          let under = under.map(|c| c as f64);
+          let over = self.operation.apply(v, input.xyz()).map(|c| c as f64);
+          let under = self.memory[(row, col)].xyz().map(|c| c as f64);
           let combined =
             (over * self.alpha + under * (1.0 - self.alpha)) / (self.alpha + (1.0 - self.alpha));
-          output[(row, col)] = combined.map(|c| c as u8);
+          output[(row, col)] = Vector4::new(
+            combined.x as u8,
+            combined.y as u8,
+            combined.z as u8,
+            ALPHA_OPAQUE,
+          );
         }
       }
     }
@@ -139,7 +143,7 @@ impl Computer {
       Command::Autosave => self.autosave = !self.autosave,
       Command::Comment => {}
       Command::Default(default) => {
-        self.default = default;
+        self.default = Vector4::new(default.x, default.y, default.z, ALPHA_OPAQUE);
       }
       Command::Viewport(viewport) => self.viewport = viewport,
       Command::For(until) => {
@@ -275,16 +279,10 @@ impl Computer {
   }
 
   fn image(&self) -> Result<RgbaImage> {
-    let mut pixels = Vec::new();
-
-    for pixel in &self.memory.transpose() {
-      pixels.extend_from_slice(&[pixel.x, pixel.y, pixel.z, 255]);
-    }
-
     ImageBuffer::from_raw(
       self.memory.ncols().try_into()?,
       self.memory.nrows().try_into()?,
-      pixels,
+      self.memory.transpose().iter().flatten().cloned().collect(),
     )
     .ok_or_else(|| "Memory is not a valid image".into())
   }
@@ -297,7 +295,7 @@ impl Computer {
         write!(
           w,
           "{:X}",
-          element.map(|scalar| scalar as u32).sum() / (16 * 3)
+          element.xyz().map(|scalar| scalar as u32).sum() / (16 * 3)
         )?;
       }
       writeln!(w)?;
@@ -322,7 +320,7 @@ impl Computer {
       height,
       image
         .rows()
-        .flat_map(|row| row.map(|pixel| Vector3::new(pixel[0], pixel[1], pixel[2]))),
+        .flat_map(|row| row.map(|pixel| Vector4::new(pixel[0], pixel[1], pixel[2], pixel[3]))),
     )
     .transpose();
 
