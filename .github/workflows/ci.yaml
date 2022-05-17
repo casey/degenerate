@@ -52,9 +52,7 @@ jobs:
 
     - name: Test
       run: |
-        cargo test --all --release -- --test-threads=1
-        rm -f www/degenerate.js
-        rm -f www/degenerate_bg.wasm
+        cargo test --all --release
 
     - name: Clippy
       run: |
