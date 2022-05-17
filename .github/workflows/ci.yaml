@@ -16,14 +16,17 @@ defaults:
   run:
     shell: bash
 
+env:
+  RUSTFLAGS: --deny warnings
+  # keep in sync with `Cargo.toml`
+  WASM_BINDGEN_VERSION: 0.2.80
+
 jobs:
   browser:
     name: Browser
 
     runs-on: ubuntu-latest
 
-    env:
-      RUSTFLAGS: --deny warnings
 
     steps:
     - uses: actions/checkout@v2
@@ -39,8 +42,7 @@ jobs:
     - name: Install `wasm-bindgen`
       uses: jetli/wasm-bindgen-action@v0.1.0
       with:
-        # keep in sync with `Cargo.toml`
-        version: 0.2.80
+        version: ${{ env.WASM_BINDGEN_VERSION }}
 
     - name: Test
       run: cargo test --all --release ::browser
@@ -49,9 +51,6 @@ jobs:
     name: Check
 
     runs-on: ubuntu-latest
-
-    env:
-      RUSTFLAGS: --deny warnings
 
     steps:
     - uses: actions/checkout@v2
@@ -94,9 +93,6 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
-    env:
-      RUSTFLAGS: --deny warnings
-
     steps:
     - uses: actions/checkout@v2
 
@@ -129,8 +125,7 @@ jobs:
     - name: Install `wasm-bindgen`
       uses: jetli/wasm-bindgen-action@v0.1.0
       with:
-        # keep in sync with `Cargo.toml`
-        version: 0.2.80
+        version: ${{ env.WASM_BINDGEN_VERSION }}
 
     - name: Install `mdbook`
       uses: peaceiris/actions-mdbook@v1
