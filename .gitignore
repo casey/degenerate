@@ -7,4 +7,6 @@
 /target
 /www/degenerate.js
 /www/degenerate_bg.wasm
+/tests/www/degenerate.js
+/tests/www/degenerate_bg.wasm
 /www/man

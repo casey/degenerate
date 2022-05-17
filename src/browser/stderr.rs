@@ -26,11 +26,6 @@ impl Stderr {
     let message = err.to_string();
     log::error!("{}", message);
     self.0.set_text_content(Some(&message));
-    js_sys::eval("window.errors")
-      .unwrap()
-      .cast::<js_sys::Array>()
-      .unwrap()
-      .push(&message.into());
   }
 
   pub(crate) fn clear(&self) {

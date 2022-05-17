@@ -1,15 +1,9 @@
 use {
   super::*,
   axum::{http::StatusCode, response::IntoResponse, routing::get_service, Router},
-  chromiumoxide::{browser::BrowserConfig, handler::viewport::Viewport},
+  chromiumoxide::browser::BrowserConfig,
   futures::StreamExt,
-  std::{
-    io,
-    net::SocketAddr,
-    process::Command,
-    sync::Once,
-    time::{Duration, Instant},
-  },
+  std::{io, net::SocketAddr, process::Command, sync::Once, time::Duration},
   tokio::task,
   tower_http::{services::ServeDir, trace::TraceLayer},
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
@@ -27,15 +21,6 @@ impl Browser {
     let (inner, mut handler) = chromiumoxide::Browser::launch(
       BrowserConfig::builder()
         .arg("--allow-insecure-localhost")
-        .window_size(256, 256)
-        .viewport(Viewport {
-          width: 256,
-          height: 256,
-          device_scale_factor: Some(1.0),
-          emulating_mobile: false,
-          is_landscape: false,
-          has_touch: false,
-        })
         .build()?,
     )
     .await?;
@@ -49,7 +34,7 @@ impl Browser {
     tracing::trace!("Listening on {}", addr);
 
     let app = Router::new()
-      .fallback(get_service(ServeDir::new("www")).handle_error(Browser::handle_error))
+      .fallback(get_service(ServeDir::new("tests/www")).handle_error(Browser::handle_error))
       .layer(TraceLayer::new_for_http());
 
     let server = axum::Server::bind(&addr).serve(app.into_make_service());
@@ -106,7 +91,7 @@ fn setup() {
         "--no-typescript",
         "target/wasm32-unknown-unknown/release/degenerate.wasm",
         "--out-dir",
-        "www",
+        "tests/www",
       ])
       .spawn()
       .unwrap();
@@ -129,63 +114,25 @@ pub async fn test(name: &str, program: &str) -> Result {
     .new_page(format!("http://127.0.0.1:{}", browser.port))
     .await?;
 
-  page.wait_for_navigation().await?;
-
-  eprintln!("Setting program on textarea...");
-
-  page
-    .evaluate(format!(
-      "document.getElementsByTagName('textarea')[0].value = '{}'",
-      program
-    ))
-    .await?;
-
-  let start = Instant::now();
+  eprintln!("Waiting for module to load...");
 
   loop {
-    page
-      .find_elements("textarea")
+    if page
+      .evaluate(format!("window.test"))
       .await?
-      .first()
-      .ok_or("Could not find textarea")?
-      .type_str(" ")
-      .await?;
-
-    let done = page.evaluate("window.done").await?.into_value::<bool>()?;
-
-    let errors = page
-      .evaluate("window.errors")
-      .await?
-      .into_value::<Vec<String>>()?;
-
-    if done || !errors.is_empty() {
+      .value()
+      .is_some()
+    {
       break;
-    }
-
-    if Instant::now().duration_since(start) > Duration::from_secs(60) {
-      panic!("Test took more than 60 seconds");
     }
 
     tokio::time::sleep(Duration::from_millis(100)).await;
   }
 
-  let errors = page
-    .evaluate("window.errors")
-    .await?
-    .into_value::<Vec<String>>()?;
-
-  if !errors.is_empty() {
-    for error in errors {
-      eprintln!("{}", error);
-    }
-
-    panic!("Test encountered errors");
-  }
-
-  eprintln!("Grabbing data url from canvas...");
+  eprintln!("Running test...");
 
   let data_url = page
-    .evaluate("document.getElementsByTagName('canvas')[0].toDataURL()")
+    .evaluate(format!("window.test('{program}')"))
     .await?
     .into_value::<String>()?;
 

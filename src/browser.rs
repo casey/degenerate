@@ -23,6 +23,7 @@ mod get_document;
 mod js_value_error;
 mod select;
 mod stderr;
+mod test;
 mod window;
 
 #[wasm_bindgen]
