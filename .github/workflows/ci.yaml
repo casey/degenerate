@@ -1,9 +1,5 @@
 name: CI
 
-# todo:
-# - pull out wasm-bindgen version
-# - find a more elegent way to selectively run tests
-
 on:
   push:
     branches:
@@ -106,7 +102,7 @@ jobs:
     - uses: Swatinem/rust-cache@v1
 
     - name: Test
-      run: cargo test --all --release
+      run: cargo test --all --release ::native
 
   pages:
     name: Pages
