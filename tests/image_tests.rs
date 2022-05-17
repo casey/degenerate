@@ -295,7 +295,6 @@ image_test! {
 image_test! {
   name: rows_overflow,
   program: "rows:18446744073709551615:18446744073709551615 apply save",
-  browser: false,
 }
 
 image_test! {

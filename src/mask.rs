@@ -5,7 +5,7 @@ pub(crate) enum Mask {
   All,
   Circle,
   Cross,
-  Mod { divisor: usize, remainder: usize },
+  Mod { divisor: u64, remainder: u64 },
   Rows { nrows: usize, step: usize },
   Square,
   Top,
@@ -24,14 +24,17 @@ impl Mask {
       Self::Circle => v.coords.norm() < 1.0,
       Self::Cross => v.x.abs() < 0.25 || v.y.abs() < 0.25,
       Self::Mod { divisor, remainder } => {
-        if *divisor == 0 {
+        let divisor = (*divisor % usize::max_value() as u64) as usize;
+        let remainder = (*remainder % usize::max_value() as u64) as usize;
+
+        if divisor == 0 {
           false
         } else {
           ((pixel.x as usize)
             .wrapping_mul(dimensions.y)
             .wrapping_add(pixel.y as usize))
-            % *divisor
-            == *remainder
+            % divisor
+            == remainder
         }
       }
       Self::Rows { nrows, step } => pixel.y as usize % (nrows.saturating_add(*step)) < *nrows,
