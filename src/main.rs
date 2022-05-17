@@ -1,7 +1,7 @@
 use {
   crate::{
-    color_axis::ColorAxis, command::Command, computer::Computer, mask::Mask, operation::Operation,
-    viewport::Viewport, wrap::Wrap,
+    color_axis::ColorAxis, command::Command, computer::Computer, mask::Mask,
+    operation::Operation, viewport::Viewport, wrap::Wrap,
   },
   image::{ImageBuffer, RgbImage},
   nalgebra::{
@@ -20,11 +20,15 @@ use {
 };
 
 #[cfg(target_arch = "wasm32")]
+use crate::browser::Gpu;
+
+#[cfg(target_arch = "wasm32")]
 mod browser;
 mod color_axis;
 mod command;
 mod computer;
 mod mask;
+
 #[cfg(not(target_arch = "wasm32"))]
 mod native;
 mod operation;

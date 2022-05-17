@@ -2,11 +2,13 @@ use super::*;
 
 const DEFAULT_OUTPUT_PATH: &str = "memory.png";
 
-pub(crate) struct Computer {
+pub(crate) struct Computer<'a> {
   alpha: f64,
   autosave: bool,
   default: Vector3<u8>,
   frame: u64,
+  #[cfg(target_arch = "wasm32")]
+  gpu: Option<&'a Gpu>,
   loop_counter: usize,
   mask: Mask,
   memory: DMatrix<Vector3<u8>>,
@@ -20,7 +22,7 @@ pub(crate) struct Computer {
   wrap: bool,
 }
 
-impl Computer {
+impl<'a> Computer<'a> {
   pub(crate) fn run(&mut self, incremental: bool) -> Result {
     while let Some(command) = self.program.get(self.program_counter).cloned() {
       if self.verbose {
@@ -60,6 +62,17 @@ impl Computer {
     &self.program
   }
 
+  #[cfg(target_arch = "wasm32")]
+  pub(crate) fn mask(&self) -> &Mask {
+    &self.mask
+  }
+
+  #[cfg(target_arch = "wasm32")]
+  pub(crate) fn operation(&self) -> &Operation {
+    &self.operation
+  }
+
+  #[cfg(not(target_arch = "wasm32"))]
   pub(crate) fn new() -> Self {
     Self {
       alpha: 1.0,
@@ -75,8 +88,30 @@ impl Computer {
       rng: StdRng::seed_from_u64(0),
       similarity: Similarity2::identity(),
       verbose: false,
-      wrap: false,
       viewport: Viewport::Fill,
+      wrap: false,
+    }
+  }
+
+  #[cfg(target_arch = "wasm32")]
+  pub(crate) fn new(gpu: Option<&'a Gpu>) -> Self {
+    Self {
+      alpha: 1.0,
+      autosave: false,
+      default: Vector3::new(0, 0, 0),
+      frame: 0,
+      gpu,
+      loop_counter: 0,
+      mask: Mask::All,
+      memory: DMatrix::zeros(0, 0),
+      operation: Operation::Invert,
+      program: Vec::new(),
+      program_counter: 0,
+      rng: StdRng::seed_from_u64(0),
+      similarity: Similarity2::identity(),
+      verbose: false,
+      viewport: Viewport::Fill,
+      wrap: false,
     }
   }
 
@@ -92,6 +127,7 @@ impl Computer {
     Vector2::new(self.memory.ncols(), self.memory.nrows())
   }
 
+  #[cfg(not(target_arch = "wasm32"))]
   fn apply(&mut self) -> Result {
     let similarity = self.similarity.inverse();
     let dimensions = self.dimensions();
@@ -129,6 +165,51 @@ impl Computer {
     }
     self.memory = output;
     self.autosave()?;
+    Ok(())
+  }
+
+  #[cfg(target_arch = "wasm32")]
+  fn apply(&mut self) -> Result {
+    if let Some(gpu) = self.gpu {
+      gpu.render_to_texture(self)?;
+    } else {
+      let similarity = self.similarity.inverse();
+      let dimensions = self.dimensions();
+      let transform = self.viewport.transform(dimensions);
+      let inverse = transform.inverse();
+      let mut output = self.memory.clone();
+      for col in 0..self.memory.ncols() {
+        for row in 0..self.memory.nrows() {
+          let i = Point2::new(col as f64, row as f64);
+          let v = transform.transform_point(&i);
+          let v = similarity.transform_point(&v);
+          let v = if self.wrap { v.wrap() } else { v };
+          let i = inverse
+            .transform_point(&v)
+            .map(|element| element.round() as isize);
+          if self.mask.is_masked(dimensions, i, v) {
+            let input = if i.x >= 0
+              && i.y >= 0
+              && i.x < self.memory.ncols() as isize
+              && i.y < self.memory.nrows() as isize
+            {
+              self.memory[(i.y as usize, i.x as usize)]
+            } else {
+              self.default
+            };
+            let over = self.operation.apply(v, input);
+            let over = over.map(|c| c as f64);
+            let under = self.memory[(row, col)];
+            let under = under.map(|c| c as f64);
+            let combined =
+              (over * self.alpha + under * (1.0 - self.alpha)) / (self.alpha + (1.0 - self.alpha));
+            output[(row, col)] = combined.map(|c| c as u8);
+          }
+        }
+      }
+      self.memory = output;
+      self.autosave()?;
+    }
     Ok(())
   }
 

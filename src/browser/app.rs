@@ -1,10 +1,10 @@
 use super::*;
 
-pub(crate) struct App {
+pub(crate) struct App<'a> {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
   animation_frame_pending: bool,
   canvas: HtmlCanvasElement,
-  computer: Computer,
+  computer: Computer<'a>,
   context: CanvasRenderingContext2d,
   input: bool,
   nav: HtmlElement,
@@ -14,7 +14,7 @@ pub(crate) struct App {
   window: Window,
 }
 
-impl App {
+impl App<'static> {
   pub(super) fn init() -> Result {
     let window = window();
 
@@ -45,7 +45,7 @@ impl App {
       stderr: stderr.clone(),
       textarea: textarea.clone(),
       window: window.clone(),
-      computer: Computer::new(),
+      computer: Computer::new(None),
     }));
 
     let local = app.clone();
@@ -151,7 +151,7 @@ impl App {
       let program_changed = program != self.computer.program();
 
       if resize || program_changed {
-        let mut computer = Computer::new();
+        let mut computer = Computer::new(None);
         computer.load_program(&program);
 
         computer.resize((

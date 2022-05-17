@@ -1,4 +1,4 @@
-use {
+pub(crate) use {
   self::{
     add_event_listener::AddEventListener, app::App, cast::Cast, get_document::GetDocument,
     gpu::Gpu, js_value_error::JsValueError, select::Select, stderr::Stderr, window::window,
@@ -12,8 +12,8 @@ use {
   wasm_bindgen::{closure::Closure, JsCast, JsValue},
   web_sys::{
     CanvasRenderingContext2d, Document, Element, EventTarget, HtmlCanvasElement, HtmlElement,
-    HtmlTextAreaElement, ImageData, WebGl2RenderingContext, WebGlProgram, WebGlShader,
-    WebGlTexture, Window, WebGlUniformLocation, WebGlFramebuffer
+    HtmlTextAreaElement, ImageData, WebGl2RenderingContext, WebGlFramebuffer, WebGlProgram,
+    WebGlShader, WebGlTexture, WebGlUniformLocation, Window,
   },
 };
 
