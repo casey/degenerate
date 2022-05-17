@@ -1,79 +1,40 @@
 use {
+  super::*,
   axum::{http::StatusCode, response::IntoResponse, routing::get_service, Router},
-  chromiumoxide::browser::BrowserConfig,
-  chromiumoxide::handler::viewport::Viewport,
+  chromiumoxide::{browser::BrowserConfig, handler::viewport::Viewport},
   futures::StreamExt,
-  image::io::Reader as ImageReader,
-  std::io,
   std::{
+    io,
     net::SocketAddr,
     process::Command,
     sync::Once,
     time::{Duration, Instant},
   },
   tokio::task,
-  tower_http::{
-    services::{ServeDir, ServeFile},
-    trace::TraceLayer,
-  },
+  tower_http::{services::ServeDir, trace::TraceLayer},
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
 };
 
-type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
-
-static SETUP: Once = Once::new();
-
-async fn handle_error(err: io::Error) -> impl IntoResponse {
-  (
-    StatusCode::INTERNAL_SERVER_ERROR,
-    format!("I/O error: {}", err),
-  )
-}
-
 struct Browser {
+  browser_handle: task::JoinHandle<()>,
   inner: chromiumoxide::Browser,
-  handle: task::JoinHandle<()>,
   port: u16,
+  server_handle: task::JoinHandle<()>,
 }
 
 impl Browser {
   async fn new() -> Result<Self> {
-    SETUP.call_once(|| {
-      tracing_subscriber::registry()
-        .with(tracing_subscriber::EnvFilter::new(
-          std::env::var("RUST_LOG").unwrap_or_else(|_| "".into()),
-        ))
-        .with(tracing_subscriber::fmt::layer())
-        .init();
-
-      Command::new("cargo")
-        .args(["build", "--release", "--target", "wasm32-unknown-unknown"])
-        .spawn()
-        .unwrap();
-
-      Command::new("wasm-bindgen")
-        .args([
-          "--target",
-          "web",
-          "--no-typescript",
-          "target/wasm32-unknown-unknown/release/degenerate.wasm",
-          "--out-dir",
-          "www",
-        ])
-        .spawn()
-        .unwrap();
-    });
-
     let (inner, mut handler) = chromiumoxide::Browser::launch(
       BrowserConfig::builder()
         .arg("--allow-insecure-localhost")
-        //.with_head()
         .window_size(256, 256)
         .viewport(Viewport {
           width: 256,
           height: 256,
           device_scale_factor: Some(1.0),
-          ..Viewport::default()
+          emulating_mobile: false,
+          is_landscape: false,
+          has_touch: false,
         })
         .build()?,
     )
@@ -83,167 +44,171 @@ impl Browser {
     let listener = tokio::net::TcpListener::bind(addr).await?;
     let port = listener.local_addr()?.port();
     drop(listener);
+
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
-    tracing::trace!("listening on {}", addr);
+    tracing::trace!("Listening on {}", addr);
 
     let app = Router::new()
-      .fallback(
-        get_service(ServeDir::new("www").fallback(ServeFile::new("www/index.html")))
-          .handle_error(handle_error),
-      )
+      .fallback(get_service(ServeDir::new("www")).handle_error(Browser::handle_error))
       .layer(TraceLayer::new_for_http());
 
     let server = axum::Server::bind(&addr).serve(app.into_make_service());
 
-    task::spawn(async move { server.await });
+    let server_handle = task::spawn(async move { server.await.unwrap() });
 
-    let handle = task::spawn(async move {
+    let browser_handle = task::spawn(async move {
       loop {
         let _ = handler.next().await.unwrap();
       }
     });
 
     Ok(Browser {
-      port,
+      browser_handle,
       inner,
-      handle,
+      port,
+      server_handle,
     })
+  }
+
+  async fn handle_error(err: io::Error) -> impl IntoResponse {
+    (
+      StatusCode::INTERNAL_SERVER_ERROR,
+      format!("I/O error: {}", err),
+    )
   }
 }
 
 impl Drop for Browser {
   fn drop(&mut self) {
-    self.handle.abort();
+    self.browser_handle.abort();
+    self.server_handle.abort();
   }
 }
 
-pub struct Test {
-  filename: String,
-  program: String,
+fn setup() {
+  static ONCE: Once = Once::new();
+
+  ONCE.call_once(|| {
+    tracing_subscriber::registry()
+      .with(tracing_subscriber::EnvFilter::from_default_env())
+      .with(tracing_subscriber::fmt::layer())
+      .init();
+
+    Command::new("cargo")
+      .args(["build", "--release", "--target", "wasm32-unknown-unknown"])
+      .spawn()
+      .unwrap();
+
+    Command::new("wasm-bindgen")
+      .args([
+        "--target",
+        "web",
+        "--no-typescript",
+        "target/wasm32-unknown-unknown/release/degenerate.wasm",
+        "--out-dir",
+        "www",
+      ])
+      .spawn()
+      .unwrap();
+  });
 }
 
-impl Test {
-  fn new() -> Self {
-    Self {
-      filename: String::new(),
-      program: String::new(),
-    }
-  }
+pub async fn test(name: &str, program: &str) -> Result {
+  super::clean();
 
-  fn filename(self, filename: impl AsRef<str>) -> Self {
-    Self {
-      filename: filename.as_ref().to_owned(),
-      ..self
-    }
-  }
+  setup();
 
-  fn program(self, program: impl AsRef<str>) -> Self {
-    Self {
-      program: program.as_ref().to_owned(),
-      ..self
-    }
-  }
+  eprintln!("Launching browser...");
 
-  async fn run(&self) -> Result {
-    super::clean();
+  let browser = Browser::new().await?;
 
-    eprintln!("Launching browser...");
+  eprintln!("Creating page...");
 
-    let browser = Browser::new().await?;
+  let page = browser
+    .inner
+    .new_page(format!("http://127.0.0.1:{}", browser.port))
+    .await?;
 
-    eprintln!("creating page...");
+  page.wait_for_navigation().await?;
 
-    let page = browser
-      .inner
-      .new_page(format!("http://127.0.0.1:{}", browser.port))
-      .await?;
-    page.wait_for_navigation().await?;
+  eprintln!("Setting program on textarea...");
 
-    eprintln!("Setting program on textarea...");
+  page
+    .evaluate(format!(
+      "document.getElementsByTagName('textarea')[0].value = '{}'",
+      program
+    ))
+    .await?;
 
+  let start = Instant::now();
+
+  loop {
     page
-      .evaluate(format!(
-        "document.getElementsByTagName('textarea')[0].value = '{}'",
-        self.program
-      ))
+      .find_elements("textarea")
+      .await?
+      .first()
+      .ok_or("Could not find textarea")?
+      .type_str(" ")
       .await?;
 
-    let start = Instant::now();
-
-    loop {
-      page
-        .find_elements("textarea")
-        .await?
-        .first()
-        .ok_or("Could not find textarea")?
-        .type_str(" ")
-        .await?;
-
-      let done = page.evaluate("window.done").await?.into_value::<bool>()?;
-
-      let errors = page
-        .evaluate("window.errors")
-        .await?
-        .into_value::<Vec<String>>()?;
-
-      if done || !errors.is_empty() {
-        break;
-      }
-
-      if Instant::now().duration_since(start) > Duration::from_secs(10000) {
-        panic!("Test took more than 60 seconds");
-      }
-
-      tokio::time::sleep(Duration::from_millis(100)).await;
-    }
+    let done = page.evaluate("window.done").await?.into_value::<bool>()?;
 
     let errors = page
       .evaluate("window.errors")
       .await?
       .into_value::<Vec<String>>()?;
 
-    if !errors.is_empty() {
-      for error in errors {
-        eprintln!("{}", error);
-      }
-
-      panic!("Test encountered errors");
+    if done || !errors.is_empty() {
+      break;
     }
 
-    eprintln!("Grabbing data url from canvas...");
-
-    let data_url = page
-      .evaluate("document.getElementsByTagName('canvas')[0].toDataURL()")
-      .await?
-      .into_value::<String>()?;
-
-    let have = image::load_from_memory(&base64::decode(&data_url[22..])?)?;
-
-    let want = ImageReader::open(format!("images/{}.png", self.filename))?.decode()?;
-
-    if have != want {
-      let destination = format!("images/{}.browser-actual-memory.png", self.filename);
-      have.save(&destination)?;
-      #[cfg(target_os = "macos")]
-      {
-        let status = Command::new("xattr")
-          .args(["-wx", "com.apple.FinderInfo"])
-          .arg("0000000000000000000C00000000000000000000000000000000000000000000")
-          .arg(&destination)
-          .status()?;
-
-        if !status.success() {
-          panic!("xattr failed: {}", status);
-        }
-      }
-
-      panic!("Images aren't the same");
+    if Instant::now().duration_since(start) > Duration::from_secs(60) {
+      panic!("Test took more than 60 seconds");
     }
 
-    Ok(())
+    tokio::time::sleep(Duration::from_millis(100)).await;
   }
-}
 
-pub async fn test(name: &str, program: &str) -> Result {
-  Test::new().filename(name).program(program).run().await
+  let errors = page
+    .evaluate("window.errors")
+    .await?
+    .into_value::<Vec<String>>()?;
+
+  if !errors.is_empty() {
+    for error in errors {
+      eprintln!("{}", error);
+    }
+
+    panic!("Test encountered errors");
+  }
+
+  eprintln!("Grabbing data url from canvas...");
+
+  let data_url = page
+    .evaluate("document.getElementsByTagName('canvas')[0].toDataURL()")
+    .await?
+    .into_value::<String>()?;
+
+  let have = image::load_from_memory(&base64::decode(
+    &data_url["data:image/png;base64,".len()..],
+  )?)?;
+
+  let want_path = format!("images/{}.png", name);
+
+  let want = image::open(&want_path)?;
+
+  if have != want {
+    let destination = format!("images/{}.browser-actual-memory.png", name);
+
+    have.save(&destination)?;
+
+    set_label_red(&destination)?;
+
+    panic!(
+      "Image test failed:\nExpected: {}\nActual:   {}",
+      want_path, destination,
+    );
+  }
+
+  Ok(())
 }

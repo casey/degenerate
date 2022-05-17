@@ -16,18 +16,7 @@ pub fn test(name: &str, program: &str) -> Result {
   if !Path::new(&expected_path).is_file() || actual_image != image::open(&expected_path)? {
     fs::rename(&actual_path, &destination)?;
 
-    #[cfg(target_os = "macos")]
-    {
-      let status = Command::new("xattr")
-        .args(["-wx", "com.apple.FinderInfo"])
-        .arg("0000000000000000000C00000000000000000000000000000000000000000000")
-        .arg(&destination)
-        .status()?;
-
-      if !status.success() {
-        panic!("xattr failed: {}", status);
-      }
-    }
+    set_label_red(&destination)?;
 
     panic!(
       "Image test failed:\nExpected: {}\nActual:   {}",

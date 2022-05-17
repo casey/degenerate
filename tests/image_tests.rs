@@ -62,6 +62,23 @@ fn clean() {
   });
 }
 
+fn set_label_red(path: &str) -> Result {
+  #[cfg(target_os = "macos")]
+  {
+    let status = Command::new("xattr")
+      .args(["-wx", "com.apple.FinderInfo"])
+      .arg("0000000000000000000C00000000000000000000000000000000000000000000")
+      .arg(path)
+      .status()?;
+
+    if !status.success() {
+      panic!("xattr failed: {}", status);
+    }
+  }
+
+  Ok(())
+}
+
 image_test! {
   name: all,
   program: "all apply save",
