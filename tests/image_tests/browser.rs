@@ -96,14 +96,13 @@ fn setup() -> u16 {
     }
 
     eprintln!("Done with setup!");
-    let rt = Box::new(Runtime::new().unwrap());
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 0));
     let listener = std::net::TcpListener::bind(addr).unwrap();
     let port = listener.local_addr().unwrap().port();
     drop(listener);
 
-    rt.spawn(async move {
+    Box::leak(Box::new(Runtime::new().unwrap())).spawn(async move {
       let addr = SocketAddr::from(([127, 0, 0, 1], port));
       tracing::trace!("Listening on {}", addr);
 
@@ -115,8 +114,6 @@ fn setup() -> u16 {
 
       task::spawn(async move { server.await.unwrap() });
     });
-
-    Box::leak(rt);
 
     PORT.store(port, Ordering::Relaxed);
   });
