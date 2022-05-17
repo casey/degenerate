@@ -81,14 +81,18 @@ fn setup() {
 
     eprintln!("Building WASM binary...");
 
-    Command::new("cargo")
+    let status = Command::new("cargo")
       .args(["build", "--release", "--target", "wasm32-unknown-unknown"])
-      .spawn()
+      .status()
       .unwrap();
+
+    if !status.success() {
+      panic!("Failed to build WASM binary: {status}");
+    }
 
     eprintln!("Running wasm-bindgen...");
 
-    Command::new("wasm-bindgen")
+    let status = Command::new("wasm-bindgen")
       .args([
         "--target",
         "web",
@@ -97,8 +101,14 @@ fn setup() {
         "--out-dir",
         "tests/www",
       ])
-      .spawn()
+      .status()
       .unwrap();
+
+    if !status.success() {
+      panic!("wasm-bindgen failed: {status}");
+    }
+
+    eprintln!("Done with setup!");
   });
 }
 
