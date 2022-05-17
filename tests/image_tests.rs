@@ -181,8 +181,20 @@ image_test! {
 }
 
 image_test! {
-  name: random,
-  program: "random:circle:square:x apply save",
+  name: random_default_seed,
+  program: "random:all:circle:cross:square:top:x apply save",
+  browser: true,
+}
+
+image_test! {
+  name: random_zero_seed,
+  program: "random:all:circle:cross:square:top:x  apply save",
+  browser: true,
+}
+
+image_test! {
+  name: random_nonzero_seed,
+  program: "seed:2 random:all:circle:cross:square:top:x apply save",
   browser: true,
 }
 
@@ -370,14 +382,8 @@ image_test! {
 }
 
 image_test! {
-  name: seed_random,
-  program: "seed:2 random:square:circle:x apply save",
-  browser: true,
-}
-
-image_test! {
   name: smear,
-  program: "seed:19798 rotate-color:g:0.01 rotate:0.01 for:100 random:circle:square:x apply loop rotate-color:b:0.01 rotate:0.01 for:100 random:circle:square:x apply loop save",
+  program: "seed:19798 rotate-color:g:0.01 rotate:0.01 for:100 random:all:circle:cross:square:top:x apply loop rotate-color:b:0.01 rotate:0.01 for:100 random:all:circle:cross:square:top:x apply loop save",
 }
 
 image_test! {
