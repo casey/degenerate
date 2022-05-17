@@ -45,7 +45,9 @@ jobs:
         cargo update --locked --package degenerate
 
     - name: Test
-      run: cargo test --all --release
+      run: |
+        cargo test --all --release
+        rm -f www/degenerate_bg.wasm
 
     - name: Clippy
       run: |
