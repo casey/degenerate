@@ -62,13 +62,13 @@ fn clean() {
   });
 }
 
-fn set_label_red(path: &str) -> Result {
+fn set_label_red(_path: &str) -> Result {
   #[cfg(target_os = "macos")]
   {
     let status = Command::new("xattr")
       .args(["-wx", "com.apple.FinderInfo"])
       .arg("0000000000000000000C00000000000000000000000000000000000000000000")
-      .arg(path)
+      .arg(_path)
       .status()?;
 
     if !status.success() {

@@ -11,7 +11,9 @@ test *args:
 	cargo test --release -- {{args}}
 
 clippy:
-  cargo clippy --all-targets
+	cargo clippy
+	cargo clippy --target wasm32-unknown-unknown
+	cargo clippy --tests
 
 run *args:
 	cargo run --release -- {{args}}
