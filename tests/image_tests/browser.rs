@@ -244,6 +244,6 @@ impl Test {
   }
 }
 
-pub async fn browser_test(name: &str, program: &str) -> Result {
+pub async fn test(name: &str, program: &str) -> Result {
   Test::new().filename(name).program(program).run().await
 }
