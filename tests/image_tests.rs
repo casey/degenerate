@@ -1,65 +1,79 @@
 use {super::*, std::sync::Once};
 
+mod browser;
+mod native;
+
 macro_rules! image_test {
-  (name: $name:ident, program: $program:literal $(,)?) => {
-    #[test]
-    fn $name() -> Result {
-      image_test(stringify!($name), $program)
+  (
+    name: $name:ident,
+    program: $program:literal $(,)?
+  ) => {
+    mod $name {
+      use super::*;
+
+      #[test]
+      fn native() -> Result {
+        native::test(stringify!($name), $program)
+      }
+
+      #[tokio::test]
+      #[ignore]
+      async fn browser() -> Result {
+        browser::test(stringify!($name), $program).await
+      }
+    }
+  };
+  (
+    name: $name:ident,
+    program: $program:literal,
+    browser: true $(,)?
+  ) => {
+    mod $name {
+      use super::*;
+
+      #[test]
+      fn native() -> Result {
+        native::test(stringify!($name), $program)
+      }
+
+      #[tokio::test]
+      async fn browser() -> Result {
+        browser::test(stringify!($name), $program).await
+      }
     }
   };
 }
 
-fn image_test(name: &str, program: &str) -> Result {
+fn clean() {
   static CLEAN: Once = Once::new();
 
   CLEAN.call_once(|| {
     for result in fs::read_dir("images").unwrap() {
       let entry = result.unwrap();
       let path = entry.path();
-      if path
-        .file_name()
-        .unwrap()
-        .to_str()
-        .unwrap()
-        .ends_with(".actual-memory.png")
+      let file_name = path.file_name().unwrap().to_str().unwrap().to_string();
+
+      if file_name.ends_with(".native-actual-memory.png")
+        || file_name.ends_with(".browser-actual-memory.png")
       {
         fs::remove_file(path).unwrap();
       }
     }
   });
+}
 
-  let destination = format!("images/{}.actual-memory.png", name);
+fn set_label_red(_path: &str) -> Result {
+  #[cfg(target_os = "macos")]
+  {
+    let status = Command::new("xattr")
+      .args(["-wx", "com.apple.FinderInfo"])
+      .arg("0000000000000000000C00000000000000000000000000000000000000000000")
+      .arg(_path)
+      .status()?;
 
-  fs::remove_file(&destination).ok();
-
-  let tempdir = Test::new()?.program(program).run_and_return_tempdir()?;
-
-  let actual_path = tempdir.path().join("memory.png");
-
-  let actual_image = image::open(&actual_path)?;
-
-  let expected_path = format!("images/{}.png", name);
-
-  if !Path::new(&expected_path).is_file() || actual_image != image::open(&expected_path)? {
-    fs::rename(&actual_path, &destination)?;
-
-    #[cfg(target_os = "macos")]
-    {
-      let status = Command::new("xattr")
-        .args(["-wx", "com.apple.FinderInfo"])
-        .arg("0000000000000000000C00000000000000000000000000000000000000000000")
-        .arg(&destination)
-        .status()?;
-
-      if !status.success() {
-        panic!("xattr failed: {}", status);
-      }
+    if !status.success() {
+      panic!("xattr failed: {}", status);
     }
-
-    panic!(
-      "Image test failed:\nExpected: {}\nActual:   {}",
-      expected_path, destination,
-    );
   }
 
   Ok(())
@@ -68,16 +82,19 @@ fn image_test(name: &str, program: &str) -> Result {
 image_test! {
   name: all,
   program: "all apply save",
+  browser: true,
 }
 
 image_test! {
   name: alpha,
   program: "alpha:0.5 x apply save",
+  browser: true,
 }
 
 image_test! {
   name: apply,
   program: "apply save",
+  browser: true,
 }
 
 image_test! {
@@ -88,71 +105,85 @@ image_test! {
 image_test! {
   name: brilliance,
   program: "x rotate-color:g:0.07 rotate:0.07 for:10 apply loop rotate-color:b:0.09 rotate:0.09 for:10 apply loop save",
+  browser: true,
 }
 
 image_test! {
   name: carpet,
   program: "circle scale:0.5 for:8 apply wrap loop save",
+  browser: true,
 }
 
 image_test! {
   name: circle,
   program: "circle apply save",
+  browser: true,
 }
 
 image_test! {
   name: circle_scale,
   program: "scale:0.5 circle apply all scale:0.9 wrap apply save",
+  browser: true,
 }
 
 image_test! {
   name: concentric_circles,
   program: "scale:0.99 circle for:100 apply loop save",
+  browser: true,
 }
 
 image_test! {
   name: cross,
   program: "cross apply save",
+  browser: true,
 }
 
 image_test! {
   name: default,
   program: "comment:foo save",
+  browser: true,
 }
 
 image_test! {
   name: diamonds,
   program: "rotate:0.3333 rotate-color:g:0.05 circle scale:0.5 wrap for:8 apply loop rotate:0.8333 rotate-color:b:0.05 for:8 apply loop save",
+  browser: true,
 }
 
 image_test! {
   name: grain,
   program: "rotate:0.111 for:16 square apply circle apply loop save",
+  browser: true,
 }
 
 image_test! {
   name: kaleidoscope,
   program: "rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate:0.8333 rotate-color:b:0.05 for:8 apply loop save",
+  browser: true,
 }
 
 image_test! {
   name: mod_3,
   program: "mod:3:0 apply save",
+  browser: true,
 }
 
 image_test! {
   name: orbs,
   program: "rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop save",
+  browser: true,
 }
 
 image_test! {
   name: pattern,
   program: "alpha:0.75 circle scale:0.5 for:8 apply wrap loop save",
+  browser: true,
 }
 
 image_test! {
   name: random_mask,
   program: "random-mask apply save",
+  browser: true,
 }
 
 image_test! {
@@ -188,61 +219,73 @@ image_test! {
 image_test! {
   name: rotate,
   program: "rotate:0.05 x apply save",
+  browser: true,
 }
 
 image_test! {
   name: rotate_0125_square,
   program: "rotate:0.125 square apply save",
+  browser: true,
 }
 
 image_test! {
   name: rotate_1_square,
   program: "rotate:1.0 square apply save",
+  browser: true,
 }
 
 image_test! {
   name: rotate_color_05_red,
   program: "rotate-color:red:0.5 all apply save",
+  browser: true,
 }
 
 image_test! {
   name: rotate_color_blue_05_all,
   program: "rotate-color:blue:0.5 all apply save",
+  browser: true,
 }
 
 image_test! {
   name: rotate_color_blue_1_all,
   program: "rotate-color:blue:1.0 all apply save",
+  browser: true,
 }
 
 image_test! {
   name: rotate_color_blue_all,
   program: "rotate-color:b:0.5 all apply save",
+  browser: true,
 }
 
 image_test! {
   name: rotate_color_g,
   program: "rotate-color:g:0.5 all apply save",
+  browser: true,
 }
 
 image_test! {
   name: rotate_color_green,
   program: "rotate-color:green:0.5 all apply save",
+  browser: true,
 }
 
 image_test! {
   name: rotate_color_green_all,
   program: "rotate-color:green:1.0 all save",
+  browser: true,
 }
 
 image_test! {
   name: rotate_color_r,
   program: "rotate-color:r:0.5 all apply save",
+  browser: true,
 }
 
 image_test! {
   name: rotate_color_red_all,
   program: "rotate-color:red:1.0 all save",
+  browser: true,
 }
 
 image_test! {
@@ -253,21 +296,25 @@ image_test! {
 image_test! {
   name: rotate_scale_x,
   program: "rotate:0.05 scale:2 x apply save",
+  browser: true,
 }
 
 image_test! {
   name: rotate_square,
   program: "rotate:0.05 square for:2 apply loop save",
+  browser: true,
 }
 
 image_test! {
   name: rotate_square_for_x,
   program: "rotate:0.05 square for:2 apply loop x for:1 apply loop save",
+  browser: true,
 }
 
 image_test! {
   name: rows,
   program: "rows:1:1 apply save",
+  browser: true,
 }
 
 image_test! {
@@ -278,11 +325,13 @@ image_test! {
 image_test! {
   name: rug,
   program: "rotate-color:g:0.05 circle scale:0.5 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop save",
+  browser: true,
 }
 
 image_test! {
   name: save,
   program: "save",
+  browser: true,
 }
 
 image_test! {
@@ -293,31 +342,37 @@ image_test! {
 image_test! {
   name: scale,
   program: "scale:0.5 circle apply save",
+  browser: true,
 }
 
 image_test! {
   name: scale_circle_for,
   program: "circle scale:0.5 for:8 apply loop save",
+  browser: true,
 }
 
 image_test! {
   name: scale_circle_wrap,
   program: "scale:0.5 circle wrap apply save",
+  browser: true,
 }
 
 image_test! {
   name: scale_rotate,
   program: "scale:2 rotate:0.05 x apply save",
+  browser: true,
 }
 
 image_test! {
   name: scale_x,
   program: "scale:2 x apply save",
+  browser: true,
 }
 
 image_test! {
   name: seed_random_mask,
   program: "seed:2 random-mask apply save",
+  browser: true,
 }
 
 image_test! {
@@ -328,11 +383,13 @@ image_test! {
 image_test! {
   name: square,
   program: "square apply save",
+  browser: true,
 }
 
 image_test! {
   name: square_top,
   program: "square apply top apply save",
+  browser: true,
 }
 
 image_test! {
@@ -343,11 +400,13 @@ image_test! {
 image_test! {
   name: top,
   program: "top apply save",
+  browser: true,
 }
 
 image_test! {
   name: viewport_fill_square,
   program: "fill x apply save",
+  browser: true,
 }
 
 image_test! {
@@ -363,6 +422,7 @@ image_test! {
 image_test! {
   name: viewport_fit_square,
   program: "fit x apply save",
+  browser: true,
 }
 
 image_test! {
@@ -383,6 +443,7 @@ image_test! {
 image_test! {
   name: viewport_stretch_square,
   program: "stretch x apply save",
+  browser: true,
 }
 
 image_test! {
@@ -398,6 +459,7 @@ image_test! {
 image_test! {
   name: x,
   program: "x apply save",
+  browser: true,
 }
 
 image_test! {
@@ -408,21 +470,25 @@ image_test! {
 image_test! {
   name: x_loop,
   program: "x scale:0.5 for:8 apply wrap loop save",
+  browser: true,
 }
 
 image_test! {
   name: x_scale,
   program: "x scale:0.5 for:8 apply loop save",
+  browser: true,
 }
 
 image_test! {
   name: x_wrap,
   program: "x apply scale:0.5 wrap identity all apply save",
+  browser: true,
 }
 
 image_test! {
   name: debug_operation,
   program: "debug apply save",
+  browser: true,
 }
 
 image_test! {
@@ -463,16 +529,19 @@ image_test! {
 image_test! {
   name: double_apply_fill_square,
   program: "fill x apply apply save",
+  browser: true,
 }
 
 image_test! {
   name: double_apply_fit_square,
   program: "fit x apply apply save",
+  browser: true,
 }
 
 image_test! {
   name: double_apply_stretch_square,
   program: "stretch x apply apply save",
+  browser: true,
 }
 
 image_test! {
@@ -483,9 +552,11 @@ image_test! {
 image_test! {
   name: mod_zero_is_always_false,
   program: "mod:0:1 apply save",
+  browser: true,
 }
 
 image_test! {
   name: square_colors,
   program: "rotate:0.01 rotate-color:g:0.1 square for:10 apply loop save",
+  browser: true,
 }

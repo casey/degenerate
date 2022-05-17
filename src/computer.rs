@@ -248,11 +248,15 @@ impl Computer {
       Command::Rotate(turns) => self
         .similarity
         .append_rotation_mut(&UnitComplex::from_angle(turns * f64::consts::TAU)),
-      Command::Save(path) => self.image()?.save(
-        path
-          .as_deref()
-          .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
-      )?,
+      Command::Save(path) => {
+        if cfg!(not(target_arch = "wasm32")) {
+          self.image()?.save(
+            path
+              .as_deref()
+              .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
+          )?
+        }
+      }
       Command::Scale(scaling) => {
         self.similarity.append_scaling_mut(scaling);
       }
@@ -270,11 +274,17 @@ impl Computer {
       .resize_mut(dimensions.0, dimensions.1, self.default)
   }
 
-  fn image(&self) -> Result<RgbImage> {
+  fn image(&self) -> Result<RgbaImage> {
+    let mut pixels = Vec::new();
+
+    for pixel in &self.memory.transpose() {
+      pixels.extend_from_slice(&[pixel.x, pixel.y, pixel.z, 255]);
+    }
+
     ImageBuffer::from_raw(
       self.memory.ncols().try_into()?,
       self.memory.nrows().try_into()?,
-      self.memory.transpose().iter().flatten().cloned().collect(),
+      pixels,
     )
     .ok_or_else(|| "Memory is not a valid image".into())
   }
@@ -301,7 +311,7 @@ impl Computer {
   fn load(&mut self, path: &Path) -> Result<()> {
     let image = image::io::Reader::open(path)?
       .decode()?
-      .as_rgb8()
+      .as_rgba8()
       .ok_or_else(|| format!("{} is not a valid rgb8 image", path.display()))?
       .to_owned();
 
