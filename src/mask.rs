@@ -12,6 +12,27 @@ pub(crate) enum Mask {
   X,
 }
 
+use std::fmt::{self, Display, Formatter};
+
+impl Display for Mask {
+  fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    write!(
+      f,
+      "{}",
+      match self {
+        Self::Circle => "circle",
+        Self::Cross => "cross",
+        Self::Mod { .. } => "mod",
+        Self::Rows { .. } => "rows",
+        Self::Square => "square",
+        Self::Top => "top",
+        Self::X => "x",
+        Self::All => "all",
+      }
+    )
+  }
+}
+
 impl Mask {
   pub(crate) fn is_masked(
     &self,

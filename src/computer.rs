@@ -161,7 +161,6 @@ impl Computer {
         )?;
         self.autosave()?;
       }
-
       Command::Loop => {
         loop {
           self.program_counter = self.program_counter.wrapping_sub(1);
