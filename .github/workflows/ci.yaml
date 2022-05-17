@@ -1,5 +1,9 @@
 name: CI
 
+# todo:
+# - pull out wasm-bindgen version
+# - find a more elegent way to selectively run tests
+
 on:
   push:
     branches:
@@ -13,8 +17,73 @@ defaults:
     shell: bash
 
 jobs:
-  all:
-    name: All
+  browser:
+    name: Browser
+
+    runs-on: ubuntu-latest
+
+    env:
+      RUSTFLAGS: --deny warnings
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Rust Toolchain Components
+      uses: actions-rs/toolchain@v1
+      with:
+        target: wasm32-unknown-unknown
+        toolchain: stable
+
+    - uses: Swatinem/rust-cache@v1
+
+    - name: Install `wasm-bindgen`
+      uses: jetli/wasm-bindgen-action@v0.1.0
+      with:
+        # keep in sync with `Cargo.toml`
+        version: 0.2.80
+
+    - name: Test
+      run: cargo test --all --release ::browser
+
+  check:
+    name: Check
+
+    runs-on: ubuntu-latest
+
+    env:
+      RUSTFLAGS: --deny warnings
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Rust Toolchain Components
+      uses: actions-rs/toolchain@v1
+      with:
+        components: clippy, rustfmt
+        target: wasm32-unknown-unknown
+        toolchain: stable
+
+    - uses: Swatinem/rust-cache@v1
+    - name: Check Lockfile
+      run: cargo update --locked --package degenerate
+
+    - name: Format
+      run: cargo fmt --all -- --check
+
+    - name: Clippy
+      run: |
+        cargo clippy
+        cargo clippy --target wasm32-unknown-unknown
+        cargo clippy --tests
+
+    - name: Check for Forbidden Words
+      run: |
+        sudo apt-get update
+        sudo apt-get install ripgrep
+        ./bin/forbid
+
+  native:
+    name: Native
 
     strategy:
       matrix:
@@ -40,34 +109,28 @@ jobs:
 
     - uses: Swatinem/rust-cache@v1
 
-    - name: Check Lockfile
-      run: |
-        cargo update --locked --package degenerate
+    - name: Test
+      run: cargo test --all --release
 
-    - name: Format
-      run: cargo fmt --all -- --check
+  pages:
+    name: Pages
 
-    - name: Clippy
-      run: |
-        cargo clippy
-        cargo clippy --target wasm32-unknown-unknown
-        cargo clippy --tests
+    runs-on: ubuntu-latest
 
-    - name: Check for Forbidden Words
-      if: ${{ matrix.os == 'ubuntu-latest' }}
-      run: |
-        sudo apt-get update
-        sudo apt-get install ripgrep
-        ./bin/forbid
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Rust Toolchain Components
+      uses: actions-rs/toolchain@v1
+      with:
+        target: wasm32-unknown-unknown
+        toolchain: stable
 
     - name: Install `wasm-bindgen`
       uses: jetli/wasm-bindgen-action@v0.1.0
       with:
         # keep in sync with `Cargo.toml`
         version: 0.2.80
-
-    - name: Test
-      run: cargo test --all --release
 
     - name: Install `mdbook`
       uses: peaceiris/actions-mdbook@v1
@@ -91,7 +154,7 @@ jobs:
 
     - name: Deploy Pages
       uses: peaceiris/actions-gh-pages@v3
-      if: github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest'
+      if: github.ref == 'refs/heads/master'
       with:
         github_token: ${{secrets.GITHUB_TOKEN}}
         publish_branch: gh-pages
