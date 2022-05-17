@@ -186,7 +186,9 @@ impl App {
           .put_image_data(&image_data, 0.0, 0.0)
           .map_err(JsValueError)?;
 
-        if !self.computer.done() {
+        if self.computer.done() {
+          js_sys::eval("window.done = true").map_err(JsValueError)?;
+        } else {
           self.request_animation_frame()?;
         }
       }

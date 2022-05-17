@@ -12,6 +12,7 @@ path = "tests/integration.rs"
 
 [dev-dependencies]
 approx = "0.5.0"
+axum = "0.5.6"
 base64 = "0.13.0"
 chromiumoxide = "0.3.5"
 executable-path = "1.0.0"
@@ -19,7 +20,12 @@ futures = "0.3.21"
 pretty_assertions = "1.0.0"
 tempfile = "3.2.0"
 tokio = { version = "1.18.2", features = ["rt", "macros"] }
+tracing = "0.1.34"
 unindent = "0.1.7"
+# axum-extra = "*"
+# hyper = "*"
+tower-http = { version = "0.3.0", features = ["fs", "trace"] }
+tracing-subscriber = { version = "0.3.0", features = ["env-filter"] }
 
 [build-dependencies]
 camino = "1.0.5"

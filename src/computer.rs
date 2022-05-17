@@ -248,11 +248,15 @@ impl Computer {
       Command::Rotate(turns) => self
         .similarity
         .append_rotation_mut(&UnitComplex::from_angle(turns * f64::consts::TAU)),
-      Command::Save(path) => self.image()?.save(
-        path
-          .as_deref()
-          .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
-      )?,
+      Command::Save(path) => {
+        if cfg!(not(target_arch = "wasm32")) {
+          self.image()?.save(
+            path
+              .as_deref()
+              .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
+          )?
+        }
+      }
       Command::Scale(scaling) => {
         self.similarity.append_scaling_mut(scaling);
       }
@@ -280,7 +284,7 @@ impl Computer {
     ImageBuffer::from_raw(
       self.memory.ncols().try_into()?,
       self.memory.nrows().try_into()?,
-      pixels
+      pixels,
     )
     .ok_or_else(|| "Memory is not a valid image".into())
   }
