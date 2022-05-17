@@ -1,6 +1,7 @@
 use super::*;
 
 const DEFAULT_OUTPUT_PATH: &str = "memory.png";
+const ALPHA_OPAQUE: u8 = 255;
 
 pub(crate) struct Computer {
   alpha: f64,
@@ -64,7 +65,7 @@ impl Computer {
     Self {
       alpha: 1.0,
       autosave: false,
-      default: Vector4::new(0, 0, 0, 255),
+      default: Vector4::new(0, 0, 0, ALPHA_OPAQUE),
       frame: 0,
       loop_counter: 0,
       mask: Mask::All,
@@ -121,8 +122,12 @@ impl Computer {
           let under = self.memory[(row, col)].xyz().map(|c| c as f64);
           let combined =
             (over * self.alpha + under * (1.0 - self.alpha)) / (self.alpha + (1.0 - self.alpha));
-          output[(row, col)] =
-            Vector4::new(combined.x as u8, combined.y as u8, combined.z as u8, 255);
+          output[(row, col)] = Vector4::new(
+            combined.x as u8,
+            combined.y as u8,
+            combined.z as u8,
+            ALPHA_OPAQUE,
+          );
         }
       }
     }
@@ -138,7 +143,7 @@ impl Computer {
       Command::Autosave => self.autosave = !self.autosave,
       Command::Comment => {}
       Command::Default(default) => {
-        self.default = Vector4::new(default.x, default.y, default.z, 255);
+        self.default = Vector4::new(default.x, default.y, default.z, ALPHA_OPAQUE);
       }
       Command::Viewport(viewport) => self.viewport = viewport,
       Command::For(until) => {
