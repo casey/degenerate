@@ -7,8 +7,8 @@ use {
   nalgebra::{
     Affine2, DMatrix, Matrix3, Point2, Rotation3, Similarity2, UnitComplex, Vector2, Vector3,
   },
-  rand::Rng,
-  rand::{rngs::StdRng, SeedableRng},
+  rand::{Rng, SeedableRng},
+  rand_chacha::ChaCha20Rng,
   std::{
     env, f64, fs,
     io::{self, BufWriter, Write},

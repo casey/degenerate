@@ -13,7 +13,7 @@ pub(crate) struct Computer {
   operation: Operation,
   program: Vec<Command>,
   program_counter: usize,
-  rng: StdRng,
+  rng: ChaCha20Rng,
   similarity: Similarity2<f64>,
   verbose: bool,
   viewport: Viewport,
@@ -72,7 +72,7 @@ impl Computer {
       operation: Operation::Invert,
       program: Vec::new(),
       program_counter: 0,
-      rng: StdRng::seed_from_u64(0),
+      rng: ChaCha20Rng::seed_from_u64(0),
       similarity: Similarity2::identity(),
       verbose: false,
       wrap: false,
@@ -143,7 +143,7 @@ impl Computer {
       }
       Command::Viewport(viewport) => self.viewport = viewport,
       Command::For(until) => {
-        if self.loop_counter >= until {
+        if self.loop_counter as u64 >= until {
           loop {
             self.program_counter = self.program_counter.wrapping_add(1);
             if let Some(Command::Loop) | None = self.program.get(self.program_counter) {
@@ -242,7 +242,7 @@ impl Computer {
         }
       }
       Command::Resize(dimensions) => {
-        self.resize(dimensions);
+        self.resize((dimensions.0.try_into()?, dimensions.1.try_into()?));
         self.autosave()?;
       }
       Command::Rotate(turns) => self
@@ -260,7 +260,7 @@ impl Computer {
       Command::Scale(scaling) => {
         self.similarity.append_scaling_mut(scaling);
       }
-      Command::Seed(seed) => self.rng = StdRng::seed_from_u64(seed),
+      Command::Seed(seed) => self.rng = ChaCha20Rng::seed_from_u64(seed),
       Command::Verbose => self.verbose = !self.verbose,
       Command::Wrap => self.wrap = !self.wrap,
     }

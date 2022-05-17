@@ -346,7 +346,6 @@ image_test! {
 image_test! {
   name: smear,
   program: "seed:19798 rotate-color:g:0.01 rotate:0.01 for:100 random-mask apply loop rotate-color:b:0.01 rotate:0.01 for:100 random-mask apply loop save",
-  browser: false,
 }
 
 image_test! {
@@ -362,7 +361,6 @@ image_test! {
 image_test! {
   name: starburst,
   program: "seed:12462 rotate-color:g:0.1 rotate:0.1 for:10 random-mask apply loop rotate-color:b:0.1 rotate:0.1 for:10 random-mask apply loop save",
-  browser: false,
 }
 
 image_test! {
