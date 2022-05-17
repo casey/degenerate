@@ -79,10 +79,14 @@ fn setup() {
       .with(tracing_subscriber::fmt::layer())
       .init();
 
+    eprintln!("Building WASM binary...");
+
     Command::new("cargo")
       .args(["build", "--release", "--target", "wasm32-unknown-unknown"])
       .spawn()
       .unwrap();
+
+    eprintln!("Running wasm-bindgen...");
 
     Command::new("wasm-bindgen")
       .args([
