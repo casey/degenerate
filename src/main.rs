@@ -6,6 +6,7 @@ use {
   image::{ImageBuffer, RgbaImage},
   nalgebra::{
     Affine2, DMatrix, Matrix3, Point2, Rotation3, Similarity2, UnitComplex, Vector2, Vector3,
+    Vector4,
   },
   rand::Rng,
   rand::{rngs::StdRng, SeedableRng},
