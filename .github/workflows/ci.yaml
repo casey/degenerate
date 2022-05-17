@@ -19,6 +19,8 @@ env:
 
 jobs:
   browser:
+    name: Browser
+
     runs-on: ubuntu-latest
 
     steps:
@@ -41,6 +43,8 @@ jobs:
       run: cargo test --all --release ::browser
 
   check:
+    name: Check
+
     runs-on: ubuntu-latest
 
     steps:
@@ -73,6 +77,8 @@ jobs:
         ./bin/forbid
 
   native:
+    name: Native
+
     strategy:
       matrix:
         os:
@@ -98,6 +104,8 @@ jobs:
       run: cargo test --all --release ::native
 
   pages:
+    name: Pages
+
     runs-on: ubuntu-latest
 
     steps:
