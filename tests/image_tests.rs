@@ -383,7 +383,8 @@ image_test! {
 
 image_test! {
   name: smear,
-  program: "seed:19798 rotate-color:g:0.01 rotate:0.01 for:100 random:all:circle:cross:square:top:x apply loop rotate-color:b:0.01 rotate:0.01 for:100 random:all:circle:cross:square:top:x apply loop save",
+  program: "seed:9 rotate-color:g:0.01 rotate:0.01 for:100 random:all:circle:cross:square:top:x apply loop rotate-color:b:0.01 rotate:0.01 for:100 random:all:circle:cross:square:top:x apply loop save",
+  browser: true,
 }
 
 image_test! {
