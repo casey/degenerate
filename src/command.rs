@@ -14,7 +14,7 @@ pub(crate) enum Command {
   Open(Option<PathBuf>),
   Operation(Operation),
   Print,
-  RandomMask,
+  Random(Vec<Command>),
   Read,
   #[cfg(not(target_arch = "wasm32"))]
   Repl,
@@ -61,7 +61,13 @@ impl FromStr for Command {
       ["open", path] => Ok(Self::Open(Some(path.parse()?))),
       ["open"] => Ok(Self::Open(None)),
       ["print"] => Ok(Self::Print),
-      ["random-mask"] => Ok(Self::RandomMask),
+      ["random", words @ ..] => Ok(Self::Random(
+        words
+          .iter()
+          .cloned()
+          .map(Command::from_str)
+          .collect::<Result<Vec<Command>>>()?,
+      )),
       ["read"] => Ok(Self::Read),
       ["repl"] => {
         #[cfg(target_arch = "wasm32")]

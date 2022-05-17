@@ -202,9 +202,10 @@ impl Computer {
       Command::Mask(mask) => self.mask = mask,
       Command::Operation(operation) => self.operation = operation,
       Command::Print => self.print()?,
-      Command::RandomMask => {
-        let mask = self.rng.gen();
-        self.execute(Command::Mask(mask))?;
+      Command::Random(commands) => {
+        if let Some(command) = commands.choose(&mut self.rng) {
+          self.execute(command.clone())?;
+        }
       }
       Command::Read => {
         let source = fs::read_to_string("program.degen")?;

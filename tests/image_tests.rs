@@ -181,8 +181,8 @@ image_test! {
 }
 
 image_test! {
-  name: random_mask,
-  program: "random-mask apply save",
+  name: random,
+  program: "random:circle:square:x apply save",
   browser: true,
 }
 
@@ -370,14 +370,14 @@ image_test! {
 }
 
 image_test! {
-  name: seed_random_mask,
-  program: "seed:2 random-mask apply save",
+  name: seed_random,
+  program: "seed:2 random:square:circle:x apply save",
   browser: true,
 }
 
 image_test! {
   name: smear,
-  program: "seed:19798 rotate-color:g:0.01 rotate:0.01 for:100 random-mask apply loop rotate-color:b:0.01 rotate:0.01 for:100 random-mask apply loop save",
+  program: "seed:19798 rotate-color:g:0.01 rotate:0.01 for:100 random:circle:square:x apply loop rotate-color:b:0.01 rotate:0.01 for:100 random:circle:square:x apply loop save",
 }
 
 image_test! {
@@ -394,7 +394,8 @@ image_test! {
 
 image_test! {
   name: starburst,
-  program: "seed:12462 rotate-color:g:0.1 rotate:0.1 for:10 random-mask apply loop rotate-color:b:0.1 rotate:0.1 for:10 random-mask apply loop save",
+  program: "seed:8 rotate-color:g:0.1 rotate:0.1 for:10 random:all:circle:cross:square:top:x apply loop rotate-color:b:0.1 rotate:0.1 for:10 random:all:circle:cross:square:top:x apply loop save",
+  browser: true,
 }
 
 image_test! {
