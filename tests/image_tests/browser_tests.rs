@@ -151,7 +151,9 @@ impl Test {
       ))
       .await?;
 
-    for i in 0..10 {
+    let start = Instant::now();
+
+    loop {
       page
         .find_elements("textarea")
         .await?
@@ -159,11 +161,7 @@ impl Test {
         .ok_or("Could not find textarea")?
         .type_str(" ")
         .await?;
-    }
 
-    let start = Instant::now();
-
-    loop {
       let done = page.evaluate("window.done").await?.into_value::<bool>()?;
 
       let errors = page
