@@ -105,11 +105,13 @@ image_test! {
 image_test! {
   name: brilliance,
   program: "x rotate-color:g:0.07 rotate:0.07 for:10 apply loop rotate-color:b:0.09 rotate:0.09 for:10 apply loop save",
+  browser: true,
 }
 
 image_test! {
   name: carpet,
   program: "circle scale:0.5 for:8 apply wrap loop save",
+  browser: true,
 }
 
 image_test! {
@@ -145,11 +147,13 @@ image_test! {
 image_test! {
   name: diamonds,
   program: "rotate:0.3333 rotate-color:g:0.05 circle scale:0.5 wrap for:8 apply loop rotate:0.8333 rotate-color:b:0.05 for:8 apply loop save",
+  browser: true,
 }
 
 image_test! {
   name: grain,
   program: "rotate:0.111 for:16 square apply circle apply loop save",
+  browser: true,
 }
 
 image_test! {
@@ -167,6 +171,7 @@ image_test! {
 image_test! {
   name: orbs,
   program: "rotate-color:g:0.05 circle scale:0.75 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop save",
+  browser: true,
 }
 
 image_test! {
