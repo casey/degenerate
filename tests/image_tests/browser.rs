@@ -3,8 +3,15 @@ use {
   axum::{http::StatusCode, response::IntoResponse, routing::get_service, Router},
   chromiumoxide::browser::BrowserConfig,
   futures::StreamExt,
-  std::{io, net::SocketAddr, process::Command, sync::Once, time::Duration},
-  tokio::task,
+  std::{
+    io,
+    net::SocketAddr,
+    process::Command,
+    sync::atomic::{AtomicU16, Ordering},
+    sync::Once,
+    time::Duration,
+  },
+  tokio::{runtime::Runtime, task},
   tower_http::{services::ServeDir, trace::TraceLayer},
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
 };
@@ -12,8 +19,6 @@ use {
 struct Browser {
   browser_handle: task::JoinHandle<()>,
   inner: chromiumoxide::Browser,
-  port: u16,
-  server_handle: task::JoinHandle<()>,
 }
 
 impl Browser {
@@ -25,22 +30,6 @@ impl Browser {
     )
     .await?;
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 0));
-    let listener = tokio::net::TcpListener::bind(addr).await?;
-    let port = listener.local_addr()?.port();
-    drop(listener);
-
-    let addr = SocketAddr::from(([127, 0, 0, 1], port));
-    tracing::trace!("Listening on {}", addr);
-
-    let app = Router::new()
-      .fallback(get_service(ServeDir::new("tests/www")).handle_error(Browser::handle_error))
-      .layer(TraceLayer::new_for_http());
-
-    let server = axum::Server::bind(&addr).serve(app.into_make_service());
-
-    let server_handle = task::spawn(async move { server.await.unwrap() });
-
     let browser_handle = task::spawn(async move {
       loop {
         let _ = handler.next().await.unwrap();
@@ -50,8 +39,6 @@ impl Browser {
     Ok(Browser {
       browser_handle,
       inner,
-      port,
-      server_handle,
     })
   }
 
@@ -66,12 +53,12 @@ impl Browser {
 impl Drop for Browser {
   fn drop(&mut self) {
     self.browser_handle.abort();
-    self.server_handle.abort();
   }
 }
 
-fn setup() {
+fn setup() -> u16 {
   static ONCE: Once = Once::new();
+  static PORT: AtomicU16 = AtomicU16::new(0);
 
   ONCE.call_once(|| {
     tracing_subscriber::registry()
@@ -109,13 +96,38 @@ fn setup() {
     }
 
     eprintln!("Done with setup!");
+    let rt = Box::new(Runtime::new().unwrap());
+
+    let addr = SocketAddr::from(([127, 0, 0, 1], 0));
+    let listener = std::net::TcpListener::bind(addr).unwrap();
+    let port = listener.local_addr().unwrap().port();
+    drop(listener);
+
+    rt.spawn(async move {
+      let addr = SocketAddr::from(([127, 0, 0, 1], port));
+      tracing::trace!("Listening on {}", addr);
+
+      let app = Router::new()
+        .fallback(get_service(ServeDir::new("tests/www")).handle_error(Browser::handle_error))
+        .layer(TraceLayer::new_for_http());
+
+      let server = axum::Server::bind(&addr).serve(app.into_make_service());
+
+      task::spawn(async move { server.await.unwrap() });
+    });
+
+    Box::leak(rt);
+
+    PORT.store(port, Ordering::Relaxed);
   });
+
+  PORT.load(Ordering::Relaxed)
 }
 
 pub async fn test(name: &str, program: &str) -> Result {
   super::clean();
 
-  setup();
+  let port = setup();
 
   eprintln!("Launching browser...");
 
@@ -125,7 +137,7 @@ pub async fn test(name: &str, program: &str) -> Result {
 
   let page = browser
     .inner
-    .new_page(format!("http://127.0.0.1:{}", browser.port))
+    .new_page(format!("http://127.0.0.1:{}", port))
     .await?;
 
   eprintln!("Waiting for module to load...");
