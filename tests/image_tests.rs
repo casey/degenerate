@@ -7,26 +7,6 @@ macro_rules! image_test {
   (
     name: $name:ident,
     program: $program:literal,
-    browser: false,
-  ) => {
-    mod $name {
-      use super::*;
-
-      #[test]
-      fn native() -> Result {
-        native::test(stringify!($name), $program)
-      }
-
-      #[test]
-      #[ignore]
-      fn browser() -> Result {
-        browser::test(stringify!($name), $program)
-      }
-    }
-  };
-  (
-    name: $name:ident,
-    program: $program:literal,
   ) => {
     mod $name {
       use super::*;

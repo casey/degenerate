@@ -183,7 +183,6 @@ impl Computer {
       }
       Command::Mask(mask) => self.mask = mask,
       Command::Operation(operation) => self.operation = operation,
-      Command::Print => self.print()?,
       Command::Resize(dimensions) => {
         self.resize((dimensions.0.try_into()?, dimensions.1.try_into()?));
       }
@@ -223,24 +222,5 @@ impl Computer {
       self.memory.transpose().iter().flatten().cloned().collect(),
     )
     .ok_or_else(|| "Memory is not a valid image".into())
-  }
-
-  fn print(&self) -> Result<()> {
-    let mut w = BufWriter::new(io::stdout());
-
-    for row in self.memory.row_iter() {
-      for element in &row {
-        write!(
-          w,
-          "{:X}",
-          element.xyz().map(|scalar| scalar as u32).sum() / (16 * 3)
-        )?;
-      }
-      writeln!(w)?;
-    }
-
-    w.flush()?;
-
-    Ok(())
   }
 }

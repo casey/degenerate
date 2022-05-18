@@ -9,13 +9,7 @@ use {
     Vector4,
   },
   rand::{rngs::StdRng, seq::SliceRandom, SeedableRng},
-  std::{
-    env, f64,
-    io::{self, BufWriter, Write},
-    path::PathBuf,
-    process,
-    str::FromStr,
-  },
+  std::{env, f64, path::PathBuf, process, str::FromStr},
   strum::EnumString,
 };
 

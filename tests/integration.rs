@@ -199,18 +199,3 @@ fn errors_printed_in_red_and_bold() -> Result<()> {
     )
     .run()
 }
-
-#[test]
-fn print() -> Result {
-  Test::new()?
-    .program("resize:4 print")
-    .expected_stdout(
-      "
-      0000
-      0000
-      0000
-      0000
-      ",
-    )
-    .run()
-}
