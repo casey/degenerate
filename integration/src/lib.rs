@@ -1,22 +1,27 @@
 use {
-  axum::{http::StatusCode, response::IntoResponse, routing::get_service, Router},
+  axum::{http::StatusCode, routing::get_service, Router},
   chromiumoxide::browser::{Browser, BrowserConfig},
   futures::StreamExt,
   lazy_static::lazy_static,
-  std::{fs, io, net::SocketAddr, process::Command, str, time::Duration},
+  std::{fs, net::SocketAddr, process::Command, str, time::Duration},
   tokio::{runtime::Runtime, task},
   tower_http::{services::ServeDir, trace::TraceLayer},
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
 };
 
-type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
-
-async fn handle_error(err: io::Error) -> impl IntoResponse {
+macro_rules! image_test {
   (
-    StatusCode::INTERNAL_SERVER_ERROR,
-    format!("I/O error: {}", err),
-  )
+    name: $name:ident,
+    program: $program:literal,
+  ) => {
+    #[test]
+    fn $name() -> Result {
+      image_test(stringify!($name), $program)
+    }
+  };
 }
+
+type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
 lazy_static! {
   static ref BROWSER: Browser = {
@@ -104,7 +109,14 @@ lazy_static! {
       tracing::trace!("Listening on {}", addr);
 
       let app = Router::new()
-        .fallback(get_service(ServeDir::new("www")).handle_error(handle_error))
+        .fallback(
+          get_service(ServeDir::new("www")).handle_error(|err| async move {
+            (
+              StatusCode::INTERNAL_SERVER_ERROR,
+              format!("I/O error: {}", err),
+            )
+          }),
+        )
         .layer(TraceLayer::new_for_http());
 
       let server = axum::Server::bind(&addr).serve(app.into_make_service());
@@ -116,7 +128,7 @@ lazy_static! {
   };
 }
 
-pub(crate) fn test(name: &str, program: &str) -> Result {
+pub(crate) fn image_test(name: &str, program: &str) -> Result {
   let browser: &'static Browser = &*BROWSER;
   RUNTIME.block_on(async {
     *CLEAN;
@@ -157,7 +169,18 @@ pub(crate) fn test(name: &str, program: &str) -> Result {
 
       have.save(&destination)?;
 
-      set_label_red(&destination)?;
+      #[cfg(target_os = "macos")]
+      {
+        let status = Command::new("xattr")
+          .args(["-wx", "com.apple.FinderInfo"])
+          .arg("0000000000000000000C00000000000000000000000000000000000000000000")
+          .arg(&destination)
+          .status()?;
+
+        if !status.success() {
+          panic!("xattr failed: {}", status);
+        }
+      }
 
       panic!(
         "Image test failed:\nExpected: {}\nActual:   {}",
@@ -167,35 +190,6 @@ pub(crate) fn test(name: &str, program: &str) -> Result {
 
     Ok(())
   })
-}
-
-macro_rules! image_test {
-  (
-    name: $name:ident,
-    program: $program:literal,
-  ) => {
-    #[test]
-    fn $name() -> Result {
-      test(stringify!($name), $program)
-    }
-  };
-}
-
-fn set_label_red(_path: &str) -> Result {
-  #[cfg(target_os = "macos")]
-  {
-    let status = Command::new("xattr")
-      .args(["-wx", "com.apple.FinderInfo"])
-      .arg("0000000000000000000C00000000000000000000000000000000000000000000")
-      .arg(_path)
-      .status()?;
-
-    if !status.success() {
-      panic!("xattr failed: {}", status);
-    }
-  }
-
-  Ok(())
 }
 
 image_test! {
