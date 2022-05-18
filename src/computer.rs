@@ -5,9 +5,7 @@ const ALPHA_OPAQUE: u8 = 255;
 
 pub(crate) struct Computer {
   alpha: f64,
-  autosave: bool,
   default: Vector4<u8>,
-  frame: u64,
   loop_counter: usize,
   mask: Mask,
   memory: DMatrix<Vector4<u8>>,
@@ -64,9 +62,7 @@ impl Computer {
   pub(crate) fn new() -> Self {
     Self {
       alpha: 1.0,
-      autosave: false,
       default: Vector4::new(0, 0, 0, ALPHA_OPAQUE),
-      frame: 0,
       loop_counter: 0,
       mask: Mask::All,
       memory: DMatrix::zeros(0, 0),
@@ -79,14 +75,6 @@ impl Computer {
       wrap: false,
       viewport: Viewport::Fill,
     }
-  }
-
-  fn autosave(&mut self) -> Result {
-    if self.autosave {
-      self.image()?.save(format!("{}.png", self.frame))?;
-      self.frame += 1;
-    }
-    Ok(())
   }
 
   fn dimensions(&self) -> Vector2<usize> {
@@ -132,7 +120,6 @@ impl Computer {
       }
     }
     self.memory = output;
-    self.autosave()?;
     Ok(())
   }
 
@@ -140,7 +127,6 @@ impl Computer {
     match command {
       Command::Alpha(alpha) => self.alpha = alpha,
       Command::Apply => self.apply()?,
-      Command::Autosave => self.autosave = !self.autosave,
       Command::Choose(commands) => {
         if let Some(command) = commands.choose(&mut self.rng) {
           self.execute(command.clone())?;
@@ -168,7 +154,6 @@ impl Computer {
             .as_deref()
             .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
         )?;
-        self.autosave()?;
       }
 
       Command::Loop => {
@@ -248,7 +233,6 @@ impl Computer {
       }
       Command::Resize(dimensions) => {
         self.resize((dimensions.0.try_into()?, dimensions.1.try_into()?));
-        self.autosave()?;
       }
       Command::Rotate(turns) => self
         .similarity

@@ -95,12 +95,6 @@ image_test! {
 }
 
 image_test! {
-  name: autosave,
-  program: "autosave square apply load:0.png x apply load:1.png save",
-  browser: false,
-}
-
-image_test! {
   name: brilliance,
   program: "x rotate-color:g:0.07 rotate:0.07 for:10 apply loop rotate-color:b:0.09 rotate:0.09 for:10 apply loop save",
 }
@@ -183,12 +177,6 @@ image_test! {
 image_test! {
   name: read,
   program: "read save",
-  browser: false,
-}
-
-image_test! {
-  name: resize_256_x_load,
-  program: "autosave resize:256 x apply load:0.png save",
   browser: false,
 }
 
@@ -422,12 +410,6 @@ image_test! {
 image_test! {
   name: x,
   program: "x apply save",
-}
-
-image_test! {
-  name: x_cross_load,
-  program: "autosave x apply cross apply load:0.png save",
-  browser: false,
 }
 
 image_test! {

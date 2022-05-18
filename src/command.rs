@@ -4,7 +4,6 @@ use super::*;
 pub(crate) enum Command {
   Alpha(f64),
   Apply,
-  Autosave,
   Choose(Vec<Command>),
   Comment,
   Default(Vector3<u8>),
@@ -36,7 +35,6 @@ impl FromStr for Command {
       ["all"] => Ok(Self::Mask(Mask::All)),
       ["alpha", alpha] => Ok(Self::Alpha(alpha.parse()?)),
       ["apply"] => Ok(Self::Apply),
-      ["autosave"] => Ok(Self::Autosave),
       ["choose", words @ ..] => Ok(Self::Choose(
         words
           .iter()

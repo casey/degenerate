@@ -252,27 +252,6 @@ fn errors_printed_in_red_and_bold() -> Result<()> {
 }
 
 #[test]
-fn autosave_toggles() -> Result {
-  {
-    let tempdir = Test::new()?
-      .program("autosave resize:256")
-      .run_and_return_tempdir()?;
-
-    assert!(tempdir.path().join("0.png").is_file());
-  }
-
-  {
-    let tempdir = Test::new()?
-      .program("autosave autosave resize:256")
-      .run_and_return_tempdir()?;
-
-    assert!(!tempdir.path().join("0.png").is_file());
-  }
-
-  Ok(())
-}
-
-#[test]
 fn print() -> Result {
   Test::new()?
     .program("resize:4 print")
