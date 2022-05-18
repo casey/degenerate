@@ -12,21 +12,13 @@ use {
   strum::EnumString,
 };
 
-#[cfg(target_arch = "wasm32")]
+type Error = Box<dyn std::error::Error>;
+type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
+
 mod browser;
 mod color_axis;
 mod command;
 mod computer;
 mod mask;
-#[cfg(not(target_arch = "wasm32"))]
-mod native;
 mod operation;
 mod wrap;
-
-type Error = Box<dyn std::error::Error>;
-type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
-
-fn main() {
-  #[cfg(not(target_arch = "wasm32"))]
-  crate::native::run();
-}

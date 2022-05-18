@@ -6,9 +6,41 @@ edition = "2021"
 license = "CC0-1.0"
 autotests = false
 
-[[test]]
-name = "integration"
-path = "tests/integration.rs"
+[workspace]
+members = [".", "integration"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+console_log = "0.2.0"
+getrandom = { version = "0.2.6", features = ["js"] }
+js-sys = "0.3.57"
+log = "0.4.17"
+nalgebra = "0.31.0"
+num-traits = "0.2.14"
+rand = { version = "0.8.4" }
+rand_derive2 = "0.1.17"
+strum = { version = "0.24.0", features = ["derive"] }
+console_error_panic_hook = "0.1.7"
+# keep in sync with `.github/workflows/ci.yaml`
+wasm-bindgen = "0.2.80"
+
+[dependencies.web-sys]
+version = "0.3.57"
+features = [
+  "CanvasRenderingContext2d",
+  "Document",
+  "Element",
+  "HtmlCanvasElement",
+  "HtmlCollection",
+  "HtmlElement",
+  "HtmlTextAreaElement",
+  "ImageData",
+  "InputEvent",
+  "Window",
+  "console",
+]
 
 [dev-dependencies]
 approx = "0.5.0"
@@ -26,44 +58,3 @@ tower-http = { version = "0.3.0", features = ["fs", "trace"] }
 tracing = "0.1.34"
 tracing-subscriber = { version = "0.3.0", features = ["env-filter"] }
 unindent = "0.1.7"
-
-[build-dependencies]
-camino = "1.0.5"
-indoc = "1.0.3"
-urlencoding = "2.1.0"
-
-[dependencies]
-console_log = "0.2.0"
-getrandom = { version = "0.2.6", features = ["js"] }
-js-sys = "0.3.57"
-log = "0.4.17"
-nalgebra = "0.31.0"
-num-traits = "0.2.14"
-rand = { version = "0.8.4" }
-rand_derive2 = "0.1.17"
-strum = { version = "0.24.0", features = ["derive"] }
-
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-console_error_panic_hook = "0.1.7"
-# keep in sync with `.github/workflows/ci.yaml`
-wasm-bindgen = "0.2.80"
-
-[target.'cfg(target_arch = "wasm32")'.dependencies.web-sys]
-version = "0.3.57"
-features = [
-  "CanvasRenderingContext2d",
-  "Document",
-  "Element",
-  "HtmlCanvasElement",
-  "HtmlCollection",
-  "HtmlElement",
-  "HtmlTextAreaElement",
-  "ImageData",
-  "InputEvent",
-  "Window",
-  "console",
-]
-
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-ansi_term = "0.12.1"
-atty = "0.2.14"
