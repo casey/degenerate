@@ -149,26 +149,6 @@ image_test! {
 }
 
 image_test! {
-  name: resize_512,
-  program: "resize:512",
-}
-
-image_test! {
-  name: resize_default_pixel,
-  program: "resize:3 default:0:255:0 scale:0.5 apply",
-}
-
-image_test! {
-  name: resize_rectangular,
-  program: "resize:512:256",
-}
-
-image_test! {
-  name: resize_starts_from_corner,
-  program: "default:0:255:0 resize:512",
-}
-
-image_test! {
   name: rotate,
   program: "rotate:0.05 x apply",
 }
@@ -309,56 +289,6 @@ image_test! {
 }
 
 image_test! {
-  name: viewport_fill_square,
-  program: "fill x apply",
-}
-
-image_test! {
-  name: viewport_fill_landscape,
-  program: "resize:512:256 fill x apply",
-}
-
-image_test! {
-  name: viewport_fill_portrait,
-  program: "resize:256:512 fill x apply",
-}
-
-image_test! {
-  name: viewport_fit_square,
-  program: "fit x apply",
-}
-
-image_test! {
-  name: viewport_fit_landscape,
-  program: "resize:512:256 fit x apply",
-}
-
-image_test! {
-  name: viewport_fit_portrait,
-  program: "resize:256:512 fit x apply",
-}
-
-image_test! {
-  name: viewport_override,
-  program: "resize:512:256 fit stretch x apply",
-}
-
-image_test! {
-  name: viewport_stretch_square,
-  program: "stretch x apply",
-}
-
-image_test! {
-  name: viewport_stretch_landscape,
-  program: "resize:512:256 stretch x apply",
-}
-
-image_test! {
-  name: viewport_stretch_portrait,
-  program: "resize:256:512 stretch x apply",
-}
-
-image_test! {
   name: x,
   program: "x apply",
 }
@@ -381,61 +311,6 @@ image_test! {
 image_test! {
   name: debug_operation,
   program: "debug apply",
-}
-
-image_test! {
-  name: debug_operation_landscape,
-  program: "resize:512:256 debug apply",
-}
-
-image_test! {
-  name: double_apply_fill_landscape,
-  program: "resize:512:256 fill x apply apply",
-}
-
-image_test! {
-  name: double_apply_fit_landscape,
-  program: "resize:512:256 fit x apply apply",
-}
-
-image_test! {
-  name: double_apply_stretch_landscape,
-  program: "resize:512:256 stretch x apply apply",
-}
-
-image_test! {
-  name: double_apply_fill_portrait,
-  program: "resize:256:512 fill x apply apply",
-}
-
-image_test! {
-  name: double_apply_fit_portrait,
-  program: "resize:256:512 fit x apply apply",
-}
-
-image_test! {
-  name: double_apply_stretch_portrait,
-  program: "resize:256:512 stretch x apply apply",
-}
-
-image_test! {
-  name: double_apply_fill_square,
-  program: "fill x apply apply",
-}
-
-image_test! {
-  name: double_apply_fit_square,
-  program: "fit x apply apply",
-}
-
-image_test! {
-  name: double_apply_stretch_square,
-  program: "stretch x apply apply",
-}
-
-image_test! {
-  name: double_apply_with_scale,
-  program: "resize:512:256 scale:0.5 x apply apply",
 }
 
 image_test! {

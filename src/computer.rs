@@ -13,7 +13,6 @@ pub(crate) struct Computer {
   program_counter: usize,
   rng: StdRng,
   similarity: Similarity2<f64>,
-  viewport: Viewport,
   wrap: bool,
 }
 
@@ -64,7 +63,6 @@ impl Computer {
       rng: StdRng::seed_from_u64(0),
       similarity: Similarity2::identity(),
       wrap: false,
-      viewport: Viewport::Fill,
     }
   }
 
@@ -75,7 +73,7 @@ impl Computer {
   fn apply(&mut self) -> Result {
     let similarity = self.similarity.inverse();
     let dimensions = self.dimensions();
-    let transform = self.viewport.transform(dimensions);
+    let transform = Viewport::Stretch.transform(dimensions);
     let inverse = transform.inverse();
     let mut output = self.memory.clone();
     for col in 0..self.memory.ncols() {
@@ -127,7 +125,6 @@ impl Computer {
       Command::Default(default) => {
         self.default = Vector4::new(default.x, default.y, default.z, ALPHA_OPAQUE);
       }
-      Command::Viewport(viewport) => self.viewport = viewport,
       Command::For(until) => {
         if self.loop_counter as u64 >= until {
           loop {
@@ -154,9 +151,6 @@ impl Computer {
       }
       Command::Mask(mask) => self.mask = mask,
       Command::Operation(operation) => self.operation = operation,
-      Command::Resize(dimensions) => {
-        self.resize((dimensions.0.try_into()?, dimensions.1.try_into()?));
-      }
       Command::Rotate(turns) => self
         .similarity
         .append_rotation_mut(&UnitComplex::from_angle(turns * f64::consts::TAU)),

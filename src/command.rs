@@ -11,11 +11,9 @@ pub(crate) enum Command {
   Loop,
   Mask(Mask),
   Operation(Operation),
-  Resize((u64, u64)),
   Rotate(f64),
   Scale(f64),
   Seed(u64),
-  Viewport(Viewport),
   Wrap,
 }
 
@@ -43,8 +41,6 @@ impl FromStr for Command {
         g.parse()?,
         b.parse()?,
       ))),
-      ["fit"] => Ok(Self::Viewport(Viewport::Fit)),
-      ["fill"] => Ok(Self::Viewport(Viewport::Fill)),
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["identity"] => Ok(Self::Operation(Operation::Identity)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
@@ -53,11 +49,6 @@ impl FromStr for Command {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
       })),
-      ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
-      ["resize", size] => {
-        let size = size.parse()?;
-        Ok(Self::Resize((size, size)))
-      }
       ["rotate", turns] => Ok(Self::Rotate(turns.parse()?)),
       ["rotate-color", axis, turns] => Ok(Self::Operation(Operation::RotateColor(
         axis.parse()?,
@@ -70,7 +61,6 @@ impl FromStr for Command {
       ["scale", scaling] => Ok(Self::Scale(scaling.parse()?)),
       ["seed", seed] => Ok(Self::Seed(seed.parse()?)),
       ["square"] => Ok(Self::Mask(Mask::Square)),
-      ["stretch"] => Ok(Self::Viewport(Viewport::Stretch)),
       ["top"] => Ok(Self::Mask(Mask::Top)),
       ["wrap"] => Ok(Self::Wrap),
       ["x"] => Ok(Self::Mask(Mask::X)),
