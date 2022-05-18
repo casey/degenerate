@@ -1,7 +1,7 @@
 use {
   crate::{
     color_axis::ColorAxis, command::Command, computer::Computer, gpu::Gpu, mask::Mask,
-    operation::Operation, software::Software, wrap::Wrap,
+    operation::Operation, wrap::Wrap,
   },
   nalgebra::{
     Affine2, DMatrix, Matrix3, Point2, Rotation3, Similarity2, UnitComplex, Vector2, Vector3,
@@ -24,7 +24,6 @@ mod mask;
 #[cfg(not(target_arch = "wasm32"))]
 mod native;
 mod operation;
-mod software;
 mod wrap;
 
 type Error = Box<dyn std::error::Error>;

@@ -5,7 +5,6 @@ const ALPHA_OPAQUE: u8 = 255;
 pub(crate) struct Computer {
   alpha: f64,
   default: Vector4<u8>,
-  frame: u64,
   gpu: Option<Arc<dyn Gpu>>,
   loop_counter: usize,
   mask: Mask,
@@ -66,7 +65,6 @@ impl Computer {
     Self {
       alpha: 1.0,
       default: Vector4::new(0, 0, 0, ALPHA_OPAQUE),
-      frame: 0,
       gpu,
       loop_counter: 0,
       mask: Mask::All,

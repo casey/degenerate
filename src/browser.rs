@@ -15,7 +15,7 @@ pub(crate) use {
   web_sys::{
     CanvasRenderingContext2d, Document, Element, EventTarget, HtmlCanvasElement, HtmlElement,
     HtmlTextAreaElement, ImageData, WebGl2RenderingContext, WebGlFramebuffer, WebGlProgram,
-    WebGlShader, WebGlTexture, WebGlUniformLocation, Window,
+    WebGlShader, WebGlTexture, Window,
   },
 };
 
