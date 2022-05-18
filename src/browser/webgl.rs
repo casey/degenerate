@@ -292,7 +292,7 @@ impl WebGl {
       canvas.width().try_into()?,
       canvas.height().try_into()?,
       0,
-      WebGl2RenderingContext::RGBA.try_into()?,
+      WebGl2RenderingContext::RGBA,
       WebGl2RenderingContext::UNSIGNED_BYTE,
       &canvas,
     )
@@ -360,6 +360,6 @@ impl WebGl {
       0,
     );
 
-    Ok((vertex_data.len() / 3).try_into()?)
+    Ok(vertex_data.len() / 3)
   }
 }
