@@ -175,12 +175,6 @@ image_test! {
 }
 
 image_test! {
-  name: read,
-  program: "read save",
-  browser: false,
-}
-
-image_test! {
   name: resize_512,
   program: "resize:512 save",
 }

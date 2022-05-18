@@ -184,19 +184,6 @@ impl Computer {
       Command::Mask(mask) => self.mask = mask,
       Command::Operation(operation) => self.operation = operation,
       Command::Print => self.print()?,
-      Command::Read => {
-        let source = fs::read_to_string("program.degen")?;
-
-        let mut program = Vec::new();
-
-        for word in source.split_whitespace() {
-          program.push(word.parse()?);
-        }
-
-        self
-          .program
-          .splice(self.program_counter + 1..self.program_counter + 1, program);
-      }
       Command::Resize(dimensions) => {
         self.resize((dimensions.0.try_into()?, dimensions.1.try_into()?));
       }

@@ -13,7 +13,6 @@ pub(crate) enum Command {
   Open(Option<PathBuf>),
   Operation(Operation),
   Print,
-  Read,
   Resize((u64, u64)),
   Rotate(f64),
   Save(Option<PathBuf>),
@@ -61,7 +60,6 @@ impl FromStr for Command {
       ["open", path] => Ok(Self::Open(Some(path.parse()?))),
       ["open"] => Ok(Self::Open(None)),
       ["print"] => Ok(Self::Print),
-      ["read"] => Ok(Self::Read),
       ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["resize", size] => {
         let size = size.parse()?;

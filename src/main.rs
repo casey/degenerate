@@ -10,7 +10,7 @@ use {
   },
   rand::{rngs::StdRng, seq::SliceRandom, SeedableRng},
   std::{
-    env, f64, fs,
+    env, f64,
     io::{self, BufWriter, Write},
     path::PathBuf,
     process,
