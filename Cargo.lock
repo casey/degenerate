@@ -584,6 +584,7 @@ dependencies = [
  "image",
  "indoc",
  "js-sys",
+ "lazy_static",
  "log",
  "nalgebra",
  "num-traits",
