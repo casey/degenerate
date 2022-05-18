@@ -73,7 +73,7 @@ impl Computer {
   fn apply(&mut self) -> Result {
     let similarity = self.similarity.inverse();
     let dimensions = self.dimensions();
-    let transform = Viewport::Stretch.transform(dimensions);
+    let transform = self.transform();
     let inverse = transform.inverse();
     let mut output = self.memory.clone();
     for col in 0..self.memory.ncols() {
@@ -168,5 +168,17 @@ impl Computer {
     self
       .memory
       .resize_mut(dimensions.0, dimensions.1, self.default)
+  }
+
+  fn transform(&self) -> Affine2<f64> {
+    let d = self.dimensions().map(|element| element as f64);
+
+    Affine2::from_matrix_unchecked(
+      Matrix3::identity()
+        .append_translation(&Vector2::from_element(0.5))
+        .append_nonuniform_scaling(&Vector2::new(1.0 / d.x, 1.0 / d.y))
+        .append_scaling(2.0)
+        .append_translation(&Vector2::from_element(-1.0)),
+    )
   }
 }
