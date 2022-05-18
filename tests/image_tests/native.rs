@@ -1,6 +1,12 @@
 use super::*;
 
 pub fn test(name: &str, program: &str) -> Result {
+  let program = if program.ends_with(" save") {
+    program.to_string()
+  } else {
+    format!("{program} save")
+  };
+
   let destination = format!("images/{}.native-actual-memory.png", name);
 
   fs::remove_file(&destination).ok();
