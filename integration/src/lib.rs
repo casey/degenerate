@@ -1,19 +1,15 @@
-use std::{fs, str};
-
-type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
-
-use std::sync::Once;
-
 use {
   axum::{http::StatusCode, response::IntoResponse, routing::get_service, Router},
   chromiumoxide::browser::{Browser, BrowserConfig},
   futures::StreamExt,
   lazy_static::lazy_static,
-  std::{io, net::SocketAddr, process::Command, time::Duration},
+  std::{fs, io, net::SocketAddr, process::Command, str, time::Duration},
   tokio::{runtime::Runtime, task},
   tower_http::{services::ServeDir, trace::TraceLayer},
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
 };
+
+type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
 async fn handle_error(err: io::Error) -> impl IntoResponse {
   (
@@ -44,6 +40,19 @@ lazy_static! {
     });
 
     browser
+  };
+  static ref CLEAN: () = {
+    for result in fs::read_dir("images").unwrap() {
+      let entry = result.unwrap();
+      let path = entry.path();
+      let file_name = path.file_name().unwrap().to_str().unwrap().to_string();
+
+      if file_name.ends_with(".native-actual-memory.png")
+        || file_name.ends_with(".browser-actual-memory.png")
+      {
+        fs::remove_file(path).unwrap();
+      }
+    }
   };
   static ref RUNTIME: Runtime = Runtime::new().unwrap();
   static ref SERVER_PORT: u16 = {
@@ -110,7 +119,7 @@ lazy_static! {
 pub(crate) fn test(name: &str, program: &str) -> Result {
   let browser: &'static Browser = &*BROWSER;
   RUNTIME.block_on(async {
-    clean();
+    *CLEAN;
 
     eprintln!("Creating page...");
 
@@ -170,24 +179,6 @@ macro_rules! image_test {
       test(stringify!($name), $program)
     }
   };
-}
-
-fn clean() {
-  static CLEAN: Once = Once::new();
-
-  CLEAN.call_once(|| {
-    for result in fs::read_dir("images").unwrap() {
-      let entry = result.unwrap();
-      let path = entry.path();
-      let file_name = path.file_name().unwrap().to_str().unwrap().to_string();
-
-      if file_name.ends_with(".native-actual-memory.png")
-        || file_name.ends_with(".browser-actual-memory.png")
-      {
-        fs::remove_file(path).unwrap();
-      }
-    }
-  });
 }
 
 fn set_label_red(_path: &str) -> Result {
