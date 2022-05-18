@@ -14,7 +14,6 @@ pub(crate) struct Computer {
   program_counter: usize,
   rng: StdRng,
   similarity: Similarity2<f64>,
-  verbose: bool,
   viewport: Viewport,
   wrap: bool,
 }
@@ -22,12 +21,6 @@ pub(crate) struct Computer {
 impl Computer {
   pub(crate) fn run(&mut self, incremental: bool) -> Result {
     while let Some(command) = self.program.get(self.program_counter).cloned() {
-      if self.verbose {
-        eprintln!(
-          "PC {} LC {} M {:?} C {:?}",
-          self.program_counter, self.loop_counter, self.mask, command,
-        );
-      }
       self.execute(command.clone())?;
       self.program_counter = self.program_counter.wrapping_add(1);
 
@@ -71,7 +64,6 @@ impl Computer {
       program_counter: 0,
       rng: StdRng::seed_from_u64(0),
       similarity: Similarity2::identity(),
-      verbose: false,
       wrap: false,
       viewport: Viewport::Fill,
     }
@@ -182,7 +174,6 @@ impl Computer {
         self.similarity.append_scaling_mut(scaling);
       }
       Command::Seed(seed) => self.rng = StdRng::seed_from_u64(seed),
-      Command::Verbose => self.verbose = !self.verbose,
       Command::Wrap => self.wrap = !self.wrap,
     }
 

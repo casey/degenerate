@@ -130,19 +130,6 @@ fn save_invalid_format() -> Result {
 }
 
 #[test]
-fn verbose_toggles_step_status() -> Result {
-  Test::new()?
-    .program("verbose square verbose square")
-    .expected_stderr(
-      "
-      PC 1 LC 0 M All C Mask(Square)
-      PC 2 LC 0 M Square C Verbose
-      ",
-    )
-    .run()
-}
-
-#[test]
 fn infinite_loop() -> Result {
   Test::new()?
     .program("loop")

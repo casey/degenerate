@@ -16,7 +16,6 @@ pub(crate) enum Command {
   Save(Option<PathBuf>),
   Scale(f64),
   Seed(u64),
-  Verbose,
   Viewport(Viewport),
   Wrap,
 }
@@ -76,7 +75,6 @@ impl FromStr for Command {
       ["square"] => Ok(Self::Mask(Mask::Square)),
       ["stretch"] => Ok(Self::Viewport(Viewport::Stretch)),
       ["top"] => Ok(Self::Mask(Mask::Top)),
-      ["verbose"] => Ok(Self::Verbose),
       ["wrap"] => Ok(Self::Wrap),
       ["x"] => Ok(Self::Mask(Mask::X)),
       _ => Err(format!("Invalid command: {}", s).into()),
