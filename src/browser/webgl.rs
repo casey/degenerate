@@ -6,10 +6,8 @@ static VERTEX: &str = indoc! {"
   in vec4 position;
   out vec2 uv;
 
-  uniform mat3 transform;
-
   void main() {
-    uv = (transform * vec3(position.xy, 1.0)).xy;
+    uv = position.xy * 0.5 + 0.5;
     gl_Position = position;
   }
 "};
@@ -216,19 +214,6 @@ impl WebGl {
         .get_uniform_location(&self.program, &state.operation().to_string())
         .as_ref(),
       1,
-    );
-
-    self.context.uniform_matrix3fv_with_f32_array(
-      self
-        .context
-        .get_uniform_location(&self.program, "transform")
-        .as_ref(),
-      true,
-      state
-        .transform()
-        .to_homogeneous()
-        .map(|v| v as f32)
-        .as_slice(),
     );
 
     self.context.draw_arrays(
