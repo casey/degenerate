@@ -1,7 +1,7 @@
 use {
   crate::{
-    color_axis::ColorAxis, command::Command, computer::Computer, mask::Mask,
-    operation::Operation, viewport::Viewport, wrap::Wrap,
+    color_axis::ColorAxis, command::Command, computer::Computer, mask::Mask, operation::Operation,
+    viewport::Viewport, wrap::Wrap,
   },
   image::{ImageBuffer, RgbaImage},
   nalgebra::{

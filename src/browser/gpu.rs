@@ -141,8 +141,6 @@ impl Gpu {
 
     let length = Self::setup_triangles(&context, &program)?;
 
-    let source = Cell::new(0);
-
     let mut textures = (0..2)
       .map(|_| Self::create_texture(&context))
       .collect::<Result<Vec<WebGlTexture>, _>>()?;
@@ -162,7 +160,7 @@ impl Gpu {
       nav,
       program,
       resize: true,
-      source,
+      source: Cell::new(0),
       stderr: stderr.clone(),
       textarea: textarea.clone(),
       textures,

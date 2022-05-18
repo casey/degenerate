@@ -12,12 +12,16 @@ use std::fmt::{self, Display, Formatter};
 
 impl Display for Operation {
   fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-    write!(f, "{}", match self {
-      Self::Debug => "debug",
-      Self::Identity => "identity",
-      Self::Invert => "invert",
-      Self::RotateColor(..) => "rotate_color"
-    })
+    write!(
+      f,
+      "{}",
+      match self {
+        Self::Debug => "debug",
+        Self::Identity => "identity",
+        Self::Invert => "invert",
+        Self::RotateColor(..) => "rotate_color",
+      }
+    )
   }
 }
 
