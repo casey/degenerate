@@ -5,8 +5,8 @@ pub(crate) enum Mask {
   All,
   Circle,
   Cross,
-  Mod { divisor: usize, remainder: usize },
-  Rows { nrows: usize, step: usize },
+  Mod { divisor: u64, remainder: u64 },
+  Rows { nrows: u64, step: u64 },
   Square,
   Top,
   X,
@@ -27,14 +27,14 @@ impl Mask {
         if *divisor == 0 {
           false
         } else {
-          ((pixel.x as usize)
-            .wrapping_mul(dimensions.y)
-            .wrapping_add(pixel.y as usize))
+          ((pixel.x as u64)
+            .wrapping_mul(dimensions.y as u64)
+            .wrapping_add(pixel.y as u64))
             % *divisor
             == *remainder
         }
       }
-      Self::Rows { nrows, step } => pixel.y as usize % (nrows.saturating_add(*step)) < *nrows,
+      Self::Rows { nrows, step } => pixel.y as u64 % (nrows.saturating_add(*step)) < *nrows,
       Self::Square => v.coords.abs() < Vector2::new(0.5, 0.5),
       Self::Top => v.y < 0.0,
       Self::X => (v.x - v.y).abs() < 0.25 || (v.x + v.y).abs() < 0.25,

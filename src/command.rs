@@ -8,7 +8,7 @@ pub(crate) enum Command {
   Choose(Vec<Command>),
   Comment,
   Default(Vector3<u8>),
-  For(usize),
+  For(u64),
   Load(Option<PathBuf>),
   Loop,
   Mask(Mask),
@@ -18,7 +18,7 @@ pub(crate) enum Command {
   Read,
   #[cfg(not(target_arch = "wasm32"))]
   Repl,
-  Resize((usize, usize)),
+  Resize((u64, u64)),
   Rotate(f64),
   Save(Option<PathBuf>),
   Scale(f64),

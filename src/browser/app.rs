@@ -169,17 +169,27 @@ impl App {
       }
 
       if resize || program_changed || run {
-        let mut pixels = Vec::new();
-
-        for pixel in &self.computer.memory().transpose() {
-          pixels.extend_from_slice(&[pixel.x, pixel.y, pixel.z, 255]);
-        }
+        let pixels = self
+          .computer
+          .memory()
+          .transpose()
+          .iter()
+          .flatten()
+          .cloned()
+          .collect::<Vec<u8>>();
 
         let image_data = ImageData::new_with_u8_clamped_array(
           wasm_bindgen::Clamped(&pixels),
           self.computer.memory().ncols().try_into()?,
         )
         .map_err(JsValueError)?;
+
+        self
+          .canvas
+          .set_height(self.computer.memory().nrows().try_into()?);
+        self
+          .canvas
+          .set_width(self.computer.memory().ncols().try_into()?);
 
         self
           .context
