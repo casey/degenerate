@@ -119,7 +119,7 @@ fn clean() {
   static ONCE: Once = Once::new();
 
   ONCE.call_once(|| {
-    for result in fs::read_dir("images").unwrap() {
+    for result in fs::read_dir("../images").unwrap() {
       let entry = result.unwrap();
       let path = entry.path();
       let file_name = path.file_name().unwrap().to_str().unwrap().to_string();
@@ -165,12 +165,12 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
       &data_url["data:image/png;base64,".len()..],
     )?)?;
 
-    let want_path = format!("images/{}.png", name);
+    let want_path = format!("../images/{}.png", name);
 
     let want = image::open(&want_path)?;
 
     if have != want {
-      let destination = format!("images/{}.browser-actual-memory.png", name);
+      let destination = format!("../images/{}.browser-actual-memory.png", name);
 
       have.save(&destination)?;
 
