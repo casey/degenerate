@@ -14,17 +14,15 @@ clippy:
 	cargo clippy --package integration --tests
 	cargo clippy --target wasm32-unknown-unknown
 
-run *args:
-	cargo run --release -- {{args}}
-
 fmt:
-	cargo fmt
+	cargo fmt --all
 
 fmt-check:
 	cargo fmt --all -- --check
 
 check:
- cargo check
+	cargo check --target wasm32-unknown-unknown
+	cargo check --package integration --tests
 
 check-lockfile:
 	cargo update --locked --package degenerate
@@ -32,19 +30,8 @@ check-lockfile:
 forbid:
 	./bin/forbid
 
-watch +args='ltest --release':
-	cargo watch --ignore README.md --clear --exec "{{args}}"
-
-generate: build
-	#!/usr/bin/env bash
-	set -eou pipefail
-
-	rm -rf generate
-	mkdir generate
-	for i in {0..9}; do
-		echo Generating image $i...
-		target/release/degenerate resize:512 seed:$i generate save:generate/$i.png
-	done
+watch +args='test --package integration --lib':
+	cargo watch --clear --exec "{{args}}"
 
 build-manual:
 	mdbook build man
@@ -65,8 +52,8 @@ publish:
 
 clean:
 	cargo clean
-	rm -f www/degenerate.js
-	rm -f www/degenerate_bg.wasm
+	rm -f integration/www/degenerate.js
+	rm -f integration/www/degenerate_bg.wasm
 
 doc-web:
 	cargo doc --open --target wasm32-unknown-unknown
