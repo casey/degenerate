@@ -178,7 +178,6 @@ image_test! {
 image_test! {
   name: choose_nonzero_seed,
   program: "seed:2 choose:all:circle:cross:square:top:x apply save",
-  browser: true,
 }
 
 image_test! {
