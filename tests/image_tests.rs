@@ -168,6 +168,7 @@ image_test! {
 image_test! {
   name: random_mask,
   program: "random-mask apply save",
+  browser: false,
 }
 
 image_test! {
@@ -185,25 +186,21 @@ image_test! {
 image_test! {
   name: resize_512,
   program: "resize:512 save",
-  browser: false,
 }
 
 image_test! {
   name: resize_default_pixel,
   program: "resize:3 default:0:255:0 scale:0.5 apply save",
-  browser: false,
 }
 
 image_test! {
   name: resize_rectangular,
   program: "resize:512:256 save",
-  browser: false,
 }
 
 image_test! {
   name: resize_starts_from_corner,
   program: "default:0:255:0 resize:512 save",
-  browser: false,
 }
 
 image_test! {
@@ -269,7 +266,6 @@ image_test! {
 image_test! {
   name: rotate_nonsquare_aspect_ratio,
   program: "resize:512:256 rotate:0.05 x apply save load save",
-  browser: false,
 }
 
 image_test! {
@@ -341,11 +337,13 @@ image_test! {
 image_test! {
   name: seed_random_mask,
   program: "seed:2 random-mask apply save",
+  browser: false,
 }
 
 image_test! {
   name: smear,
   program: "seed:19798 rotate-color:g:0.01 rotate:0.01 for:100 random-mask apply loop rotate-color:b:0.01 rotate:0.01 for:100 random-mask apply loop save",
+  browser: false,
 }
 
 image_test! {
@@ -361,6 +359,7 @@ image_test! {
 image_test! {
   name: starburst,
   program: "seed:12462 rotate-color:g:0.1 rotate:0.1 for:10 random-mask apply loop rotate-color:b:0.1 rotate:0.1 for:10 random-mask apply loop save",
+  browser: false,
 }
 
 image_test! {
@@ -376,13 +375,11 @@ image_test! {
 image_test! {
   name: viewport_fill_landscape,
   program: "resize:512:256 fill x apply save",
-  browser: false,
 }
 
 image_test! {
   name: viewport_fill_portrait,
   program: "resize:256:512 fill x apply save",
-  browser: false,
 }
 
 image_test! {
@@ -393,19 +390,16 @@ image_test! {
 image_test! {
   name: viewport_fit_landscape,
   program: "resize:512:256 fit x apply save",
-  browser: false,
 }
 
 image_test! {
   name: viewport_fit_portrait,
   program: "resize:256:512 fit x apply save",
-  browser: false,
 }
 
 image_test! {
   name: viewport_override,
   program: "resize:512:256 fit stretch x apply save",
-  browser: false,
 }
 
 image_test! {
@@ -416,13 +410,11 @@ image_test! {
 image_test! {
   name: viewport_stretch_landscape,
   program: "resize:512:256 stretch x apply save",
-  browser: false,
 }
 
 image_test! {
   name: viewport_stretch_portrait,
   program: "resize:256:512 stretch x apply save",
-  browser: false,
 }
 
 image_test! {
@@ -459,43 +451,36 @@ image_test! {
 image_test! {
   name: debug_operation_landscape,
   program: "resize:512:256 debug apply save",
-  browser: false,
 }
 
 image_test! {
   name: double_apply_fill_landscape,
   program: "resize:512:256 fill x apply apply save",
-  browser: false,
 }
 
 image_test! {
   name: double_apply_fit_landscape,
   program: "resize:512:256 fit x apply apply save",
-  browser: false,
 }
 
 image_test! {
   name: double_apply_stretch_landscape,
   program: "resize:512:256 stretch x apply apply save",
-  browser: false,
 }
 
 image_test! {
   name: double_apply_fill_portrait,
   program: "resize:256:512 fill x apply apply save",
-  browser: false,
 }
 
 image_test! {
   name: double_apply_fit_portrait,
   program: "resize:256:512 fit x apply apply save",
-  browser: false,
 }
 
 image_test! {
   name: double_apply_stretch_portrait,
   program: "resize:256:512 stretch x apply apply save",
-  browser: false,
 }
 
 image_test! {
@@ -516,7 +501,6 @@ image_test! {
 image_test! {
   name: double_apply_with_scale,
   program: "resize:512:256 scale:0.5 x apply apply save",
-  browser: false,
 }
 
 image_test! {

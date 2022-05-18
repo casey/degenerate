@@ -21,20 +21,6 @@ fn test_inner(program: &str) -> Result<String> {
 
   let document = window.get_document();
 
-  let canvas = document
-    .create_element("canvas")
-    .map_err(JsValueError)?
-    .cast::<HtmlCanvasElement>()?;
-
-  canvas.set_height(256);
-  canvas.set_width(256);
-
-  let context = canvas
-    .get_context("2d")
-    .map_err(JsValueError)?
-    .ok_or("failed to retrieve context")?
-    .cast::<CanvasRenderingContext2d>()?;
-
   let pixels = computer
     .memory()
     .transpose()
@@ -48,6 +34,20 @@ fn test_inner(program: &str) -> Result<String> {
     computer.memory().ncols().try_into()?,
   )
   .map_err(JsValueError)?;
+
+  let canvas = document
+    .create_element("canvas")
+    .map_err(JsValueError)?
+    .cast::<HtmlCanvasElement>()?;
+
+  canvas.set_height(computer.memory().nrows().try_into()?);
+  canvas.set_width(computer.memory().ncols().try_into()?);
+
+  let context = canvas
+    .get_context("2d")
+    .map_err(JsValueError)?
+    .ok_or("failed to retrieve context")?
+    .cast::<CanvasRenderingContext2d>()?;
 
   context
     .put_image_data(&image_data, 0.0, 0.0)
