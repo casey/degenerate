@@ -4,27 +4,16 @@ use super::*;
 pub(crate) enum Command {
   Alpha(f64),
   Apply,
-  Autosave,
   Choose(Vec<Command>),
   Comment,
   Default(Vector3<u8>),
   For(u64),
-  Load(Option<PathBuf>),
   Loop,
   Mask(Mask),
-  Open(Option<PathBuf>),
   Operation(Operation),
-  Print,
-  Read,
-  #[cfg(not(target_arch = "wasm32"))]
-  Repl,
-  Resize((u64, u64)),
   Rotate(f64),
-  Save(Option<PathBuf>),
   Scale(f64),
   Seed(u64),
-  Verbose,
-  Viewport(Viewport),
   Wrap,
 }
 
@@ -36,7 +25,6 @@ impl FromStr for Command {
       ["all"] => Ok(Self::Mask(Mask::All)),
       ["alpha", alpha] => Ok(Self::Alpha(alpha.parse()?)),
       ["apply"] => Ok(Self::Apply),
-      ["autosave"] => Ok(Self::Autosave),
       ["choose", words @ ..] => Ok(Self::Choose(
         words
           .iter()
@@ -53,38 +41,14 @@ impl FromStr for Command {
         g.parse()?,
         b.parse()?,
       ))),
-      ["fit"] => Ok(Self::Viewport(Viewport::Fit)),
-      ["fill"] => Ok(Self::Viewport(Viewport::Fill)),
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["identity"] => Ok(Self::Operation(Operation::Identity)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
-      ["load", path] => Ok(Self::Load(Some(path.parse()?))),
-      ["load"] => Ok(Self::Load(None)),
       ["loop"] => Ok(Self::Loop),
       ["mod", divisor, remainder] => Ok(Self::Mask(Mask::Mod {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
       })),
-      ["open", path] => Ok(Self::Open(Some(path.parse()?))),
-      ["open"] => Ok(Self::Open(None)),
-      ["print"] => Ok(Self::Print),
-      ["read"] => Ok(Self::Read),
-      ["repl"] => {
-        #[cfg(target_arch = "wasm32")]
-        {
-          Err("`repl` command is not supported in browser".into())
-        }
-
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-          Ok(Self::Repl)
-        }
-      }
-      ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
-      ["resize", size] => {
-        let size = size.parse()?;
-        Ok(Self::Resize((size, size)))
-      }
       ["rotate", turns] => Ok(Self::Rotate(turns.parse()?)),
       ["rotate-color", axis, turns] => Ok(Self::Operation(Operation::RotateColor(
         axis.parse()?,
@@ -94,14 +58,10 @@ impl FromStr for Command {
         nrows: nrows.parse()?,
         step: step.parse()?,
       })),
-      ["save", path] => Ok(Self::Save(Some(path.parse()?))),
-      ["save"] => Ok(Self::Save(None)),
       ["scale", scaling] => Ok(Self::Scale(scaling.parse()?)),
       ["seed", seed] => Ok(Self::Seed(seed.parse()?)),
       ["square"] => Ok(Self::Mask(Mask::Square)),
-      ["stretch"] => Ok(Self::Viewport(Viewport::Stretch)),
       ["top"] => Ok(Self::Mask(Mask::Top)),
-      ["verbose"] => Ok(Self::Verbose),
       ["wrap"] => Ok(Self::Wrap),
       ["x"] => Ok(Self::Mask(Mask::X)),
       _ => Err(format!("Invalid command: {}", s).into()),
