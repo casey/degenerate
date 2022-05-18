@@ -1,17 +1,11 @@
 use {
   super::*,
   ansi_term::{Colour::Red, Style},
-  rustyline::error::ReadlineError,
+  std::{env, process},
 };
 
 pub(crate) fn run() {
   if let Err(error) = run_inner() {
-    if let Some(ReadlineError::Eof | ReadlineError::Interrupted) =
-      error.downcast_ref::<ReadlineError>()
-    {
-      return;
-    }
-
     if atty::is(atty::Stream::Stderr)
       || env::var("CLICOLOR_FORCE")
         .map(|val| val != "0")
@@ -37,7 +31,7 @@ fn run_inner() -> Result {
     .map(|word| word.parse())
     .collect::<Result<Vec<Command>>>()?;
 
-  let mut computer = Computer::new(Box::new(Software::new()));
+  let mut computer = Computer::new(None);
 
   computer.resize((256, 256));
   computer.load_program(&program);

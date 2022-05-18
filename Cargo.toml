@@ -17,6 +17,7 @@ base64 = "0.13.0"
 chromiumoxide = "0.3.5"
 executable-path = "1.0.0"
 futures = "0.3.21"
+image = "0.24.1"
 lazy_static = "1.4.0"
 pretty_assertions = "1.0.0"
 tempfile = "3.2.0"
@@ -32,10 +33,8 @@ indoc = "1.0.3"
 urlencoding = "2.1.0"
 
 [dependencies]
-atty = "0.2.14"
 console_log = "0.2.0"
 getrandom = { version = "0.2.6", features = ["js"] }
-image = "0.24.1"
 indoc = "1.0.6"
 js-sys = "0.3.57"
 log = "0.4.17"
@@ -75,5 +74,4 @@ features = [
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 ansi_term = "0.12.1"
-dirs = "4.0.0"
-rustyline = "9.1.1"
+atty = "0.2.14"
