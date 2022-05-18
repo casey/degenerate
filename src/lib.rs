@@ -12,6 +12,9 @@ use {
   strum::EnumString,
 };
 
+type Error = Box<dyn std::error::Error>;
+type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
+
 mod browser;
 mod color_axis;
 mod command;
@@ -19,6 +22,3 @@ mod computer;
 mod mask;
 mod operation;
 mod wrap;
-
-type Error = Box<dyn std::error::Error>;
-type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;

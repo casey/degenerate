@@ -3,7 +3,7 @@ use {
   chromiumoxide::browser::{Browser, BrowserConfig},
   futures::StreamExt,
   lazy_static::lazy_static,
-  std::{fs, net::SocketAddr, process::Command, str, time::Duration},
+  std::{fs, net::SocketAddr, process::Command, str, sync::Once, time::Duration},
   tokio::{runtime::Runtime, task},
   tower_http::{services::ServeDir, trace::TraceLayer},
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
@@ -46,19 +46,6 @@ lazy_static! {
 
     browser
   };
-  static ref CLEAN: () = {
-    for result in fs::read_dir("images").unwrap() {
-      let entry = result.unwrap();
-      let path = entry.path();
-      let file_name = path.file_name().unwrap().to_str().unwrap().to_string();
-
-      if file_name.ends_with(".native-actual-memory.png")
-        || file_name.ends_with(".browser-actual-memory.png")
-      {
-        fs::remove_file(path).unwrap();
-      }
-    }
-  };
   static ref RUNTIME: Runtime = Runtime::new().unwrap();
   static ref SERVER_PORT: u16 = {
     tracing_subscriber::registry()
@@ -87,7 +74,7 @@ lazy_static! {
         "--no-typescript",
         "target/wasm32-unknown-unknown/release/degenerate.wasm",
         "--out-dir",
-        "tests/www",
+        "integration/www",
       ])
       .current_dir("..")
       .status()
@@ -128,10 +115,28 @@ lazy_static! {
   };
 }
 
+fn clean() {
+  static ONCE: Once = Once::new();
+
+  ONCE.call_once(|| {
+    for result in fs::read_dir("images").unwrap() {
+      let entry = result.unwrap();
+      let path = entry.path();
+      let file_name = path.file_name().unwrap().to_str().unwrap().to_string();
+
+      if file_name.ends_with(".native-actual-memory.png")
+        || file_name.ends_with(".browser-actual-memory.png")
+      {
+        fs::remove_file(path).unwrap();
+      }
+    }
+  });
+}
+
 pub(crate) fn image_test(name: &str, program: &str) -> Result {
   let browser: &'static Browser = &*BROWSER;
   RUNTIME.block_on(async {
-    *CLEAN;
+    clean();
 
     eprintln!("Creating page...");
 

@@ -8,12 +8,11 @@ build:
 	cargo build --release
 
 test *args:
-	cargo test --release -- {{args}}
+	cargo test --package integration --lib -- {{args}}
 
 clippy:
-	cargo clippy
+	cargo clippy --package integration --tests
 	cargo clippy --target wasm32-unknown-unknown
-	cargo clippy --tests
 
 run *args:
 	cargo run --release -- {{args}}
