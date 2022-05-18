@@ -6,9 +6,8 @@ edition = "2021"
 license = "CC0-1.0"
 autotests = false
 
-[[test]]
-name = "integration"
-path = "tests/integration.rs"
+[workspace]
+members = [".", "integration"]
 
 [dev-dependencies]
 approx = "0.5.0"
