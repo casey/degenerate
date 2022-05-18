@@ -5,6 +5,7 @@ pub(crate) enum Command {
   Alpha(f64),
   Apply,
   Autosave,
+  Choose(Vec<Command>),
   Comment,
   Default(Vector3<u8>),
   For(usize),
@@ -14,7 +15,6 @@ pub(crate) enum Command {
   Open(Option<PathBuf>),
   Operation(Operation),
   Print,
-  Random(Vec<Command>),
   Read,
   #[cfg(not(target_arch = "wasm32"))]
   Repl,
@@ -37,6 +37,13 @@ impl FromStr for Command {
       ["alpha", alpha] => Ok(Self::Alpha(alpha.parse()?)),
       ["apply"] => Ok(Self::Apply),
       ["autosave"] => Ok(Self::Autosave),
+      ["choose", words @ ..] => Ok(Self::Choose(
+        words
+          .iter()
+          .cloned()
+          .map(Command::from_str)
+          .collect::<Result<Vec<Command>>>()?,
+      )),
       ["circle"] => Ok(Self::Mask(Mask::Circle)),
       ["comment", ..] => Ok(Self::Comment),
       ["cross"] => Ok(Self::Mask(Mask::Cross)),
@@ -61,13 +68,6 @@ impl FromStr for Command {
       ["open", path] => Ok(Self::Open(Some(path.parse()?))),
       ["open"] => Ok(Self::Open(None)),
       ["print"] => Ok(Self::Print),
-      ["random", words @ ..] => Ok(Self::Random(
-        words
-          .iter()
-          .cloned()
-          .map(Command::from_str)
-          .collect::<Result<Vec<Command>>>()?,
-      )),
       ["read"] => Ok(Self::Read),
       ["repl"] => {
         #[cfg(target_arch = "wasm32")]

@@ -141,6 +141,11 @@ impl Computer {
       Command::Alpha(alpha) => self.alpha = alpha,
       Command::Apply => self.apply()?,
       Command::Autosave => self.autosave = !self.autosave,
+      Command::Choose(commands) => {
+        if let Some(command) = commands.choose(&mut self.rng) {
+          self.execute(command.clone())?;
+        }
+      }
       Command::Comment => {}
       Command::Default(default) => {
         self.default = Vector4::new(default.x, default.y, default.z, ALPHA_OPAQUE);
@@ -202,11 +207,6 @@ impl Computer {
       Command::Mask(mask) => self.mask = mask,
       Command::Operation(operation) => self.operation = operation,
       Command::Print => self.print()?,
-      Command::Random(commands) => {
-        if let Some(command) = commands.choose(&mut self.rng) {
-          self.execute(command.clone())?;
-        }
-      }
       Command::Read => {
         let source = fs::read_to_string("program.degen")?;
 
