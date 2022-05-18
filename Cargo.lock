@@ -589,7 +589,6 @@ dependencies = [
  "num-traits",
  "pretty_assertions",
  "rand",
- "rand_chacha",
  "rand_derive2",
  "rustyline",
  "strum",

@@ -14,7 +14,7 @@ pub(crate) struct Computer {
   operation: Operation,
   program: Vec<Command>,
   program_counter: usize,
-  rng: ChaCha20Rng,
+  rng: StdRng,
   similarity: Similarity2<f64>,
   verbose: bool,
   viewport: Viewport,
@@ -73,7 +73,7 @@ impl Computer {
       operation: Operation::Invert,
       program: Vec::new(),
       program_counter: 0,
-      rng: ChaCha20Rng::seed_from_u64(0),
+      rng: StdRng::seed_from_u64(0),
       similarity: Similarity2::identity(),
       verbose: false,
       wrap: false,
@@ -264,7 +264,7 @@ impl Computer {
       Command::Scale(scaling) => {
         self.similarity.append_scaling_mut(scaling);
       }
-      Command::Seed(seed) => self.rng = ChaCha20Rng::seed_from_u64(seed),
+      Command::Seed(seed) => self.rng = StdRng::seed_from_u64(seed),
       Command::Verbose => self.verbose = !self.verbose,
       Command::Wrap => self.wrap = !self.wrap,
     }

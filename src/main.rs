@@ -8,8 +8,7 @@ use {
     Affine2, DMatrix, Matrix3, Point2, Rotation3, Similarity2, UnitComplex, Vector2, Vector3,
     Vector4,
   },
-  rand::{Rng, SeedableRng},
-  rand_chacha::ChaCha20Rng,
+  rand::{rngs::StdRng, Rng, SeedableRng},
   std::{
     env, f64, fs,
     io::{self, BufWriter, Write},

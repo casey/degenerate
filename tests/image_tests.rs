@@ -266,6 +266,7 @@ image_test! {
 image_test! {
   name: rotate_nonsquare_aspect_ratio,
   program: "resize:512:256 rotate:0.05 x apply save load save",
+  browser: false,
 }
 
 image_test! {
