@@ -17,10 +17,10 @@ macro_rules! image_test {
         native::test(stringify!($name), $program)
       }
 
-      #[tokio::test]
+      #[test]
       #[ignore]
-      async fn browser() -> Result {
-        browser::test(stringify!($name), $program).await
+      fn browser() -> Result {
+        browser::test(stringify!($name), $program)
       }
     }
   };
@@ -36,9 +36,9 @@ macro_rules! image_test {
         native::test(stringify!($name), $program)
       }
 
-      #[tokio::test]
-      async fn browser() -> Result {
-        browser::test(stringify!($name), $program).await
+      #[test]
+      fn browser() -> Result {
+        browser::test(stringify!($name), $program)
       }
     }
   };
