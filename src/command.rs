@@ -10,7 +10,6 @@ pub(crate) enum Command {
   For(u64),
   Loop,
   Mask(Mask),
-  Open(Option<PathBuf>),
   Operation(Operation),
   Resize((u64, u64)),
   Rotate(f64),
@@ -56,8 +55,6 @@ impl FromStr for Command {
         divisor: divisor.parse()?,
         remainder: remainder.parse()?,
       })),
-      ["open", path] => Ok(Self::Open(Some(path.parse()?))),
-      ["open"] => Ok(Self::Open(None)),
       ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["resize", size] => {
         let size = size.parse()?;

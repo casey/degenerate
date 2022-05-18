@@ -14,7 +14,6 @@ struct Test<'a> {
   env_vars: Vec<(&'a str, &'a str)>,
   expected_status: i32,
   expected_stderr: String,
-  expected_stdout: String,
   program: String,
   tempdir: TempDir,
 }
@@ -29,7 +28,6 @@ impl<'a> Test<'a> {
       env_vars: Vec::new(),
       expected_status: 0,
       expected_stderr: String::new(),
-      expected_stdout: String::new(),
       program: String::new(),
       tempdir,
     })
@@ -52,13 +50,6 @@ impl<'a> Test<'a> {
   fn expected_stderr(self, expected_stderr: &str) -> Self {
     Self {
       expected_stderr: expected_stderr.unindent(),
-      ..self
-    }
-  }
-
-  fn expected_stdout(self, expected_stdout: &str) -> Self {
-    Self {
-      expected_stdout: expected_stdout.unindent(),
       ..self
     }
   }
@@ -121,8 +112,6 @@ impl<'a> Test<'a> {
       assert_eq!(stderr, self.expected_stderr);
     }
 
-    assert_eq!(str::from_utf8(&output.stdout)?, self.expected_stdout);
-
     Ok(self.tempdir)
   }
 }
@@ -148,32 +137,6 @@ fn verbose_toggles_step_status() -> Result {
       "
       PC 1 LC 0 M All C Mask(Square)
       PC 2 LC 0 M Square C Verbose
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn open() -> Result {
-  Test::new()?
-    .program("resize:4:4 save:test.png open:test.png")
-    .env_var("DEGENERATE_OPEN_COMMAND", "echo")
-    .expected_stdout(
-      "
-      test.png
-      ",
-    )
-    .run()
-}
-
-#[test]
-fn open_default() -> Result {
-  Test::new()?
-    .program("resize:4:4 save open")
-    .env_var("DEGENERATE_OPEN_COMMAND", "echo")
-    .expected_stdout(
-      "
-      memory.png
       ",
     )
     .run()

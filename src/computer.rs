@@ -161,26 +161,6 @@ impl Computer {
         }
         self.loop_counter += 1;
       }
-      Command::Open(path) => {
-        let command = if let Some(command) = env::var_os("DEGENERATE_OPEN_COMMAND") {
-          command
-        } else if cfg!(target_os = "macos") {
-          "open".into()
-        } else if cfg!(target_os = "linux") {
-          "xdg-open".into()
-        } else if cfg!(target_os = "windows") {
-          "explorer".into()
-        } else {
-          return Err("Please supply an open command by setting the `DEGENERATE_OPEN_COMMAND` environment variable".into());
-        };
-        process::Command::new(command)
-          .arg(
-            path
-              .as_deref()
-              .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
-          )
-          .spawn()?;
-      }
       Command::Mask(mask) => self.mask = mask,
       Command::Operation(operation) => self.operation = operation,
       Command::Resize(dimensions) => {

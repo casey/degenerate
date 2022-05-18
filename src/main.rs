@@ -9,7 +9,7 @@ use {
     Vector4,
   },
   rand::{rngs::StdRng, seq::SliceRandom, SeedableRng},
-  std::{env, f64, path::PathBuf, process, str::FromStr},
+  std::{f64, path::PathBuf, str::FromStr},
   strum::EnumString,
 };
 
