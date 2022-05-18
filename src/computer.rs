@@ -3,13 +3,12 @@ use super::*;
 const DEFAULT_OUTPUT_PATH: &str = "memory.png";
 const ALPHA_OPAQUE: u8 = 255;
 
-pub(crate) struct Computer<'a> {
+pub(crate) struct Computer {
   alpha: f64,
   autosave: bool,
   default: Vector4<u8>,
   frame: u64,
-  #[cfg(target_arch = "wasm32")]
-  gpu: Option<&'a Gpu>,
+  gpu: Arc<dyn Gpu>,
   loop_counter: usize,
   mask: Mask,
   memory: DMatrix<Vector4<u8>>,
@@ -23,7 +22,7 @@ pub(crate) struct Computer<'a> {
   wrap: bool,
 }
 
-impl<'a> Computer<'a> {
+impl Computer {
   pub(crate) fn run(&mut self, incremental: bool) -> Result {
     while let Some(command) = self.program.get(self.program_counter).cloned() {
       if self.verbose {
@@ -32,6 +31,7 @@ impl<'a> Computer<'a> {
           self.program_counter, self.loop_counter, self.mask, command,
         );
       }
+
       self.execute(command.clone())?;
       self.program_counter = self.program_counter.wrapping_add(1);
 
@@ -73,29 +73,7 @@ impl<'a> Computer<'a> {
     &self.operation
   }
 
-  #[cfg(not(target_arch = "wasm32"))]
-  pub(crate) fn new() -> Self {
-    Self {
-      alpha: 1.0,
-      autosave: false,
-      default: Vector4::new(0, 0, 0, ALPHA_OPAQUE),
-      frame: 0,
-      loop_counter: 0,
-      mask: Mask::All,
-      memory: DMatrix::zeros(0, 0),
-      operation: Operation::Invert,
-      program: Vec::new(),
-      program_counter: 0,
-      rng: StdRng::seed_from_u64(0),
-      similarity: Similarity2::identity(),
-      verbose: false,
-      viewport: Viewport::Fill,
-      wrap: false,
-    }
-  }
-
-  #[cfg(target_arch = "wasm32")]
-  pub(crate) fn new(gpu: Option<&'a Gpu>) -> Self {
+  pub(crate) fn new(gpu: Arc<dyn Gpu>) -> Self {
     Self {
       alpha: 1.0,
       autosave: false,
@@ -128,96 +106,51 @@ impl<'a> Computer<'a> {
     Vector2::new(self.memory.ncols(), self.memory.nrows())
   }
 
-  #[cfg(not(target_arch = "wasm32"))]
-  fn apply(&mut self) -> Result {
-    let similarity = self.similarity.inverse();
-    let dimensions = self.dimensions();
-    let transform = self.viewport.transform(dimensions);
-    let inverse = transform.inverse();
-    let mut output = self.memory.clone();
-    for col in 0..self.memory.ncols() {
-      for row in 0..self.memory.nrows() {
-        let i = Point2::new(col as f64, row as f64);
-        let v = transform.transform_point(&i);
-        let v = similarity.transform_point(&v);
-        let v = if self.wrap { v.wrap() } else { v };
-        let i = inverse
-          .transform_point(&v)
-          .map(|element| element.round() as isize);
-        if self.mask.is_masked(dimensions, i, v) {
-          let input = if i.x >= 0
-            && i.y >= 0
-            && i.x < self.memory.ncols() as isize
-            && i.y < self.memory.nrows() as isize
-          {
-            self.memory[(i.y as usize, i.x as usize)]
-          } else {
-            self.default
-          };
-          let over = self.operation.apply(v, input.xyz()).map(|c| c as f64);
-          let under = self.memory[(row, col)].xyz().map(|c| c as f64);
-          let combined =
-            (over * self.alpha + under * (1.0 - self.alpha)) / (self.alpha + (1.0 - self.alpha));
-          output[(row, col)] = Vector4::new(
-            combined.x as u8,
-            combined.y as u8,
-            combined.z as u8,
-            ALPHA_OPAQUE,
-          );
-        }
-      }
-    }
-    self.memory = output;
-    self.autosave()?;
-    Ok(())
+  pub(crate) fn transform(&self) -> Affine2<f64> {
+    self.viewport.transform(self.dimensions())
   }
 
-  #[cfg(target_arch = "wasm32")]
   fn apply(&mut self) -> Result {
-    if let Some(gpu) = self.gpu {
-      gpu.render_to_texture(self)?;
-    } else {
-      let similarity = self.similarity.inverse();
-      let dimensions = self.dimensions();
-      let transform = self.viewport.transform(dimensions);
-      let inverse = transform.inverse();
-      let mut output = self.memory.clone();
-      for col in 0..self.memory.ncols() {
-        for row in 0..self.memory.nrows() {
-          let i = Point2::new(col as f64, row as f64);
-          let v = transform.transform_point(&i);
-          let v = similarity.transform_point(&v);
-          let v = if self.wrap { v.wrap() } else { v };
-          let i = inverse
-            .transform_point(&v)
-            .map(|element| element.round() as isize);
-          if self.mask.is_masked(dimensions, i, v) {
-            let input = if i.x >= 0
-              && i.y >= 0
-              && i.x < self.memory.ncols() as isize
-              && i.y < self.memory.nrows() as isize
-            {
-              self.memory[(i.y as usize, i.x as usize)]
-            } else {
-              self.default
-            };
-            let over = self.operation.apply(v, input.xyz()).map(|c| c as f64);
-            let under = self.memory[(row, col)].xyz().map(|c| c as f64);
-            let combined =
-              (over * self.alpha + under * (1.0 - self.alpha)) / (self.alpha + (1.0 - self.alpha));
-            output[(row, col)] = Vector4::new(
-              combined.x as u8,
-              combined.y as u8,
-              combined.z as u8,
-              ALPHA_OPAQUE,
-            );
-          }
-        }
-      }
-      self.memory = output;
-      self.autosave()?;
-    }
-    Ok(())
+    self.gpu.apply(self)
+    // let similarity = self.similarity.inverse();
+    // let dimensions = self.dimensions();
+    // let transform = self.viewport.transform(dimensions);
+    // let inverse = transform.inverse();
+    // let mut output = self.memory.clone();
+    // for col in 0..self.memory.ncols() {
+    //   for row in 0..self.memory.nrows() {
+    //     let i = Point2::new(col as f64, row as f64);
+    //     let v = transform.transform_point(&i);
+    //     let v = similarity.transform_point(&v);
+    //     let v = if self.wrap { v.wrap() } else { v };
+    //     let i = inverse
+    //       .transform_point(&v)
+    //       .map(|element| element.round() as isize);
+    //     if self.mask.is_masked(dimensions, i, v) {
+    //       let input = if i.x >= 0
+    //         && i.y >= 0
+    //         && i.x < self.memory.ncols() as isize
+    //         && i.y < self.memory.nrows() as isize
+    //       {
+    //         self.memory[(i.y as usize, i.x as usize)]
+    //       } else {
+    //         self.default
+    //       };
+    //       let over = self.operation.apply(v, input.xyz()).map(|c| c as f64);
+    //       let under = self.memory[(row, col)].xyz().map(|c| c as f64);
+    //       let combined =
+    //         (over * self.alpha + under * (1.0 - self.alpha)) / (self.alpha + (1.0 - self.alpha));
+    //       output[(row, col)] = Vector4::new(
+    //         combined.x as u8,
+    //         combined.y as u8,
+    //         combined.z as u8,
+    //         ALPHA_OPAQUE,
+    //       );
+    //     }
+    //   }
+    // }
+    // self.memory = output;
+    // self.autosave()
   }
 
   fn execute(&mut self, command: Command) -> Result<()> {

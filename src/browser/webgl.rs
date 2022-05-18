@@ -1,17 +1,15 @@
 use super::*;
 
-use indoc::indoc;
-
-use std::cell::Cell;
-
 static VERTEX: &str = indoc! {"
   #version 300 es
 
   in vec4 position;
   out vec2 uv;
 
+  uniform mat3 transform;
+
   void main() {
-    uv = position.xy * 0.5 + 0.5;
+    uv = (transform * vec3(position.xy, 1.0)).xy;
     gl_Position = position;
   }
 "};
@@ -58,37 +56,28 @@ struct ShaderDescription {
   shader_type: u32,
 }
 
-pub(crate) struct Gpu {
-  animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
-  animation_frame_pending: bool,
-  canvas: HtmlCanvasElement,
+#[derive(Clone)]
+pub(crate) struct WebGl {
   context: WebGl2RenderingContext,
   frame_buffer: WebGlFramebuffer,
-  input: bool,
   length: usize,
-  nav: HtmlElement,
   program: WebGlProgram,
-  resize: bool,
   source: Cell<usize>,
-  stderr: Stderr,
-  textarea: HtmlTextAreaElement,
   textures: Vec<WebGlTexture>,
-  window: Window,
 }
 
-impl Gpu {
-  pub(super) fn init() -> Result {
-    let window = window();
+impl Gpu for WebGl {
+  fn apply(&self, state: &Computer) -> Result {
+    self.render_to_texture(state)
+  }
+}
 
-    let document = window.get_document();
-
-    let textarea = document.select("textarea")?.cast::<HtmlTextAreaElement>()?;
-
-    let canvas = document.select("canvas")?.cast::<HtmlCanvasElement>()?;
-
-    let nav = document.select("nav")?.cast::<HtmlElement>()?;
-
-    let stderr = Stderr::get();
+impl WebGl {
+  pub(super) fn new() -> Result<Self> {
+    let canvas = window()
+      .get_document()
+      .select("canvas")?
+      .cast::<HtmlCanvasElement>()?;
 
     let context = canvas
       .get_context("webgl2")
@@ -99,7 +88,7 @@ impl Gpu {
     let css_pixel_height: f64 = canvas.client_height().try_into()?;
     let css_pixel_width: f64 = canvas.client_width().try_into()?;
 
-    let device_pixel_ratio = window.device_pixel_ratio();
+    let device_pixel_ratio = window().device_pixel_ratio();
     let device_pixel_height = css_pixel_height * device_pixel_ratio;
     let device_pixel_width = css_pixel_width * device_pixel_ratio;
 
@@ -141,7 +130,7 @@ impl Gpu {
 
     let length = Self::setup_triangles(&context, &program)?;
 
-    let mut textures = (0..2)
+    let textures = (0..2)
       .map(|_| Self::create_texture(&context))
       .collect::<Result<Vec<WebGlTexture>, _>>()?;
 
@@ -149,49 +138,17 @@ impl Gpu {
       .create_framebuffer()
       .ok_or("Failed to create frame buffer")?;
 
-    let app = Arc::new(Mutex::new(Self {
-      animation_frame_callback: None,
-      animation_frame_pending: false,
-      canvas,
+    Ok(Self {
       context,
       frame_buffer,
-      input: false,
       length,
-      nav,
       program,
-      resize: true,
       source: Cell::new(0),
-      stderr: stderr.clone(),
-      textarea: textarea.clone(),
       textures,
-      window: window.clone(),
-    }));
-
-    let local = app.clone();
-    app.lock().unwrap().animation_frame_callback = Some(Closure::wrap(Box::new(move |timestamp| {
-      let mut app = local.lock().unwrap();
-      let result = app.on_animation_frame(timestamp);
-      app.stderr.update(result);
     })
-      as Box<dyn FnMut(f64)>));
-
-    let local = app.clone();
-    window.add_event_listener("resize", move || {
-      let mut app = local.lock().unwrap();
-      let result = app.on_resize();
-      app.stderr.update(result);
-    })?;
-
-    textarea.add_event_listener("input", move || {
-      let mut app = app.lock().unwrap();
-      let result = app.on_input();
-      stderr.update(result);
-    })?;
-
-    Ok(())
   }
 
-  fn render_to_canvas(&self, state: &Computer) -> Result {
+  pub(crate) fn render_to_canvas(&self, state: &Computer) -> Result {
     self
       .context
       .bind_framebuffer(WebGl2RenderingContext::FRAMEBUFFER, None);
@@ -226,7 +183,7 @@ impl Gpu {
     Ok(())
   }
 
-  pub(crate) fn render_to_texture(&self, state: &Computer) -> Result {
+  fn render_to_texture(&self, state: &Computer) -> Result {
     self.context.bind_framebuffer(
       WebGl2RenderingContext::FRAMEBUFFER,
       Some(&self.frame_buffer),
@@ -259,6 +216,19 @@ impl Gpu {
         .get_uniform_location(&self.program, &state.operation().to_string())
         .as_ref(),
       1,
+    );
+
+    self.context.uniform_matrix3fv_with_f32_array(
+      self
+        .context
+        .get_uniform_location(&self.program, "transform")
+        .as_ref(),
+      true,
+      state
+        .transform()
+        .to_homogeneous()
+        .map(|v| v as f32)
+        .as_slice(),
     );
 
     self.context.draw_arrays(
@@ -340,7 +310,8 @@ impl Gpu {
       WebGl2RenderingContext::RGBA.try_into()?,
       WebGl2RenderingContext::UNSIGNED_BYTE,
       &canvas,
-    );
+    )
+    .map_err(JsValueError)?;
 
     gl.tex_parameteri(
       WebGl2RenderingContext::TEXTURE_2D,
@@ -405,93 +376,5 @@ impl Gpu {
     );
 
     Ok((vertex_data.len() / 3).try_into()?)
-  }
-
-  pub(super) fn on_resize(&mut self) -> Result {
-    self.resize = true;
-    self.request_animation_frame()?;
-    Ok(())
-  }
-
-  pub(super) fn on_input(&mut self) -> Result {
-    self.input = true;
-    self.request_animation_frame()?;
-    Ok(())
-  }
-
-  fn request_animation_frame(&mut self) -> Result {
-    if self.animation_frame_pending {
-      return Ok(());
-    }
-
-    self
-      .window
-      .request_animation_frame(
-        self
-          .animation_frame_callback
-          .as_ref()
-          .unwrap()
-          .as_ref()
-          .dyn_ref()
-          .unwrap(),
-      )
-      .map_err(JsValueError)?;
-
-    self.animation_frame_pending = true;
-
-    Ok(())
-  }
-
-  fn on_animation_frame(&mut self, timestamp: f64) -> Result {
-    self.animation_frame_pending = false;
-
-    log::trace!("Animation frame timestamp {}s", timestamp);
-
-    let resize = self.resize;
-
-    if self.resize {
-      let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
-      let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
-
-      let device_pixel_ratio = self.window.device_pixel_ratio();
-      let device_pixel_height = css_pixel_height * device_pixel_ratio;
-      let device_pixel_width = css_pixel_width * device_pixel_ratio;
-
-      let height = if cfg!(debug_assertions) {
-        device_pixel_height / 32.0
-      } else {
-        device_pixel_height
-      };
-
-      let width = if cfg!(debug_assertions) {
-        device_pixel_width / 32.0
-      } else {
-        device_pixel_width
-      };
-
-      self.canvas.set_height(height.ceil() as u32);
-      self.canvas.set_width(width.ceil() as u32);
-      self.resize = false;
-    }
-
-    if self.input {
-      self.nav.set_class_name("fade-out");
-
-      let program = self
-        .textarea
-        .value()
-        .split_whitespace()
-        .into_iter()
-        .map(Command::from_str)
-        .collect::<Result<Vec<Command>>>()?;
-
-      let mut computer = Computer::new(Some(self));
-      computer.load_program(&program);
-      computer.run(false)?;
-
-      self.render_to_canvas(&computer)?;
-    }
-
-    Ok(())
   }
 }

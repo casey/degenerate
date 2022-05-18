@@ -1,7 +1,7 @@
 use {
   crate::{
-    color_axis::ColorAxis, command::Command, computer::Computer, mask::Mask, operation::Operation,
-    viewport::Viewport, wrap::Wrap,
+    color_axis::ColorAxis, command::Command, computer::Computer, gpu::Gpu, mask::Mask,
+    operation::Operation, software::Software, viewport::Viewport, wrap::Wrap,
   },
   image::{ImageBuffer, RgbaImage},
   nalgebra::{
@@ -15,12 +15,12 @@ use {
     path::{Path, PathBuf},
     process,
     str::FromStr,
+    sync::Arc
   },
   strum::EnumString,
 };
 
-#[cfg(target_arch = "wasm32")]
-use crate::browser::Gpu;
+mod gpu;
 
 #[cfg(target_arch = "wasm32")]
 mod browser;
@@ -32,6 +32,7 @@ mod mask;
 #[cfg(not(target_arch = "wasm32"))]
 mod native;
 mod operation;
+mod software;
 mod viewport;
 mod wrap;
 

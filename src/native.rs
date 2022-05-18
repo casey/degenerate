@@ -37,7 +37,7 @@ fn run_inner() -> Result {
     .map(|word| word.parse())
     .collect::<Result<Vec<Command>>>()?;
 
-  let mut computer = Computer::new();
+  let mut computer = Computer::new(Box::new(Software::new()));
 
   computer.resize((256, 256));
   computer.load_program(&program);

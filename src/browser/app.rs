@@ -1,20 +1,21 @@
 use super::*;
 
-pub(crate) struct App<'a> {
+pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
   animation_frame_pending: bool,
   canvas: HtmlCanvasElement,
-  computer: Computer<'a>,
-  context: CanvasRenderingContext2d,
+  computer: Computer,
+  // context: CanvasRenderingContext2d,
   input: bool,
   nav: HtmlElement,
   resize: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
+  webgl: Arc<WebGl>,
   window: Window,
 }
 
-impl App<'static> {
+impl App {
   pub(super) fn init() -> Result {
     let window = window();
 
@@ -28,24 +29,27 @@ impl App<'static> {
 
     let stderr = Stderr::get();
 
-    let context = canvas
-      .get_context("2d")
-      .map_err(JsValueError)?
-      .ok_or("failed to retrieve context")?
-      .cast::<CanvasRenderingContext2d>()?;
+    // let context = canvas
+    //   .get_context("2d")
+    //   .map_err(JsValueError)?
+    //   .ok_or("Failed to retrieve context")?
+    //   .cast::<CanvasRenderingContext2d>()?;
+
+    let webgl = Arc::new(WebGl::new()?);
 
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
       animation_frame_pending: false,
-      context,
       canvas,
+      computer: Computer::new(webgl.clone()),
+      // context,
       input: false,
       nav,
       resize: true,
       stderr: stderr.clone(),
       textarea: textarea.clone(),
+      webgl,
       window: window.clone(),
-      computer: Computer::new(None),
     }));
 
     let local = app.clone();
@@ -117,21 +121,26 @@ impl App<'static> {
     if self.resize {
       let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
       let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
+
       let device_pixel_ratio = self.window.device_pixel_ratio();
       let device_pixel_height = css_pixel_height * device_pixel_ratio;
       let device_pixel_width = css_pixel_width * device_pixel_ratio;
+
       let height = if cfg!(debug_assertions) {
         device_pixel_height / 32.0
       } else {
         device_pixel_height
       };
+
       let width = if cfg!(debug_assertions) {
         device_pixel_width / 32.0
       } else {
         device_pixel_width
       };
+
       self.canvas.set_height(height.ceil() as u32);
       self.canvas.set_width(width.ceil() as u32);
+
       self.resize = false;
     }
 
@@ -151,7 +160,7 @@ impl App<'static> {
       let program_changed = program != self.computer.program();
 
       if resize || program_changed {
-        let mut computer = Computer::new(None);
+        let mut computer = Computer::new(self.webgl.clone());
         computer.load_program(&program);
 
         computer.resize((
@@ -166,25 +175,26 @@ impl App<'static> {
 
       if run {
         self.computer.run(true)?;
+        self.webgl.render_to_canvas(&self.computer)?;
       }
 
       if resize || program_changed || run {
-        let mut pixels = Vec::new();
+        // let mut pixels = Vec::new();
 
-        for pixel in &self.computer.memory().transpose() {
-          pixels.extend_from_slice(&[pixel.x, pixel.y, pixel.z, 255]);
-        }
+        // for pixel in &self.computer.memory().transpose() {
+        //   pixels.extend_from_slice(&[pixel.x, pixel.y, pixel.z, 255]);
+        // }
 
-        let image_data = ImageData::new_with_u8_clamped_array(
-          wasm_bindgen::Clamped(&pixels),
-          self.computer.memory().ncols().try_into()?,
-        )
-        .map_err(JsValueError)?;
+        // let image_data = ImageData::new_with_u8_clamped_array(
+        //   wasm_bindgen::Clamped(&pixels),
+        //   self.computer.memory().ncols().try_into()?,
+        // )
+        // .map_err(JsValueError)?;
 
-        self
-          .context
-          .put_image_data(&image_data, 0.0, 0.0)
-          .map_err(JsValueError)?;
+        // self
+        //   .context
+        //   .put_image_data(&image_data, 0.0, 0.0)
+        //   .map_err(JsValueError)?;
 
         if !self.computer.done() {
           self.request_animation_frame()?;
