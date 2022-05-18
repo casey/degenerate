@@ -261,12 +261,6 @@ image_test! {
 }
 
 image_test! {
-  name: rotate_nonsquare_aspect_ratio,
-  program: "resize:512:256 rotate:0.05 x apply save load save",
-  browser: false,
-}
-
-image_test! {
   name: rotate_scale_x,
   program: "rotate:0.05 scale:2 x apply save",
 }
@@ -299,12 +293,6 @@ image_test! {
 image_test! {
   name: save,
   program: "save",
-}
-
-image_test! {
-  name: save_and_load,
-  program: "resize:512:256 all apply save all apply load",
-  browser: false,
 }
 
 image_test! {

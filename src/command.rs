@@ -8,7 +8,6 @@ pub(crate) enum Command {
   Comment,
   Default(Vector3<u8>),
   For(u64),
-  Load(Option<PathBuf>),
   Loop,
   Mask(Mask),
   Open(Option<PathBuf>),
@@ -54,8 +53,6 @@ impl FromStr for Command {
       ["for", count] => Ok(Self::For(count.parse()?)),
       ["identity"] => Ok(Self::Operation(Operation::Identity)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
-      ["load", path] => Ok(Self::Load(Some(path.parse()?))),
-      ["load"] => Ok(Self::Load(None)),
       ["loop"] => Ok(Self::Loop),
       ["mod", divisor, remainder] => Ok(Self::Mask(Mask::Mod {
         divisor: divisor.parse()?,

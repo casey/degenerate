@@ -148,14 +148,6 @@ impl Computer {
           self.loop_counter = 0;
         }
       }
-      Command::Load(path) => {
-        self.load(
-          path
-            .as_deref()
-            .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
-        )?;
-      }
-
       Command::Loop => {
         loop {
           self.program_counter = self.program_counter.wrapping_sub(1);
@@ -261,27 +253,6 @@ impl Computer {
     }
 
     w.flush()?;
-
-    Ok(())
-  }
-
-  fn load(&mut self, path: &Path) -> Result<()> {
-    let image = image::io::Reader::open(path)?
-      .decode()?
-      .as_rgba8()
-      .ok_or_else(|| format!("{} is not a valid rgb8 image", path.display()))?
-      .to_owned();
-
-    let (width, height) = (image.width() as usize, image.height() as usize);
-
-    self.memory = DMatrix::from_iterator(
-      width,
-      height,
-      image
-        .rows()
-        .flat_map(|row| row.map(|pixel| Vector4::new(pixel[0], pixel[1], pixel[2], pixel[3]))),
-    )
-    .transpose();
 
     Ok(())
   }

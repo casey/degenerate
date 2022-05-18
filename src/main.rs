@@ -12,7 +12,7 @@ use {
   std::{
     env, f64, fs,
     io::{self, BufWriter, Write},
-    path::{Path, PathBuf},
+    path::PathBuf,
     process,
     str::FromStr,
   },
