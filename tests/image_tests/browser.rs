@@ -1,66 +1,47 @@
 use {
   super::*,
   axum::{http::StatusCode, response::IntoResponse, routing::get_service, Router},
-  chromiumoxide::browser::BrowserConfig,
+  chromiumoxide::browser::{Browser, BrowserConfig},
   futures::StreamExt,
-  std::{
-    io,
-    net::SocketAddr,
-    process::Command,
-    sync::atomic::{AtomicU16, Ordering},
-    sync::Once,
-    time::Duration,
-  },
+  lazy_static::lazy_static,
+  std::{io, net::SocketAddr, process::Command, time::Duration},
   tokio::{runtime::Runtime, task},
   tower_http::{services::ServeDir, trace::TraceLayer},
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
 };
 
-struct Browser {
-  browser_handle: task::JoinHandle<()>,
-  inner: chromiumoxide::Browser,
+async fn handle_error(err: io::Error) -> impl IntoResponse {
+  (
+    StatusCode::INTERNAL_SERVER_ERROR,
+    format!("I/O error: {}", err),
+  )
 }
 
-impl Browser {
-  async fn new() -> Result<Self> {
-    let (inner, mut handler) = chromiumoxide::Browser::launch(
-      BrowserConfig::builder()
-        .arg("--allow-insecure-localhost")
-        .build()?,
-    )
-    .await?;
+lazy_static! {
+  static ref BROWSER: Browser = {
+    let runtime: &'static Runtime = &*RUNTIME;
 
-    let browser_handle = task::spawn(async move {
+    let (browser, mut handler) = runtime.block_on(async {
+      Browser::launch(
+        BrowserConfig::builder()
+          .arg("--allow-insecure-localhost")
+          .build()
+          .unwrap(),
+      )
+      .await
+      .unwrap()
+    });
+
+    runtime.spawn(async move {
       loop {
         let _ = handler.next().await.unwrap();
       }
     });
 
-    Ok(Browser {
-      browser_handle,
-      inner,
-    })
-  }
-
-  async fn handle_error(err: io::Error) -> impl IntoResponse {
-    (
-      StatusCode::INTERNAL_SERVER_ERROR,
-      format!("I/O error: {}", err),
-    )
-  }
-}
-
-impl Drop for Browser {
-  fn drop(&mut self) {
-    self.browser_handle.abort();
-  }
-}
-
-fn setup() -> u16 {
-  static ONCE: Once = Once::new();
-  static PORT: AtomicU16 = AtomicU16::new(0);
-
-  ONCE.call_once(|| {
+    browser
+  };
+  static ref RUNTIME: Runtime = Runtime::new().unwrap();
+  static ref SERVER_PORT: u16 = {
     tracing_subscriber::registry()
       .with(tracing_subscriber::EnvFilter::from_default_env())
       .with(tracing_subscriber::fmt::layer())
@@ -102,12 +83,12 @@ fn setup() -> u16 {
     let port = listener.local_addr().unwrap().port();
     drop(listener);
 
-    Box::leak(Box::new(Runtime::new().unwrap())).spawn(async move {
+    RUNTIME.spawn(async move {
       let addr = SocketAddr::from(([127, 0, 0, 1], port));
       tracing::trace!("Listening on {}", addr);
 
       let app = Router::new()
-        .fallback(get_service(ServeDir::new("tests/www")).handle_error(Browser::handle_error))
+        .fallback(get_service(ServeDir::new("tests/www")).handle_error(handle_error))
         .layer(TraceLayer::new_for_http());
 
       let server = axum::Server::bind(&addr).serve(app.into_make_service());
@@ -115,65 +96,59 @@ fn setup() -> u16 {
       task::spawn(async move { server.await.unwrap() });
     });
 
-    PORT.store(port, Ordering::Relaxed);
-  });
-
-  PORT.load(Ordering::Relaxed)
+    port
+  };
 }
 
-pub async fn test(name: &str, program: &str) -> Result {
-  super::clean();
+pub(crate) fn test(name: &str, program: &str) -> Result {
+  let browser: &'static Browser = &*BROWSER;
+  RUNTIME.block_on(async {
+    super::clean();
 
-  let port = setup();
+    eprintln!("Creating page...");
 
-  eprintln!("Launching browser...");
+    let page = browser
+      .new_page(format!("http://127.0.0.1:{}", *SERVER_PORT))
+      .await?;
 
-  let browser = Browser::new().await?;
+    eprintln!("Waiting for module to load...");
 
-  eprintln!("Creating page...");
+    loop {
+      if page.evaluate("window.test").await?.value().is_some() {
+        break;
+      }
 
-  let page = browser
-    .inner
-    .new_page(format!("http://127.0.0.1:{}", port))
-    .await?;
-
-  eprintln!("Waiting for module to load...");
-
-  loop {
-    if page.evaluate("window.test").await?.value().is_some() {
-      break;
+      tokio::time::sleep(Duration::from_millis(100)).await;
     }
 
-    tokio::time::sleep(Duration::from_millis(100)).await;
-  }
+    eprintln!("Running test...");
 
-  eprintln!("Running test...");
+    let data_url = page
+      .evaluate(format!("window.test('{program}')"))
+      .await?
+      .into_value::<String>()?;
 
-  let data_url = page
-    .evaluate(format!("window.test('{program}')"))
-    .await?
-    .into_value::<String>()?;
+    let have = image::load_from_memory(&base64::decode(
+      &data_url["data:image/png;base64,".len()..],
+    )?)?;
 
-  let have = image::load_from_memory(&base64::decode(
-    &data_url["data:image/png;base64,".len()..],
-  )?)?;
+    let want_path = format!("images/{}.png", name);
 
-  let want_path = format!("images/{}.png", name);
+    let want = image::open(&want_path)?;
 
-  let want = image::open(&want_path)?;
+    if have != want {
+      let destination = format!("images/{}.browser-actual-memory.png", name);
 
-  if have != want {
-    let destination = format!("images/{}.browser-actual-memory.png", name);
+      have.save(&destination)?;
 
-    have.save(&destination)?;
+      set_label_red(&destination)?;
 
-    set_label_red(&destination)?;
+      panic!(
+        "Image test failed:\nExpected: {}\nActual:   {}",
+        want_path, destination,
+      );
+    }
 
-    panic!(
-      "Image test failed:\nExpected: {}\nActual:   {}",
-      want_path, destination,
-    );
-  }
-
-  Ok(())
+    Ok(())
+  })
 }
