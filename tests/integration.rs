@@ -1,14 +1,7 @@
 use {
   executable_path::executable_path,
   pretty_assertions::assert_eq,
-  std::{
-    fs,
-    io::prelude::*,
-    path::Path,
-    process::{Command, Stdio},
-    str, thread,
-    time::Duration,
-  },
+  std::{fs, path::Path, process::Command, str, thread, time::Duration},
   tempfile::TempDir,
   unindent::Unindent,
 };
@@ -132,50 +125,6 @@ impl<'a> Test<'a> {
 
     Ok(self.tempdir)
   }
-}
-
-#[test]
-fn repl_returns_success_after_reaching_eol() -> Result {
-  Test::new()?.program("repl").run()
-}
-
-#[test]
-fn repl_valid_command() -> Result {
-  let mut command = Command::new(executable_path("degenerate"))
-    .args(["resize:4:4", "repl"])
-    .stdin(Stdio::piped())
-    .stdout(Stdio::piped())
-    .stderr(Stdio::piped())
-    .spawn()?;
-
-  writeln!(command.stdin.as_mut().unwrap(), "rows:1:1")?;
-  writeln!(command.stdin.as_mut().unwrap(), "apply")?;
-
-  assert_eq!(
-    str::from_utf8(&command.wait_with_output()?.stdout)?,
-    "0000\n0000\n0000\n0000\nFFFF\n0000\nFFFF\n0000\n"
-  );
-
-  Ok(())
-}
-
-#[test]
-fn repl_invalid_command() -> Result {
-  let mut command = Command::new(executable_path("degenerate"))
-    .args(["resize:4:4", "repl"])
-    .stdin(Stdio::piped())
-    .stdout(Stdio::piped())
-    .stderr(Stdio::piped())
-    .spawn()?;
-
-  write!(command.stdin.as_mut().unwrap(), "invalid")?;
-
-  assert_eq!(
-    str::from_utf8(&command.wait_with_output()?.stderr)?,
-    "Could not parse command from `invalid`: Invalid command: invalid\n"
-  );
-
-  Ok(())
 }
 
 #[test]

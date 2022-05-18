@@ -205,32 +205,6 @@ impl Computer {
           .program
           .splice(self.program_counter + 1..self.program_counter + 1, program);
       }
-      #[cfg(not(target_arch = "wasm32"))]
-      Command::Repl => {
-        use {dirs::home_dir, rustyline::Editor};
-
-        let history = home_dir().unwrap_or_default().join(".degenerate_history");
-
-        let mut editor = Editor::<()>::new();
-        editor.load_history(&history).ok();
-
-        loop {
-          let line = editor.readline("> ")?;
-
-          editor.add_history_entry(line.as_str());
-          editor.save_history(&history)?;
-
-          match line.parse::<Command>() {
-            Ok(command) => {
-              self.execute(command)?;
-              self.print()?;
-            }
-            Err(err) => {
-              eprintln!("Could not parse command from `{}`: {}", line, err);
-            }
-          }
-        }
-      }
       Command::Resize(dimensions) => {
         self.resize((dimensions.0.try_into()?, dimensions.1.try_into()?));
       }

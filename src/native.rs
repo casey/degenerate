@@ -1,17 +1,10 @@
 use {
   super::*,
   ansi_term::{Colour::Red, Style},
-  rustyline::error::ReadlineError,
 };
 
 pub(crate) fn run() {
   if let Err(error) = run_inner() {
-    if let Some(ReadlineError::Eof | ReadlineError::Interrupted) =
-      error.downcast_ref::<ReadlineError>()
-    {
-      return;
-    }
-
     if atty::is(atty::Stream::Stderr)
       || env::var("CLICOLOR_FORCE")
         .map(|val| val != "0")

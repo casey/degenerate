@@ -67,5 +67,3 @@ features = [
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 ansi_term = "0.12.1"
-dirs = "4.0.0"
-rustyline = "9.1.1"

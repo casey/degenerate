@@ -15,8 +15,6 @@ pub(crate) enum Command {
   Operation(Operation),
   Print,
   Read,
-  #[cfg(not(target_arch = "wasm32"))]
-  Repl,
   Resize((u64, u64)),
   Rotate(f64),
   Save(Option<PathBuf>),
@@ -67,17 +65,6 @@ impl FromStr for Command {
       ["open"] => Ok(Self::Open(None)),
       ["print"] => Ok(Self::Print),
       ["read"] => Ok(Self::Read),
-      ["repl"] => {
-        #[cfg(target_arch = "wasm32")]
-        {
-          Err("`repl` command is not supported in browser".into())
-        }
-
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-          Ok(Self::Repl)
-        }
-      }
       ["resize", cols, rows] => Ok(Self::Resize((rows.parse()?, cols.parse()?))),
       ["resize", size] => {
         let size = size.parse()?;
