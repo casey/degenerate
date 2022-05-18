@@ -1,6 +1,5 @@
 use super::*;
 
-const DEFAULT_OUTPUT_PATH: &str = "memory.png";
 const ALPHA_OPAQUE: u8 = 255;
 
 pub(crate) struct Computer {
@@ -161,15 +160,6 @@ impl Computer {
       Command::Rotate(turns) => self
         .similarity
         .append_rotation_mut(&UnitComplex::from_angle(turns * f64::consts::TAU)),
-      Command::Save(path) => {
-        if cfg!(not(target_arch = "wasm32")) {
-          self.image()?.save(
-            path
-              .as_deref()
-              .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
-          )?
-        }
-      }
       Command::Scale(scaling) => {
         self.similarity.append_scaling_mut(scaling);
       }
@@ -184,14 +174,5 @@ impl Computer {
     self
       .memory
       .resize_mut(dimensions.0, dimensions.1, self.default)
-  }
-
-  fn image(&self) -> Result<RgbaImage> {
-    ImageBuffer::from_raw(
-      self.memory.ncols().try_into()?,
-      self.memory.nrows().try_into()?,
-      self.memory.transpose().iter().flatten().cloned().collect(),
-    )
-    .ok_or_else(|| "Memory is not a valid image".into())
   }
 }

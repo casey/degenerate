@@ -1,7 +1,6 @@
 use {super::*, std::sync::Once};
 
 mod browser;
-mod native;
 
 macro_rules! image_test {
   (
@@ -10,11 +9,6 @@ macro_rules! image_test {
   ) => {
     mod $name {
       use super::*;
-
-      #[test]
-      fn native() -> Result {
-        native::test(stringify!($name), $program)
-      }
 
       #[test]
       fn browser() -> Result {
@@ -262,11 +256,6 @@ image_test! {
 image_test! {
   name: rug,
   program: "rotate-color:g:0.05 circle scale:0.5 wrap for:8 apply loop rotate-color:b:0.05 for:8 apply loop",
-}
-
-image_test! {
-  name: save,
-  program: "save",
 }
 
 image_test! {

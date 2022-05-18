@@ -1,7 +1,7 @@
 use {
   executable_path::executable_path,
   pretty_assertions::assert_eq,
-  std::{fs, path::Path, process::Command, str, thread, time::Duration},
+  std::{fs, process::Command, str, thread, time::Duration},
   tempfile::TempDir,
   unindent::Unindent,
 };
@@ -114,19 +114,6 @@ impl<'a> Test<'a> {
 
     Ok(self.tempdir)
   }
-}
-
-#[test]
-fn save_invalid_format() -> Result {
-  Test::new()?
-    .program("resize:4:4 top save:output.txt")
-    .expected_status(1)
-    .expected_stderr(
-      "
-      error: The file extension `.\"txt\"` was not recognized as an image format
-      ",
-    )
-    .run()
 }
 
 #[test]
