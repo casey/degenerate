@@ -99,7 +99,7 @@ impl<'a> Computer<'a> {
     Self {
       alpha: 1.0,
       autosave: false,
-      default: Vector3::new(0, 0, 0),
+      default: Vector4::new(0, 0, 0, ALPHA_OPAQUE),
       frame: 0,
       gpu,
       loop_counter: 0,
@@ -201,13 +201,16 @@ impl<'a> Computer<'a> {
             } else {
               self.default
             };
-            let over = self.operation.apply(v, input);
-            let over = over.map(|c| c as f64);
-            let under = self.memory[(row, col)];
-            let under = under.map(|c| c as f64);
+            let over = self.operation.apply(v, input.xyz()).map(|c| c as f64);
+            let under = self.memory[(row, col)].xyz().map(|c| c as f64);
             let combined =
               (over * self.alpha + under * (1.0 - self.alpha)) / (self.alpha + (1.0 - self.alpha));
-            output[(row, col)] = combined.map(|c| c as u8);
+            output[(row, col)] = Vector4::new(
+              combined.x as u8,
+              combined.y as u8,
+              combined.z as u8,
+              ALPHA_OPAQUE,
+            );
           }
         }
       }

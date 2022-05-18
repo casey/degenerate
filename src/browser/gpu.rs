@@ -143,10 +143,9 @@ impl Gpu {
 
     let source = Cell::new(0);
 
-    let mut textures = Vec::new();
-    for _ in 0..2 {
-      textures.push(Self::create_texture(&context)?);
-    }
+    let mut textures = (0..2)
+      .map(|_| Self::create_texture(&context))
+      .collect::<Result<Vec<WebGlTexture>, _>>()?;
 
     let frame_buffer = context
       .create_framebuffer()
