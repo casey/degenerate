@@ -9,7 +9,7 @@ pub(crate) use {
     ops::Deref,
     sync::{Arc, Mutex},
   },
-  wasm_bindgen::{closure::Closure, JsCast, JsValue},
+  wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue},
   web_sys::{
     CanvasRenderingContext2d, Document, Element, EventTarget, HtmlCanvasElement, HtmlElement,
     HtmlTextAreaElement, ImageData, WebGl2RenderingContext, WebGlFramebuffer, WebGlProgram,
@@ -25,9 +25,11 @@ mod gpu;
 mod js_value_error;
 mod select;
 mod stderr;
+mod test;
 mod window;
 
-pub(crate) fn run() {
+#[wasm_bindgen]
+pub fn run() {
   console_error_panic_hook::set_once();
   console_log::init_with_level(log::Level::Trace).unwrap();
   Stderr::get().update(Gpu::init());

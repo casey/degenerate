@@ -1,17 +1,18 @@
 use super::*;
 
 const DEFAULT_OUTPUT_PATH: &str = "memory.png";
+const ALPHA_OPAQUE: u8 = 255;
 
 pub(crate) struct Computer<'a> {
   alpha: f64,
   autosave: bool,
-  default: Vector3<u8>,
+  default: Vector4<u8>,
   frame: u64,
   #[cfg(target_arch = "wasm32")]
   gpu: Option<&'a Gpu>,
   loop_counter: usize,
   mask: Mask,
-  memory: DMatrix<Vector3<u8>>,
+  memory: DMatrix<Vector4<u8>>,
   operation: Operation,
   program: Vec<Command>,
   program_counter: usize,
@@ -43,7 +44,7 @@ impl<'a> Computer<'a> {
   }
 
   #[cfg(target_arch = "wasm32")]
-  pub(crate) fn memory(&self) -> &DMatrix<Vector3<u8>> {
+  pub(crate) fn memory(&self) -> &DMatrix<Vector4<u8>> {
     &self.memory
   }
 
@@ -77,7 +78,7 @@ impl<'a> Computer<'a> {
     Self {
       alpha: 1.0,
       autosave: false,
-      default: Vector3::new(0, 0, 0),
+      default: Vector4::new(0, 0, 0, ALPHA_OPAQUE),
       frame: 0,
       loop_counter: 0,
       mask: Mask::All,
@@ -153,13 +154,16 @@ impl<'a> Computer<'a> {
           } else {
             self.default
           };
-          let over = self.operation.apply(v, input);
-          let over = over.map(|c| c as f64);
-          let under = self.memory[(row, col)];
-          let under = under.map(|c| c as f64);
+          let over = self.operation.apply(v, input.xyz()).map(|c| c as f64);
+          let under = self.memory[(row, col)].xyz().map(|c| c as f64);
           let combined =
             (over * self.alpha + under * (1.0 - self.alpha)) / (self.alpha + (1.0 - self.alpha));
-          output[(row, col)] = combined.map(|c| c as u8);
+          output[(row, col)] = Vector4::new(
+            combined.x as u8,
+            combined.y as u8,
+            combined.z as u8,
+            ALPHA_OPAQUE,
+          );
         }
       }
     }
@@ -220,7 +224,7 @@ impl<'a> Computer<'a> {
       Command::Autosave => self.autosave = !self.autosave,
       Command::Comment => {}
       Command::Default(default) => {
-        self.default = default;
+        self.default = Vector4::new(default.x, default.y, default.z, ALPHA_OPAQUE);
       }
       Command::Viewport(viewport) => self.viewport = viewport,
       Command::For(until) => {
@@ -328,11 +332,15 @@ impl<'a> Computer<'a> {
       Command::Rotate(turns) => self
         .similarity
         .append_rotation_mut(&UnitComplex::from_angle(turns * f64::consts::TAU)),
-      Command::Save(path) => self.image()?.save(
-        path
-          .as_deref()
-          .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
-      )?,
+      Command::Save(path) => {
+        if cfg!(not(target_arch = "wasm32")) {
+          self.image()?.save(
+            path
+              .as_deref()
+              .unwrap_or_else(|| DEFAULT_OUTPUT_PATH.as_ref()),
+          )?
+        }
+      }
       Command::Scale(scaling) => {
         self.similarity.append_scaling_mut(scaling);
       }
@@ -350,7 +358,7 @@ impl<'a> Computer<'a> {
       .resize_mut(dimensions.0, dimensions.1, self.default)
   }
 
-  fn image(&self) -> Result<RgbImage> {
+  fn image(&self) -> Result<RgbaImage> {
     ImageBuffer::from_raw(
       self.memory.ncols().try_into()?,
       self.memory.nrows().try_into()?,
@@ -367,7 +375,7 @@ impl<'a> Computer<'a> {
         write!(
           w,
           "{:X}",
-          element.map(|scalar| scalar as u32).sum() / (16 * 3)
+          element.xyz().map(|scalar| scalar as u32).sum() / (16 * 3)
         )?;
       }
       writeln!(w)?;
@@ -381,7 +389,7 @@ impl<'a> Computer<'a> {
   fn load(&mut self, path: &Path) -> Result<()> {
     let image = image::io::Reader::open(path)?
       .decode()?
-      .as_rgb8()
+      .as_rgba8()
       .ok_or_else(|| format!("{} is not a valid rgb8 image", path.display()))?
       .to_owned();
 
@@ -392,7 +400,7 @@ impl<'a> Computer<'a> {
       height,
       image
         .rows()
-        .flat_map(|row| row.map(|pixel| Vector3::new(pixel[0], pixel[1], pixel[2]))),
+        .flat_map(|row| row.map(|pixel| Vector4::new(pixel[0], pixel[1], pixel[2], pixel[3]))),
     )
     .transpose();
 

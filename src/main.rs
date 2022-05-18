@@ -3,9 +3,10 @@ use {
     color_axis::ColorAxis, command::Command, computer::Computer, mask::Mask,
     operation::Operation, viewport::Viewport, wrap::Wrap,
   },
-  image::{ImageBuffer, RgbImage},
+  image::{ImageBuffer, RgbaImage},
   nalgebra::{
     Affine2, DMatrix, Matrix3, Point2, Rotation3, Similarity2, UnitComplex, Vector2, Vector3,
+    Vector4,
   },
   rand::Rng,
   rand::{rngs::StdRng, SeedableRng},
@@ -39,9 +40,6 @@ type Error = Box<dyn std::error::Error>;
 type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
 fn main() {
-  #[cfg(target_arch = "wasm32")]
-  crate::browser::run();
-
   #[cfg(not(target_arch = "wasm32"))]
   crate::native::run();
 }

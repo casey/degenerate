@@ -1,9 +1,12 @@
 /generate
-/images/*.actual-memory.png
+/images/*.browser-actual-memory.png
+/images/*.native-actual-memory.png
 /memory.png
 /output.txt
 /program.degen
 /target
 /www/degenerate.js
 /www/degenerate_bg.wasm
+/tests/www/degenerate.js
+/tests/www/degenerate_bg.wasm
 /www/man
