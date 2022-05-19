@@ -18,8 +18,8 @@ env:
   WASM_BINDGEN_VERSION: 0.2.80
 
 jobs:
-  browser:
-    name: Browser
+  test:
+    name: Test
 
     runs-on: ubuntu-latest
 
@@ -40,7 +40,7 @@ jobs:
         version: ${{ env.WASM_BINDGEN_VERSION }}
 
     - name: Test
-      run: cargo test --all --release ::browser
+      run: cargo test --package integration --lib
 
   check:
     name: Check
@@ -66,42 +66,14 @@ jobs:
 
     - name: Clippy
       run: |
-        cargo clippy
+        cargo clippy --package integration --tests
         cargo clippy --target wasm32-unknown-unknown
-        cargo clippy --tests
 
     - name: Check for Forbidden Words
       run: |
         sudo apt-get update
         sudo apt-get install ripgrep
         ./bin/forbid
-
-  native:
-    name: Native
-
-    strategy:
-      matrix:
-        os:
-        - macos-latest
-        - ubuntu-latest
-        - windows-latest
-
-    runs-on: ${{ matrix.os }}
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Install Rust Toolchain Components
-      uses: actions-rs/toolchain@v1
-      with:
-        components: clippy, rustfmt
-        target: wasm32-unknown-unknown
-        toolchain: stable
-
-    - uses: Swatinem/rust-cache@v1
-
-    - name: Test
-      run: cargo test --all --release ::native
 
   pages:
     name: Pages

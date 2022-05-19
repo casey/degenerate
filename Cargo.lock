@@ -213,17 +213,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "065374052e7df7ee4047b1160cca5e1467a12351a40b3da123c870ba0b8eda2a"
 
 [[package]]
-name = "atty"
-version = "0.2.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9b39be18770d11421cdb1b9947a45dd3f37e93092cbf377614828a319d5fee8"
-dependencies = [
- "hermit-abi",
- "libc",
- "winapi",
-]
-
-[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -344,12 +333,6 @@ name = "cache-padded"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c1db59621ec70f09c5e9b597b220c7a2b43611f4710dc03ceb8748637775692c"
-
-[[package]]
-name = "camino"
-version = "1.0.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "07fd178c5af4d59e83498ef15cf3f154e1a6f9d091270cb86283c65ef44e9ef0"
 
 [[package]]
 name = "cc"
@@ -557,12 +540,9 @@ dependencies = [
 name = "degenerate"
 version = "0.0.1"
 dependencies = [
- "ansi_term",
  "approx",
- "atty",
  "axum",
  "base64",
- "camino",
  "chromiumoxide",
  "console_error_panic_hook",
  "console_log",
@@ -586,7 +566,6 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "unindent",
- "urlencoding",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -983,6 +962,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a5bbe824c507c5da5956355e86a746d82e0e1464f65d862cc5e71da70e94b2c"
 dependencies = [
  "cfg-if",
+]
+
+[[package]]
+name = "integration"
+version = "0.0.0"
+dependencies = [
+ "approx",
+ "axum",
+ "base64",
+ "chromiumoxide",
+ "executable-path",
+ "futures",
+ "image",
+ "lazy_static",
+ "pretty_assertions",
+ "tempfile",
+ "tokio",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+ "unindent",
 ]
 
 [[package]]
@@ -2000,12 +2000,6 @@ dependencies = [
  "matches",
  "percent-encoding",
 ]
-
-[[package]]
-name = "urlencoding"
-version = "2.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "68b90931029ab9b034b300b797048cf23723400aa757e8a2bfb9d748102f9821"
 
 [[package]]
 name = "utf-8"
