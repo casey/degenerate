@@ -179,12 +179,13 @@ impl App {
           ImageData::new_with_u8_clamped_array(wasm_bindgen::Clamped(&pixels), size.try_into()?)
             .map_err(JsValueError)?;
 
-        let dx = self.canvas.width() as f64 - size as f64;
-        let dy = self.canvas.height() as f64 - size as f64;
-
         self
           .context
-          .put_image_data(&image_data, dx / 2.0, dy / 2.0)
+          .put_image_data(
+            &image_data,
+            self.canvas.width() as f64 - size as f64 / 2.0,
+            self.canvas.height() as f64 - size as f64 / 2.0,
+          )
           .map_err(JsValueError)?;
 
         if !self.computer.done() {
