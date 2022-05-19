@@ -66,13 +66,13 @@ impl Computer {
     }
   }
 
-  fn dimensions(&self) -> Vector2<usize> {
-    Vector2::new(self.memory.ncols(), self.memory.nrows())
+  fn size(&self) -> usize {
+    self.memory.ncols()
   }
 
   fn apply(&mut self) -> Result {
     let similarity = self.similarity.inverse();
-    let dimensions = self.dimensions();
+    let size = self.size();
     let transform = self.transform();
     let inverse = transform.inverse();
     let mut output = self.memory.clone();
@@ -85,7 +85,7 @@ impl Computer {
         let i = inverse
           .transform_point(&v)
           .map(|element| element.round() as isize);
-        if self.mask.is_masked(dimensions, i, v) {
+        if self.mask.is_masked(size, i, v) {
           let input = if i.x >= 0
             && i.y >= 0
             && i.x < self.memory.ncols() as isize
@@ -169,12 +169,10 @@ impl Computer {
   }
 
   fn transform(&self) -> Affine2<f64> {
-    let d = self.dimensions().map(|element| element as f64);
-
     Affine2::from_matrix_unchecked(
       Matrix3::identity()
         .append_translation(&Vector2::from_element(0.5))
-        .append_nonuniform_scaling(&Vector2::new(1.0 / d.x, 1.0 / d.y))
+        .append_scaling(1.0 / self.size() as f64)
         .append_scaling(2.0)
         .append_translation(&Vector2::from_element(-1.0)),
     )
