@@ -3,7 +3,7 @@ use {
   chromiumoxide::browser::{Browser, BrowserConfig},
   futures::StreamExt,
   lazy_static::lazy_static,
-  std::{fs, net::SocketAddr, process::Command, str, sync::Once, time::Duration},
+  std::{fs, net::SocketAddr, str, sync::Once, time::Duration},
   tokio::{runtime::Runtime, task},
   tower_http::{services::ServeDir, trace::TraceLayer},
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
@@ -143,7 +143,7 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
 
       #[cfg(target_os = "macos")]
       {
-        let status = Command::new("xattr")
+        let status = std::process::Command::new("xattr")
           .args(["-wx", "com.apple.FinderInfo"])
           .arg("0000000000000000000C00000000000000000000000000000000000000000000")
           .arg(&destination)
