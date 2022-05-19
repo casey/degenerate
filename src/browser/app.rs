@@ -153,8 +153,7 @@ impl App {
       if resize || program_changed {
         let mut computer = Computer::new();
         computer.load_program(&program);
-        let size = self.canvas.width().max(self.canvas.height()).try_into()?;
-        computer.resize(if size % 2 == 0 { size + 1 } else { size });
+        computer.resize((self.canvas.width().max(self.canvas.height()) | 1).try_into()?);
         self.computer = computer;
       }
 
