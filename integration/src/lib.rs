@@ -7,6 +7,7 @@ use {
   tokio::{runtime::Runtime, task},
   tower_http::{services::ServeDir, trace::TraceLayer},
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
+  unindent::Unindent,
 };
 
 macro_rules! image_test {
@@ -157,7 +158,7 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
     eprintln!("Running test...");
 
     let data_url = page
-      .evaluate(format!("window.test(`{program}`)"))
+      .evaluate(format!("window.test(`{}`)", program.unindent()))
       .await?
       .into_value::<String>()?;
 
@@ -293,7 +294,7 @@ image_test! {
 image_test! {
   name: default,
   program: "
-    comment foo
+    # foo
   ",
 }
 
@@ -767,5 +768,17 @@ image_test! {
     for 10
     apply
     loop
+  ",
+}
+
+image_test! {
+  name: whitespace_is_ignored,
+  program: "
+    rotate\t\t0.125
+
+    \tx\t
+
+    apply
+
   ",
 }
