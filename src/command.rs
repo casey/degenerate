@@ -17,11 +17,27 @@ pub(crate) enum Command {
   Wrap,
 }
 
+impl Command {
+  pub(crate) fn parse_program(program: &str) -> Result<Vec<Command>> {
+    program
+      .trim()
+      .lines()
+      .into_iter()
+      .map(Command::from_str)
+      .collect()
+  }
+}
+
 impl FromStr for Command {
   type Err = Error;
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
-    match s.split(':').collect::<Vec<&str>>().as_slice() {
+    match s
+      .trim()
+      .split_whitespace()
+      .collect::<Vec<&str>>()
+      .as_slice()
+    {
       ["all"] => Ok(Self::Mask(Mask::All)),
       ["alpha", alpha] => Ok(Self::Alpha(alpha.parse()?)),
       ["apply"] => Ok(Self::Apply),

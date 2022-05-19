@@ -157,7 +157,7 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
     eprintln!("Running test...");
 
     let data_url = page
-      .evaluate(format!("window.test('{program}')"))
+      .evaluate(format!("window.test(`{program}`)"))
       .await?
       .into_value::<String>()?;
 
