@@ -53,39 +53,6 @@ lazy_static! {
       .with(tracing_subscriber::fmt::layer())
       .init();
 
-    eprintln!("Building WASM binary...");
-
-    let status = Command::new("cargo")
-      .args(["build", "--release", "--target", "wasm32-unknown-unknown"])
-      .current_dir("..")
-      .status()
-      .unwrap();
-
-    if !status.success() {
-      panic!("Failed to build WASM binary: {status}");
-    }
-
-    eprintln!("Running wasm-bindgen...");
-
-    let status = Command::new("wasm-bindgen")
-      .args([
-        "--target",
-        "web",
-        "--no-typescript",
-        "target/wasm32-unknown-unknown/release/degenerate.wasm",
-        "--out-dir",
-        "integration/www",
-      ])
-      .current_dir("..")
-      .status()
-      .unwrap();
-
-    if !status.success() {
-      panic!("wasm-bindgen failed: {status}");
-    }
-
-    eprintln!("Done with setup!");
-
     let addr = SocketAddr::from(([127, 0, 0, 1], 0));
     let listener = std::net::TcpListener::bind(addr).unwrap();
     let port = listener.local_addr().unwrap().port();
