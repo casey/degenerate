@@ -164,10 +164,8 @@ impl Computer {
     Ok(())
   }
 
-  pub(crate) fn resize(&mut self, dimensions: (usize, usize)) {
-    self
-      .memory
-      .resize_mut(dimensions.0, dimensions.1, self.default)
+  pub(crate) fn resize(&mut self, size: usize) {
+    self.memory.resize_mut(size, size, self.default)
   }
 
   fn transform(&self) -> Affine2<f64> {

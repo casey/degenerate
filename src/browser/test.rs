@@ -14,7 +14,7 @@ fn test_inner(program: &str) -> Result<String> {
 
   let mut computer = Computer::new();
   computer.load_program(&program);
-  computer.resize((256, 256));
+  computer.resize(256);
   computer.run(false)?;
 
   let window = window();
