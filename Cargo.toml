@@ -39,6 +39,7 @@ features = [
   "HtmlTextAreaElement",
   "ImageData",
   "InputEvent",
+  "Location",
   "WebGl2RenderingContext",
   "WebGlBuffer",
   "WebGlFramebuffer",

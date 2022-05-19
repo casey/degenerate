@@ -12,48 +12,53 @@ fn test_inner(program: &str) -> Result<String> {
     .map(Command::from_str)
     .collect::<Result<Vec<Command>>>()?;
 
-  // grab page fragment
-
-  let mut computer = Computer::new(None);
-  computer.load_program(&program);
-  computer.resize((256, 256));
-  computer.run(false)?;
-
   let window = window();
 
-  let document = window.get_document();
-
-  let pixels = computer
-    .memory()
-    .transpose()
-    .iter()
-    .flatten()
-    .cloned()
-    .collect::<Vec<u8>>();
-
-  let image_data = ImageData::new_with_u8_clamped_array(
-    wasm_bindgen::Clamped(&pixels),
-    computer.memory().ncols().try_into()?,
-  )
-  .map_err(JsValueError)?;
-
-  let canvas = document
+  let canvas = window
+    .get_document()
     .create_element("canvas")
     .map_err(JsValueError)?
     .cast::<HtmlCanvasElement>()?;
 
-  canvas.set_height(computer.memory().nrows().try_into()?);
-  canvas.set_width(computer.memory().ncols().try_into()?);
+  canvas.set_height(256);
+  canvas.set_width(256);
 
-  let context = canvas
-    .get_context("2d")
-    .map_err(JsValueError)?
-    .ok_or("failed to retrieve context")?
-    .cast::<CanvasRenderingContext2d>()?;
+  let gpu = (window.location().hash().map_err(JsValueError)? == "#gpu")
+    .then(|| Some(Arc::new(WebGl::new(&canvas).unwrap())))
+    .unwrap_or(None);
 
-  context
-    .put_image_data(&image_data, 0.0, 0.0)
+  let mut computer = Computer::new(gpu.clone());
+  computer.load_program(&program);
+  computer.resize((canvas.width().try_into()?, canvas.height().try_into()?));
+  computer.run(false)?;
+
+  if let Some(gpu) = gpu {
+    gpu.render_to_canvas(&computer)?;
+  } else {
+    let pixels = computer
+      .memory()
+      .transpose()
+      .iter()
+      .flatten()
+      .cloned()
+      .collect::<Vec<u8>>();
+
+    let image_data = ImageData::new_with_u8_clamped_array(
+      wasm_bindgen::Clamped(&pixels),
+      computer.memory().ncols().try_into()?,
+    )
     .map_err(JsValueError)?;
+
+    let context = canvas
+      .get_context("2d")
+      .map_err(JsValueError)?
+      .ok_or("failed to retrieve context")?
+      .cast::<CanvasRenderingContext2d>()?;
+
+    context
+      .put_image_data(&image_data, 0.0, 0.0)
+      .map_err(JsValueError)?;
+  }
 
   Ok(canvas.to_data_url().map_err(JsValueError)?)
 }

@@ -37,9 +37,9 @@ static FRAGMENT: &str = indoc! {"
 
   bool is_masked() {
     if (circle)
-      return length((uv - 0.5) * 2.0) < 0.5;
+      return length((uv - 0.5) * 2.0) < 1.0;
     if (x)
-      return min(abs((1.0 - uv.x) - uv.y), abs(uv.x - uv.y)) < 0.1;
+      return min(abs((1.0 - uv.x) - uv.y), abs(uv.x - uv.y)) < 0.125;
     return true;
   }
 
@@ -65,39 +65,12 @@ pub(crate) struct WebGl {
 }
 
 impl WebGl {
-  pub(super) fn new() -> Result<Self> {
-    let canvas = window()
-      .get_document()
-      .select("canvas")?
-      .cast::<HtmlCanvasElement>()?;
-
+  pub(super) fn new(canvas: &HtmlCanvasElement) -> Result<Self> {
     let context = canvas
       .get_context("webgl2")
       .map_err(JsValueError)?
       .ok_or("Failed to retrieve context")?
       .cast::<WebGl2RenderingContext>()?;
-
-    let css_pixel_height: f64 = canvas.client_height().try_into()?;
-    let css_pixel_width: f64 = canvas.client_width().try_into()?;
-
-    let device_pixel_ratio = window().device_pixel_ratio();
-    let device_pixel_height = css_pixel_height * device_pixel_ratio;
-    let device_pixel_width = css_pixel_width * device_pixel_ratio;
-
-    let height = if cfg!(debug_assertions) {
-      device_pixel_height / 32.0
-    } else {
-      device_pixel_height
-    };
-
-    let width = if cfg!(debug_assertions) {
-      device_pixel_width / 32.0
-    } else {
-      device_pixel_width
-    };
-
-    canvas.set_height(height.ceil() as u32);
-    canvas.set_width(width.ceil() as u32);
 
     context.viewport(
       0,
