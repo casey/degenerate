@@ -71,3 +71,17 @@ build-web-release:
 
 open:
 	open http://localhost:8000
+
+fix:
+	#!/usr/bin/env python3
+
+	for line in open('integration/src/lib.rs').read().splitlines():
+		if 'program: "' in line:
+			program = line.split('"')[1]
+			commands = program.split(' ')
+			print('  program: "')
+			for command in commands:
+				print('   ', ' '.join(command.split(':')))
+			print('  ",')
+		else:
+			print(line)
