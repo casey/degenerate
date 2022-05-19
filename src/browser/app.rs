@@ -120,18 +120,8 @@ impl App {
       let device_pixel_ratio = self.window.device_pixel_ratio();
       let device_pixel_height = css_pixel_height * device_pixel_ratio;
       let device_pixel_width = css_pixel_width * device_pixel_ratio;
-      let height = if cfg!(debug_assertions) {
-        device_pixel_height / 32.0
-      } else {
-        device_pixel_height
-      };
-      let width = if cfg!(debug_assertions) {
-        device_pixel_width / 32.0
-      } else {
-        device_pixel_width
-      };
-      self.canvas.set_height(height.ceil() as u32);
-      self.canvas.set_width(width.ceil() as u32);
+      self.canvas.set_height(device_pixel_height.ceil() as u32);
+      self.canvas.set_width(device_pixel_width.ceil() as u32);
       self.resize = false;
     }
 
