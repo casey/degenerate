@@ -183,8 +183,8 @@ impl App {
           .context
           .put_image_data(
             &image_data,
-            self.canvas.width() as f64 - size as f64 / 2.0,
-            self.canvas.height() as f64 - size as f64 / 2.0,
+            (self.canvas.width() as f64 - size as f64) / 2.0,
+            (self.canvas.height() as f64 - size as f64) / 2.0,
           )
           .map_err(JsValueError)?;
 
