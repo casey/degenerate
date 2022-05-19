@@ -64,12 +64,6 @@ pub(crate) struct WebGl {
   textures: Vec<WebGlTexture>,
 }
 
-impl Gpu for WebGl {
-  fn apply(&self, state: &Computer) -> Result {
-    self.render_to_texture(state)
-  }
-}
-
 impl WebGl {
   pub(super) fn new() -> Result<Self> {
     let canvas = window()
@@ -181,7 +175,7 @@ impl WebGl {
     Ok(())
   }
 
-  fn render_to_texture(&self, state: &Computer) -> Result {
+  pub(crate) fn render_to_texture(&self, state: &Computer) -> Result {
     self.context.bind_framebuffer(
       WebGl2RenderingContext::FRAMEBUFFER,
       Some(&self.frame_buffer),

@@ -12,6 +12,8 @@ fn test_inner(program: &str) -> Result<String> {
     .map(Command::from_str)
     .collect::<Result<Vec<Command>>>()?;
 
+  // grab page fragment
+
   let mut computer = Computer::new(None);
   computer.load_program(&program);
   computer.resize((256, 256));

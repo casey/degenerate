@@ -14,9 +14,16 @@ macro_rules! image_test {
     name: $name:ident,
     program: $program:literal,
   ) => {
-    #[test]
-    fn $name() -> Result {
-      image_test(stringify!($name), $program)
+    mod $name {
+      #[test]
+      fn cpu() -> result {
+        image_test(stringify!($name), $program, false)
+      }
+
+      #[test]
+      fn gpu() -> result {
+        image_test(stringify!($name), $program, true)
+      }
     }
   };
 }
@@ -133,7 +140,7 @@ fn clean() {
   });
 }
 
-pub(crate) fn image_test(name: &str, program: &str) -> Result {
+pub(crate) fn image_test(name: &str, program: &str, gpu: bool) -> Result {
   let browser: &'static Browser = &*BROWSER;
   RUNTIME.block_on(async {
     clean();
@@ -141,7 +148,7 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
     eprintln!("Creating page...");
 
     let page = browser
-      .new_page(format!("http://127.0.0.1:{}", *SERVER_PORT))
+      .new_page(format!("http://127.0.0.1:{}/#{}", *SERVER_PORT, gpu))
       .await?;
 
     eprintln!("Waiting for module to load...");

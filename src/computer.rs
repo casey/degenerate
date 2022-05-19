@@ -1,11 +1,13 @@
 use super::*;
 
+use crate::browser::WebGl;
+
 const ALPHA_OPAQUE: u8 = 255;
 
 pub(crate) struct Computer {
   alpha: f64,
   default: Vector4<u8>,
-  gpu: Option<Arc<dyn Gpu>>,
+  gpu: Option<Arc<WebGl>>,
   loop_counter: usize,
   mask: Mask,
   memory: DMatrix<Vector4<u8>>,
@@ -31,12 +33,10 @@ impl Computer {
     Ok(())
   }
 
-  #[cfg(target_arch = "wasm32")]
   pub(crate) fn memory(&self) -> &DMatrix<Vector4<u8>> {
     &self.memory
   }
 
-  #[cfg(target_arch = "wasm32")]
   pub(crate) fn done(&self) -> bool {
     self.program_counter >= self.program.len()
   }
@@ -46,22 +46,19 @@ impl Computer {
     self.program_counter = 0;
   }
 
-  #[cfg(target_arch = "wasm32")]
   pub(crate) fn program(&self) -> &[Command] {
     &self.program
   }
 
-  #[cfg(target_arch = "wasm32")]
   pub(crate) fn mask(&self) -> &Mask {
     &self.mask
   }
 
-  #[cfg(target_arch = "wasm32")]
   pub(crate) fn operation(&self) -> &Operation {
     &self.operation
   }
 
-  pub(crate) fn new(gpu: Option<Arc<dyn Gpu>>) -> Self {
+  pub(crate) fn new(gpu: Option<Arc<WebGl>>) -> Self {
     Self {
       alpha: 1.0,
       default: Vector4::new(0, 0, 0, ALPHA_OPAQUE),
@@ -84,7 +81,7 @@ impl Computer {
 
   fn apply(&mut self) -> Result {
     if let Some(gpu) = &self.gpu {
-      gpu.apply(self)?;
+      gpu.render_to_texture(self)?;
     } else {
       let similarity = self.similarity.inverse();
       let dimensions = self.dimensions();
