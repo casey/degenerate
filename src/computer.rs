@@ -172,8 +172,7 @@ impl Computer {
     Affine2::from_matrix_unchecked(
       Matrix3::identity()
         .append_translation(&Vector2::from_element(0.5))
-        .append_scaling(1.0 / self.size() as f64)
-        .append_scaling(2.0)
+        .append_scaling(2.0 / self.size() as f64)
         .append_translation(&Vector2::from_element(-1.0)),
     )
   }
