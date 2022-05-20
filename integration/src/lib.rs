@@ -6,11 +6,12 @@ use {
     fs,
     net::SocketAddr,
     str,
-    sync::{Arc, Mutex, Once, Weak},
+    sync::{Arc, Once, Weak},
     time::Duration,
   },
   tokio::{
     runtime::Runtime,
+    sync::Mutex,
     task::{self, JoinHandle},
   },
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
@@ -43,7 +44,7 @@ impl Drop for Browser {
 }
 
 async fn browser() -> Arc<Browser> {
-  let mut guard = BROWSER.lock().unwrap();
+  let mut guard = BROWSER.lock().await;
 
   if let Some(browser) = guard.upgrade() {
     return browser;
