@@ -57,13 +57,16 @@ struct ShaderDescription {
 pub(crate) struct WebGl {
   context: WebGl2RenderingContext,
   frame_buffer: WebGlFramebuffer,
-  length: usize,
   program: WebGlProgram,
   source: AtomicUsize,
   textures: Vec<WebGlTexture>,
 }
 
 impl WebGl {
+  const VERTICES: [f32; 12] = [
+    -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0,
+  ];
+
   pub(super) fn new(canvas: &HtmlCanvasElement) -> Result<Self> {
     let context = canvas
       .get_context("webgl2")
@@ -92,7 +95,7 @@ impl WebGl {
       ],
     )?;
 
-    let length = Self::setup_triangles(&context, &program)?;
+    Self::setup_triangles(&context, &program)?;
 
     let textures = (0..2)
       .map(|_| Self::create_texture(&context))
@@ -105,7 +108,6 @@ impl WebGl {
     Ok(Self {
       context,
       frame_buffer,
-      length,
       program,
       source: AtomicUsize::new(0),
       textures,
@@ -141,7 +143,7 @@ impl WebGl {
     self.context.draw_arrays(
       WebGl2RenderingContext::TRIANGLES,
       0,
-      self.length.try_into()?,
+      (Self::VERTICES.len() / 2).try_into()?,
     );
 
     Ok(())
@@ -185,7 +187,7 @@ impl WebGl {
     self.context.draw_arrays(
       WebGl2RenderingContext::TRIANGLES,
       0,
-      self.length.try_into()?,
+      (Self::VERTICES.len() / 2).try_into()?,
     );
 
     self
@@ -287,22 +289,9 @@ impl WebGl {
     Ok(texture)
   }
 
-  fn setup_triangles(gl: &WebGl2RenderingContext, program: &WebGlProgram) -> Result<usize> {
-    let vertex_data = vec![
-      vec![-1.0, -1.0, 0.0],
-      vec![1.0, -1.0, 0.0],
-      vec![1.0, 1.0, 0.0],
-      vec![1.0, 1.0, 0.0],
-      vec![-1.0, 1.0, 0.0],
-      vec![-1.0, -1.0, 0.0],
-    ]
-    .iter()
-    .flatten()
-    .cloned()
-    .collect::<Vec<f32>>();
-
-    let vertices = js_sys::Float32Array::new_with_length(vertex_data.len().try_into()?);
-    vertices.copy_from(&vertex_data);
+  fn setup_triangles(gl: &WebGl2RenderingContext, program: &WebGlProgram) -> Result {
+    let vertices = js_sys::Float32Array::new_with_length(Self::VERTICES.len().try_into()?);
+    vertices.copy_from(&Self::VERTICES);
 
     let position = gl.get_attrib_location(program, "position");
 
@@ -321,13 +310,13 @@ impl WebGl {
 
     gl.vertex_attrib_pointer_with_i32(
       position.try_into()?,
-      3,
+      2,
       WebGl2RenderingContext::FLOAT,
       false,
       0,
       0,
     );
 
-    Ok(vertex_data.len() / 3)
+    Ok(())
   }
 }
