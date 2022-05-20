@@ -61,6 +61,11 @@ jobs:
     - name: Check Lockfile
       run: cargo update --locked --package degenerate
 
+    - name: Install `wasm-bindgen`
+      uses: jetli/wasm-bindgen-action@v0.1.0
+      with:
+        version: ${{ env.WASM_BINDGEN_VERSION }}
+
     - name: Format
       run: cargo fmt --all -- --check
 
