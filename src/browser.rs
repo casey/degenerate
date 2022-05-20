@@ -13,8 +13,8 @@ use {
   wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue},
   web_sys::{
     CanvasRenderingContext2d, Document, Element, EventTarget, HtmlCanvasElement, HtmlElement,
-    HtmlTextAreaElement, ImageData, WebGl2RenderingContext, WebGlFramebuffer, WebGlProgram,
-    WebGlTexture, Window,
+    HtmlTextAreaElement, ImageData, WebGl2RenderingContext, WebGlFramebuffer,
+    WebGlTexture, Window, WebGlUniformLocation
   },
 };
 

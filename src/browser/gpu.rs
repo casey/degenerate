@@ -2,9 +2,10 @@ use super::*;
 
 pub(crate) struct Gpu {
   canvas: HtmlCanvasElement,
-  gl: WebGl2RenderingContext,
   frame_buffer: WebGlFramebuffer,
-  program: WebGlProgram,
+  gl: WebGl2RenderingContext,
+  mask: WebGlUniformLocation,
+  operation: WebGlUniformLocation,
   source: Cell<usize>,
   textures: [WebGlTexture; 2],
 }
@@ -79,6 +80,14 @@ impl Gpu {
       program
     };
 
+    let mask = gl
+      .get_uniform_location(&program, "mask")
+      .ok_or("Could not find uniform `mask`")?;
+
+    let operation = gl
+      .get_uniform_location(&program, "operation")
+      .ok_or("Could not find uniform `operation`")?;
+
     let vertices = Float32Array::new_with_length(Self::VERTICES.len().try_into()?);
     vertices.copy_from(&Self::VERTICES);
 
@@ -117,9 +126,10 @@ impl Gpu {
 
     Ok(Self {
       canvas: canvas.clone(),
-      gl,
       frame_buffer,
-      program,
+      gl,
+      mask,
+      operation,
       source: Cell::new(0),
       textures,
     })
@@ -135,16 +145,12 @@ impl Gpu {
       Some(&self.textures[self.source.get()]),
     );
 
-    self.gl.uniform1ui(
-      self.gl.get_uniform_location(&self.program, "mask").as_ref(),
-      Self::mask_uniform(&Mask::All),
-    );
+    self
+      .gl
+      .uniform1ui(Some(&self.mask), Self::mask_uniform(&Mask::All));
 
     self.gl.uniform1ui(
-      self
-        .gl
-        .get_uniform_location(&self.program, "operation")
-        .as_ref(),
+      Some(&self.operation),
       Self::operation_uniform(&Operation::Identity),
     );
 
@@ -176,16 +182,12 @@ impl Gpu {
       Some(&self.textures[self.source.get()]),
     );
 
-    self.gl.uniform1ui(
-      self.gl.get_uniform_location(&self.program, "mask").as_ref(),
-      Self::mask_uniform(computer.mask()),
-    );
+    self
+      .gl
+      .uniform1ui(Some(&self.mask), Self::mask_uniform(computer.mask()));
 
     self.gl.uniform1ui(
-      self
-        .gl
-        .get_uniform_location(&self.program, "operation")
-        .as_ref(),
+      Some(&self.operation),
       Self::operation_uniform(computer.operation()),
     );
 
