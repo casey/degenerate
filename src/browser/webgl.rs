@@ -1,6 +1,7 @@
 use super::*;
 
 pub(crate) struct WebGl {
+  canvas: HtmlCanvasElement,
   context: WebGl2RenderingContext,
   frame_buffer: WebGlFramebuffer,
   program: WebGlProgram,
@@ -118,6 +119,7 @@ impl WebGl {
       .ok_or("Failed to create frame buffer")?;
 
     Ok(Self {
+      canvas: canvas.clone(),
       context,
       frame_buffer,
       program,
@@ -242,9 +244,12 @@ impl WebGl {
   }
 
   pub(crate) fn resize(&mut self, size: usize) -> Result {
-    self
-      .context
-      .viewport(0, 0, size.try_into()?, size.try_into()?);
+    self.context.viewport(
+      (self.canvas.width() as i32 - size as i32) / 2,
+      (self.canvas.height() as i32 - size as i32) / 2,
+      size.try_into()?,
+      size.try_into()?,
+    );
 
     self.context.delete_texture(Some(&self.textures[0]));
     self.context.delete_texture(Some(&self.textures[1]));

@@ -80,7 +80,7 @@ impl Computer {
   }
 
   fn apply(&mut self) -> Result {
-    if let Some(gpu) = self.gpu.as_ref(){
+    if let Some(gpu) = self.gpu.as_ref() {
       gpu.lock().unwrap().render_to_texture(self)?;
     } else {
       let similarity = self.similarity.inverse();
