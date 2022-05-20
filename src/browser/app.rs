@@ -10,7 +10,7 @@ pub(crate) struct App {
   resize: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
-  webgl: Option<Arc<Mutex<WebGl>>>,
+  gpu: Option<Arc<Mutex<Gpu>>>,
   window: Window,
 }
 
@@ -28,8 +28,8 @@ impl App {
 
     let stderr = Stderr::get();
 
-    let webgl = if window.location().hash().map_err(JsValueError)? == "#gpu" {
-      Some(Arc::new(Mutex::new(WebGl::new(&canvas)?)))
+    let gpu = if window.location().hash().map_err(JsValueError)? == "#gpu" {
+      Some(Arc::new(Mutex::new(Gpu::new(&canvas)?)))
     } else {
       None
     };
@@ -38,13 +38,13 @@ impl App {
       animation_frame_callback: None,
       animation_frame_pending: false,
       canvas,
-      computer: Computer::new(webgl.clone()),
+      computer: Computer::new(gpu.clone()),
       input: false,
       nav,
       resize: true,
       stderr: stderr.clone(),
       textarea: textarea.clone(),
-      webgl,
+      gpu,
       window: window.clone(),
     }));
 
@@ -138,7 +138,7 @@ impl App {
       let program_changed = program != self.computer.program();
 
       if resize || program_changed {
-        let mut computer = Computer::new(self.webgl.clone());
+        let mut computer = Computer::new(self.gpu.clone());
         computer.load_program(&program);
         // Make sure size is odd, so we don't get jaggies when drawing the X
         computer.resize((self.canvas.width().max(self.canvas.height()) | 1).try_into()?)?;
@@ -152,8 +152,8 @@ impl App {
       }
 
       if resize || program_changed || run {
-        if let Some(webgl) = self.webgl.clone() {
-          webgl.lock().unwrap().render_to_canvas(&self.computer)?;
+        if let Some(gpu) = self.gpu.clone() {
+          gpu.lock().unwrap().render_to_canvas(&self.computer)?;
         } else {
           let context = self
             .canvas

@@ -1,9 +1,10 @@
 pub(crate) use {
   self::{
     add_event_listener::AddEventListener, app::App, cast::Cast, get_document::GetDocument,
-    js_value_error::JsValueError, select::Select, stderr::Stderr, webgl::WebGl, window::window,
+    gpu::Gpu, js_value_error::JsValueError, select::Select, stderr::Stderr, window::window,
   },
   super::*,
+  js_sys::Float32Array,
   std::{
     cell::Cell,
     fmt::{self, Formatter},
@@ -22,11 +23,11 @@ mod add_event_listener;
 mod app;
 mod cast;
 mod get_document;
+pub mod gpu;
 mod js_value_error;
 mod select;
 mod stderr;
 pub mod test;
-mod webgl;
 mod window;
 
 #[wasm_bindgen]

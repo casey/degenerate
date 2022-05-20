@@ -1,13 +1,11 @@
 use super::*;
 
-use crate::browser::WebGl;
-
 const ALPHA_OPAQUE: u8 = 255;
 
 pub(crate) struct Computer {
   alpha: f64,
   default: Vector4<u8>,
-  gpu: Option<Arc<Mutex<WebGl>>>,
+  gpu: Option<Arc<Mutex<Gpu>>>,
   loop_counters: Vec<u64>,
   mask: Mask,
   memory: DMatrix<Vector4<u8>>,
@@ -58,7 +56,7 @@ impl Computer {
     &self.operation
   }
 
-  pub(crate) fn new(gpu: Option<Arc<Mutex<WebGl>>>) -> Self {
+  pub(crate) fn new(gpu: Option<Arc<Mutex<Gpu>>>) -> Self {
     Self {
       alpha: 1.0,
       default: Vector4::new(0, 0, 0, ALPHA_OPAQUE),

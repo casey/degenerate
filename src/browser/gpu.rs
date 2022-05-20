@@ -1,6 +1,6 @@
 use super::*;
 
-pub(crate) struct WebGl {
+pub(crate) struct Gpu {
   canvas: HtmlCanvasElement,
   context: WebGl2RenderingContext,
   frame_buffer: WebGlFramebuffer,
@@ -9,7 +9,7 @@ pub(crate) struct WebGl {
   textures: [WebGlTexture; 2],
 }
 
-impl WebGl {
+impl Gpu {
   const VERTICES: [f32; 12] = [
     -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0,
   ];
@@ -82,7 +82,7 @@ impl WebGl {
       program
     };
 
-    let vertices = js_sys::Float32Array::new_with_length(Self::VERTICES.len().try_into()?);
+    let vertices = Float32Array::new_with_length(Self::VERTICES.len().try_into()?);
     vertices.copy_from(&Self::VERTICES);
 
     let position = context.get_attrib_location(&program, "position");

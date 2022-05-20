@@ -19,19 +19,19 @@ fn test_inner(program: &str) -> Result<String> {
   canvas.set_height(256);
   canvas.set_width(256);
 
-  let webgl = if window.location().hash().map_err(JsValueError)? == "#gpu" {
-    Some(Arc::new(Mutex::new(WebGl::new(&canvas)?)))
+  let gpu = if window.location().hash().map_err(JsValueError)? == "#gpu" {
+    Some(Arc::new(Mutex::new(Gpu::new(&canvas)?)))
   } else {
     None
   };
 
-  let mut computer = Computer::new(webgl.clone());
+  let mut computer = Computer::new(gpu.clone());
   computer.load_program(&program);
   computer.resize(canvas.width().try_into()?)?;
   computer.run(false)?;
 
-  if let Some(webgl) = webgl {
-    webgl.lock().unwrap().render_to_canvas(&computer)?;
+  if let Some(gpu) = gpu {
+    gpu.lock().unwrap().render_to_canvas(&computer)?;
   } else {
     let pixels = computer
       .memory()
