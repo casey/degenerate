@@ -138,13 +138,7 @@ impl App {
     if self.input {
       self.nav.set_class_name("fade-out");
 
-      let program = self
-        .textarea
-        .value()
-        .split_whitespace()
-        .into_iter()
-        .map(Command::from_str)
-        .collect::<Result<Vec<Command>>>()?;
+      let program = Command::parse_program(&self.textarea.value())?;
 
       log::trace!("Program: {:?}", program);
 
