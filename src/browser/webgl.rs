@@ -245,10 +245,10 @@ impl WebGl {
 
   pub(crate) fn resize(&mut self, size: usize) -> Result {
     self.context.viewport(
-      (self.canvas.width() as i32 - size as i32) / 2,
-      (self.canvas.height() as i32 - size as i32) / 2,
-      size.try_into()?,
-      size.try_into()?,
+      0,
+      0,
+      self.canvas.width().try_into()?,
+      self.canvas.height().try_into()?,
     );
 
     self.context.delete_texture(Some(&self.textures[0]));
