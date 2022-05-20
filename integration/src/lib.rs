@@ -229,12 +229,12 @@ image_test! {
     rotate-color g 0.07
     rotate 0.07
     for 10
-    apply
+      apply
     loop
     rotate-color b 0.09
     rotate 0.09
     for 10
-    apply
+      apply
     loop
   ",
 }
@@ -245,8 +245,8 @@ image_test! {
     circle
     scale 0.5
     for 8
-    apply
-    wrap
+      apply
+      wrap
     loop
   ",
 }
@@ -278,7 +278,7 @@ image_test! {
     scale 0.99
     circle
     for 100
-    apply
+      apply
     loop
   ",
 }
@@ -307,12 +307,12 @@ image_test! {
     scale 0.5
     wrap
     for 8
-    apply
+      apply
     loop
     rotate 0.8333
     rotate-color b 0.05
     for 8
-    apply
+      apply
     loop
   ",
 }
@@ -322,10 +322,10 @@ image_test! {
   program: "
     rotate 0.111
     for 16
-    square
-    apply
-    circle
-    apply
+      square
+      apply
+      circle
+      apply
     loop
   ",
 }
@@ -338,12 +338,12 @@ image_test! {
     scale 0.75
     wrap
     for 8
-    apply
+      apply
     loop
     rotate 0.8333
     rotate-color b 0.05
     for 8
-    apply
+      apply
     loop
   ",
 }
@@ -364,11 +364,11 @@ image_test! {
     scale 0.75
     wrap
     for 8
-    apply
+      apply
     loop
     rotate-color b 0.05
     for 8
-    apply
+      apply
     loop
   ",
 }
@@ -380,8 +380,8 @@ image_test! {
     circle
     scale 0.5
     for 8
-    apply
-    wrap
+      apply
+      wrap
     loop
   ",
 }
@@ -533,7 +533,7 @@ image_test! {
     rotate 0.05
     square
     for 2
-    apply
+      apply
     loop
   ",
 }
@@ -544,11 +544,11 @@ image_test! {
     rotate 0.05
     square
     for 2
-    apply
+      apply
     loop
     x
     for 1
-    apply
+      apply
     loop
   ",
 }
@@ -577,11 +577,11 @@ image_test! {
     scale 0.5
     wrap
     for 8
-    apply
+      apply
     loop
     rotate-color b 0.05
     for 8
-    apply
+      apply
     loop
   ",
 }
@@ -601,7 +601,7 @@ image_test! {
     circle
     scale 0.5
     for 8
-    apply
+      apply
     loop
   ",
 }
@@ -642,14 +642,14 @@ image_test! {
     rotate-color g 0.01
     rotate 0.01
     for 100
-    choose all circle cross square top x
-    apply
+      choose all circle cross square top x
+      apply
     loop
     rotate-color b 0.01
     rotate 0.01
     for 100
-    choose all circle cross square top x
-    apply
+      choose all circle cross square top x
+      apply
     loop
   ",
 }
@@ -679,14 +679,14 @@ image_test! {
     rotate-color g 0.1
     rotate 0.1
     for 10
-    choose all circle cross square top x
-    apply
+      choose all circle cross square top x
+      apply
     loop
     rotate-color b 0.1
     rotate 0.1
     for 10
-    choose all circle cross square top x
-    apply
+      choose all circle cross square top x
+      apply
     loop
   ",
 }
@@ -713,8 +713,8 @@ image_test! {
     x
     scale 0.5
     for 8
-    apply
-    wrap
+      apply
+      wrap
     loop
   ",
 }
@@ -725,7 +725,7 @@ image_test! {
     x
     scale 0.5
     for 8
-    apply
+      apply
     loop
   ",
 }
@@ -766,7 +766,7 @@ image_test! {
     rotate-color g 0.1
     square
     for 10
-    apply
+      apply
     loop
   ",
 }
