@@ -1,7 +1,16 @@
 use {
-  axum::{http::StatusCode, routing::get_service, Router},
+  axum::{
+    http::{
+      header::{self, HeaderValue},
+      StatusCode,
+    },
+    routing::get_service,
+    Router,
+  },
   std::net::SocketAddr,
-  tower_http::{services::ServeDir, services::ServeFile, trace::TraceLayer},
+  tower_http::{
+    services::ServeDir, services::ServeFile, set_header::SetResponseHeaderLayer, trace::TraceLayer,
+  },
 };
 
 pub async fn run(port: u16) -> Result<(), Box<dyn std::error::Error>> {
@@ -19,6 +28,10 @@ pub async fn run(port: u16) -> Result<(), Box<dyn std::error::Error>> {
         },
       ),
     )
+    .layer(SetResponseHeaderLayer::if_not_present(
+      header::CACHE_CONTROL,
+      HeaderValue::from_static("no-store"),
+    ))
     .layer(TraceLayer::new_for_http());
 
   axum::Server::bind(&addr)
