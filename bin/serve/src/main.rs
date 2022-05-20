@@ -1,7 +1,4 @@
-use {
-  std::net::SocketAddr,
-  tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
-};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 
@@ -12,7 +9,7 @@ async fn main() -> Result {
     .with(tracing_subscriber::fmt::layer())
     .init();
 
-  serve::run(SocketAddr::from(([127, 0, 0, 1], 8000))).await?;
+  serve::run(8000).await?;
 
   Ok(())
 }

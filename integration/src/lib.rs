@@ -58,7 +58,7 @@ lazy_static! {
     drop(listener);
 
     RUNTIME.spawn(async move {
-      task::spawn(async move { serve::run(addr).await.unwrap() });
+      task::spawn(async move { serve::run(port).await.unwrap() });
     });
 
     port

@@ -6,7 +6,8 @@ use {
 
 type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 
-pub async fn run(addr: SocketAddr) -> Result {
+pub async fn run(port: u16) -> Result {
+  let addr = SocketAddr::from(([127, 0, 0, 1], port));
   eprintln!("Listening on {}", addr);
 
   let app = Router::new()
