@@ -3,7 +3,7 @@ use {
   chromiumoxide::browser::{Browser, BrowserConfig},
   futures::StreamExt,
   lazy_static::lazy_static,
-  std::{fs, net::SocketAddr, process::Command, str, sync::Once, time::Duration},
+  std::{fs, net::SocketAddr, str, sync::Once, time::Duration},
   tokio::{runtime::Runtime, task},
   tower_http::{services::ServeDir, trace::TraceLayer},
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
@@ -53,39 +53,6 @@ lazy_static! {
       .with(tracing_subscriber::EnvFilter::from_default_env())
       .with(tracing_subscriber::fmt::layer())
       .init();
-
-    eprintln!("Building WASM binary...");
-
-    let status = Command::new("cargo")
-      .args(["build", "--release", "--target", "wasm32-unknown-unknown"])
-      .current_dir("..")
-      .status()
-      .unwrap();
-
-    if !status.success() {
-      panic!("Failed to build WASM binary: {status}");
-    }
-
-    eprintln!("Running wasm-bindgen...");
-
-    let status = Command::new("wasm-bindgen")
-      .args([
-        "--target",
-        "web",
-        "--no-typescript",
-        "target/wasm32-unknown-unknown/release/degenerate.wasm",
-        "--out-dir",
-        "integration/www",
-      ])
-      .current_dir("..")
-      .status()
-      .unwrap();
-
-    if !status.success() {
-      panic!("wasm-bindgen failed: {status}");
-    }
-
-    eprintln!("Done with setup!");
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 0));
     let listener = std::net::TcpListener::bind(addr).unwrap();
@@ -175,7 +142,7 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
 
       #[cfg(target_os = "macos")]
       {
-        let status = Command::new("xattr")
+        let status = std::process::Command::new("xattr")
           .args(["-wx", "com.apple.FinderInfo"])
           .arg("0000000000000000000C00000000000000000000000000000000000000000000")
           .arg(&destination)
