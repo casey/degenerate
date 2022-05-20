@@ -40,7 +40,7 @@ jobs:
         version: ${{ env.WASM_BINDGEN_VERSION }}
 
     - name: Test
-      run: cargo test --all-targets
+      run: cargo test --all --all-targets
 
   check:
     name: Check
