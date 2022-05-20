@@ -245,8 +245,8 @@ impl WebGl {
 
   pub(crate) fn resize(&mut self, size: usize) -> Result {
     self.context.viewport(
-      0,
-      0,
+      (self.canvas.width() as i32 - size as i32) / 2,
+      (self.canvas.height() as i32 - size as i32) / 2,
       self.canvas.width().try_into()?,
       self.canvas.height().try_into()?,
     );
