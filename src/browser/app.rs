@@ -10,7 +10,7 @@ pub(crate) struct App {
   resize: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
-  webgl: Arc<WebGl>,
+  webgl: Option<Arc<WebGl>>,
   window: Window,
 }
 
@@ -28,13 +28,15 @@ impl App {
 
     let stderr = Stderr::get();
 
-    let webgl = Arc::new(WebGl::new(&canvas)?);
+    let webgl = (window.location().hash().map_err(JsValueError)? == "#gpu")
+      .then(|| Some(Arc::new(WebGl::new(&canvas).unwrap())))
+      .unwrap_or(None);
 
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
       animation_frame_pending: false,
       canvas,
-      computer: Computer::new(Some(webgl.clone())),
+      computer: Computer::new(webgl.clone()),
       input: false,
       nav,
       resize: true,
@@ -146,7 +148,7 @@ impl App {
       let program_changed = program != self.computer.program();
 
       if resize || program_changed {
-        let mut computer = Computer::new(Some(self.webgl.clone()));
+        let mut computer = Computer::new(self.webgl.clone());
         computer.load_program(&program);
 
         computer.resize((
@@ -161,10 +163,47 @@ impl App {
 
       if run {
         self.computer.run(true)?;
-        self.webgl.render_to_canvas(&self.computer)?;
+        if let Some(webgl) = self.webgl.clone() {
+          webgl.render_to_canvas(&self.computer)?;
+        }
       }
 
       if (resize || program_changed || run) && !self.computer.done() {
+        if self.webgl.clone().is_none() {
+          let context = self
+            .canvas
+            .get_context("2d")
+            .map_err(JsValueError)?
+            .ok_or("Failed to retrieve context")?
+            .cast::<CanvasRenderingContext2d>()?;
+
+          let pixels = self
+            .computer
+            .memory()
+            .transpose()
+            .iter()
+            .flatten()
+            .cloned()
+            .collect::<Vec<u8>>();
+
+          let image_data = ImageData::new_with_u8_clamped_array(
+            wasm_bindgen::Clamped(&pixels),
+            self.computer.memory().ncols().try_into()?,
+          )
+          .map_err(JsValueError)?;
+
+          self
+            .canvas
+            .set_height(self.computer.memory().nrows().try_into()?);
+          self
+            .canvas
+            .set_width(self.computer.memory().ncols().try_into()?);
+
+          context
+            .put_image_data(&image_data, 0.0, 0.0)
+            .map_err(JsValueError)?;
+        }
+
         self.request_animation_frame()?;
       }
     }
