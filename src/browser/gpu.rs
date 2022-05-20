@@ -178,7 +178,7 @@ impl Gpu {
 
     self.gl.uniform1ui(
       self.gl.get_uniform_location(&self.program, "mask").as_ref(),
-      Self::mask_uniform(&computer.mask()),
+      Self::mask_uniform(computer.mask()),
     );
 
     self.gl.uniform1ui(
@@ -186,7 +186,7 @@ impl Gpu {
         .gl
         .get_uniform_location(&self.program, "operation")
         .as_ref(),
-      Self::operation_uniform(&computer.operation()),
+      Self::operation_uniform(computer.operation()),
     );
 
     self.gl.draw_arrays(
