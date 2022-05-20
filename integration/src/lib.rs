@@ -1,11 +1,9 @@
 use {
-  axum::{http::StatusCode, routing::get_service, Router},
   chromiumoxide::browser::{Browser, BrowserConfig},
   futures::StreamExt,
   lazy_static::lazy_static,
   std::{fs, net::SocketAddr, str, sync::Once, time::Duration},
   tokio::{runtime::Runtime, task},
-  tower_http::{services::ServeDir, trace::TraceLayer},
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
   unindent::Unindent,
 };
@@ -60,23 +58,7 @@ lazy_static! {
     drop(listener);
 
     RUNTIME.spawn(async move {
-      let addr = SocketAddr::from(([127, 0, 0, 1], port));
-      tracing::trace!("Listening on {}", addr);
-
-      let app = Router::new()
-        .fallback(
-          get_service(ServeDir::new("www")).handle_error(|err| async move {
-            (
-              StatusCode::INTERNAL_SERVER_ERROR,
-              format!("I/O error: {}", err),
-            )
-          }),
-        )
-        .layer(TraceLayer::new_for_http());
-
-      let server = axum::Server::bind(&addr).serve(app.into_make_service());
-
-      task::spawn(async move { server.await.unwrap() });
+      task::spawn(async move { serve::run(addr).await.unwrap() });
     });
 
     port

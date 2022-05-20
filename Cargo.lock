@@ -962,7 +962,6 @@ name = "integration"
 version = "0.0.0"
 dependencies = [
  "approx",
- "axum",
  "base64",
  "chromiumoxide",
  "executable-path",
@@ -970,9 +969,9 @@ dependencies = [
  "image",
  "lazy_static",
  "pretty_assertions",
+ "serve",
  "tempfile",
  "tokio",
- "tower-http",
  "tracing",
  "tracing-subscriber",
  "unindent",
