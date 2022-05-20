@@ -30,12 +30,10 @@ impl Computer {
     Ok(())
   }
 
-  #[cfg(target_arch = "wasm32")]
   pub(crate) fn memory(&self) -> &DMatrix<Vector4<u8>> {
     &self.memory
   }
 
-  #[cfg(target_arch = "wasm32")]
   pub(crate) fn done(&self) -> bool {
     self.program_counter >= self.program.len()
   }
@@ -45,7 +43,6 @@ impl Computer {
     self.program_counter = 0;
   }
 
-  #[cfg(target_arch = "wasm32")]
   pub(crate) fn program(&self) -> &[Command] {
     &self.program
   }
@@ -66,13 +63,13 @@ impl Computer {
     }
   }
 
-  fn dimensions(&self) -> Vector2<usize> {
-    Vector2::new(self.memory.ncols(), self.memory.nrows())
+  pub(crate) fn size(&self) -> usize {
+    self.memory.ncols()
   }
 
   fn apply(&mut self) -> Result {
     let similarity = self.similarity.inverse();
-    let dimensions = self.dimensions();
+    let size = self.size();
     let transform = self.transform();
     let inverse = transform.inverse();
     let mut output = self.memory.clone();
@@ -85,7 +82,7 @@ impl Computer {
         let i = inverse
           .transform_point(&v)
           .map(|element| element.round() as isize);
-        if self.mask.is_masked(dimensions, i, v) {
+        if self.mask.is_masked(size, i, v) {
           let input = if i.x >= 0
             && i.y >= 0
             && i.x < self.memory.ncols() as isize
@@ -164,20 +161,15 @@ impl Computer {
     Ok(())
   }
 
-  pub(crate) fn resize(&mut self, dimensions: (usize, usize)) {
-    self
-      .memory
-      .resize_mut(dimensions.0, dimensions.1, self.default)
+  pub(crate) fn resize(&mut self, size: usize) {
+    self.memory.resize_mut(size, size, self.default)
   }
 
   fn transform(&self) -> Affine2<f64> {
-    let d = self.dimensions().map(|element| element as f64);
-
     Affine2::from_matrix_unchecked(
       Matrix3::identity()
         .append_translation(&Vector2::from_element(0.5))
-        .append_nonuniform_scaling(&Vector2::new(1.0 / d.x, 1.0 / d.y))
-        .append_scaling(2.0)
+        .append_scaling(2.0 / self.size() as f64)
         .append_translation(&Vector2::from_element(-1.0)),
     )
   }

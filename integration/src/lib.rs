@@ -92,9 +92,7 @@ fn clean() {
       let path = entry.path();
       let file_name = path.file_name().unwrap().to_str().unwrap().to_string();
 
-      if file_name.ends_with(".native-actual-memory.png")
-        || file_name.ends_with(".browser-actual-memory.png")
-      {
+      if file_name.ends_with(".actual-memory.png") {
         fs::remove_file(path).unwrap();
       }
     }
@@ -138,7 +136,7 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
     let want = image::open(&want_path)?;
 
     if have != want {
-      let destination = format!("../images/{}.browser-actual-memory.png", name);
+      let destination = format!("../images/{}.actual-memory.png", name);
 
       have.save(&destination)?;
 
