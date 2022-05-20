@@ -217,7 +217,7 @@ impl WebGl {
     context.tex_storage_2d(
       WebGl2RenderingContext::TEXTURE_2D,
       1,
-      WebGl2RenderingContext::RGBA8.try_into()?,
+      WebGl2RenderingContext::RGBA8,
       size.try_into()?,
       size.try_into()?,
     );
@@ -255,8 +255,8 @@ impl WebGl {
     self.context.delete_texture(Some(&self.textures[1]));
 
     self.textures = [
-      Self::create_texture(&self.context, size.try_into()?)?,
-      Self::create_texture(&self.context, size.try_into()?)?,
+      Self::create_texture(&self.context, size)?,
+      Self::create_texture(&self.context, size)?,
     ];
 
     Ok(())
