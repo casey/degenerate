@@ -23,8 +23,9 @@ macro_rules! image_test {
       }
 
       #[test]
+      #[ignore]
       fn gpu() -> Result {
-        image_test(stringify!($name), $program, false)
+        image_test(stringify!($name), $program, true)
       }
     }
   };
