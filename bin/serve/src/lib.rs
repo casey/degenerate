@@ -28,7 +28,7 @@ pub async fn run(port: u16) -> Result<(), Box<dyn std::error::Error>> {
         },
       ),
     )
-    .layer(SetResponseHeaderLayer::if_not_present(
+    .layer(SetResponseHeaderLayer::overriding(
       header::CACHE_CONTROL,
       HeaderValue::from_static("no-store"),
     ))
