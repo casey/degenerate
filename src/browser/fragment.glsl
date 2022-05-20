@@ -2,30 +2,27 @@
 
 precision highp float;
 
-in vec2 uv;
-out vec4 color;
-
 uniform sampler2D source;
-
-#define I texture(source, uv)
-
+uniform uint mask;
 uniform uint operation;
 
-vec4 apply_operation() {
+in vec2 uv;
+
+out vec4 color;
+
+vec4 apply_operation(vec4 pixel) {
   switch (operation) {
     // Identity
     case 0u:
-      return I;
+      return pixel;
     // Invert
     case 1u:
-      return vec4(1.0 - I.rgb, 1.0);
+      return vec4(1.0 - pixel.rgb, 1.0);
     // Error
     default:
       return vec4(0.0, 1.0, 0.0, 1.0);
   }
 }
-
-uniform uint mask;
 
 bool is_masked() {
   switch (mask) {
@@ -45,5 +42,6 @@ bool is_masked() {
 }
 
 void main() {
-  color = is_masked() ? apply_operation() : vec4(I.xyz, 1.0);
+  vec4 pixel = texture(source, uv);
+  color = is_masked() ? apply_operation(pixel) : vec4(pixel.xyz, 1.0);
 }
