@@ -5,7 +5,7 @@ pub(crate) struct WebGl {
   frame_buffer: WebGlFramebuffer,
   program: WebGlProgram,
   source: Cell<usize>,
-  textures: Vec<WebGlTexture>,
+  textures: [WebGlTexture; 2],
 }
 
 impl WebGl {
@@ -108,47 +108,10 @@ impl WebGl {
       0,
     );
 
-    let textures = (0..2)
-      .map(|_| -> Result<WebGlTexture> {
-        let texture = context.create_texture().ok_or("Failed to create texture")?;
-
-        context.bind_texture(WebGl2RenderingContext::TEXTURE_2D, Some(&texture));
-
-        context
-          .tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_html_canvas_element(
-            WebGl2RenderingContext::TEXTURE_2D,
-            0,
-            WebGl2RenderingContext::RGBA.try_into()?,
-            canvas.width().try_into()?,
-            canvas.height().try_into()?,
-            0,
-            WebGl2RenderingContext::RGBA,
-            WebGl2RenderingContext::UNSIGNED_BYTE,
-            canvas,
-          )
-          .map_err(JsValueError)?;
-
-        context.tex_parameteri(
-          WebGl2RenderingContext::TEXTURE_2D,
-          WebGl2RenderingContext::TEXTURE_MIN_FILTER,
-          WebGl2RenderingContext::LINEAR.try_into()?,
-        );
-
-        context.tex_parameteri(
-          WebGl2RenderingContext::TEXTURE_2D,
-          WebGl2RenderingContext::TEXTURE_WRAP_S,
-          WebGl2RenderingContext::CLAMP_TO_EDGE.try_into()?,
-        );
-
-        context.tex_parameteri(
-          WebGl2RenderingContext::TEXTURE_2D,
-          WebGl2RenderingContext::TEXTURE_WRAP_T,
-          WebGl2RenderingContext::CLAMP_TO_EDGE.try_into()?,
-        );
-
-        Ok(texture)
-      })
-      .collect::<Result<Vec<WebGlTexture>, _>>()?;
+    let textures = [
+      Self::create_texture(&context, canvas.width().try_into()?)?,
+      Self::create_texture(&context, canvas.width().try_into()?)?,
+    ];
 
     let frame_buffer = context
       .create_framebuffer()
@@ -240,6 +203,56 @@ impl WebGl {
     );
 
     self.source.set(self.source.get() ^ 1);
+
+    Ok(())
+  }
+
+  fn create_texture(context: &WebGl2RenderingContext, size: usize) -> Result<WebGlTexture> {
+    let texture = context.create_texture().ok_or("Failed to create texture")?;
+
+    context.bind_texture(WebGl2RenderingContext::TEXTURE_2D, Some(&texture));
+
+    context.tex_storage_2d(
+      WebGl2RenderingContext::TEXTURE_2D,
+      1,
+      WebGl2RenderingContext::RGBA8.try_into()?,
+      size.try_into()?,
+      size.try_into()?,
+    );
+
+    context.tex_parameteri(
+      WebGl2RenderingContext::TEXTURE_2D,
+      WebGl2RenderingContext::TEXTURE_MIN_FILTER,
+      WebGl2RenderingContext::LINEAR.try_into()?,
+    );
+
+    context.tex_parameteri(
+      WebGl2RenderingContext::TEXTURE_2D,
+      WebGl2RenderingContext::TEXTURE_WRAP_S,
+      WebGl2RenderingContext::CLAMP_TO_EDGE.try_into()?,
+    );
+
+    context.tex_parameteri(
+      WebGl2RenderingContext::TEXTURE_2D,
+      WebGl2RenderingContext::TEXTURE_WRAP_T,
+      WebGl2RenderingContext::CLAMP_TO_EDGE.try_into()?,
+    );
+
+    Ok(texture)
+  }
+
+  pub(crate) fn resize(&mut self, size: usize) -> Result {
+    self
+      .context
+      .viewport(0, 0, size.try_into()?, size.try_into()?);
+
+    self.context.delete_texture(Some(&self.textures[0]));
+    self.context.delete_texture(Some(&self.textures[1]));
+
+    self.textures = [
+      Self::create_texture(&self.context, size.try_into()?)?,
+      Self::create_texture(&self.context, size.try_into()?)?,
+    ];
 
     Ok(())
   }

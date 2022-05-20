@@ -7,7 +7,7 @@ const ALPHA_OPAQUE: u8 = 255;
 pub(crate) struct Computer {
   alpha: f64,
   default: Vector4<u8>,
-  gpu: Option<Arc<WebGl>>,
+  gpu: Option<Arc<Mutex<WebGl>>>,
   loop_counters: Vec<u64>,
   mask: Mask,
   memory: DMatrix<Vector4<u8>>,
@@ -58,7 +58,7 @@ impl Computer {
     &self.operation
   }
 
-  pub(crate) fn new(gpu: Option<Arc<WebGl>>) -> Self {
+  pub(crate) fn new(gpu: Option<Arc<Mutex<WebGl>>>) -> Self {
     Self {
       alpha: 1.0,
       default: Vector4::new(0, 0, 0, ALPHA_OPAQUE),
@@ -80,8 +80,8 @@ impl Computer {
   }
 
   fn apply(&mut self) -> Result {
-    if let Some(gpu) = &self.gpu {
-      gpu.render_to_texture(self)?;
+    if let Some(gpu) = self.gpu.as_ref(){
+      gpu.lock().unwrap().render_to_texture(self)?;
     } else {
       let similarity = self.similarity.inverse();
       let size = self.size();
@@ -193,8 +193,14 @@ impl Computer {
     Ok(())
   }
 
-  pub(crate) fn resize(&mut self, size: usize) {
-    self.memory.resize_mut(size, size, self.default)
+  pub(crate) fn resize(&mut self, size: usize) -> Result {
+    if let Some(gpu) = self.gpu.as_ref() {
+      gpu.lock().unwrap().resize(size)?;
+    } else {
+      self.memory.resize_mut(size, size, self.default);
+    }
+
+    Ok(())
   }
 
   fn transform(&self) -> Affine2<f64> {

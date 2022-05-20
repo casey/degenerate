@@ -12,7 +12,7 @@ use {
     f64,
     fmt::{self, Display, Formatter},
     str::FromStr,
-    sync::Arc,
+    sync::{Arc, Mutex},
   },
   strum::EnumString,
 };

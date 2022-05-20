@@ -10,7 +10,7 @@ pub(crate) struct App {
   resize: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
-  webgl: Option<Arc<WebGl>>,
+  webgl: Option<Arc<Mutex<WebGl>>>,
   window: Window,
 }
 
@@ -29,7 +29,7 @@ impl App {
     let stderr = Stderr::get();
 
     let webgl = if window.location().hash().map_err(JsValueError)? == "#gpu" {
-      Some(Arc::new(WebGl::new(&canvas)?))
+      Some(Arc::new(Mutex::new(WebGl::new(&canvas)?)))
     } else {
       None
     };
@@ -126,11 +126,6 @@ impl App {
       self.canvas.set_width(device_pixel_width.ceil() as u32);
 
       self.resize = false;
-
-      // Hack
-      if self.webgl.clone().is_some() {
-        self.webgl = Some(Arc::new(WebGl::new(&self.canvas)?));
-      }
     }
 
     if self.input {
@@ -146,7 +141,7 @@ impl App {
         let mut computer = Computer::new(self.webgl.clone());
         computer.load_program(&program);
         // Make sure size is odd, so we don't get jaggies when drawing the X
-        computer.resize((self.canvas.width().max(self.canvas.height()) | 1).try_into()?);
+        computer.resize((self.canvas.width().max(self.canvas.height()) | 1).try_into()?)?;
         self.computer = computer;
       }
 
@@ -158,7 +153,7 @@ impl App {
 
       if resize || program_changed || run {
         if let Some(webgl) = self.webgl.clone() {
-          webgl.render_to_canvas(&self.computer)?;
+          webgl.lock().unwrap().render_to_canvas(&self.computer)?;
         } else {
           let context = self
             .canvas
