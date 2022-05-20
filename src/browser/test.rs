@@ -19,9 +19,11 @@ fn test_inner(program: &str) -> Result<String> {
   canvas.set_height(256);
   canvas.set_width(256);
 
-  let webgl = (window.location().hash().map_err(JsValueError)? == "#gpu")
-    .then(|| Some(Arc::new(WebGl::new(&canvas).unwrap())))
-    .unwrap_or(None);
+  let webgl = if window.location().hash().map_err(JsValueError)? == "#gpu" {
+    Some(Arc::new(WebGl::new(&canvas)?))
+  } else {
+    None
+  };
 
   let mut computer = Computer::new(webgl.clone());
   computer.load_program(&program);
