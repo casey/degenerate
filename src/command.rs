@@ -22,6 +22,8 @@ impl Command {
     program
       .trim()
       .lines()
+      .map(|line| line.split(';'))
+      .flatten()
       .map(str::trim)
       .filter(|line| !line.is_empty())
       .into_iter()

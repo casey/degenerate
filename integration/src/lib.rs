@@ -782,3 +782,10 @@ image_test! {
 
   ",
 }
+
+image_test! {
+  name: semicolons_can_be_used_to_separate_commands,
+  program: "
+    x;apply
+  ",
+}
