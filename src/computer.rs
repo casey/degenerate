@@ -5,7 +5,7 @@ const ALPHA_OPAQUE: u8 = 255;
 pub(crate) struct Computer {
   alpha: f64,
   default: Vector4<u8>,
-  loop_counter: usize,
+  loop_counters: Vec<u64>,
   mask: Mask,
   memory: DMatrix<Vector4<u8>>,
   operation: Operation,
@@ -19,8 +19,8 @@ pub(crate) struct Computer {
 impl Computer {
   pub(crate) fn run(&mut self, incremental: bool) -> Result {
     while let Some(command) = self.program.get(self.program_counter).cloned() {
-      self.execute(command.clone())?;
       self.program_counter = self.program_counter.wrapping_add(1);
+      self.execute(command.clone())?;
 
       if incremental && command == Command::Apply {
         break;
@@ -51,7 +51,7 @@ impl Computer {
     Self {
       alpha: 1.0,
       default: Vector4::new(0, 0, 0, ALPHA_OPAQUE),
-      loop_counter: 0,
+      loop_counters: Vec::new(),
       mask: Mask::All,
       memory: DMatrix::zeros(0, 0),
       operation: Operation::Invert,
@@ -123,29 +123,45 @@ impl Computer {
         self.default = Vector4::new(default.x, default.y, default.z, ALPHA_OPAQUE);
       }
       Command::For(until) => {
-        if self.loop_counter as u64 >= until {
-          loop {
-            self.program_counter = self.program_counter.wrapping_add(1);
-            if let Some(Command::Loop) | None = self.program.get(self.program_counter) {
+        if until == 0 {
+          while let Some(command) = self.program.get(self.program_counter) {
+            self.program_counter += 1;
+
+            if let Command::Loop = command {
               break;
             }
           }
-          self.loop_counter = 0;
+        } else {
+          self.loop_counters.push(until);
         }
       }
-      Command::Loop => {
-        loop {
-          self.program_counter = self.program_counter.wrapping_sub(1);
-          let next = self.program_counter.wrapping_add(1);
-          if next == 0 {
-            break;
-          }
-          if let Some(Command::For(_)) | None = self.program.get(next) {
-            break;
+      Command::Loop => match self.loop_counters.last_mut() {
+        Some(loop_counter) => {
+          if *loop_counter > 1 {
+            *loop_counter -= 1;
+            let mut skip = 0;
+            self.program_counter -= 2;
+            while let Some(command) = self.program.get(self.program_counter) {
+              match command {
+                Command::For(_) => {
+                  if skip > 0 {
+                    skip -= 1;
+                  } else {
+                    self.program_counter += 1;
+                    break;
+                  }
+                }
+                Command::Loop => skip += 1,
+                _ => {}
+              }
+              self.program_counter -= 1;
+            }
+          } else {
+            self.loop_counters.pop();
           }
         }
-        self.loop_counter += 1;
-      }
+        None => self.program_counter = 0,
+      },
       Command::Mask(mask) => self.mask = mask,
       Command::Operation(operation) => self.operation = operation,
       Command::Rotate(turns) => self

@@ -747,3 +747,28 @@ image_test! {
 
   ",
 }
+
+image_test! {
+  name: nested_for_loops,
+  program: "
+    circle
+    scale 0.9
+
+    for 2
+      for 2
+        apply
+      loop
+    loop
+  ",
+}
+
+image_test! {
+  name: for_zero,
+  program: "
+    circle
+
+    for 0
+      apply
+    loop
+  ",
+}
