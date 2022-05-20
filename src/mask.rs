@@ -12,8 +12,6 @@ pub(crate) enum Mask {
   X,
 }
 
-use std::fmt::{self, Display, Formatter};
-
 impl Display for Mask {
   fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
     write!(

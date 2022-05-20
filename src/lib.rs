@@ -8,7 +8,12 @@ use {
     Vector4,
   },
   rand::{rngs::StdRng, seq::SliceRandom, SeedableRng},
-  std::{f64, str::FromStr, sync::Arc},
+  std::{
+    f64,
+    fmt::{self, Display, Formatter},
+    str::FromStr,
+    sync::Arc,
+  },
   strum::EnumString,
 };
 

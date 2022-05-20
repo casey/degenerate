@@ -8,8 +8,6 @@ pub(crate) enum Operation {
   RotateColor(ColorAxis, f64),
 }
 
-use std::fmt::{self, Display, Formatter};
-
 impl Display for Operation {
   fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
     write!(
