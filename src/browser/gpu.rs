@@ -125,7 +125,7 @@ impl Gpu {
     })
   }
 
-  pub(crate) fn render_to_canvas(&self, state: &Computer) -> Result {
+  pub(crate) fn render_to_canvas(&self, computer: &Computer) -> Result {
     self
       .gl
       .bind_framebuffer(WebGl2RenderingContext::FRAMEBUFFER, None);
@@ -138,7 +138,7 @@ impl Gpu {
     self.gl.uniform1i(
       self
         .gl
-        .get_uniform_location(&self.program, &state.mask().to_string())
+        .get_uniform_location(&self.program, &computer.mask().to_string())
         .as_ref(),
       0,
     );
@@ -146,7 +146,7 @@ impl Gpu {
     self.gl.uniform1i(
       self
         .gl
-        .get_uniform_location(&self.program, &state.operation().to_string())
+        .get_uniform_location(&self.program, &computer.operation().to_string())
         .as_ref(),
       0,
     );
@@ -160,7 +160,7 @@ impl Gpu {
     Ok(())
   }
 
-  pub(crate) fn render_to_texture(&self, state: &Computer) -> Result {
+  pub(crate) fn render_to_texture(&self, computer: &Computer) -> Result {
     self.gl.bind_framebuffer(
       WebGl2RenderingContext::FRAMEBUFFER,
       Some(&self.frame_buffer),
@@ -182,7 +182,7 @@ impl Gpu {
     self.gl.uniform1i(
       self
         .gl
-        .get_uniform_location(&self.program, &state.mask().to_string())
+        .get_uniform_location(&self.program, &computer.mask().to_string())
         .as_ref(),
       1,
     );
@@ -190,7 +190,7 @@ impl Gpu {
     self.gl.uniform1i(
       self
         .gl
-        .get_uniform_location(&self.program, &state.operation().to_string())
+        .get_uniform_location(&self.program, &computer.operation().to_string())
         .as_ref(),
       1,
     );
