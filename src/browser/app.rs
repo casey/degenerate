@@ -147,6 +147,7 @@ impl App {
       if resize || program_changed {
         let mut computer = Computer::new();
         computer.load_program(&program);
+        // Make sure size is odd, so we don't get jaggies when drawing the X
         computer.resize((self.canvas.width().max(self.canvas.height()) | 1).try_into()?);
         self.computer = computer;
       }
