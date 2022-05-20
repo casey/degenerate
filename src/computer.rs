@@ -130,6 +130,7 @@ impl Computer {
         if until == 0 {
           while let Some(command) = self.program.get(self.program_counter) {
             if let Command::Loop = command {
+              self.program_counter += 1;
               break;
             }
             self.program_counter += 1;
@@ -143,19 +144,21 @@ impl Computer {
           if *loop_counter > 1 {
             *loop_counter -= 1;
             let mut skip = 0;
-            for (program_counter, command) in self.program.iter().enumerate().rev() {
+            self.program_counter -= 2;
+            while let Some(command) = self.program.get(self.program_counter) {
               match command {
                 Command::For(_) => {
                   if skip > 0 {
                     skip -= 1;
                   } else {
-                    self.program_counter = program_counter + 1;
+                    self.program_counter = self.program_counter + 1;
                     break;
                   }
                 }
                 Command::Loop => skip += 1,
                 _ => {}
               }
+              self.program_counter -= 1;
             }
           } else {
             self.loop_counters.pop();
