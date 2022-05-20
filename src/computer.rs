@@ -150,7 +150,7 @@ impl Computer {
                   if skip > 0 {
                     skip -= 1;
                   } else {
-                    self.program_counter = self.program_counter + 1;
+                    self.program_counter += 1;
                     break;
                   }
                 }
