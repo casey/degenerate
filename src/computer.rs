@@ -126,7 +126,6 @@ impl Computer {
         self.default = Vector4::new(default.x, default.y, default.z, ALPHA_OPAQUE);
       }
       Command::For(until) => {
-        // todo: test for 0
         if until == 0 {
           while let Some(command) = self.program.get(self.program_counter) {
             if let Command::Loop = command {

@@ -3,7 +3,7 @@ use {
   chromiumoxide::browser::{Browser, BrowserConfig},
   futures::StreamExt,
   lazy_static::lazy_static,
-  std::{fs, net::SocketAddr, path::Path, process::Command, str, sync::Once, time::Duration},
+  std::{fs, net::SocketAddr, process::Command, str, sync::Once, time::Duration},
   tokio::{runtime::Runtime, task},
   tower_http::{services::ServeDir, trace::TraceLayer},
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
@@ -168,11 +168,6 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
     let destination = format!("../images/{}.browser-actual-memory.png", name);
 
     let want_path = format!("../images/{}.png", name);
-
-    if !Path::new(&want_path).is_file() {
-      have.save(&destination)?;
-      panic!("No output to compare with at `{}`", want_path);
-    }
 
     let want = image::open(&want_path)?;
 
@@ -797,6 +792,17 @@ image_test! {
       for 2
         apply
       loop
+    loop
+  ",
+}
+
+image_test! {
+  name: for_zero,
+  program: "
+    circle
+
+    for 0
+      apply
     loop
   ",
 }
