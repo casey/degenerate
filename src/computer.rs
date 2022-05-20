@@ -128,11 +128,11 @@ impl Computer {
       Command::For(until) => {
         if until == 0 {
           while let Some(command) = self.program.get(self.program_counter) {
+            self.program_counter += 1;
+
             if let Command::Loop = command {
-              self.program_counter += 1;
               break;
             }
-            self.program_counter += 1;
           }
         } else {
           self.loop_counters.push(until);
