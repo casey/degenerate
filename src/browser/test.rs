@@ -31,7 +31,7 @@ fn test_inner(program: &str) -> Result<String> {
   computer.run(false)?;
 
   if let Some(gpu) = gpu {
-    gpu.lock().unwrap().render_to_canvas(&computer)?;
+    gpu.lock().unwrap().render_to_canvas()?;
   } else {
     let pixels = computer
       .memory()

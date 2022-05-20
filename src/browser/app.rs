@@ -153,7 +153,7 @@ impl App {
 
       if resize || program_changed || run {
         if let Some(gpu) = self.gpu.clone() {
-          gpu.lock().unwrap().render_to_canvas(&self.computer)?;
+          gpu.lock().unwrap().render_to_canvas()?;
         } else {
           let context = self
             .canvas

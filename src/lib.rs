@@ -10,7 +10,7 @@ use {
   rand::{rngs::StdRng, seq::SliceRandom, SeedableRng},
   std::{
     f64,
-    fmt::{self, Display, Formatter},
+    fmt::{self, Formatter},
     str::FromStr,
     sync::{Arc, Mutex},
   },

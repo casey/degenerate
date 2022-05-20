@@ -7,7 +7,6 @@ pub(crate) use {
   js_sys::Float32Array,
   std::{
     cell::Cell,
-    fmt::{self, Formatter},
     ops::Deref,
     sync::{Arc, Mutex},
   },

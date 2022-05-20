@@ -125,7 +125,7 @@ impl Gpu {
     })
   }
 
-  pub(crate) fn render_to_canvas(&self, computer: &Computer) -> Result {
+  pub(crate) fn render_to_canvas(&self) -> Result {
     self
       .gl
       .bind_framebuffer(WebGl2RenderingContext::FRAMEBUFFER, None);
@@ -135,20 +135,17 @@ impl Gpu {
       Some(&self.textures[self.source.get()]),
     );
 
-    self.gl.uniform1i(
-      self
-        .gl
-        .get_uniform_location(&self.program, &computer.mask().to_string())
-        .as_ref(),
-      0,
+    self.gl.uniform1ui(
+      self.gl.get_uniform_location(&self.program, "mask").as_ref(),
+      Self::mask_uniform(&Mask::All),
     );
 
-    self.gl.uniform1i(
+    self.gl.uniform1ui(
       self
         .gl
-        .get_uniform_location(&self.program, &computer.operation().to_string())
+        .get_uniform_location(&self.program, "operation")
         .as_ref(),
-      0,
+      Self::operation_uniform(&Operation::Identity),
     );
 
     self.gl.draw_arrays(
@@ -179,20 +176,17 @@ impl Gpu {
       Some(&self.textures[self.source.get()]),
     );
 
-    self.gl.uniform1i(
-      self
-        .gl
-        .get_uniform_location(&self.program, &computer.mask().to_string())
-        .as_ref(),
-      1,
+    self.gl.uniform1ui(
+      self.gl.get_uniform_location(&self.program, "mask").as_ref(),
+      Self::mask_uniform(&computer.mask()),
     );
 
-    self.gl.uniform1i(
+    self.gl.uniform1ui(
       self
         .gl
-        .get_uniform_location(&self.program, &computer.operation().to_string())
+        .get_uniform_location(&self.program, "operation")
         .as_ref(),
-      1,
+      Self::operation_uniform(&computer.operation()),
     );
 
     self.gl.draw_arrays(
@@ -257,5 +251,22 @@ impl Gpu {
     ];
 
     Ok(())
+  }
+
+  fn operation_uniform(operation: &Operation) -> u32 {
+    match operation {
+      Operation::Identity => 0,
+      Operation::Invert => 1,
+      _ => panic!("Invalid operation"),
+    }
+  }
+
+  fn mask_uniform(mask: &Mask) -> u32 {
+    match mask {
+      Mask::X => 0,
+      Mask::Circle => 1,
+      Mask::All => 2,
+      _ => panic!("Invalid mask"),
+    }
   }
 }

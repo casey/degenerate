@@ -8,21 +8,6 @@ pub(crate) enum Operation {
   RotateColor(ColorAxis, f64),
 }
 
-impl Display for Operation {
-  fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-    write!(
-      f,
-      "{}",
-      match self {
-        Self::Debug => "debug",
-        Self::Identity => "identity",
-        Self::Invert => "invert",
-        Self::RotateColor(..) => "rotate_color",
-      }
-    )
-  }
-}
-
 impl Operation {
   pub(crate) fn apply(self, coordinates: Point2<f64>, element: Vector3<u8>) -> Vector3<u8> {
     match self {
