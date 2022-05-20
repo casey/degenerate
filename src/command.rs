@@ -5,7 +5,6 @@ pub(crate) enum Command {
   Alpha(f64),
   Apply,
   Choose(Vec<Command>),
-  Comment,
   Default(Vector3<u8>),
   For(u64),
   Loop,
@@ -19,16 +18,27 @@ pub(crate) enum Command {
 
 impl Command {
   pub(crate) fn parse_program(program: &str) -> Result<Vec<Command>> {
-    program
-      .trim()
-      .lines()
-      .map(|line| line.split(';'))
-      .flatten()
-      .map(str::trim)
-      .filter(|line| !line.is_empty())
-      .into_iter()
-      .map(Command::from_str)
-      .collect()
+    let mut commands = Vec::new();
+
+    for line in program.lines() {
+      let source = line
+        .split_once('#')
+        .map(|(command, _comment)| command)
+        .unwrap_or(line)
+        .trim();
+
+      for command in source.split(';') {
+        let command = command.trim();
+
+        if command.is_empty() {
+          continue;
+        }
+
+        commands.push(command.parse()?);
+      }
+    }
+
+    Ok(commands)
   }
 }
 
@@ -36,10 +46,6 @@ impl FromStr for Command {
   type Err = Error;
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
-    if s.starts_with('#') {
-      return Ok(Command::Comment);
-    }
-
     match s.split_whitespace().collect::<Vec<&str>>().as_slice() {
       ["all"] => Ok(Self::Mask(Mask::All)),
       ["alpha", alpha] => Ok(Self::Alpha(alpha.parse()?)),
@@ -128,5 +134,15 @@ mod tests {
   #[test]
   fn trailing_whitespace_is_ignored() {
     case("apply  ", &[Command::Apply]);
+  }
+
+  #[test]
+  fn comments_are_ignored() {
+    case("# foo", &[]);
+  }
+
+  #[test]
+  fn empty_lines_with_extra_whitespace_are_ignored() {
+    case("  ", &[]);
   }
 }

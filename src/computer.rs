@@ -118,7 +118,6 @@ impl Computer {
           self.execute(command.clone())?;
         }
       }
-      Command::Comment => {}
       Command::Default(default) => {
         self.default = Vector4::new(default.x, default.y, default.z, ALPHA_OPAQUE);
       }

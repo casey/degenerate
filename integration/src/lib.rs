@@ -258,9 +258,7 @@ image_test! {
 
 image_test! {
   name: default,
-  program: "
-    # foo
-  ",
+  program: "",
 }
 
 image_test! {
