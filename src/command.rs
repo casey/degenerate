@@ -86,3 +86,47 @@ impl FromStr for Command {
     }
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  fn case(program: &str, expected_commands: &[Command]) {
+    assert_eq!(Command::parse_program(program).unwrap(), expected_commands);
+  }
+
+  #[test]
+  fn semicolons_can_be_used_to_separate_commands() {
+    case("apply;apply", &[Command::Apply, Command::Apply]);
+  }
+
+  #[test]
+  fn leading_blank_lines_are_ignored() {
+    case("\napply", &[Command::Apply]);
+  }
+
+  #[test]
+  fn trailing_blank_lines_are_ignored() {
+    case("apply\n", &[Command::Apply]);
+  }
+
+  #[test]
+  fn intermediate_blank_lines_are_ignored() {
+    case("apply\n\napply", &[Command::Apply, Command::Apply]);
+  }
+
+  #[test]
+  fn extra_whitespace_between_arguments_is_ignored() {
+    case("scale  0.5", &[Command::Scale(0.5)]);
+  }
+
+  #[test]
+  fn leading_whitespace_is_ignored() {
+    case("  apply", &[Command::Apply]);
+  }
+
+  #[test]
+  fn trailing_whitespace_is_ignored() {
+    case("apply  ", &[Command::Apply]);
+  }
+}

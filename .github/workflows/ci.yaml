@@ -40,7 +40,7 @@ jobs:
         version: ${{ env.WASM_BINDGEN_VERSION }}
 
     - name: Test
-      run: cargo test --package integration --lib
+      run: cargo test --all-targets
 
   check:
     name: Check
@@ -60,6 +60,11 @@ jobs:
     - uses: Swatinem/rust-cache@v1
     - name: Check Lockfile
       run: cargo update --locked --package degenerate
+
+    - name: Install `wasm-bindgen`
+      uses: jetli/wasm-bindgen-action@v0.1.0
+      with:
+        version: ${{ env.WASM_BINDGEN_VERSION }}
 
     - name: Format
       run: cargo fmt --all -- --check

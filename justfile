@@ -8,7 +8,7 @@ build:
 	cargo build --release
 
 test *args:
-	cargo test --package integration --lib -- {{args}}
+	cargo test --all --all-targets -- {{args}}
 
 clippy:
 	cargo clippy --package integration --tests
@@ -30,7 +30,7 @@ check-lockfile:
 forbid:
 	./bin/forbid
 
-watch +args='test --package integration --lib':
+watch +args='test --all --all-targets':
 	cargo watch --clear --exec "{{args}}"
 
 build-manual:
