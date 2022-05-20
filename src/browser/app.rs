@@ -163,13 +163,12 @@ impl App {
 
       if run {
         self.computer.run(true)?;
-        if let Some(webgl) = self.webgl.clone() {
-          webgl.render_to_canvas(&self.computer)?;
-        }
       }
 
       if (resize || program_changed || run) && !self.computer.done() {
-        if self.webgl.clone().is_none() {
+        if let Some(webgl) = self.webgl.clone() {
+          webgl.render_to_canvas(&self.computer)?;
+        } else {
           let context = self
             .canvas
             .get_context("2d")
@@ -204,7 +203,9 @@ impl App {
             .map_err(JsValueError)?;
         }
 
-        self.request_animation_frame()?;
+        if !self.computer.done() {
+          self.request_animation_frame()?;
+        }
       }
     }
 

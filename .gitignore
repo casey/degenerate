@@ -1,6 +1,7 @@
 /generate
 /images/*.browser-actual-memory.png
 /images/*.native-actual-memory.png
+/integration/target
 /integration/www/degenerate.js
 /integration/www/degenerate_bg.wasm
 /memory.png
