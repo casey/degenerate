@@ -15,7 +15,6 @@ crate-type = ["cdylib"]
 [dependencies]
 console_log = "0.2.0"
 getrandom = { version = "0.2.6", features = ["js"] }
-indoc = "1.0.6"
 js-sys = "0.3.57"
 log = "0.4.17"
 nalgebra = "0.31.0"

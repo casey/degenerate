@@ -4,7 +4,6 @@ pub(crate) use {
     js_value_error::JsValueError, select::Select, stderr::Stderr, webgl::WebGl, window::window,
   },
   super::*,
-  indoc::indoc,
   std::{
     fmt::{self, Formatter},
     ops::Deref,

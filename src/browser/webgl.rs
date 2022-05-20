@@ -1,53 +1,5 @@
 use super::*;
 
-static VERTEX: &str = indoc! {"
-  #version 300 es
-
-  in vec4 position;
-  out vec2 uv;
-
-  void main() {
-    uv = position.xy * 0.5 + 0.5;
-    gl_Position = position;
-  }
-"};
-
-static FRAGMENT: &str = indoc! {"
-  #version 300 es
-
-  precision highp float;
-
-  in vec2 uv;
-  out vec4 color;
-
-  uniform sampler2D source;
-
-  #define I texture(source, uv)
-
-  uniform bool invert;
-
-  vec4 operation() {
-    if (invert)
-      return vec4(1.0 - I.rgb, 1.0);
-    return I;
-  }
-
-  uniform bool circle;
-  uniform bool x;
-
-  bool is_masked() {
-    if (circle)
-      return length((uv - 0.5) * 2.0) < 1.0;
-    if (x)
-      return min(abs((1.0 - uv.x) - uv.y), abs(uv.x - uv.y)) < 0.125;
-    return true;
-  }
-
-  void main() {
-    color = is_masked() ? operation() : vec4(I.xyz, 1.0);
-  }
-"};
-
 #[derive(Clone)]
 struct ShaderDescription {
   code: String,
@@ -85,11 +37,11 @@ impl WebGl {
       &context,
       vec![
         ShaderDescription {
-          code: VERTEX.into(),
+          code: include_str!("vertex.glsl").into(),
           shader_type: WebGl2RenderingContext::VERTEX_SHADER,
         },
         ShaderDescription {
-          code: FRAGMENT.into(),
+          code: include_str!("fragment.glsl").into(),
           shader_type: WebGl2RenderingContext::FRAGMENT_SHADER,
         },
       ],
