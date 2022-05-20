@@ -7,22 +7,19 @@ license = "CC0-1.0"
 autotests = false
 
 [workspace]
-members = [".", "integration"]
+members = [".", "bin/serve", "integration"]
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
+console_error_panic_hook = "0.1.7"
 console_log = "0.2.0"
 getrandom = { version = "0.2.6", features = ["js"] }
-js-sys = "0.3.57"
 log = "0.4.17"
 nalgebra = "0.31.0"
-num-traits = "0.2.14"
 rand = { version = "0.8.4" }
-rand_derive2 = "0.1.17"
 strum = { version = "0.24.0", features = ["derive"] }
-console_error_panic_hook = "0.1.7"
 # keep in sync with `.github/workflows/ci.yaml`
 wasm-bindgen = "0.2.80"
 
@@ -44,17 +41,3 @@ features = [
 
 [dev-dependencies]
 approx = "0.5.0"
-axum = "0.5.6"
-base64 = "0.13.0"
-chromiumoxide = "0.3.5"
-executable-path = "1.0.0"
-futures = "0.3.21"
-image = "0.24.1"
-lazy_static = "1.4.0"
-pretty_assertions = "1.0.0"
-tempfile = "3.2.0"
-tokio = { version = "1.18.2", features = ["macros", "rt", "rt-multi-thread"] }
-tower-http = { version = "0.3.0", features = ["fs", "trace"] }
-tracing = "0.1.34"
-tracing-subscriber = { version = "0.3.0", features = ["env-filter"] }
-unindent = "0.1.7"

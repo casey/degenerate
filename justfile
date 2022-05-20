@@ -59,7 +59,7 @@ doc-web:
 	cargo doc --open --target wasm32-unknown-unknown
 
 serve:
-	python3 -m http.server --directory www --bind 0.0.0.0
+	cargo run --package serve
 
 build-web:
 	cargo build --target wasm32-unknown-unknown
