@@ -66,7 +66,7 @@ impl Computer {
     }
   }
 
-  fn size(&self) -> usize {
+  pub(crate) fn size(&self) -> usize {
     self.memory.ncols()
   }
 

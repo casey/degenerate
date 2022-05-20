@@ -167,7 +167,7 @@ impl App {
           .cloned()
           .collect::<Vec<u8>>();
 
-        let size = self.computer.memory().ncols();
+        let size = self.computer.size();
 
         let image_data =
           ImageData::new_with_u8_clamped_array(wasm_bindgen::Clamped(&pixels), size.try_into()?)
