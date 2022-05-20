@@ -258,9 +258,7 @@ image_test! {
 
 image_test! {
   name: default,
-  program: "
-    # foo
-  ",
+  program: "",
 }
 
 image_test! {
@@ -733,18 +731,6 @@ image_test! {
     for 10
       apply
     loop
-  ",
-}
-
-image_test! {
-  name: whitespace_is_ignored,
-  program: "
-    rotate\t\t0.125
-
-    \tx\t
-
-    apply
-
   ",
 }
 
