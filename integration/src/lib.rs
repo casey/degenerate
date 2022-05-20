@@ -139,9 +139,9 @@ pub(crate) fn image_test(name: &str, program: &str, gpu: bool) -> Result {
 
     let page = browser
       .new_page(format!(
-        "http://127.0.0.1:{}/#{}",
+        "http://127.0.0.1:{}{}",
         *SERVER_PORT,
-        if gpu { "gpu" } else { "cpu" }
+        if gpu { "/#gpu" } else { "" }
       ))
       .await?;
 

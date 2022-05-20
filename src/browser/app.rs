@@ -126,6 +126,11 @@ impl App {
       self.canvas.set_width(device_pixel_width.ceil() as u32);
 
       self.resize = false;
+
+      // Hack
+      if self.webgl.clone().is_some() {
+        self.webgl = Some(Arc::new(WebGl::new(&self.canvas)?));
+      }
     }
 
     if self.input {
