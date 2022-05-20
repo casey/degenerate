@@ -1,6 +1,6 @@
-use {super::*, rand_derive2::RandGen};
+use super::*;
 
-#[derive(Clone, Debug, RandGen, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub(crate) enum Mask {
   All,
   Circle,
