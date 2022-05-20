@@ -25,9 +25,9 @@ mod get_document;
 mod js_value_error;
 mod select;
 mod stderr;
+pub mod test;
 mod webgl;
 mod window;
-pub mod test;
 
 #[wasm_bindgen]
 pub fn run() {
