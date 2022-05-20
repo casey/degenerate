@@ -3,7 +3,7 @@ use {
   chromiumoxide::browser::{Browser, BrowserConfig},
   futures::StreamExt,
   lazy_static::lazy_static,
-  std::{fs, net::SocketAddr, process::Command, str, sync::Once, time::Duration},
+  std::{fs, net::SocketAddr, str, sync::Once, time::Duration},
   tokio::{runtime::Runtime, task},
   tower_http::{services::ServeDir, trace::TraceLayer},
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
@@ -84,39 +84,6 @@ lazy_static! {
       .with(tracing_subscriber::fmt::layer())
       .init();
 
-    eprintln!("Building WASM binary...");
-
-    let status = Command::new("cargo")
-      .args(["build", "--release", "--target", "wasm32-unknown-unknown"])
-      .current_dir("..")
-      .status()
-      .unwrap();
-
-    if !status.success() {
-      panic!("Failed to build WASM binary: {status}");
-    }
-
-    eprintln!("Running wasm-bindgen...");
-
-    let status = Command::new("wasm-bindgen")
-      .args([
-        "--target",
-        "web",
-        "--no-typescript",
-        "target/wasm32-unknown-unknown/release/degenerate.wasm",
-        "--out-dir",
-        "integration/www",
-      ])
-      .current_dir("..")
-      .status()
-      .unwrap();
-
-    if !status.success() {
-      panic!("wasm-bindgen failed: {status}");
-    }
-
-    eprintln!("Done with setup!");
-
     let addr = SocketAddr::from(([127, 0, 0, 1], 0));
     let listener = std::net::TcpListener::bind(addr).unwrap();
     let port = listener.local_addr().unwrap().port();
@@ -155,9 +122,7 @@ fn clean() {
       let path = entry.path();
       let file_name = path.file_name().unwrap().to_str().unwrap().to_string();
 
-      if file_name.ends_with(".native-actual-memory.png")
-        || file_name.ends_with(".browser-actual-memory.png")
-      {
+      if file_name.ends_with(".actual-memory.png") {
         fs::remove_file(path).unwrap();
       }
     }
@@ -206,13 +171,13 @@ pub(crate) fn image_test(name: &str, program: &str, gpu: bool) -> Result {
     let want = image::open(&want_path)?;
 
     if have != want {
-      let destination = format!("../images/{}.browser-actual-memory.png", name);
+      let destination = format!("../images/{}.actual-memory.png", name);
 
       have.save(&destination)?;
 
       #[cfg(target_os = "macos")]
       {
-        let status = Command::new("xattr")
+        let status = std::process::Command::new("xattr")
           .args(["-wx", "com.apple.FinderInfo"])
           .arg("0000000000000000000C00000000000000000000000000000000000000000000")
           .arg(&destination)
@@ -329,9 +294,7 @@ image_test! {
 
 image_test! {
   name: default,
-  program: "
-    # foo
-  ",
+  program: "",
 }
 
 image_test! {
@@ -809,13 +772,26 @@ image_test! {
 }
 
 image_test! {
-  name: whitespace_is_ignored,
+  name: nested_for_loops,
   program: "
-    rotate\t\t0.125
+    circle
+    scale 0.9
 
-    \tx\t
+    for 2
+      for 2
+        apply
+      loop
+    loop
+  ",
+}
 
-    apply
+image_test! {
+  name: for_zero,
+  program: "
+    circle
 
+    for 0
+      apply
+    loop
   ",
 }

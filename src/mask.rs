@@ -32,12 +32,7 @@ impl Display for Mask {
 }
 
 impl Mask {
-  pub(crate) fn is_masked(
-    &self,
-    dimensions: Vector2<usize>,
-    pixel: Point2<isize>,
-    v: Point2<f64>,
-  ) -> bool {
+  pub(crate) fn is_masked(&self, size: usize, pixel: Point2<isize>, v: Point2<f64>) -> bool {
     match self {
       Self::All => true,
       Self::Circle => v.coords.norm() < 1.0,
@@ -47,7 +42,7 @@ impl Mask {
           false
         } else {
           ((pixel.x as u64)
-            .wrapping_mul(dimensions.y as u64)
+            .wrapping_mul(size as u64)
             .wrapping_add(pixel.y as u64))
             % *divisor
             == *remainder

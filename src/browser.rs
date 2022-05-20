@@ -25,7 +25,7 @@ mod get_document;
 mod js_value_error;
 mod select;
 mod stderr;
-mod test;
+pub mod test;
 mod webgl;
 mod window;
 

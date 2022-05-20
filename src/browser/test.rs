@@ -25,7 +25,7 @@ fn test_inner(program: &str) -> Result<String> {
 
   let mut computer = Computer::new(webgl.clone());
   computer.load_program(&program);
-  computer.resize((canvas.width().try_into()?, canvas.height().try_into()?));
+  computer.resize(canvas.width().try_into()?);
   computer.run(false)?;
 
   if let Some(webgl) = webgl {
