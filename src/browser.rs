@@ -5,18 +5,16 @@ pub(crate) use {
   },
   super::*,
   std::{
+    cell::Cell,
     fmt::{self, Formatter},
     ops::Deref,
-    sync::{
-      atomic::{AtomicUsize, Ordering},
-      Arc, Mutex,
-    },
+    sync::{Arc, Mutex},
   },
   wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue},
   web_sys::{
     CanvasRenderingContext2d, Document, Element, EventTarget, HtmlCanvasElement, HtmlElement,
     HtmlTextAreaElement, ImageData, WebGl2RenderingContext, WebGlFramebuffer, WebGlProgram,
-    WebGlShader, WebGlTexture, Window,
+    WebGlTexture, Window,
   },
 };
 

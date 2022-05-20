@@ -1,16 +1,10 @@
 use super::*;
 
-#[derive(Clone)]
-struct ShaderDescription {
-  code: String,
-  shader_type: u32,
-}
-
 pub(crate) struct WebGl {
   context: WebGl2RenderingContext,
   frame_buffer: WebGlFramebuffer,
   program: WebGlProgram,
-  source: AtomicUsize,
+  source: Cell<usize>,
   textures: Vec<WebGlTexture>,
 }
 
@@ -33,24 +27,127 @@ impl WebGl {
       canvas.height().try_into()?,
     );
 
-    let program = Self::create_program(
-      &context,
-      vec![
-        ShaderDescription {
-          code: include_str!("vertex.glsl").into(),
-          shader_type: WebGl2RenderingContext::VERTEX_SHADER,
-        },
-        ShaderDescription {
-          code: include_str!("fragment.glsl").into(),
-          shader_type: WebGl2RenderingContext::FRAGMENT_SHADER,
-        },
-      ],
-    )?;
+    let program = {
+      let program = context.create_program().ok_or("Failed to create program")?;
 
-    Self::setup_triangles(&context, &program)?;
+      let vertex = context
+        .create_shader(WebGl2RenderingContext::VERTEX_SHADER)
+        .ok_or("Failed to create shader")?;
+
+      context.shader_source(&vertex, include_str!("vertex.glsl").trim());
+      context.compile_shader(&vertex);
+
+      if !context.get_shader_parameter(&vertex, WebGl2RenderingContext::COMPILE_STATUS) {
+        return Err(
+          context
+            .get_shader_info_log(&vertex)
+            .ok_or("Failed to get shader info log")?
+            .into(),
+        );
+      }
+
+      let fragment = context
+        .create_shader(WebGl2RenderingContext::FRAGMENT_SHADER)
+        .ok_or("Failed to create shader")?;
+
+      context.shader_source(&fragment, include_str!("fragment.glsl").trim());
+      context.compile_shader(&fragment);
+
+      if !context.get_shader_parameter(&fragment, WebGl2RenderingContext::COMPILE_STATUS) {
+        return Err(
+          context
+            .get_shader_info_log(&fragment)
+            .ok_or("Failed to get shader info log")?
+            .into(),
+        );
+      }
+
+      context.attach_shader(&program, &vertex);
+      context.attach_shader(&program, &fragment);
+
+      context.link_program(&program);
+
+      if !context.get_program_parameter(&program, WebGl2RenderingContext::LINK_STATUS) {
+        return Err(
+          context
+            .get_program_info_log(&program)
+            .ok_or("Failed to get program log info")?
+            .into(),
+        );
+      }
+
+      context.use_program(Some(&program));
+
+      program
+    };
+
+    let vertices = js_sys::Float32Array::new_with_length(Self::VERTICES.len().try_into()?);
+    vertices.copy_from(&Self::VERTICES);
+
+    let position = context.get_attrib_location(&program, "position");
+
+    context.bind_buffer(
+      WebGl2RenderingContext::ARRAY_BUFFER,
+      context.create_buffer().as_ref(),
+    );
+
+    context.buffer_data_with_opt_array_buffer(
+      WebGl2RenderingContext::ARRAY_BUFFER,
+      Some(&vertices.buffer()),
+      WebGl2RenderingContext::STATIC_DRAW,
+    );
+
+    context.enable_vertex_attrib_array(position.try_into()?);
+
+    context.vertex_attrib_pointer_with_i32(
+      position.try_into()?,
+      2,
+      WebGl2RenderingContext::FLOAT,
+      false,
+      0,
+      0,
+    );
 
     let textures = (0..2)
-      .map(|_| Self::create_texture(&context))
+      .map(|_| -> Result<WebGlTexture> {
+        let texture = context.create_texture().ok_or("Failed to create texture")?;
+
+        context.bind_texture(WebGl2RenderingContext::TEXTURE_2D, Some(&texture));
+
+        context
+          .tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_html_canvas_element(
+            WebGl2RenderingContext::TEXTURE_2D,
+            0,
+            WebGl2RenderingContext::RGBA.try_into()?,
+            canvas.width().try_into()?,
+            canvas.height().try_into()?,
+            0,
+            WebGl2RenderingContext::RGBA,
+            WebGl2RenderingContext::UNSIGNED_BYTE,
+            canvas,
+          )
+          .map_err(JsValueError)?;
+
+        context.tex_parameteri(
+          WebGl2RenderingContext::TEXTURE_2D,
+          WebGl2RenderingContext::TEXTURE_MIN_FILTER,
+          WebGl2RenderingContext::LINEAR.try_into()?,
+        );
+
+        context.tex_parameteri(
+          WebGl2RenderingContext::TEXTURE_2D,
+          WebGl2RenderingContext::TEXTURE_WRAP_S,
+          WebGl2RenderingContext::CLAMP_TO_EDGE.try_into()?,
+        );
+
+        context.tex_parameteri(
+          WebGl2RenderingContext::TEXTURE_2D,
+          WebGl2RenderingContext::TEXTURE_WRAP_T,
+          WebGl2RenderingContext::CLAMP_TO_EDGE.try_into()?,
+        );
+
+        Ok(texture)
+      })
       .collect::<Result<Vec<WebGlTexture>, _>>()?;
 
     let frame_buffer = context
@@ -61,7 +158,7 @@ impl WebGl {
       context,
       frame_buffer,
       program,
-      source: AtomicUsize::new(0),
+      source: Cell::new(0),
       textures,
     })
   }
@@ -73,7 +170,7 @@ impl WebGl {
 
     self.context.bind_texture(
       WebGl2RenderingContext::TEXTURE_2D,
-      Some(&self.textures[self.source.load(Ordering::Relaxed)]),
+      Some(&self.textures[self.source.get()]),
     );
 
     self.context.uniform1i(
@@ -111,13 +208,13 @@ impl WebGl {
       WebGl2RenderingContext::FRAMEBUFFER,
       WebGl2RenderingContext::COLOR_ATTACHMENT0,
       WebGl2RenderingContext::TEXTURE_2D,
-      Some(&self.textures[self.source.load(Ordering::Relaxed) ^ 1]),
+      Some(&self.textures[self.source.get() ^ 1]),
       0,
     );
 
     self.context.bind_texture(
       WebGl2RenderingContext::TEXTURE_2D,
-      Some(&self.textures[self.source.load(Ordering::Relaxed)]),
+      Some(&self.textures[self.source.get()]),
     );
 
     self.context.uniform1i(
@@ -142,132 +239,7 @@ impl WebGl {
       (Self::VERTICES.len() / 2).try_into()?,
     );
 
-    self
-      .source
-      .store(self.source.load(Ordering::Relaxed) ^ 1, Ordering::Relaxed);
-
-    Ok(())
-  }
-
-  fn create_program(
-    gl: &WebGl2RenderingContext,
-    descriptions: Vec<ShaderDescription>,
-  ) -> Result<WebGlProgram> {
-    let program = gl.create_program().ok_or("Failed to create program")?;
-
-    descriptions
-      .iter()
-      .map(|desc| Self::create_shader(gl, desc.clone()).unwrap())
-      .for_each(|shader| gl.attach_shader(&program, &shader));
-
-    gl.link_program(&program);
-
-    if !gl.get_program_parameter(&program, WebGl2RenderingContext::LINK_STATUS) {
-      return Err(
-        gl.get_program_info_log(&program)
-          .ok_or("Failed to get program log info")?
-          .into(),
-      );
-    }
-
-    gl.use_program(Some(&program));
-
-    Ok(program)
-  }
-
-  fn create_shader(
-    gl: &WebGl2RenderingContext,
-    description: ShaderDescription,
-  ) -> Result<WebGlShader> {
-    let shader = gl
-      .create_shader(description.shader_type)
-      .ok_or("Failed to create shader")?;
-
-    gl.shader_source(&shader, description.code.trim());
-    gl.compile_shader(&shader);
-
-    if !gl.get_shader_parameter(&shader, WebGl2RenderingContext::COMPILE_STATUS) {
-      return Err(
-        gl.get_shader_info_log(&shader)
-          .ok_or("Failed to get shader info log")?
-          .into(),
-      );
-    }
-
-    Ok(shader)
-  }
-
-  fn create_texture(gl: &WebGl2RenderingContext) -> Result<WebGlTexture> {
-    let canvas = gl
-      .canvas()
-      .ok_or("Failed to get canvas off of WebGL context")?
-      .cast::<HtmlCanvasElement>()?;
-
-    let texture = gl.create_texture().ok_or("Failed to create texture")?;
-
-    gl.bind_texture(WebGl2RenderingContext::TEXTURE_2D, Some(&texture));
-
-    gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_html_canvas_element(
-      WebGl2RenderingContext::TEXTURE_2D,
-      0,
-      WebGl2RenderingContext::RGBA.try_into()?,
-      canvas.width().try_into()?,
-      canvas.height().try_into()?,
-      0,
-      WebGl2RenderingContext::RGBA,
-      WebGl2RenderingContext::UNSIGNED_BYTE,
-      &canvas,
-    )
-    .map_err(JsValueError)?;
-
-    gl.tex_parameteri(
-      WebGl2RenderingContext::TEXTURE_2D,
-      WebGl2RenderingContext::TEXTURE_MIN_FILTER,
-      WebGl2RenderingContext::LINEAR.try_into()?,
-    );
-
-    gl.tex_parameteri(
-      WebGl2RenderingContext::TEXTURE_2D,
-      WebGl2RenderingContext::TEXTURE_WRAP_S,
-      WebGl2RenderingContext::CLAMP_TO_EDGE.try_into()?,
-    );
-
-    gl.tex_parameteri(
-      WebGl2RenderingContext::TEXTURE_2D,
-      WebGl2RenderingContext::TEXTURE_WRAP_T,
-      WebGl2RenderingContext::CLAMP_TO_EDGE.try_into()?,
-    );
-
-    Ok(texture)
-  }
-
-  fn setup_triangles(gl: &WebGl2RenderingContext, program: &WebGlProgram) -> Result {
-    let vertices = js_sys::Float32Array::new_with_length(Self::VERTICES.len().try_into()?);
-    vertices.copy_from(&Self::VERTICES);
-
-    let position = gl.get_attrib_location(program, "position");
-
-    gl.bind_buffer(
-      WebGl2RenderingContext::ARRAY_BUFFER,
-      gl.create_buffer().as_ref(),
-    );
-
-    gl.buffer_data_with_opt_array_buffer(
-      WebGl2RenderingContext::ARRAY_BUFFER,
-      Some(&vertices.buffer()),
-      WebGl2RenderingContext::STATIC_DRAW,
-    );
-
-    gl.enable_vertex_attrib_array(position.try_into()?);
-
-    gl.vertex_attrib_pointer_with_i32(
-      position.try_into()?,
-      2,
-      WebGl2RenderingContext::FLOAT,
-      false,
-      0,
-      0,
-    );
+    self.source.set(self.source.get() ^ 1);
 
     Ok(())
   }
