@@ -7,7 +7,7 @@ license = "CC0-1.0"
 autotests = false
 
 [workspace]
-members = [".", "integration"]
+members = [".", "bin/serve", "integration"]
 
 [lib]
 crate-type = ["cdylib"]

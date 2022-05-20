@@ -1556,6 +1556,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "serve"
+version = "0.0.0"
+dependencies = [
+ "approx",
+ "axum",
+ "base64",
+ "chromiumoxide",
+ "executable-path",
+ "futures",
+ "image",
+ "lazy_static",
+ "pretty_assertions",
+ "tempfile",
+ "tokio",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+ "unindent",
+]
+
+[[package]]
 name = "sha-1"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
