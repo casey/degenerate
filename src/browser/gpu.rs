@@ -22,13 +22,6 @@ impl Gpu {
       .ok_or("Failed to retrieve gl")?
       .cast::<WebGl2RenderingContext>()?;
 
-    gl.viewport(
-      0,
-      0,
-      canvas.width().try_into()?,
-      canvas.height().try_into()?,
-    );
-
     let program = {
       let program = gl.create_program().ok_or("Failed to create program")?;
 
