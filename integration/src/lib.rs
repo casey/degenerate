@@ -172,6 +172,7 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
 
     if have != want {
       let destination = format!("../images/{}.browser-actual-memory.png", name);
+
       have.save(&destination)?;
 
       #[cfg(target_os = "macos")]
