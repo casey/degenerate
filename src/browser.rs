@@ -6,10 +6,12 @@ pub(crate) use {
   super::*,
   indoc::indoc,
   std::{
-    cell::Cell,
     fmt::{self, Formatter},
     ops::Deref,
-    sync::{Arc, Mutex},
+    sync::{
+      atomic::{AtomicUsize, Ordering},
+      Arc, Mutex,
+    },
   },
   wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue},
   web_sys::{

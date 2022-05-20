@@ -54,13 +54,12 @@ struct ShaderDescription {
   shader_type: u32,
 }
 
-#[derive(Clone)]
 pub(crate) struct WebGl {
   context: WebGl2RenderingContext,
   frame_buffer: WebGlFramebuffer,
   length: usize,
   program: WebGlProgram,
-  source: Cell<usize>,
+  source: AtomicUsize,
   textures: Vec<WebGlTexture>,
 }
 
@@ -108,7 +107,7 @@ impl WebGl {
       frame_buffer,
       length,
       program,
-      source: Cell::new(0),
+      source: AtomicUsize::new(0),
       textures,
     })
   }
@@ -120,7 +119,7 @@ impl WebGl {
 
     self.context.bind_texture(
       WebGl2RenderingContext::TEXTURE_2D,
-      Some(&self.textures[self.source.get()]),
+      Some(&self.textures[self.source.load(Ordering::Relaxed)]),
     );
 
     self.context.uniform1i(
@@ -158,13 +157,13 @@ impl WebGl {
       WebGl2RenderingContext::FRAMEBUFFER,
       WebGl2RenderingContext::COLOR_ATTACHMENT0,
       WebGl2RenderingContext::TEXTURE_2D,
-      Some(&self.textures[self.source.get() ^ 1]),
+      Some(&self.textures[self.source.load(Ordering::Relaxed) ^ 1]),
       0,
     );
 
     self.context.bind_texture(
       WebGl2RenderingContext::TEXTURE_2D,
-      Some(&self.textures[self.source.get()]),
+      Some(&self.textures[self.source.load(Ordering::Relaxed)]),
     );
 
     self.context.uniform1i(
@@ -189,7 +188,9 @@ impl WebGl {
       self.length.try_into()?,
     );
 
-    self.source.set(self.source.get() ^ 1);
+    self
+      .source
+      .store(self.source.load(Ordering::Relaxed) ^ 1, Ordering::Relaxed);
 
     Ok(())
   }
