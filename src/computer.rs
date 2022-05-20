@@ -30,12 +30,10 @@ impl Computer {
     Ok(())
   }
 
-  #[cfg(target_arch = "wasm32")]
   pub(crate) fn memory(&self) -> &DMatrix<Vector4<u8>> {
     &self.memory
   }
 
-  #[cfg(target_arch = "wasm32")]
   pub(crate) fn done(&self) -> bool {
     self.program_counter >= self.program.len()
   }
@@ -45,7 +43,6 @@ impl Computer {
     self.program_counter = 0;
   }
 
-  #[cfg(target_arch = "wasm32")]
   pub(crate) fn program(&self) -> &[Command] {
     &self.program
   }
