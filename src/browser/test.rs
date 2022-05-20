@@ -6,11 +6,7 @@ pub fn test(program: &str) -> Result<String, String> {
 }
 
 fn test_inner(program: &str) -> Result<String> {
-  let program = program
-    .split_whitespace()
-    .into_iter()
-    .map(Command::from_str)
-    .collect::<Result<Vec<Command>>>()?;
+  let program = Command::parse_program(program)?;
 
   let mut computer = Computer::new();
   computer.load_program(&program);
