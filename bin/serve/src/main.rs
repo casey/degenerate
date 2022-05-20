@@ -1,9 +1,7 @@
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-type Result = std::result::Result<(), Box<dyn std::error::Error>>;
-
 #[tokio::main]
-async fn main() -> Result {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
   tracing_subscriber::registry()
     .with(tracing_subscriber::EnvFilter::from_default_env())
     .with(tracing_subscriber::fmt::layer())
