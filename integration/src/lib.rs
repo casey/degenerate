@@ -165,13 +165,13 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
     let have = image::load_from_memory(&base64::decode(
       &data_url["data:image/png;base64,".len()..],
     )?)?;
-    let destination = format!("../images/{}.browser-actual-memory.png", name);
 
     let want_path = format!("../images/{}.png", name);
 
     let want = image::open(&want_path)?;
 
     if have != want {
+      let destination = format!("../images/{}.browser-actual-memory.png", name);
       have.save(&destination)?;
 
       #[cfg(target_os = "macos")]
