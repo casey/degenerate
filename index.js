@@ -1,5 +1,5 @@
-import init, {run} from './degenerate.js';
+import init, {run} from '/degenerate.js';
 
-await init('degenerate_bg.wasm');
+await init('/degenerate_bg.wasm');
 
 run();
