@@ -1,9 +1,19 @@
 use {
-  chromiumoxide::browser::{Browser, BrowserConfig},
+  chromiumoxide::browser::BrowserConfig,
   futures::StreamExt,
   lazy_static::lazy_static,
-  std::{fs, net::SocketAddr, str, sync::Once, time::Duration},
-  tokio::{runtime::Runtime, task},
+  std::{
+    fs,
+    net::SocketAddr,
+    str,
+    sync::{Arc, Once, Weak},
+    time::Duration,
+  },
+  tokio::{
+    runtime::Runtime,
+    sync::Mutex,
+    task::{self, JoinHandle},
+  },
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
   unindent::Unindent,
 };
@@ -52,29 +62,48 @@ macro_rules! image_test {
 
 type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
+struct Browser {
+  inner: chromiumoxide::Browser,
+  handle: JoinHandle<()>,
+}
+
+impl Drop for Browser {
+  fn drop(&mut self) {
+    self.handle.abort();
+  }
+}
+
+async fn browser() -> Arc<Browser> {
+  let mut guard = BROWSER.lock().await;
+
+  if let Some(browser) = guard.upgrade() {
+    return browser;
+  }
+
+  let (inner, mut handler) = chromiumoxide::Browser::launch(
+    BrowserConfig::builder()
+      .arg("--allow-insecure-localhost")
+      .build()
+      .unwrap(),
+  )
+  .await
+  .unwrap();
+
+  let handle = tokio::task::spawn(async move {
+    loop {
+      let _ = handler.next().await.unwrap();
+    }
+  });
+
+  let browser = Arc::new(Browser { inner, handle });
+
+  *guard = Arc::downgrade(&browser);
+
+  browser
+}
+
 lazy_static! {
-  static ref BROWSER: Browser = {
-    let runtime: &'static Runtime = &*RUNTIME;
-
-    let (browser, mut handler) = runtime.block_on(async {
-      Browser::launch(
-        BrowserConfig::builder()
-          .arg("--allow-insecure-localhost")
-          .build()
-          .unwrap(),
-      )
-      .await
-      .unwrap()
-    });
-
-    runtime.spawn(async move {
-      loop {
-        let _ = handler.next().await.unwrap();
-      }
-    });
-
-    browser
-  };
+  static ref BROWSER: Mutex<Weak<Browser>> = Mutex::new(Weak::new());
   static ref RUNTIME: Runtime = Runtime::new().unwrap();
   static ref SERVER_PORT: u16 = {
     tracing_subscriber::registry()
@@ -112,14 +141,15 @@ fn clean() {
 }
 
 pub(crate) fn image_test(name: &str, program: &str, gpu: bool) -> Result {
-  let browser: &'static Browser = &*BROWSER;
-
   RUNTIME.block_on(async {
     clean();
 
     eprintln!("Creating page...");
 
+    let browser = browser().await;
+
     let page = browser
+      .inner
       .new_page(format!(
         "http://127.0.0.1:{}{}",
         *SERVER_PORT,
