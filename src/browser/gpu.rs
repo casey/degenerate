@@ -19,7 +19,7 @@ impl Gpu {
     let gl = canvas
       .get_context("webgl2")
       .map_err(JsValueError)?
-      .ok_or("Failed to retrieve gl")?
+      .ok_or("Failed to retrieve webgl2 context")?
       .cast::<WebGl2RenderingContext>()?;
 
     let program = {
@@ -115,7 +115,7 @@ impl Gpu {
 
     let frame_buffer = gl
       .create_framebuffer()
-      .ok_or("Failed to create frame buffer")?;
+      .ok_or("Failed to create framebuffer")?;
 
     Ok(Self {
       canvas: canvas.clone(),
