@@ -6,7 +6,7 @@ pub(crate) struct Gpu {
   gl: WebGl2RenderingContext,
   mask: WebGlUniformLocation,
   operation: WebGlUniformLocation,
-  source: Cell<usize>,
+  source_texture: Cell<usize>,
   textures: [WebGlTexture; 2],
 }
 
@@ -123,7 +123,7 @@ impl Gpu {
       gl,
       mask,
       operation,
-      source: Cell::new(0),
+      source_texture: Cell::new(0),
       textures,
     })
   }
@@ -135,7 +135,7 @@ impl Gpu {
 
     self.gl.bind_texture(
       WebGl2RenderingContext::TEXTURE_2D,
-      Some(&self.textures[self.source.get()]),
+      Some(&self.textures[self.source_texture.get()]),
     );
 
     self
@@ -166,13 +166,13 @@ impl Gpu {
       WebGl2RenderingContext::FRAMEBUFFER,
       WebGl2RenderingContext::COLOR_ATTACHMENT0,
       WebGl2RenderingContext::TEXTURE_2D,
-      Some(&self.textures[self.source.get() ^ 1]),
+      Some(&self.textures[self.source_texture.get() ^ 1]),
       0,
     );
 
     self.gl.bind_texture(
       WebGl2RenderingContext::TEXTURE_2D,
-      Some(&self.textures[self.source.get()]),
+      Some(&self.textures[self.source_texture.get()]),
     );
 
     self
@@ -190,7 +190,7 @@ impl Gpu {
       (Self::VERTICES.len() / 2).try_into()?,
     );
 
-    self.source.set(self.source.get() ^ 1);
+    self.source_texture.set(self.source_texture.get() ^ 1);
 
     Ok(())
   }
