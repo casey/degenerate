@@ -195,7 +195,7 @@ impl Gpu {
     Ok(())
   }
 
-  fn create_texture(gl: &WebGl2RenderingContext, size: usize) -> Result<WebGlTexture> {
+  fn create_texture(gl: &WebGl2RenderingContext, size: i32) -> Result<WebGlTexture> {
     let texture = gl.create_texture().ok_or("Failed to create texture")?;
 
     gl.bind_texture(WebGl2RenderingContext::TEXTURE_2D, Some(&texture));
@@ -204,8 +204,8 @@ impl Gpu {
       WebGl2RenderingContext::TEXTURE_2D,
       1,
       WebGl2RenderingContext::RGBA8,
-      size.try_into()?,
-      size.try_into()?,
+      size,
+      size,
     );
 
     gl.tex_parameteri(
@@ -230,12 +230,13 @@ impl Gpu {
   }
 
   pub(crate) fn resize(&mut self, size: usize) -> Result {
-    self.gl.viewport(
-      (self.canvas.width() as i32 - size as i32) / 2,
-      (self.canvas.height() as i32 - size as i32) / 2,
-      self.canvas.width().try_into()?,
-      self.canvas.height().try_into()?,
-    );
+    let size = size.try_into()?;
+    let width: i32 = self.canvas.width().try_into()?;
+    let height: i32 = self.canvas.height().try_into()?;
+
+    self
+      .gl
+      .viewport((width - size) / 4, (height - size) / 4, size, size);
 
     self.gl.delete_texture(Some(&self.textures[0]));
     self.gl.delete_texture(Some(&self.textures[1]));
