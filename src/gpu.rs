@@ -231,7 +231,7 @@ impl Gpu {
 
   pub(crate) fn resize(&mut self, size: usize) -> Result {
     let size = size.try_into()?;
-    
+
     let width: i32 = self.canvas.width().try_into()?;
     let height: i32 = self.canvas.height().try_into()?;
 
