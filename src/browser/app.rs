@@ -5,12 +5,12 @@ pub(crate) struct App {
   animation_frame_pending: bool,
   canvas: HtmlCanvasElement,
   computer: Computer,
-  context: CanvasRenderingContext2d,
   input: bool,
   nav: HtmlElement,
   resize: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
+  gpu: Option<Arc<Mutex<Gpu>>>,
   window: Window,
 }
 
@@ -28,24 +28,24 @@ impl App {
 
     let stderr = Stderr::get();
 
-    let context = canvas
-      .get_context("2d")
-      .map_err(JsValueError)?
-      .ok_or("failed to retrieve context")?
-      .cast::<CanvasRenderingContext2d>()?;
+    let gpu = if window.location().hash().map_err(JsValueError)? == "#gpu" {
+      Some(Arc::new(Mutex::new(Gpu::new(&canvas)?)))
+    } else {
+      None
+    };
 
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
       animation_frame_pending: false,
-      context,
       canvas,
+      computer: Computer::new(gpu.clone()),
       input: false,
       nav,
       resize: true,
       stderr: stderr.clone(),
       textarea: textarea.clone(),
+      gpu,
       window: window.clone(),
-      computer: Computer::new(),
     }));
 
     let local = app.clone();
@@ -117,11 +117,14 @@ impl App {
     if self.resize {
       let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
       let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
+
       let device_pixel_ratio = self.window.device_pixel_ratio();
       let device_pixel_height = css_pixel_height * device_pixel_ratio;
       let device_pixel_width = css_pixel_width * device_pixel_ratio;
+
       self.canvas.set_height(device_pixel_height.ceil() as u32);
       self.canvas.set_width(device_pixel_width.ceil() as u32);
+
       self.resize = false;
     }
 
@@ -135,10 +138,10 @@ impl App {
       let program_changed = program != self.computer.program();
 
       if resize || program_changed {
-        let mut computer = Computer::new();
+        let mut computer = Computer::new(self.gpu.clone());
         computer.load_program(&program);
         // Make sure size is odd, so we don't get jaggies when drawing the X
-        computer.resize((self.canvas.width().max(self.canvas.height()) | 1).try_into()?);
+        computer.resize((self.canvas.width().max(self.canvas.height()) | 1).try_into()?)?;
         self.computer = computer;
       }
 
@@ -149,29 +152,39 @@ impl App {
       }
 
       if resize || program_changed || run {
-        let pixels = self
-          .computer
-          .memory()
-          .transpose()
-          .iter()
-          .flatten()
-          .cloned()
-          .collect::<Vec<u8>>();
+        if let Some(gpu) = self.gpu.clone() {
+          gpu.lock().unwrap().render_to_canvas()?;
+        } else {
+          let context = self
+            .canvas
+            .get_context("2d")
+            .map_err(JsValueError)?
+            .ok_or("Failed to retrieve context")?
+            .cast::<CanvasRenderingContext2d>()?;
 
-        let size = self.computer.size();
+          let pixels = self
+            .computer
+            .memory()
+            .transpose()
+            .iter()
+            .flatten()
+            .cloned()
+            .collect::<Vec<u8>>();
 
-        let image_data =
-          ImageData::new_with_u8_clamped_array(wasm_bindgen::Clamped(&pixels), size.try_into()?)
+          let size = self.computer.size();
+
+          let image_data =
+            ImageData::new_with_u8_clamped_array(wasm_bindgen::Clamped(&pixels), size.try_into()?)
+              .map_err(JsValueError)?;
+
+          context
+            .put_image_data(
+              &image_data,
+              (self.canvas.width() as f64 - size as f64) / 2.0,
+              (self.canvas.height() as f64 - size as f64) / 2.0,
+            )
             .map_err(JsValueError)?;
-
-        self
-          .context
-          .put_image_data(
-            &image_data,
-            (self.canvas.width() as f64 - size as f64) / 2.0,
-            (self.canvas.height() as f64 - size as f64) / 2.0,
-          )
-          .map_err(JsValueError)?;
+        }
 
         if !self.computer.done() {
           self.request_animation_frame()?;

@@ -544,6 +544,7 @@ dependencies = [
  "console_error_panic_hook",
  "console_log",
  "getrandom",
+ "js-sys",
  "log",
  "nalgebra",
  "rand",

@@ -1,18 +1,20 @@
 use {
   self::{
     add_event_listener::AddEventListener, app::App, cast::Cast, get_document::GetDocument,
-    js_value_error::JsValueError, select::Select, stderr::Stderr, window::window,
+    gpu::Gpu, js_value_error::JsValueError, select::Select, stderr::Stderr, window::window,
   },
   super::*,
+  js_sys::Float32Array,
   std::{
-    fmt::{self, Formatter},
+    cell::Cell,
     ops::Deref,
     sync::{Arc, Mutex},
   },
   wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue},
   web_sys::{
     CanvasRenderingContext2d, Document, Element, EventTarget, HtmlCanvasElement, HtmlElement,
-    HtmlTextAreaElement, ImageData, Window,
+    HtmlTextAreaElement, ImageData, WebGl2RenderingContext, WebGlFramebuffer, WebGlTexture,
+    WebGlUniformLocation, Window,
   },
 };
 
@@ -20,6 +22,7 @@ mod add_event_listener;
 mod app;
 mod cast;
 mod get_document;
+pub mod gpu;
 mod js_value_error;
 mod select;
 mod stderr;

@@ -23,9 +23,39 @@ macro_rules! image_test {
     name: $name:ident,
     program: $program:literal,
   ) => {
-    #[test]
-    fn $name() -> Result {
-      image_test(stringify!($name), $program)
+    mod $name {
+      use super::*;
+
+      #[test]
+      fn cpu() -> Result {
+        image_test(stringify!($name), $program, false)
+      }
+
+      #[test]
+      #[ignore]
+      fn gpu() -> Result {
+        image_test(stringify!($name), $program, true)
+      }
+    }
+  };
+
+  (
+    name: $name:ident,
+    program: $program:literal,
+    gpu: true $(,)?
+  ) => {
+    mod $name {
+      use super::*;
+
+      #[test]
+      fn cpu() -> Result {
+        image_test(stringify!($name), $program, false)
+      }
+
+      #[test]
+      fn gpu() -> Result {
+        image_test(stringify!($name), $program, true)
+      }
     }
   };
 }
@@ -110,7 +140,7 @@ fn clean() {
   });
 }
 
-pub(crate) fn image_test(name: &str, program: &str) -> Result {
+pub(crate) fn image_test(name: &str, program: &str, gpu: bool) -> Result {
   RUNTIME.block_on(async {
     clean();
 
@@ -120,7 +150,11 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
 
     let page = browser
       .inner
-      .new_page(format!("http://127.0.0.1:{}", *SERVER_PORT))
+      .new_page(format!(
+        "http://127.0.0.1:{}{}",
+        *SERVER_PORT,
+        if gpu { "/#gpu" } else { "" }
+      ))
       .await?;
 
     eprintln!("Waiting for module to load...");
@@ -235,6 +269,7 @@ image_test! {
     circle
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -681,6 +716,7 @@ image_test! {
     x
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
