@@ -151,8 +151,8 @@ impl Gpu {
     let dy = (resolution - height) / 2;
 
     self.gl.blit_framebuffer(
-      0 + dx,
-      0 + dy,
+      dx,
+      dy,
       width + dx,
       height + dy,
       0,
