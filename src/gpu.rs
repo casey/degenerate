@@ -177,24 +177,6 @@ impl Gpu {
       size as i32,
     );
 
-    gl.tex_parameteri(
-      WebGl2RenderingContext::TEXTURE_2D,
-      WebGl2RenderingContext::TEXTURE_MIN_FILTER,
-      WebGl2RenderingContext::LINEAR.try_into()?,
-    );
-
-    gl.tex_parameteri(
-      WebGl2RenderingContext::TEXTURE_2D,
-      WebGl2RenderingContext::TEXTURE_WRAP_S,
-      WebGl2RenderingContext::CLAMP_TO_EDGE.try_into()?,
-    );
-
-    gl.tex_parameteri(
-      WebGl2RenderingContext::TEXTURE_2D,
-      WebGl2RenderingContext::TEXTURE_WRAP_T,
-      WebGl2RenderingContext::CLAMP_TO_EDGE.try_into()?,
-    );
-
     Ok(texture)
   }
 

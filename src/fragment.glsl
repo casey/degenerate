@@ -41,8 +41,7 @@ bool is_masked(vec2 position) {
 }
 
 void main() {
-  vec2 uv = gl_FragCoord.xy / float(resolution);
-  vec4 pixel = texture(source, uv);
-  vec2 position = uv.xy * 2.0 - 1.0;
+  vec2 position = gl_FragCoord.xy / float(resolution) * 2.0 - 1.0;
+  vec4 pixel = texelFetch(source, ivec2(gl_FragCoord.xy), 0);
   color = is_masked(position) ? apply_operation(pixel) : vec4(pixel.xyz, 1.0);
 }
