@@ -3,7 +3,7 @@ use {
     add_event_listener::AddEventListener, app::App, cast::Cast, color_axis::ColorAxis,
     command::Command, computer::Computer, get_document::GetDocument, gpu::Gpu,
     js_value_error::JsValueError, mask::Mask, operation::Operation, select::Select, stderr::Stderr,
-    window::window, wrap::Wrap,
+    token::Token, token_kind::TokenKind, window::window, wrap::Wrap,
   },
   js_sys::Float32Array,
   nalgebra::{
@@ -40,11 +40,15 @@ mod computer;
 mod get_document;
 pub mod gpu;
 mod js_value_error;
+mod lexer;
 mod mask;
 mod operation;
+mod parser;
 mod select;
 mod stderr;
 pub mod test;
+mod token;
+mod token_kind;
 mod window;
 mod wrap;
 
