@@ -5,8 +5,7 @@ precision highp float;
 uniform sampler2D source;
 uniform uint mask;
 uniform uint operation;
-
-in vec2 uv;
+uniform uint resolution;
 
 out vec4 color;
 
@@ -42,6 +41,7 @@ bool is_masked(vec2 position) {
 }
 
 void main() {
+  vec2 uv = gl_FragCoord.xy / float(resolution);
   vec4 pixel = texture(source, uv);
   vec2 position = uv.xy * 2.0 - 1.0;
   color = is_masked(position) ? apply_operation(pixel) : vec4(pixel.xyz, 1.0);

@@ -193,7 +193,7 @@ impl Computer {
 
   pub(crate) fn resize(&mut self, size: usize) -> Result {
     if let Some(gpu) = self.gpu.as_ref() {
-      gpu.lock().unwrap().resize(size)?;
+      gpu.lock().unwrap().resize()?;
     } else {
       self.memory.resize_mut(size, size, self.default);
     }

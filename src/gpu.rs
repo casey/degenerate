@@ -6,6 +6,7 @@ pub(crate) struct Gpu {
   gl: WebGl2RenderingContext,
   mask: WebGlUniformLocation,
   operation: WebGlUniformLocation,
+  resolution: WebGlUniformLocation,
   source_texture: Cell<usize>,
   textures: [WebGlTexture; 2],
 }
@@ -79,6 +80,10 @@ impl Gpu {
       .get_uniform_location(&program, "operation")
       .ok_or("Could not find uniform `operation`")?;
 
+    let resolution = gl
+      .get_uniform_location(&program, "resolution")
+      .ok_or("Could not find uniform `resolution`")?;
+
     let textures = [
       Self::create_texture(&gl, canvas.width().try_into()?)?,
       Self::create_texture(&gl, canvas.width().try_into()?)?,
@@ -94,6 +99,7 @@ impl Gpu {
       gl,
       mask,
       operation,
+      resolution,
       source_texture: Cell::new(0),
       textures,
     })
@@ -158,7 +164,7 @@ impl Gpu {
     Ok(())
   }
 
-  fn create_texture(gl: &WebGl2RenderingContext, size: i32) -> Result<WebGlTexture> {
+  fn create_texture(gl: &WebGl2RenderingContext, size: u32) -> Result<WebGlTexture> {
     let texture = gl.create_texture().ok_or("Failed to create texture")?;
 
     gl.bind_texture(WebGl2RenderingContext::TEXTURE_2D, Some(&texture));
@@ -167,8 +173,8 @@ impl Gpu {
       WebGl2RenderingContext::TEXTURE_2D,
       1,
       WebGl2RenderingContext::RGBA8,
-      size,
-      size,
+      size as i32,
+      size as i32,
     );
 
     gl.tex_parameteri(
@@ -192,15 +198,14 @@ impl Gpu {
     Ok(texture)
   }
 
-  pub(crate) fn resize(&mut self, size: usize) -> Result {
-    let size = size.try_into()?;
+  pub(crate) fn resize(&mut self) -> Result {
+    let width = self.canvas.width();
+    let height = self.canvas.height();
+    let size = width.max(height);
 
-    let width: i32 = self.canvas.width().try_into()?;
-    let height: i32 = self.canvas.height().try_into()?;
+    self.gl.uniform1ui(Some(&self.resolution), size);
 
-    self
-      .gl
-      .viewport((width - size) / 4, (height - size) / 4, size, size);
+    self.gl.viewport(0, 0, size as i32, size as i32);
 
     self.gl.delete_texture(Some(&self.textures[0]));
     self.gl.delete_texture(Some(&self.textures[1]));
