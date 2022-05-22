@@ -118,7 +118,7 @@ impl Gpu {
       Self::operation_uniform(&Operation::Identity),
     );
 
-    self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 6);
+    self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 3);
 
     Ok(())
   }
@@ -151,7 +151,7 @@ impl Gpu {
       Self::operation_uniform(computer.operation()),
     );
 
-    self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 6);
+    self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 3);
 
     self.source_texture.set(self.source_texture.get() ^ 1);
 
