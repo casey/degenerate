@@ -1,6 +1,6 @@
 use {super::*, TokenKind::*};
 
-struct Lexer<'src> {
+pub(crate) struct Lexer<'src> {
   src: &'src str,
   token_end: usize,
   token_start: usize,
@@ -8,17 +8,17 @@ struct Lexer<'src> {
 }
 
 impl<'src> Lexer<'src> {
-  fn lex(src: &'src str) -> Result<Vec<Token<'src>>> {
+  pub(crate) fn lex(src: &'src str) -> Result<Vec<Token<'src>>> {
     Lexer {
       src,
       token_end: 0,
       token_start: 0,
       tokens: Vec::new(),
     }
-    .lex_program()
+    .lex_tokens()
   }
 
-  fn lex_program(mut self) -> Result<Vec<Token<'src>>> {
+  fn lex_tokens(mut self) -> Result<Vec<Token<'src>>> {
     while let Some(c) = self.next() {
       self.lex_token(c)?;
     }
@@ -60,6 +60,7 @@ impl<'src> Lexer<'src> {
   }
 
   fn advance(&mut self) {
+    assert!(self.token_end < self.src.len());
     self.token_end += self.next().unwrap().len_utf8();
   }
 

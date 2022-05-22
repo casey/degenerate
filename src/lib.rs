@@ -2,8 +2,9 @@ use {
   crate::{
     add_event_listener::AddEventListener, app::App, cast::Cast, color_axis::ColorAxis,
     command::Command, computer::Computer, get_document::GetDocument, gpu::Gpu,
-    js_value_error::JsValueError, mask::Mask, operation::Operation, select::Select, stderr::Stderr,
-    token::Token, token_kind::TokenKind, window::window, wrap::Wrap,
+    js_value_error::JsValueError, lexer::Lexer, mask::Mask, operation::Operation, parser::Parser,
+    select::Select, stderr::Stderr, token::Token, token_kind::TokenKind, window::window,
+    wrap::Wrap,
   },
   js_sys::Float32Array,
   nalgebra::{

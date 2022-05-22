@@ -6,7 +6,7 @@ pub fn test(program: &str) -> Result<String, String> {
 }
 
 fn test_inner(program: &str) -> Result<String> {
-  let program = Command::parse_program(program)?;
+  let program = Parser::parse(program)?;
 
   let window = window();
 

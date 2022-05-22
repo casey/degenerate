@@ -1,8 +1,9 @@
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub(crate) enum TokenKind {
-  Whitespace,
   Comment,
+  Eof,
   Identifier,
-  Number,
   Newline,
+  Number,
+  Whitespace,
 }
