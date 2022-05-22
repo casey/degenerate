@@ -39,6 +39,7 @@ features = [
   "Location",
   "WebGl2RenderingContext",
   "WebGlBuffer",
+  "WebGlContextAttributes",
   "WebGlFramebuffer",
   "WebGlProgram",
   "WebGlShader",

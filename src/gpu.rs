@@ -4,20 +4,33 @@ pub(crate) struct Gpu {
   canvas: HtmlCanvasElement,
   frame_buffer: WebGlFramebuffer,
   gl: WebGl2RenderingContext,
-  mask: WebGlUniformLocation,
-  operation: WebGlUniformLocation,
-  resolution: WebGlUniformLocation,
+  mask_uniform: WebGlUniformLocation,
+  operation_uniform: WebGlUniformLocation,
+  resolution_uniform: WebGlUniformLocation,
   source_texture: Cell<usize>,
   textures: [WebGlTexture; 2],
+  width: u32,
+  height: u32,
+  resolution: u32,
 }
 
 impl Gpu {
   pub(super) fn new(canvas: &HtmlCanvasElement) -> Result<Self> {
+    let mut context_options = WebGlContextAttributes::new();
+
+    context_options
+      .alpha(false)
+      .antialias(false)
+      .depth(false)
+      .stencil(false);
+
     let gl = canvas
-      .get_context("webgl2")
+      .get_context_with_context_options("webgl2", &context_options.into())
       .map_err(JsValueError)?
       .ok_or("Failed to retrieve webgl2 context")?
       .cast::<WebGl2RenderingContext>()?;
+
+    log::info!("{:?}", gl.get_context_attributes());
 
     gl.enable(WebGl2RenderingContext::CULL_FACE);
 
@@ -72,21 +85,25 @@ impl Gpu {
       program
     };
 
-    let mask = gl
+    let mask_uniform = gl
       .get_uniform_location(&program, "mask")
       .ok_or("Could not find uniform `mask`")?;
 
-    let operation = gl
+    let operation_uniform = gl
       .get_uniform_location(&program, "operation")
       .ok_or("Could not find uniform `operation`")?;
 
-    let resolution = gl
+    let resolution_uniform = gl
       .get_uniform_location(&program, "resolution")
       .ok_or("Could not find uniform `resolution`")?;
 
+    let width = canvas.width();
+    let height = canvas.height();
+    let resolution = width.max(height);
+
     let textures = [
-      Self::create_texture(&gl, canvas.width().try_into()?)?,
-      Self::create_texture(&gl, canvas.width().try_into()?)?,
+      Self::create_texture(&gl, resolution)?,
+      Self::create_texture(&gl, resolution)?,
     ];
 
     let frame_buffer = gl
@@ -97,34 +114,54 @@ impl Gpu {
       canvas: canvas.clone(),
       frame_buffer,
       gl,
-      mask,
-      operation,
-      resolution,
+      mask_uniform,
+      operation_uniform,
+      resolution_uniform,
       source_texture: Cell::new(0),
       textures,
+      width,
+      height,
+      resolution,
     })
   }
 
   pub(crate) fn render_to_canvas(&self) -> Result {
+    self.gl.bind_framebuffer(
+      WebGl2RenderingContext::READ_FRAMEBUFFER,
+      Some(&self.frame_buffer),
+    );
+
     self
       .gl
-      .bind_framebuffer(WebGl2RenderingContext::FRAMEBUFFER, None);
+      .bind_framebuffer(WebGl2RenderingContext::DRAW_FRAMEBUFFER, None);
 
-    self.gl.bind_texture(
+    self.gl.framebuffer_texture_2d(
+      WebGl2RenderingContext::READ_FRAMEBUFFER,
+      WebGl2RenderingContext::COLOR_ATTACHMENT0,
       WebGl2RenderingContext::TEXTURE_2D,
       Some(&self.textures[self.source_texture.get()]),
+      0,
     );
 
-    self
-      .gl
-      .uniform1ui(Some(&self.mask), Self::mask_uniform(&Mask::All));
+    let width = self.width as i32;
+    let height = self.height as i32;
+    let resolution = self.resolution as i32;
 
-    self.gl.uniform1ui(
-      Some(&self.operation),
-      Self::operation_uniform(&Operation::Identity),
+    let dx = (resolution - width) / 2;
+    let dy = (resolution - height) / 2;
+
+    self.gl.blit_framebuffer(
+      0 + dx,
+      0 + dy,
+      width + dx,
+      height + dy,
+      0,
+      0,
+      width,
+      height,
+      WebGl2RenderingContext::COLOR_BUFFER_BIT,
+      WebGl2RenderingContext::NEAREST,
     );
-
-    self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 3);
 
     Ok(())
   }
@@ -148,12 +185,13 @@ impl Gpu {
       Some(&self.textures[self.source_texture.get()]),
     );
 
-    self
-      .gl
-      .uniform1ui(Some(&self.mask), Self::mask_uniform(computer.mask()));
+    self.gl.uniform1ui(
+      Some(&self.mask_uniform),
+      Self::mask_uniform(computer.mask()),
+    );
 
     self.gl.uniform1ui(
-      Some(&self.operation),
+      Some(&self.operation_uniform),
       Self::operation_uniform(computer.operation()),
     );
 
@@ -164,7 +202,7 @@ impl Gpu {
     Ok(())
   }
 
-  fn create_texture(gl: &WebGl2RenderingContext, size: u32) -> Result<WebGlTexture> {
+  fn create_texture(gl: &WebGl2RenderingContext, resolution: u32) -> Result<WebGlTexture> {
     let texture = gl.create_texture().ok_or("Failed to create texture")?;
 
     gl.bind_texture(WebGl2RenderingContext::TEXTURE_2D, Some(&texture));
@@ -173,28 +211,32 @@ impl Gpu {
       WebGl2RenderingContext::TEXTURE_2D,
       1,
       WebGl2RenderingContext::RGBA8,
-      size as i32,
-      size as i32,
+      resolution as i32,
+      resolution as i32,
     );
 
     Ok(texture)
   }
 
   pub(crate) fn resize(&mut self) -> Result {
-    let width = self.canvas.width();
-    let height = self.canvas.height();
-    let size = width.max(height);
+    self.width = self.canvas.width();
+    self.height = self.canvas.height();
+    self.resolution = self.width.max(self.height);
 
-    self.gl.uniform1ui(Some(&self.resolution), size);
+    self
+      .gl
+      .uniform1ui(Some(&self.resolution_uniform), self.resolution);
 
-    self.gl.viewport(0, 0, size as i32, size as i32);
+    self
+      .gl
+      .viewport(0, 0, self.resolution as i32, self.resolution as i32);
 
     self.gl.delete_texture(Some(&self.textures[0]));
     self.gl.delete_texture(Some(&self.textures[1]));
 
     self.textures = [
-      Self::create_texture(&self.gl, size)?,
-      Self::create_texture(&self.gl, size)?,
+      Self::create_texture(&self.gl, self.resolution)?,
+      Self::create_texture(&self.gl, self.resolution)?,
     ];
 
     Ok(())
