@@ -5,7 +5,6 @@ use {
     js_value_error::JsValueError, mask::Mask, operation::Operation, select::Select, stderr::Stderr,
     window::window, wrap::Wrap,
   },
-  js_sys::Float32Array,
   nalgebra::{
     Affine2, DMatrix, Matrix3, Point2, Rotation3, Similarity2, UnitComplex, Vector2, Vector3,
     Vector4,

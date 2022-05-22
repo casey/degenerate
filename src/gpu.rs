@@ -11,10 +11,6 @@ pub(crate) struct Gpu {
 }
 
 impl Gpu {
-  const VERTICES: [f32; 12] = [
-    -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0,
-  ];
-
   pub(super) fn new(canvas: &HtmlCanvasElement) -> Result<Self> {
     let gl = canvas
       .get_context("webgl2")
@@ -83,33 +79,6 @@ impl Gpu {
       .get_uniform_location(&program, "operation")
       .ok_or("Could not find uniform `operation`")?;
 
-    let vertices = Float32Array::new_with_length(Self::VERTICES.len().try_into()?);
-    vertices.copy_from(&Self::VERTICES);
-
-    let position = gl.get_attrib_location(&program, "position");
-
-    gl.bind_buffer(
-      WebGl2RenderingContext::ARRAY_BUFFER,
-      gl.create_buffer().as_ref(),
-    );
-
-    gl.buffer_data_with_opt_array_buffer(
-      WebGl2RenderingContext::ARRAY_BUFFER,
-      Some(&vertices.buffer()),
-      WebGl2RenderingContext::STATIC_DRAW,
-    );
-
-    gl.enable_vertex_attrib_array(position.try_into()?);
-
-    gl.vertex_attrib_pointer_with_i32(
-      position.try_into()?,
-      2,
-      WebGl2RenderingContext::FLOAT,
-      false,
-      0,
-      0,
-    );
-
     let textures = [
       Self::create_texture(&gl, canvas.width().try_into()?)?,
       Self::create_texture(&gl, canvas.width().try_into()?)?,
@@ -149,11 +118,7 @@ impl Gpu {
       Self::operation_uniform(&Operation::Identity),
     );
 
-    self.gl.draw_arrays(
-      WebGl2RenderingContext::TRIANGLES,
-      0,
-      (Self::VERTICES.len() / 2).try_into()?,
-    );
+    self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 6);
 
     Ok(())
   }
@@ -186,11 +151,7 @@ impl Gpu {
       Self::operation_uniform(computer.operation()),
     );
 
-    self.gl.draw_arrays(
-      WebGl2RenderingContext::TRIANGLES,
-      0,
-      (Self::VERTICES.len() / 2).try_into()?,
-    );
+    self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 6);
 
     self.source_texture.set(self.source_texture.get() ^ 1);
 
