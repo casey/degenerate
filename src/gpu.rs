@@ -22,6 +22,8 @@ impl Gpu {
       .ok_or("Failed to retrieve webgl2 context")?
       .cast::<WebGl2RenderingContext>()?;
 
+    gl.enable(WebGl2RenderingContext::CULL_FACE);
+
     let program = {
       let program = gl.create_program().ok_or("Failed to create program")?;
 
