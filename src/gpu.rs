@@ -166,7 +166,7 @@ impl Gpu {
     Ok(())
   }
 
-  pub(crate) fn render_to_texture(&self, computer: &Computer) -> Result {
+  pub(crate) fn apply(&self, computer: &Computer) -> Result {
     self.gl.bind_framebuffer(
       WebGl2RenderingContext::FRAMEBUFFER,
       Some(&self.frame_buffer),
