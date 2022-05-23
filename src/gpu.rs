@@ -39,7 +39,7 @@ impl Gpu {
         .create_shader(WebGl2RenderingContext::VERTEX_SHADER)
         .ok_or("Failed to create shader")?;
 
-      gl.shader_source(&vertex, include_str!("vertex.glsl").trim());
+      gl.shader_source(&vertex, include_str!("vertex.glsl"));
       gl.compile_shader(&vertex);
 
       if !gl.get_shader_parameter(&vertex, WebGl2RenderingContext::COMPILE_STATUS) {
@@ -56,25 +56,18 @@ impl Gpu {
 
       let mut defines = String::from('\n');
 
-      Mask::VARIANTS.iter().enumerate().for_each(|(index, mask)| {
-        defines.push_str(&format!("\nconst int {} = {};", &mask.to_string(), index));
-      });
+      for (index, mask) in Mask::VARIANTS.iter().enumerate() {
+        defines.push_str(&format!("\nconst int {} = {};", mask, index));
+      }
 
-      Operation::VARIANTS
-        .iter()
-        .enumerate()
-        .for_each(|(index, operation)| {
-          defines.push_str(&format!(
-            "\nconst int {} = {};",
-            &operation.to_string(),
-            index
-          ));
-        });
+      for (index, operation) in Operation::VARIANTS.iter().enumerate() {
+        defines.push_str(&format!("\nconst int {} = {};", operation, index));
+      }
 
-      let mut fragment_source = include_str!("fragment.glsl").to_owned();
-      fragment_source.insert_str("#version 300 es".len(), &defines);
-
-      gl.shader_source(&fragment, fragment_source.trim());
+      gl.shader_source(
+        &fragment,
+        &include_str!("fragment.glsl").replace("// INSERT_GENERATED_CODE_HERE", &defines),
+      );
       gl.compile_shader(&fragment);
 
       if !gl.get_shader_parameter(&fragment, WebGl2RenderingContext::COMPILE_STATUS) {
@@ -208,7 +201,7 @@ impl Gpu {
       Mask::VARIANTS
         .iter()
         .position(|mask| *mask == computer.mask().as_ref())
-        .ok_or("Invalid mask")?
+        .expect("Mask should always be present")
         .try_into()?,
     );
 
@@ -217,7 +210,7 @@ impl Gpu {
       Operation::VARIANTS
         .iter()
         .position(|operation| *operation == computer.operation().as_ref())
-        .ok_or("Invalid operation")?
+        .expect("Operation should always be present")
         .try_into()?,
     );
 

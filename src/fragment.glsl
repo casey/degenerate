@@ -1,5 +1,7 @@
 #version 300 es
 
+// INSERT_GENERATED_CODE_HERE
+
 precision highp float;
 
 uniform sampler2D source;
