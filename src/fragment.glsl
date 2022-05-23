@@ -11,13 +11,10 @@ out vec4 color;
 
 vec4 apply_operation(vec4 pixel) {
   switch (operation) {
-    // Identity
-    case 0u:
+    case Identity:
       return pixel;
-    // Invert
-    case 1u:
+    case Invert:
       return vec4(1.0 - pixel.rgb, 1.0);
-    // Error
     default:
       return vec4(0.0, 1.0, 0.0, 1.0);
   }
@@ -25,16 +22,12 @@ vec4 apply_operation(vec4 pixel) {
 
 bool is_masked(vec2 position) {
   switch (mask) {
-    // X
-    case 0u:
-      return abs(abs(position.x) - abs(position.y)) < 0.25;
-    // Circle
-    case 1u:
+    case All:
+      return true;
+    case Circle:
       return length(position) < 1.0;
-    // All
-    case 2u:
-       return true;
-    // Error
+    case X:
+      return abs(abs(position.x) - abs(position.y)) < 0.25;
     default:
       return false;
   }

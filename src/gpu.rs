@@ -56,7 +56,22 @@ impl Gpu {
         .create_shader(WebGl2RenderingContext::FRAGMENT_SHADER)
         .ok_or("Failed to create shader")?;
 
-      gl.shader_source(&fragment, include_str!("fragment.glsl").trim());
+      let mut defines = String::from('\n');
+
+      Mask::iter().enumerate().for_each(|(index, mask)| {
+        defines.push_str(&format!("\n#define {} {}u", &mask.to_string(), index));
+      });
+
+      Operation::iter()
+        .enumerate()
+        .for_each(|(index, operation)| {
+          defines.push_str(&format!("\n#define {} {}u", &operation.to_string(), index));
+        });
+
+      let mut fragment_source = include_str!("fragment.glsl").to_owned();
+      fragment_source.insert_str("#version 300 es".len(), &defines);
+
+      gl.shader_source(&fragment, fragment_source.trim());
       gl.compile_shader(&fragment);
 
       if !gl.get_shader_parameter(&fragment, WebGl2RenderingContext::COMPILE_STATUS) {
@@ -244,17 +259,17 @@ impl Gpu {
 
   fn operation_uniform(operation: &Operation) -> u32 {
     match operation {
-      Operation::Identity => 0,
-      Operation::Invert => 1,
+      Operation::Identity => 1,
+      Operation::Invert => 2,
       _ => panic!("Invalid operation"),
     }
   }
 
   fn mask_uniform(mask: &Mask) -> u32 {
     match mask {
-      Mask::X => 0,
+      Mask::All => 0,
       Mask::Circle => 1,
-      Mask::All => 2,
+      Mask::X => 7,
       _ => panic!("Invalid mask"),
     }
   }

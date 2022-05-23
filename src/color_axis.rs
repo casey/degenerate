@@ -11,6 +11,12 @@ pub(crate) enum ColorAxis {
   Blue,
 }
 
+impl Default for ColorAxis {
+  fn default() -> Self {
+    ColorAxis::Red
+  }
+}
+
 impl ColorAxis {
   pub(crate) fn vector(&self) -> Vector3<f64> {
     match self {

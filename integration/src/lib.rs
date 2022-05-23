@@ -216,6 +216,7 @@ image_test! {
     all
     apply
   ",
+  gpu: true,
 }
 
 image_test! {

@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Display, EnumIter, PartialEq)]
 pub(crate) enum Mask {
   All,
   Circle,
