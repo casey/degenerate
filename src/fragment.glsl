@@ -28,6 +28,8 @@ bool is_masked(vec2 position) {
       return true;
     case CIRCLE:
       return length(position) < 1.0;
+    case SQUARE:
+      return abs(position.x) < 0.5 && abs(position.y) < 0.5;
     case X:
       return abs(abs(position.x) - abs(position.y)) < 0.25;
     default:
