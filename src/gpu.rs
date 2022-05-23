@@ -253,6 +253,7 @@ impl Gpu {
       Mask::X => 0,
       Mask::Circle => 1,
       Mask::All => 2,
+      Mask::Square => 3,
       _ => panic!("Invalid mask"),
     }
   }
