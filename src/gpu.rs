@@ -269,6 +269,7 @@ impl Gpu {
     match mask {
       Mask::All => 0,
       Mask::Circle => 1,
+      Mask::Cross => 2,
       Mask::X => 7,
       _ => panic!("Invalid mask"),
     }

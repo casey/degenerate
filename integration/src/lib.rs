@@ -303,6 +303,7 @@ image_test! {
     cross
     apply
   ",
+  gpu: true,
 }
 
 image_test! {

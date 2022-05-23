@@ -26,6 +26,8 @@ bool is_masked(vec2 position) {
       return true;
     case Circle:
       return length(position) < 1.0;
+    case Cross:
+      return abs(position.x) < 0.25 || abs(position.y) < 0.25;
     case X:
       return abs(abs(position.x) - abs(position.y)) < 0.25;
     default:
