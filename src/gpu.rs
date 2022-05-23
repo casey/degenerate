@@ -56,14 +56,19 @@ impl Gpu {
 
       let mut defines = String::from('\n');
 
-      Mask::iter().enumerate().for_each(|(index, mask)| {
-        defines.push_str(&format!("\n#define {} {}u", &mask.to_string(), index));
+      Mask::VARIANTS.iter().enumerate().for_each(|(index, mask)| {
+        defines.push_str(&format!("\nconst int {} = {};", &mask.to_string(), index));
       });
 
-      Operation::iter()
+      Operation::VARIANTS
+        .iter()
         .enumerate()
         .for_each(|(index, operation)| {
-          defines.push_str(&format!("\n#define {} {}u", &operation.to_string(), index));
+          defines.push_str(&format!(
+            "\nconst int {} = {};",
+            &operation.to_string(),
+            index
+          ));
         });
 
       let mut fragment_source = include_str!("fragment.glsl").to_owned();
@@ -198,14 +203,22 @@ impl Gpu {
       Some(&self.textures[self.source_texture.get()]),
     );
 
-    self.gl.uniform1ui(
+    self.gl.uniform1i(
       Some(&self.mask_uniform),
-      Self::mask_uniform(computer.mask()),
+      Mask::VARIANTS
+        .iter()
+        .position(|mask| *mask == computer.mask().as_ref())
+        .ok_or("Invalid mask")?
+        .try_into()?,
     );
 
-    self.gl.uniform1ui(
+    self.gl.uniform1i(
       Some(&self.operation_uniform),
-      Self::operation_uniform(computer.operation()),
+      Operation::VARIANTS
+        .iter()
+        .position(|operation| *operation == computer.operation().as_ref())
+        .ok_or("Invalid operation")?
+        .try_into()?,
     );
 
     self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 3);
@@ -253,22 +266,5 @@ impl Gpu {
     ];
 
     Ok(())
-  }
-
-  fn operation_uniform(operation: &Operation) -> u32 {
-    match operation {
-      Operation::Identity => 1,
-      Operation::Invert => 2,
-      _ => panic!("Invalid operation"),
-    }
-  }
-
-  fn mask_uniform(mask: &Mask) -> u32 {
-    match mask {
-      Mask::All => 0,
-      Mask::Circle => 1,
-      Mask::X => 7,
-      _ => panic!("Invalid mask"),
-    }
   }
 }
