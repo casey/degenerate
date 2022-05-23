@@ -233,6 +233,7 @@ image_test! {
   program: "
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -309,6 +310,7 @@ image_test! {
 image_test! {
   name: default,
   program: "",
+  gpu: true,
 }
 
 image_test! {
@@ -405,6 +407,7 @@ image_test! {
     choose all circle cross square top x
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -413,6 +416,7 @@ image_test! {
     choose all circle cross square top x
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -422,6 +426,7 @@ image_test! {
     choose all circle cross square top x
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
