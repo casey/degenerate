@@ -30,8 +30,6 @@ impl Gpu {
       .ok_or("Failed to retrieve webgl2 context")?
       .cast::<WebGl2RenderingContext>()?;
 
-    log::info!("{:?}", gl.get_context_attributes());
-
     gl.enable(WebGl2RenderingContext::CULL_FACE);
 
     let program = {
@@ -41,7 +39,7 @@ impl Gpu {
         .create_shader(WebGl2RenderingContext::VERTEX_SHADER)
         .ok_or("Failed to create shader")?;
 
-      gl.shader_source(&vertex, include_str!("vertex.glsl").trim());
+      gl.shader_source(&vertex, include_str!("vertex.glsl"));
       gl.compile_shader(&vertex);
 
       if !gl.get_shader_parameter(&vertex, WebGl2RenderingContext::COMPILE_STATUS) {
@@ -56,22 +54,20 @@ impl Gpu {
         .create_shader(WebGl2RenderingContext::FRAGMENT_SHADER)
         .ok_or("Failed to create shader")?;
 
-      let mut defines = String::from('\n');
+      let mut defines = String::new();
 
-      Mask::iter().enumerate().for_each(|(index, mask)| {
-        defines.push_str(&format!("\n#define {} {}u", &mask.to_string(), index));
-      });
+      for (index, mask) in Mask::VARIANTS.iter().enumerate() {
+        defines.push_str(&format!("const int {} = {};\n", mask, index));
+      }
 
-      Operation::iter()
-        .enumerate()
-        .for_each(|(index, operation)| {
-          defines.push_str(&format!("\n#define {} {}u", &operation.to_string(), index));
-        });
+      for (index, operation) in Operation::VARIANTS.iter().enumerate() {
+        defines.push_str(&format!("const int {} = {};\n", operation, index));
+      }
 
-      let mut fragment_source = include_str!("fragment.glsl").to_owned();
-      fragment_source.insert_str("#version 300 es".len(), &defines);
-
-      gl.shader_source(&fragment, fragment_source.trim());
+      gl.shader_source(
+        &fragment,
+        &include_str!("fragment.glsl").replace("// INSERT_GENERATED_CODE_HERE", &defines),
+      );
       gl.compile_shader(&fragment);
 
       if !gl.get_shader_parameter(&fragment, WebGl2RenderingContext::COMPILE_STATUS) {
@@ -200,14 +196,22 @@ impl Gpu {
       Some(&self.textures[self.source_texture.get()]),
     );
 
-    self.gl.uniform1ui(
+    self.gl.uniform1i(
       Some(&self.mask_uniform),
-      Self::mask_uniform(computer.mask()),
+      Mask::VARIANTS
+        .iter()
+        .position(|mask| *mask == computer.mask().as_ref())
+        .expect("Mask should always be present")
+        .try_into()?,
     );
 
-    self.gl.uniform1ui(
+    self.gl.uniform1i(
       Some(&self.operation_uniform),
-      Self::operation_uniform(computer.operation()),
+      Operation::VARIANTS
+        .iter()
+        .position(|operation| *operation == computer.operation().as_ref())
+        .expect("Operation should always be present")
+        .try_into()?,
     );
 
     self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 3);
@@ -255,23 +259,5 @@ impl Gpu {
     ];
 
     Ok(())
-  }
-
-  fn operation_uniform(operation: &Operation) -> u32 {
-    match operation {
-      Operation::Identity => 1,
-      Operation::Invert => 2,
-      _ => panic!("Invalid operation"),
-    }
-  }
-
-  fn mask_uniform(mask: &Mask) -> u32 {
-    match mask {
-      Mask::All => 0,
-      Mask::Circle => 1,
-      Mask::Cross => 2,
-      Mask::X => 7,
-      _ => panic!("Invalid mask"),
-    }
   }
 }

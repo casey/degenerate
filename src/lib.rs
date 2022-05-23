@@ -19,7 +19,7 @@ use {
     string::ToString,
     sync::{Arc, Mutex},
   },
-  strum::{Display, EnumIter, EnumString, IntoEnumIterator},
+  strum::{AsRefStr, EnumString, EnumVariantNames, VariantNames},
   wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue},
   web_sys::{
     CanvasRenderingContext2d, Document, Element, EventTarget, HtmlCanvasElement, HtmlElement,
