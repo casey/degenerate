@@ -16,9 +16,10 @@ use {
     fmt::{self, Formatter},
     ops::Deref,
     str::FromStr,
+    string::ToString,
     sync::{Arc, Mutex},
   },
-  strum::EnumString,
+  strum::{AsRefStr, EnumString, EnumVariantNames, VariantNames},
   wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue},
   web_sys::{
     CanvasRenderingContext2d, Document, Element, EventTarget, HtmlCanvasElement, HtmlElement,

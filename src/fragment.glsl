@@ -1,23 +1,22 @@
 #version 300 es
 
+// INSERT_GENERATED_CODE_HERE
+
 precision highp float;
 
 uniform sampler2D source;
-uniform uint mask;
-uniform uint operation;
+uniform int mask;
+uniform int operation;
 uniform uint resolution;
 
 out vec4 color;
 
 vec4 apply_operation(vec4 pixel) {
   switch (operation) {
-    // Identity
-    case 0u:
+    case IDENTITY:
       return pixel;
-    // Invert
-    case 1u:
+    case INVERT:
       return vec4(1.0 - pixel.rgb, 1.0);
-    // Error
     default:
       return vec4(0.0, 1.0, 0.0, 1.0);
   }
@@ -25,19 +24,14 @@ vec4 apply_operation(vec4 pixel) {
 
 bool is_masked(vec2 position) {
   switch (mask) {
-    // X
-    case 0u:
-      return abs(abs(position.x) - abs(position.y)) < 0.25;
-    // Circle
-    case 1u:
+    case ALL:
+      return true;
+    case CIRCLE:
       return length(position) < 1.0;
-    // All
-    case 2u:
-       return true;
-    // Square
-    case 3u:
-       return abs(position.x) < 0.5 && abs(position.y) < 0.5;
-    // Error
+    case SQUARE:
+      return abs(position.x) < 0.5 && abs(position.y) < 0.5;
+    case X:
+      return abs(abs(position.x) - abs(position.y)) < 0.25;
     default:
       return false;
   }

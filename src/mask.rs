@@ -1,6 +1,7 @@
 use super::*;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(AsRefStr, Clone, Debug, EnumVariantNames, PartialEq)]
+#[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 pub(crate) enum Mask {
   All,
   Circle,
