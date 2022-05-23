@@ -672,6 +672,7 @@ image_test! {
     square
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
