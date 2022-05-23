@@ -34,6 +34,9 @@ bool is_masked(vec2 position) {
     // All
     case 2u:
        return true;
+    // Square
+    case 3u:
+       return abs(position.x) < 0.5 && abs(position.y) < 0.5;
     // Error
     default:
       return false;
