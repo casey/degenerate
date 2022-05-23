@@ -5,7 +5,6 @@ use {
     js_value_error::JsValueError, mask::Mask, operation::Operation, select::Select, stderr::Stderr,
     window::window, wrap::Wrap,
   },
-  js_sys::Float32Array,
   nalgebra::{
     Affine2, DMatrix, Matrix3, Point2, Rotation3, Similarity2, UnitComplex, Vector2, Vector3,
     Vector4,
@@ -23,8 +22,8 @@ use {
   wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue},
   web_sys::{
     CanvasRenderingContext2d, Document, Element, EventTarget, HtmlCanvasElement, HtmlElement,
-    HtmlTextAreaElement, ImageData, WebGl2RenderingContext, WebGlFramebuffer, WebGlTexture,
-    WebGlUniformLocation, Window,
+    HtmlTextAreaElement, ImageData, WebGl2RenderingContext, WebGlContextAttributes,
+    WebGlFramebuffer, WebGlTexture, WebGlUniformLocation, Window,
   },
 };
 

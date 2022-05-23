@@ -5,8 +5,7 @@ precision highp float;
 uniform sampler2D source;
 uniform uint mask;
 uniform uint operation;
-
-in vec2 uv;
+uniform uint resolution;
 
 out vec4 color;
 
@@ -24,14 +23,14 @@ vec4 apply_operation(vec4 pixel) {
   }
 }
 
-bool is_masked() {
+bool is_masked(vec2 position) {
   switch (mask) {
     // X
     case 0u:
-      return min(abs((1.0 - uv.x) - uv.y), abs(uv.x - uv.y)) < 0.125;
+      return abs(abs(position.x) - abs(position.y)) < 0.25;
     // Circle
     case 1u:
-      return length((uv - 0.5) * 2.0) < 1.0;
+      return length(position) < 1.0;
     // All
     case 2u:
        return true;
@@ -42,6 +41,7 @@ bool is_masked() {
 }
 
 void main() {
-  vec4 pixel = texture(source, uv);
-  color = is_masked() ? apply_operation(pixel) : vec4(pixel.xyz, 1.0);
+  vec4 pixel = texelFetch(source, ivec2(gl_FragCoord.xy - 0.5), 0);
+  vec2 position = gl_FragCoord.xy / float(resolution) * 2.0 - 1.0;
+  color = is_masked(position) ? apply_operation(pixel) : vec4(pixel.xyz, 1.0);
 }
