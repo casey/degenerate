@@ -684,6 +684,7 @@ image_test! {
     top
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -711,6 +712,7 @@ image_test! {
     top
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
