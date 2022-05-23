@@ -30,8 +30,6 @@ impl Gpu {
       .ok_or("Failed to retrieve webgl2 context")?
       .cast::<WebGl2RenderingContext>()?;
 
-    log::info!("{:?}", gl.get_context_attributes());
-
     gl.enable(WebGl2RenderingContext::CULL_FACE);
 
     let program = {
