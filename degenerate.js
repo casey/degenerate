@@ -312,6 +312,10 @@ async function init(input) {
         const ret = false;
         return ret;
     };
+    imports.wbg.__wbindgen_is_falsy = function(arg0) {
+        const ret = !getObject(arg0);
+        return ret;
+    };
     imports.wbg.__wbindgen_object_clone_ref = function(arg0) {
         const ret = getObject(arg0);
         return addHeapObject(ret);
@@ -323,10 +327,6 @@ async function init(input) {
     imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
         const ret = getStringFromWasm0(arg0, arg1);
         return addHeapObject(ret);
-    };
-    imports.wbg.__wbindgen_is_falsy = function(arg0) {
-        const ret = !getObject(arg0);
-        return ret;
     };
     imports.wbg.__wbg_new_693216e109162396 = function() {
         const ret = new Error();
@@ -430,6 +430,9 @@ async function init(input) {
     };
     imports.wbg.__wbg_shaderSource_bbfeb057b5f88df5 = function(arg0, arg1, arg2, arg3) {
         getObject(arg0).shaderSource(getObject(arg1), getStringFromWasm0(arg2, arg3));
+    };
+    imports.wbg.__wbg_uniform1i_22f9e77ed65e1503 = function(arg0, arg1, arg2) {
+        getObject(arg0).uniform1i(getObject(arg1), arg2);
     };
     imports.wbg.__wbg_useProgram_039f85866d3a975b = function(arg0, arg1) {
         getObject(arg0).useProgram(getObject(arg1));
@@ -609,11 +612,11 @@ async function init(input) {
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm0(arg0, arg1));
     };
-    imports.wbg.__wbindgen_closure_wrapper109 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper110 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 6, __wbg_adapter_20);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper111 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper112 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 6, __wbg_adapter_23);
         return addHeapObject(ret);
     };
