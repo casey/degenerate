@@ -1,7 +1,6 @@
 use super::*;
 
 #[derive(Copy, Clone, Debug, Display, EnumIter, PartialEq)]
-#[repr(u8)]
 pub(crate) enum Operation {
   Debug,
   Identity,
