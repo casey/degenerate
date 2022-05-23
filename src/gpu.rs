@@ -54,14 +54,14 @@ impl Gpu {
         .create_shader(WebGl2RenderingContext::FRAGMENT_SHADER)
         .ok_or("Failed to create shader")?;
 
-      let mut defines = String::from('\n');
+      let mut defines = String::new();
 
       for (index, mask) in Mask::VARIANTS.iter().enumerate() {
-        defines.push_str(&format!("\nconst int {} = {};", mask, index));
+        defines.push_str(&format!("const int {} = {};\n", mask, index));
       }
 
       for (index, operation) in Operation::VARIANTS.iter().enumerate() {
-        defines.push_str(&format!("\nconst int {} = {};", operation, index));
+        defines.push_str(&format!("const int {} = {};\n", operation, index));
       }
 
       gl.shader_source(
