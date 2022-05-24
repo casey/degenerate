@@ -369,6 +369,7 @@ image_test! {
     mod 3 0
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -779,6 +780,7 @@ image_test! {
     mod 0 1
     apply
   ",
+  gpu: true,
 }
 
 image_test! {

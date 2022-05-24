@@ -4,14 +4,15 @@ pub(crate) struct Gpu {
   canvas: HtmlCanvasElement,
   frame_buffer: WebGlFramebuffer,
   gl: WebGl2RenderingContext,
+  height: u32,
   mask_uniform: WebGlUniformLocation,
   operation_uniform: WebGlUniformLocation,
+  program: WebGlProgram,
+  resolution: u32,
   resolution_uniform: WebGlUniformLocation,
   source_texture: Cell<usize>,
   textures: [WebGlTexture; 2],
   width: u32,
-  height: u32,
-  resolution: u32,
 }
 
 impl Gpu {
@@ -54,19 +55,19 @@ impl Gpu {
         .create_shader(WebGl2RenderingContext::FRAGMENT_SHADER)
         .ok_or("Failed to create shader")?;
 
-      let mut defines = String::new();
+      let mut constants = String::new();
 
       for (index, mask) in Mask::VARIANTS.iter().enumerate() {
-        defines.push_str(&format!("const int {} = {};\n", mask, index));
+        constants.push_str(&format!("const int {} = {};\n", mask, index));
       }
 
       for (index, operation) in Operation::VARIANTS.iter().enumerate() {
-        defines.push_str(&format!("const int {} = {};\n", operation, index));
+        constants.push_str(&format!("const int {} = {};\n", operation, index));
       }
 
       gl.shader_source(
         &fragment,
-        &include_str!("fragment.glsl").replace("// INSERT_GENERATED_CODE_HERE", &defines),
+        &include_str!("fragment.glsl").replace("// INSERT_GENERATED_CODE_HERE", &constants),
       );
       gl.compile_shader(&fragment);
 
@@ -125,14 +126,15 @@ impl Gpu {
       canvas: canvas.clone(),
       frame_buffer,
       gl,
+      height,
       mask_uniform,
       operation_uniform,
+      program,
+      resolution,
       resolution_uniform,
       source_texture: Cell::new(0),
       textures,
       width,
-      height,
-      resolution,
     })
   }
 
@@ -196,14 +198,51 @@ impl Gpu {
       Some(&self.textures[self.source_texture.get()]),
     );
 
-    self.gl.uniform1i(
-      Some(&self.mask_uniform),
-      Mask::VARIANTS
-        .iter()
-        .position(|mask| *mask == computer.mask().as_ref())
-        .expect("Mask should always be present")
-        .try_into()?,
-    );
+    let mask_position = Mask::VARIANTS
+      .iter()
+      .position(|mask| *mask == computer.mask().as_ref())
+      .expect("Mask should always be present");
+
+    match computer.mask() {
+      All | Circle | Cross | Square | Top | X => {
+        self
+          .gl
+          .uniform1i(Some(&self.mask_uniform), mask_position.try_into()?);
+      }
+      Mod { divisor, remainder } => {
+        self.gl.uniform1i(
+          Some(
+            &self
+              .gl
+              .get_uniform_location(&self.program, "size")
+              .ok_or("Failed to get `size` uniform location")?,
+          ),
+          self.width.try_into()?,
+        );
+        self.gl.uniform1i(
+          Some(
+            &self
+              .gl
+              .get_uniform_location(&self.program, "divisor")
+              .ok_or("Failed to get `divisor` uniform location")?,
+          ),
+          *divisor as i32,
+        );
+        self.gl.uniform1i(
+          Some(
+            &self
+              .gl
+              .get_uniform_location(&self.program, "remainder")
+              .ok_or("Failed to get `remainder` uniform location")?,
+          ),
+          *remainder as i32,
+        );
+        self
+          .gl
+          .uniform1i(Some(&self.mask_uniform), mask_position.try_into()?);
+      }
+      _ => {}
+    }
 
     self.gl.uniform1i(
       Some(&self.operation_uniform),
