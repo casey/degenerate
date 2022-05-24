@@ -239,6 +239,18 @@ export function test(program) {
     }
 }
 
+let cachegetFloat32Memory0 = null;
+function getFloat32Memory0() {
+    if (cachegetFloat32Memory0 === null || cachegetFloat32Memory0.buffer !== wasm.memory.buffer) {
+        cachegetFloat32Memory0 = new Float32Array(wasm.memory.buffer);
+    }
+    return cachegetFloat32Memory0;
+}
+
+function getArrayF32FromWasm0(ptr, len) {
+    return getFloat32Memory0().subarray(ptr / 4, ptr / 4 + len);
+}
+
 function isLikeNone(x) {
     return x === undefined || x === null;
 }
@@ -358,6 +370,9 @@ async function init(input) {
     };
     imports.wbg.__wbg_uniform1ui_e9d1b69d984510ca = function(arg0, arg1, arg2) {
         getObject(arg0).uniform1ui(getObject(arg1), arg2 >>> 0);
+    };
+    imports.wbg.__wbg_uniformMatrix3fv_e9ac456550ed8239 = function(arg0, arg1, arg2, arg3, arg4) {
+        getObject(arg0).uniformMatrix3fv(getObject(arg1), arg2 !== 0, getArrayF32FromWasm0(arg3, arg4));
     };
     imports.wbg.__wbg_attachShader_0994bf956cb31b2b = function(arg0, arg1, arg2) {
         getObject(arg0).attachShader(getObject(arg1), getObject(arg2));
@@ -609,11 +624,11 @@ async function init(input) {
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm0(arg0, arg1));
     };
-    imports.wbg.__wbindgen_closure_wrapper109 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper110 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 6, __wbg_adapter_20);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper111 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper112 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 6, __wbg_adapter_23);
         return addHeapObject(ret);
     };
