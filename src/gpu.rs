@@ -204,15 +204,6 @@ impl Gpu {
           Some(
             &self
               .gl
-              .get_uniform_location(&self.program, "size")
-              .ok_or("Failed to get `size` uniform location")?,
-          ),
-          self.width.try_into()?,
-        );
-        self.gl.uniform1i(
-          Some(
-            &self
-              .gl
               .get_uniform_location(&self.program, "divisor")
               .ok_or("Failed to get `divisor` uniform location")?,
           ),

@@ -183,7 +183,11 @@ pub(crate) fn image_test(name: &str, program: &str, gpu: bool) -> Result {
     let want = image::open(&want_path)?;
 
     if have != want {
-      let destination = format!("../images/{}.actual-memory.png", name);
+      let destination = format!(
+        "../images/{}.{}-actual-memory.png",
+        name,
+        if gpu { "gpu" } else { "cpu" },
+      );
 
       have.save(&destination)?;
 
