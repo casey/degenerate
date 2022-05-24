@@ -60,5 +60,5 @@ void main() {
   ivec2 coordinates = ivec2(gl_FragCoord.xy - 0.5);
   vec4 pixel = texelFetch(source, coordinates, 0);
   vec2 position = gl_FragCoord.xy / float(resolution) * 2.0 - 1.0;
-  color = is_masked(position) ? apply_operation(position, pixel) : vec4(pixel.xyz, 1.0);
+  color = is_masked(coordinates, position) ? apply_operation(position, pixel) : vec4(pixel.xyz, 1.0);
 }
