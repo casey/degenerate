@@ -24,7 +24,7 @@ use {
   web_sys::{
     CanvasRenderingContext2d, Document, Element, EventTarget, HtmlCanvasElement, HtmlElement,
     HtmlTextAreaElement, ImageData, WebGl2RenderingContext, WebGlContextAttributes,
-    WebGlFramebuffer, WebGlTexture, WebGlUniformLocation, Window,
+    WebGlFramebuffer, WebGlProgram, WebGlTexture, WebGlUniformLocation, Window,
   },
 };
 

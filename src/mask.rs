@@ -23,9 +23,9 @@ impl Mask {
         if *divisor == 0 {
           false
         } else {
-          ((pixel.x as u64)
+          ((pixel.y as u64)
             .wrapping_mul(size as u64)
-            .wrapping_add(pixel.y as u64))
+            .wrapping_add(pixel.x as u64))
             % *divisor
             == *remainder
         }
