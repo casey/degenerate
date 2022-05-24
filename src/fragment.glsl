@@ -19,9 +19,9 @@ out vec4 color;
 vec3 apply_operation(vec2 position, vec3 pixel) {
   switch (operation) {
     case DEBUG:
-      vec3 a = vec3((position.x + 1.0) / 2.0, 0.0, 1.0 - (position.y + 1.0) / 2.0);
-      vec3 b = floor(a * 16.0) / 16.0;
-      return b;
+      vec3 color = vec3((position.x + 1.0) / 2.0, 0.0, 1.0 - (position.y + 1.0) / 2.0);
+      vec3 quantized = floor(color * 16.0) / 16.0;
+      return quantized;
     case IDENTITY:
       return pixel;
     case INVERT:
