@@ -25,10 +25,7 @@ vec3 apply_operation(vec2 position, vec3 pixel) {
     case INVERT:
       return 1.0 - pixel;
     case ROTATE_COLOR:
-      vec3 position = (pixel * 2.0 - 1.0);
-      vec3 rotated = color_rotation * position;
-      vec3 color = (rotated + 1.0) / 2.0;
-      return color;
+      return (color_rotation * (pixel * 2.0 - 1.0) + 1.0) / 2.0;
     default:
       return vec3(0.0, 1.0, 0.0);
   }
