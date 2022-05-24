@@ -198,17 +198,7 @@ impl Gpu {
       Some(&self.textures[self.source_texture.get()]),
     );
 
-    let mask_position = Mask::VARIANTS
-      .iter()
-      .position(|mask| *mask == computer.mask().as_ref())
-      .expect("Mask should always be present");
-
     match computer.mask() {
-      All | Circle | Cross | Square | Top | X => {
-        self
-          .gl
-          .uniform1i(Some(&self.mask_uniform), mask_position.try_into()?);
-      }
       Mod { divisor, remainder } => {
         self.gl.uniform1i(
           Some(
@@ -237,12 +227,18 @@ impl Gpu {
           ),
           *remainder as i32,
         );
-        self
-          .gl
-          .uniform1i(Some(&self.mask_uniform), mask_position.try_into()?);
       }
       _ => {}
     }
+
+    self.gl.uniform1i(
+      Some(&self.mask_uniform),
+      Mask::VARIANTS
+        .iter()
+        .position(|mask| *mask == computer.mask().as_ref())
+        .expect("Mask should always be present")
+        .try_into()?,
+    );
 
     self.gl.uniform1i(
       Some(&self.operation_uniform),
