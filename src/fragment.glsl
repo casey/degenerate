@@ -20,9 +20,9 @@ vec3 apply_operation(vec2 position, vec3 pixel) {
   switch (operation) {
     case DEBUG:
       return vec3(
-        uint((position.x + 1.0) / 2.0 * 255.0) & 0xF0u,
+        (position.x + 1.0) / 2.0,
         0.0,
-        uint((position.y + 1.0) / 2.0 * 255.0) & 0xF0u
+        1.0 - (position.y + 1.0) / 2.0
       );
     case IDENTITY:
       return pixel;
