@@ -578,6 +578,7 @@ image_test! {
     rows 1 1
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -586,6 +587,7 @@ image_test! {
     rows 18446744073709551615 18446744073709551615
     apply
   ",
+  gpu: true,
 }
 
 image_test! {

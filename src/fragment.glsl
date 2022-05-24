@@ -11,6 +11,8 @@ uniform uint resolution;
 uniform int divisor;
 uniform int remainder;
 uniform int size;
+uniform int nrows;
+uniform int step;
 
 out vec4 color;
 
@@ -35,6 +37,8 @@ bool is_masked(ivec2 pixel, vec2 position) {
       return abs(position.x) < 0.25 || abs(position.y) < 0.25;
     case MOD:
       return divisor == 0 ? false : (pixel.x * size + pixel.y) % divisor == remainder;
+    case ROWS:
+      return pixel.y % (nrows + step) < nrows;
     case SQUARE:
       return abs(position.x) < 0.5 && abs(position.y) < 0.5;
     case TOP:
