@@ -468,6 +468,7 @@ image_test! {
     all
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -477,6 +478,7 @@ image_test! {
     all
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -486,6 +488,7 @@ image_test! {
     all
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -495,6 +498,7 @@ image_test! {
     all
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -504,6 +508,7 @@ image_test! {
     all
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -513,6 +518,7 @@ image_test! {
     all
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -521,6 +527,7 @@ image_test! {
     rotate-color green 1.0
     all
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -530,6 +537,7 @@ image_test! {
     all
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -538,6 +546,7 @@ image_test! {
     rotate-color red 1.0
     all
   ",
+  gpu: true,
 }
 
 image_test! {
