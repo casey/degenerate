@@ -19,9 +19,9 @@ vec4 apply_operation(vec2 position, vec4 pixel) {
   switch (operation) {
     case DEBUG:
       return vec4(
-        uint((position.x + 1.0) / 2.0 * 255.0) & 11110000u,
+        uint((position.x + 1.0) / 2.0 * 255.0) & 0xF0u,
         0.0,
-        uint((position.y + 1.0) / 2.0 * 255.0) & 11110000u,
+        uint((position.y + 1.0) / 2.0 * 255.0) & 0xF0u,
         1.0
       );
     case IDENTITY:
