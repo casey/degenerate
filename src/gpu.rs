@@ -217,15 +217,13 @@ impl Gpu {
     }
 
     if let Operation::RotateColor(axis, turns) = computer.operation() {
-      // TODO: remove the casts once CPU is out
       self.gl.uniform_matrix3fv_with_f32_array(
         Some(&self.uniforms.color_rotation),
         false,
-        Rotation3::new(
-          axis.vector().map(|element| element as f32) * (*turns as f32) * f32::consts::TAU,
-        )
-        .matrix()
-        .as_slice(),
+        Rotation3::new(axis.vector() * *turns * f64::consts::TAU)
+          .matrix()
+          .map(|element| element as f32)
+          .as_slice(),
       );
     }
 

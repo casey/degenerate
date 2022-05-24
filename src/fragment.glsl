@@ -14,10 +14,6 @@ uniform uint remainder;
 uniform uint resolution;
 uniform uint step;
 
-// quaternion
-// matrix
-// axis angle
-
 out vec4 color;
 
 vec3 apply_operation(vec3 pixel) {
@@ -27,7 +23,6 @@ vec3 apply_operation(vec3 pixel) {
     case INVERT:
       return 1.0 - pixel;
     case ROTATE_COLOR:
-      // may need to quantize to u8 to get exact same output
       vec3 position = (pixel * 2.0 - 1.0);
       vec3 rotated = color_rotation * position;
       vec3 color = (rotated + 1.0) / 2.0;
