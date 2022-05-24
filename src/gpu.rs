@@ -1,17 +1,25 @@
-use super::*;
+use {super::*, Mask::*};
 
 pub(crate) struct Gpu {
   canvas: HtmlCanvasElement,
   frame_buffer: WebGlFramebuffer,
   gl: WebGl2RenderingContext,
-  mask_uniform: WebGlUniformLocation,
-  operation_uniform: WebGlUniformLocation,
-  resolution_uniform: WebGlUniformLocation,
-  source_texture: Cell<usize>,
-  textures: [WebGlTexture; 2],
-  width: u32,
   height: u32,
   resolution: u32,
+  source_texture: Cell<usize>,
+  textures: [WebGlTexture; 2],
+  uniforms: Uniforms,
+  width: u32,
+}
+
+struct Uniforms {
+  divisor: WebGlUniformLocation,
+  mask: WebGlUniformLocation,
+  operation: WebGlUniformLocation,
+  remainder: WebGlUniformLocation,
+  resolution: WebGlUniformLocation,
+  nrows: WebGlUniformLocation,
+  step: WebGlUniformLocation,
 }
 
 impl Gpu {
@@ -54,19 +62,19 @@ impl Gpu {
         .create_shader(WebGl2RenderingContext::FRAGMENT_SHADER)
         .ok_or("Failed to create shader")?;
 
-      let mut defines = String::new();
+      let mut constants = String::new();
 
       for (index, mask) in Mask::VARIANTS.iter().enumerate() {
-        defines.push_str(&format!("const int {} = {};\n", mask, index));
+        constants.push_str(&format!("const uint {} = {}u;\n", mask, index));
       }
 
       for (index, operation) in Operation::VARIANTS.iter().enumerate() {
-        defines.push_str(&format!("const int {} = {};\n", operation, index));
+        constants.push_str(&format!("const uint {} = {}u;\n", operation, index));
       }
 
       gl.shader_source(
         &fragment,
-        &include_str!("fragment.glsl").replace("// INSERT_GENERATED_CODE_HERE", &defines),
+        &include_str!("fragment.glsl").replace("// INSERT_GENERATED_CODE_HERE", &constants),
       );
       gl.compile_shader(&fragment);
 
@@ -96,18 +104,6 @@ impl Gpu {
       program
     };
 
-    let mask_uniform = gl
-      .get_uniform_location(&program, "mask")
-      .ok_or("Could not find uniform `mask`")?;
-
-    let operation_uniform = gl
-      .get_uniform_location(&program, "operation")
-      .ok_or("Could not find uniform `operation`")?;
-
-    let resolution_uniform = gl
-      .get_uniform_location(&program, "resolution")
-      .ok_or("Could not find uniform `resolution`")?;
-
     let width = canvas.width();
     let height = canvas.height();
     let resolution = width.max(height);
@@ -121,18 +117,26 @@ impl Gpu {
       .create_framebuffer()
       .ok_or("Failed to create framebuffer")?;
 
+    let uniforms = Uniforms {
+      mask: Self::get_uniform_location(&gl, &program, "mask"),
+      operation: Self::get_uniform_location(&gl, &program, "operation"),
+      resolution: Self::get_uniform_location(&gl, &program, "resolution"),
+      divisor: Self::get_uniform_location(&gl, &program, "divisor"),
+      remainder: Self::get_uniform_location(&gl, &program, "remainder"),
+      nrows: Self::get_uniform_location(&gl, &program, "nrows"),
+      step: Self::get_uniform_location(&gl, &program, "step"),
+    };
+
     Ok(Self {
       canvas: canvas.clone(),
       frame_buffer,
       gl,
-      mask_uniform,
-      operation_uniform,
-      resolution_uniform,
-      source_texture: Cell::new(0),
-      textures,
-      width,
       height,
       resolution,
+      source_texture: Cell::new(0),
+      textures,
+      uniforms,
+      width,
     })
   }
 
@@ -196,8 +200,22 @@ impl Gpu {
       Some(&self.textures[self.source_texture.get()]),
     );
 
-    self.gl.uniform1i(
-      Some(&self.mask_uniform),
+    match computer.mask() {
+      Mod { divisor, remainder } => {
+        self.gl.uniform1ui(Some(&self.uniforms.divisor), *divisor);
+        self
+          .gl
+          .uniform1ui(Some(&self.uniforms.remainder), *remainder);
+      }
+      Rows { nrows, step } => {
+        self.gl.uniform1ui(Some(&self.uniforms.nrows), *nrows);
+        self.gl.uniform1ui(Some(&self.uniforms.step), *step);
+      }
+      _ => {}
+    }
+
+    self.gl.uniform1ui(
+      Some(&self.uniforms.mask),
       Mask::VARIANTS
         .iter()
         .position(|mask| *mask == computer.mask().as_ref())
@@ -205,8 +223,8 @@ impl Gpu {
         .try_into()?,
     );
 
-    self.gl.uniform1i(
-      Some(&self.operation_uniform),
+    self.gl.uniform1ui(
+      Some(&self.uniforms.operation),
       Operation::VARIANTS
         .iter()
         .position(|operation| *operation == computer.operation().as_ref())
@@ -244,7 +262,7 @@ impl Gpu {
 
     self
       .gl
-      .uniform1ui(Some(&self.resolution_uniform), self.resolution);
+      .uniform1ui(Some(&self.uniforms.resolution), self.resolution);
 
     self
       .gl
@@ -259,5 +277,15 @@ impl Gpu {
     ];
 
     Ok(())
+  }
+
+  fn get_uniform_location(
+    gl: &WebGl2RenderingContext,
+    program: &WebGlProgram,
+    name: &str,
+  ) -> WebGlUniformLocation {
+    gl.get_uniform_location(program, name)
+      .ok_or_else(|| format!("Could not find uniform `{}`", name))
+      .unwrap()
   }
 }
