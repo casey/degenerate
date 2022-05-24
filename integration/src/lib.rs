@@ -781,12 +781,9 @@ image_test! {
   ",
 }
 
-image_test! {
-  name: debug_operation,
-  program: "
-    debug
-    apply
-  ",
+#[test]
+fn debug_operation() -> Result {
+  image_test("debug_operation", "debug\napply", true)
 }
 
 image_test! {

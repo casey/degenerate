@@ -16,8 +16,10 @@ uniform uint step;
 
 out vec4 color;
 
-vec3 apply_operation(vec3 pixel) {
+vec3 apply_operation(vec2 position, vec3 pixel) {
   switch (operation) {
+    case DEBUG:
+      return floor(vec3((position.x + 1.0) / 2.0, 0.0, 1.0 - (position.y + 1.0) / 2.0) * 16.0) / 16.0;
     case IDENTITY:
       return pixel;
     case INVERT:
@@ -59,6 +61,6 @@ void main() {
   ivec2 coordinates = ivec2(gl_FragCoord.xy - 0.5);
   vec3 pixel = texelFetch(source, coordinates, 0).rgb;
   vec2 position = gl_FragCoord.xy / float(resolution) * 2.0 - 1.0;
-  vec3 result = is_masked(coordinates, position) ? apply_operation(pixel) : pixel;
+  vec3 result = is_masked(coordinates, position) ? apply_operation(position, pixel) : pixel;
   color = vec4(result, 1.0);
 }
