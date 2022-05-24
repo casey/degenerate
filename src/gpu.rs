@@ -13,12 +13,13 @@ pub(crate) struct Gpu {
 }
 
 struct Uniforms {
+  color_rotation: WebGlUniformLocation,
   divisor: WebGlUniformLocation,
   mask: WebGlUniformLocation,
+  nrows: WebGlUniformLocation,
   operation: WebGlUniformLocation,
   remainder: WebGlUniformLocation,
   resolution: WebGlUniformLocation,
-  nrows: WebGlUniformLocation,
   step: WebGlUniformLocation,
 }
 
@@ -118,12 +119,13 @@ impl Gpu {
       .ok_or("Failed to create framebuffer")?;
 
     let uniforms = Uniforms {
-      mask: Self::get_uniform_location(&gl, &program, "mask"),
-      operation: Self::get_uniform_location(&gl, &program, "operation"),
-      resolution: Self::get_uniform_location(&gl, &program, "resolution"),
+      color_rotation: Self::get_uniform_location(&gl, &program, "color_rotation"),
       divisor: Self::get_uniform_location(&gl, &program, "divisor"),
-      remainder: Self::get_uniform_location(&gl, &program, "remainder"),
+      mask: Self::get_uniform_location(&gl, &program, "mask"),
       nrows: Self::get_uniform_location(&gl, &program, "nrows"),
+      operation: Self::get_uniform_location(&gl, &program, "operation"),
+      remainder: Self::get_uniform_location(&gl, &program, "remainder"),
+      resolution: Self::get_uniform_location(&gl, &program, "resolution"),
       step: Self::get_uniform_location(&gl, &program, "step"),
     };
 
@@ -212,6 +214,19 @@ impl Gpu {
         self.gl.uniform1ui(Some(&self.uniforms.step), *step);
       }
       _ => {}
+    }
+
+    if let Operation::RotateColor(axis, turns) = computer.operation() {
+      // TODO: remove the casts once CPU is out
+      self.gl.uniform_matrix3fv_with_f32_array(
+        Some(&self.uniforms.color_rotation),
+        false,
+        Rotation3::new(
+          axis.vector().map(|element| element as f32) * (*turns as f32) * f32::consts::TAU,
+        )
+        .matrix()
+        .as_slice(),
+      );
     }
 
     self.gl.uniform1ui(

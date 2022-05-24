@@ -12,7 +12,7 @@ use {
   rand::{rngs::StdRng, seq::SliceRandom, SeedableRng},
   std::{
     cell::Cell,
-    f64,
+    f32, f64,
     fmt::{self, Formatter},
     ops::Deref,
     str::FromStr,

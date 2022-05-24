@@ -4,6 +4,7 @@
 
 precision highp float;
 
+uniform mat3 color_rotation;
 uniform sampler2D source;
 uniform uint divisor;
 uniform uint mask;
@@ -13,16 +14,26 @@ uniform uint remainder;
 uniform uint resolution;
 uniform uint step;
 
+// quaternion
+// matrix
+// axis angle
+
 out vec4 color;
 
-vec4 apply_operation(vec4 pixel) {
+vec3 apply_operation(vec3 pixel) {
   switch (operation) {
     case IDENTITY:
       return pixel;
     case INVERT:
-      return vec4(1.0 - pixel.rgb, 1.0);
+      return 1.0 - pixel;
+    case ROTATE_COLOR:
+      // may need to quantize to u8 to get exact same output
+      vec3 position = (pixel * 2.0 - 1.0);
+      vec3 rotated = color_rotation * position;
+      vec3 color = (rotated + 1.0) / 2.0;
+      return color;
     default:
-      return vec4(0.0, 1.0, 0.0, 1.0);
+      return vec3(0.0, 1.0, 0.0);
   }
 }
 
@@ -51,7 +62,8 @@ bool is_masked(ivec2 pixel, vec2 position) {
 
 void main() {
   ivec2 coordinates = ivec2(gl_FragCoord.xy - 0.5);
-  vec4 pixel = texelFetch(source, coordinates, 0);
+  vec3 pixel = texelFetch(source, coordinates, 0).rgb;
   vec2 position = gl_FragCoord.xy / float(resolution) * 2.0 - 1.0;
-  color = is_masked(coordinates, position) ? apply_operation(pixel) : vec4(pixel.xyz, 1.0);
+  vec3 result = is_masked(coordinates, position) ? apply_operation(pixel) : pixel;
+  color = vec4(result, 1.0);
 }
