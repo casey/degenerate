@@ -4,12 +4,14 @@
 
 precision highp float;
 
-uniform int divisor;
-uniform int mask;
-uniform int operation;
-uniform int remainder;
 uniform sampler2D source;
+uniform uint divisor;
+uniform uint mask;
+uniform uint nrows;
+uniform uint operation;
+uniform uint remainder;
 uniform uint resolution;
+uniform uint step;
 
 out vec4 color;
 
@@ -33,7 +35,9 @@ bool is_masked(ivec2 pixel, vec2 position) {
     case CROSS:
       return abs(position.x) < 0.25 || abs(position.y) < 0.25;
     case MOD:
-      return divisor == 0 ? false : ((int(resolution) - 1 - pixel.y) * int(resolution) + pixel.x) % divisor == remainder;
+      return divisor == 0u ? false : ((resolution - 1u - uint(pixel.y)) * resolution + uint(pixel.x)) % divisor == remainder;
+    case ROWS:
+      return (resolution - 1u - uint(pixel.y)) % (nrows + step) < nrows;
     case SQUARE:
       return abs(position.x) < 0.5 && abs(position.y) < 0.5;
     case TOP:

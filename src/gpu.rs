@@ -18,6 +18,8 @@ struct Uniforms {
   operation: WebGlUniformLocation,
   remainder: WebGlUniformLocation,
   resolution: WebGlUniformLocation,
+  nrows: WebGlUniformLocation,
+  step: WebGlUniformLocation,
 }
 
 impl Gpu {
@@ -63,11 +65,11 @@ impl Gpu {
       let mut constants = String::new();
 
       for (index, mask) in Mask::VARIANTS.iter().enumerate() {
-        constants.push_str(&format!("const int {} = {};\n", mask, index));
+        constants.push_str(&format!("const uint {} = {}u;\n", mask, index));
       }
 
       for (index, operation) in Operation::VARIANTS.iter().enumerate() {
-        constants.push_str(&format!("const int {} = {};\n", operation, index));
+        constants.push_str(&format!("const uint {} = {}u;\n", operation, index));
       }
 
       gl.shader_source(
@@ -121,6 +123,8 @@ impl Gpu {
       resolution: Self::get_uniform_location(&gl, &program, "resolution"),
       divisor: Self::get_uniform_location(&gl, &program, "divisor"),
       remainder: Self::get_uniform_location(&gl, &program, "remainder"),
+      nrows: Self::get_uniform_location(&gl, &program, "nrows"),
+      step: Self::get_uniform_location(&gl, &program, "step"),
     };
 
     Ok(Self {
@@ -196,16 +200,21 @@ impl Gpu {
       Some(&self.textures[self.source_texture.get()]),
     );
 
-    if let Mod { divisor, remainder } = computer.mask() {
-      self
-        .gl
-        .uniform1i(Some(&self.uniforms.divisor), *divisor as i32);
-      self
-        .gl
-        .uniform1i(Some(&self.uniforms.remainder), *remainder as i32);
+    match computer.mask() {
+      Mod { divisor, remainder } => {
+        self.gl.uniform1ui(Some(&self.uniforms.divisor), *divisor);
+        self
+          .gl
+          .uniform1ui(Some(&self.uniforms.remainder), *remainder);
+      }
+      Rows { nrows, step } => {
+        self.gl.uniform1ui(Some(&self.uniforms.nrows), *nrows);
+        self.gl.uniform1ui(Some(&self.uniforms.step), *step);
+      }
+      _ => {}
     }
 
-    self.gl.uniform1i(
+    self.gl.uniform1ui(
       Some(&self.uniforms.mask),
       Mask::VARIANTS
         .iter()
@@ -214,7 +223,7 @@ impl Gpu {
         .try_into()?,
     );
 
-    self.gl.uniform1i(
+    self.gl.uniform1ui(
       Some(&self.uniforms.operation),
       Operation::VARIANTS
         .iter()
