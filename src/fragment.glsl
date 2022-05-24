@@ -4,12 +4,12 @@
 
 precision highp float;
 
-uniform sampler2D source;
+uniform int divisor;
 uniform int mask;
 uniform int operation;
-uniform uint resolution;
-uniform int divisor;
 uniform int remainder;
+uniform sampler2D source;
+uniform uint resolution;
 
 out vec4 color;
 
