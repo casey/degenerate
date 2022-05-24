@@ -5,6 +5,7 @@
 precision highp float;
 
 uniform mat3 color_rotation;
+uniform mat3 similarity;
 uniform sampler2D source;
 uniform uint divisor;
 uniform uint mask;
@@ -55,10 +56,17 @@ bool is_masked(ivec2 pixel, vec2 position) {
   }
 }
 
+// transform w/similarity
+// apply wrap
+// transform back to integer coordinates
+// get pixel or default
+
 void main() {
   ivec2 coordinates = ivec2(gl_FragCoord.xy - 0.5);
-  vec3 pixel = texelFetch(source, coordinates, 0).rgb;
   vec2 position = gl_FragCoord.xy / float(resolution) * 2.0 - 1.0;
-  vec3 result = is_masked(coordinates, position) ? apply_operation(pixel) : pixel;
+  vec2 transformed = (similarity * vec3(position, 1.0)).xy;
+  ivec2 coordinates_transformed = ivec2(((transformed + 1.0) / 2.0) * float(resolution));
+  vec3 pixel = texelFetch(source, coordinates_transformed, 0).rgb;
+  vec3 result = is_masked(coordinates, transformed) ? apply_operation(pixel) : pixel;
   color = vec4(result, 1.0);
 }

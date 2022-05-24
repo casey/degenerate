@@ -627,6 +627,7 @@ image_test! {
     circle
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -638,6 +639,7 @@ image_test! {
       apply
     loop
   ",
+  gpu: true,
 }
 
 image_test! {

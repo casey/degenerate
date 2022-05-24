@@ -56,6 +56,10 @@ impl Computer {
     &self.operation
   }
 
+  pub(crate) fn similarity(&self) -> &Similarity2<f64> {
+    &self.similarity
+  }
+
   pub(crate) fn new(gpu: Option<Arc<Mutex<Gpu>>>) -> Self {
     Self {
       alpha: 1.0,
