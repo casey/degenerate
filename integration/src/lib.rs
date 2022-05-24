@@ -588,7 +588,7 @@ image_test! {
 image_test! {
   name: rows_overflow,
   program: "
-    rows 18446744073709551615 18446744073709551615
+    rows 4294967295 4294967295
     apply
   ",
   gpu: true,

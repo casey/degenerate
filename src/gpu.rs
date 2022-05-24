@@ -65,11 +65,11 @@ impl Gpu {
       let mut constants = String::new();
 
       for (index, mask) in Mask::VARIANTS.iter().enumerate() {
-        constants.push_str(&format!("const int {} = {};\n", mask, index));
+        constants.push_str(&format!("const uint {} = {}u;\n", mask, index));
       }
 
       for (index, operation) in Operation::VARIANTS.iter().enumerate() {
-        constants.push_str(&format!("const int {} = {};\n", operation, index));
+        constants.push_str(&format!("const uint {} = {}u;\n", operation, index));
       }
 
       gl.shader_source(
@@ -202,21 +202,19 @@ impl Gpu {
 
     match computer.mask() {
       Mod { divisor, remainder } => {
+        self.gl.uniform1ui(Some(&self.uniforms.divisor), *divisor);
         self
           .gl
-          .uniform1i(Some(&self.uniforms.divisor), *divisor as i32);
-        self
-          .gl
-          .uniform1i(Some(&self.uniforms.remainder), *remainder as i32);
+          .uniform1ui(Some(&self.uniforms.remainder), *remainder);
       }
       Rows { nrows, step } => {
-        self.gl.uniform1i(Some(&self.uniforms.nrows), *nrows as i32);
-        self.gl.uniform1i(Some(&self.uniforms.step), *step as i32);
+        self.gl.uniform1ui(Some(&self.uniforms.nrows), *nrows);
+        self.gl.uniform1ui(Some(&self.uniforms.step), *step);
       }
       _ => {}
     }
 
-    self.gl.uniform1i(
+    self.gl.uniform1ui(
       Some(&self.uniforms.mask),
       Mask::VARIANTS
         .iter()
@@ -225,7 +223,7 @@ impl Gpu {
         .try_into()?,
     );
 
-    self.gl.uniform1i(
+    self.gl.uniform1ui(
       Some(&self.uniforms.operation),
       Operation::VARIANTS
         .iter()
