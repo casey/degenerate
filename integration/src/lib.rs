@@ -771,6 +771,7 @@ image_test! {
     debug
     apply
   ",
+  gpu: true
 }
 
 image_test! {

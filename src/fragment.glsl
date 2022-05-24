@@ -11,8 +11,15 @@ uniform uint resolution;
 
 out vec4 color;
 
-vec4 apply_operation(vec4 pixel) {
+vec4 apply_operation(vec2 position, vec4 pixel) {
   switch (operation) {
+    case DEBUG:
+      return vec4(
+        uint((position.x + 1.0) / 2.0 * 255.0) & 11110000u,
+        0.0,
+        uint((position.y + 1.0) / 2.0 * 255.0) & 11110000u,
+        1.0
+      );
     case IDENTITY:
       return pixel;
     case INVERT:
@@ -44,5 +51,5 @@ bool is_masked(vec2 position) {
 void main() {
   vec4 pixel = texelFetch(source, ivec2(gl_FragCoord.xy - 0.5), 0);
   vec2 position = gl_FragCoord.xy / float(resolution) * 2.0 - 1.0;
-  color = is_masked(position) ? apply_operation(pixel) : vec4(pixel.xyz, 1.0);
+  color = is_masked(position) ? apply_operation(position, pixel) : vec4(pixel.xyz, 1.0);
 }
