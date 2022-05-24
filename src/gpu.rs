@@ -1,4 +1,4 @@
-use super::*;
+use {super::*, Mask::*};
 
 pub(crate) struct Gpu {
   canvas: HtmlCanvasElement,
