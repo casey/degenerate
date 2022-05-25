@@ -13,6 +13,7 @@ pub(crate) struct Gpu {
 }
 
 struct Uniforms {
+  alpha: WebGlUniformLocation,
   color_rotation: WebGlUniformLocation,
   divisor: WebGlUniformLocation,
   mask: WebGlUniformLocation,
@@ -120,6 +121,7 @@ impl Gpu {
       .ok_or("Failed to create framebuffer")?;
 
     let uniforms = Uniforms {
+      alpha: Self::get_uniform_location(&gl, &program, "alpha"),
       color_rotation: Self::get_uniform_location(&gl, &program, "color_rotation"),
       divisor: Self::get_uniform_location(&gl, &program, "divisor"),
       mask: Self::get_uniform_location(&gl, &program, "mask"),
@@ -203,6 +205,10 @@ impl Gpu {
       WebGl2RenderingContext::TEXTURE_2D,
       Some(&self.textures[self.source_texture.get()]),
     );
+
+    self
+      .gl
+      .uniform1f(Some(&self.uniforms.alpha), computer.alpha() as f32);
 
     match computer.mask() {
       Mod { divisor, remainder } => {

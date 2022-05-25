@@ -32,7 +32,6 @@ macro_rules! image_test {
       }
 
       #[test]
-      #[ignore]
       fn gpu() -> Result {
         image_test(stringify!($name), $program, true)
       }
@@ -230,6 +229,7 @@ image_test! {
     x
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -441,6 +441,7 @@ image_test! {
     x
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
@@ -783,12 +784,9 @@ image_test! {
   ",
 }
 
-image_test! {
-  name: debug_operation,
-  program: "
-    debug
-    apply
-  ",
+#[test]
+fn debug_operation() -> Result {
+  image_test("debug_operation", "debug\napply", true)
 }
 
 image_test! {
