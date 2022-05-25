@@ -31,6 +31,10 @@ impl Computer {
     Ok(())
   }
 
+  pub(crate) fn alpha(&self) -> f64 {
+    self.alpha
+  }
+
   pub(crate) fn memory(&self) -> &DMatrix<Vector4<u8>> {
     &self.memory
   }
