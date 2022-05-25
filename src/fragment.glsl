@@ -64,23 +64,21 @@ bool is_masked(ivec2 pixel, vec2 position) {
 //   .transform_point(&v)
 //   .map(|element| element.round() as isize);
 //
-// i = integer pixel coordinates
-// v = floating point vector with ori
-//
-// all coordinates are between 0 and 1 with the same origin
-// all values are floats
+// i = integer pixel coordinates [0, resolution)
+// v = floating point vector with origin in center, [-1, 1]
+// p = rgb pixel
 
 void main() {
-  ivec2 coordinates = ivec2(gl_FragCoord.xy - 0.5);
-  vec2 position = gl_FragCoord.xy / float(resolution) * 2.0 - 1.0;
-  vec2 transformed = (similarity * vec3(position, 1.0)).xy;
-  ivec2 coordinates_transformed = ivec2(((transformed + 1.0) / 2.0) * float(resolution));
-  vec3 transformed_pixel = texelFetch(source, coordinates_transformed, 0).rgb;
-  vec3 untransformed_pixel = texelFetch(source, coordinates, 0).rgb;
-  if (is_masked(coordinates_transformed, transformed)) {
-    vec3 over = apply_operation(transformed, transformed_pixel);
-    color = vec4(over * alpha + untransformed_pixel * (1.0 - alpha), 1.0);
+  ivec2 i = ivec2(gl_FragCoord.xy - 0.5);
+  vec2 v = gl_FragCoord.xy / float(resolution) * 2.0 - 1.0;
+  vec2 vt = (similarity * vec3(v, 1.0)).xy;
+  ivec2 it = ivec2(((vt + 1.0) / 2.0) * float(resolution));
+  vec3 pt = texelFetch(source, it, 0).rgb;
+  vec3 p = texelFetch(source, i, 0).rgb;
+  if (is_masked(it, vt)) {
+    vec3 over = apply_operation(vt, pt);
+    color = vec4(over * alpha + p * (1.0 - alpha), 1.0);
   } else {
-    color = vec4(untransformed_pixel, 1.0);
+    color = vec4(p, 1.0);
   }
 }
