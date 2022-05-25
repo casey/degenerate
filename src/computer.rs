@@ -111,12 +111,11 @@ impl Computer {
             };
             let over = self.operation.apply(v, input.xyz()).map(|c| c as f64);
             let under = self.memory[(row, col)].xyz().map(|c| c as f64);
-            let combined =
-              (over * self.alpha + under * (1.0 - self.alpha)) / (self.alpha + (1.0 - self.alpha));
+            let combined = over * self.alpha + under * (1.0 - self.alpha);
             output[(row, col)] = Vector4::new(
-              combined.x as u8,
-              combined.y as u8,
-              combined.z as u8,
+              combined.x.ceil() as u8,
+              combined.y.ceil() as u8,
+              combined.z.ceil() as u8,
               ALPHA_OPAQUE,
             );
           }
