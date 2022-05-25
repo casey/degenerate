@@ -23,6 +23,7 @@ struct Uniforms {
   resolution: WebGlUniformLocation,
   similarity: WebGlUniformLocation,
   step: WebGlUniformLocation,
+  wrap: WebGlUniformLocation,
 }
 
 impl Gpu {
@@ -131,6 +132,7 @@ impl Gpu {
       resolution: Self::get_uniform_location(&gl, &program, "resolution"),
       similarity: Self::get_uniform_location(&gl, &program, "similarity"),
       step: Self::get_uniform_location(&gl, &program, "step"),
+      wrap: Self::get_uniform_location(&gl, &program, "wrap"),
     };
 
     Ok(Self {
@@ -245,6 +247,10 @@ impl Gpu {
         .map(|element| element as f32)
         .as_slice(),
     );
+
+    self
+      .gl
+      .uniform1ui(Some(&self.uniforms.wrap), computer.wrap() as u32);
 
     self.gl.uniform1ui(
       Some(&self.uniforms.mask),
