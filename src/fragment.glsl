@@ -66,6 +66,9 @@ bool is_masked(ivec2 pixel, vec2 position) {
 //
 // i = integer pixel coordinates
 // v = floating point vector with ori
+//
+// all coordinates are between 0 and 1 with the same origin
+// all values are floats
 
 void main() {
   ivec2 coordinates = ivec2(gl_FragCoord.xy - 0.5);

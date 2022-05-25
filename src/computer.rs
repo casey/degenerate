@@ -191,7 +191,7 @@ impl Computer {
       Command::Operation(operation) => self.operation = operation,
       Command::Rotate(turns) => self
         .similarity
-        .append_rotation_mut(&UnitComplex::from_angle(-turns * f64::consts::TAU)),
+        .append_rotation_mut(&UnitComplex::from_angle(turns * f64::consts::TAU)),
       Command::Scale(scaling) => {
         self.similarity.append_scaling_mut(scaling);
       }
