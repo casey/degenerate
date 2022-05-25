@@ -61,8 +61,7 @@ void main() {
   vec2 position = gl_FragCoord.xy / float(resolution) * 2.0 - 1.0;
   if (is_masked(coordinates, position)) {
     vec3 over = apply_operation(position, pixel);
-    vec3 under = pixel;
-    color = vec4(over * alpha + under * (1.0 - alpha), 1.0);
+    color = vec4(over * alpha + pixel * (1.0 - alpha), 1.0);
   } else {
     color = vec4(pixel, 1.0);
   }
