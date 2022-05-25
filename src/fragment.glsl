@@ -4,6 +4,7 @@
 
 precision highp float;
 
+uniform float alpha;
 uniform mat3 color_rotation;
 uniform sampler2D source;
 uniform uint divisor;
@@ -58,6 +59,10 @@ void main() {
   ivec2 coordinates = ivec2(gl_FragCoord.xy - 0.5);
   vec3 pixel = texelFetch(source, coordinates, 0).rgb;
   vec2 position = gl_FragCoord.xy / float(resolution) * 2.0 - 1.0;
-  vec3 result = is_masked(coordinates, position) ? apply_operation(position, pixel) : pixel;
-  color = vec4(result, 1.0);
+  if (is_masked(coordinates, position)) {
+    vec3 over = apply_operation(position, pixel);
+    color = vec4(over * alpha + pixel * (1.0 - alpha), 1.0);
+  } else {
+    color = vec4(pixel, 1.0);
+  }
 }

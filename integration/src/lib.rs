@@ -230,6 +230,7 @@ image_test! {
     x
     apply
   ",
+  gpu: true,
 }
 
 image_test! {
