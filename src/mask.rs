@@ -6,7 +6,6 @@ pub(crate) enum Mask {
   All,
   Circle,
   Cross,
-  Left,
   Mod { divisor: u32, remainder: u32 },
   Rows { nrows: u32, step: u32 },
   Square,
@@ -20,7 +19,6 @@ impl Mask {
       Self::All => true,
       Self::Circle => v.coords.norm() < 1.0,
       Self::Cross => v.x.abs() < 0.25 || v.y.abs() < 0.25,
-      Self::Left => v.x < 0.0 && v.y < 0.0,
       Self::Mod { divisor, remainder } => {
         if *divisor == 0 {
           false
