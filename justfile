@@ -71,10 +71,3 @@ build-web-release:
 
 open:
 	open http://localhost:8000
-
-fix:
-	#!/usr/bin/env bash
-	set -euxo pipefail
-	for image in images/*.gpu.actual-memory.png; do
-		mv $image ${image%.gpu.actual-memory.png}.png
-	done
