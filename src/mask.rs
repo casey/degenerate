@@ -32,7 +32,7 @@ impl Mask {
       }
       Self::Rows { nrows, step } => pixel.y as u32 % (nrows.saturating_add(*step)) < *nrows,
       Self::Square => v.coords.abs() < Vector2::new(0.5, 0.5),
-      Self::Top => v.y < 0.0,
+      Self::Top => v.y > 0.0,
       Self::X => (v.x - v.y).abs() < 0.25 || (v.x + v.y).abs() < 0.25,
     }
   }
