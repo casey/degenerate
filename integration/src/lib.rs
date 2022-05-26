@@ -25,7 +25,7 @@ macro_rules! image_test {
   ) => {
     #[test]
     fn $name() -> Result {
-      image_test(stringify!($name), $program, true)
+      image_test(stringify!($name), $program)
     }
   };
 }
@@ -110,7 +110,7 @@ fn clean() {
   });
 }
 
-pub(crate) fn image_test(name: &str, program: &str, gpu: bool) -> Result {
+pub(crate) fn image_test(name: &str, program: &str) -> Result {
   RUNTIME.block_on(async {
     clean();
 
@@ -118,13 +118,10 @@ pub(crate) fn image_test(name: &str, program: &str, gpu: bool) -> Result {
 
     let browser = browser().await;
 
+    // TODO: remove /#gpu
     let page = browser
       .inner
-      .new_page(format!(
-        "http://127.0.0.1:{}{}",
-        *SERVER_PORT,
-        if gpu { "/#gpu" } else { "" }
-      ))
+      .new_page(format!("http://127.0.0.1:{}/#gpu", *SERVER_PORT))
       .await?;
 
     eprintln!("Waiting for module to load...");
@@ -153,11 +150,7 @@ pub(crate) fn image_test(name: &str, program: &str, gpu: bool) -> Result {
     let want = image::open(&want_path)?;
 
     if have != want {
-      let destination = format!(
-        "../images/{}.{}.actual-memory.png",
-        name,
-        if gpu { "gpu" } else { "cpu" },
-      );
+      let destination = format!("../images/{}.actual-memory.png", name);
 
       have.save(&destination)?;
 
