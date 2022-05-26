@@ -57,18 +57,6 @@ bool is_masked(ivec2 pixel, vec2 position) {
   }
 }
 
-// let i = Point2::new(col as f64, row as f64);
-// let v = transform.transform_point(&i);
-// let v = similarity.transform_point(&v);
-// let v = if self.wrap { v.wrap() } else { v };
-// let i = inverse
-//   .transform_point(&v)
-//   .map(|element| element.round() as isize);
-//
-// i = integer pixel coordinates [0, resolution)
-// v = floating point vector with origin in center, [-1, 1]
-// p = rgb pixel
-
 void main() {
   ivec2 i = ivec2(gl_FragCoord.xy - 0.5);
   vec2 v = gl_FragCoord.xy / float(resolution) * 2.0 - 1.0;
