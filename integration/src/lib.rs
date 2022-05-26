@@ -23,38 +23,9 @@ macro_rules! image_test {
     name: $name:ident,
     program: $program:literal,
   ) => {
-    mod $name {
-      use super::*;
-
-      #[test]
-      fn cpu() -> Result {
-        image_test(stringify!($name), $program, false)
-      }
-
-      #[test]
-      fn gpu() -> Result {
-        image_test(stringify!($name), $program, true)
-      }
-    }
-  };
-
-  (
-    name: $name:ident,
-    program: $program:literal,
-    gpu: true $(,)?
-  ) => {
-    mod $name {
-      use super::*;
-
-      #[test]
-      fn cpu() -> Result {
-        image_test(stringify!($name), $program, false)
-      }
-
-      #[test]
-      fn gpu() -> Result {
-        image_test(stringify!($name), $program, true)
-      }
+    #[test]
+    fn $name() -> Result {
+      image_test(stringify!($name), $program, true)
     }
   };
 }
@@ -219,7 +190,6 @@ image_test! {
     all
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -229,7 +199,6 @@ image_test! {
     x
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -237,7 +206,6 @@ image_test! {
   program: "
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -275,7 +243,6 @@ image_test! {
     circle
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -308,13 +275,11 @@ image_test! {
     cross
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
   name: default,
   program: "",
-  gpu: true,
 }
 
 image_test! {
@@ -373,7 +338,6 @@ image_test! {
     mod 3 0
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -412,7 +376,6 @@ image_test! {
     choose all circle cross square top x
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -421,7 +384,6 @@ image_test! {
     choose all circle cross square top x
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -431,7 +393,6 @@ image_test! {
     choose all circle cross square top x
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -441,7 +402,6 @@ image_test! {
     x
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -469,7 +429,6 @@ image_test! {
     all
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -479,7 +438,6 @@ image_test! {
     all
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -489,7 +447,6 @@ image_test! {
     all
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -499,7 +456,6 @@ image_test! {
     all
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -509,7 +465,6 @@ image_test! {
     all
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -519,7 +474,6 @@ image_test! {
     all
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -528,7 +482,6 @@ image_test! {
     rotate-color green 1.0
     all
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -538,7 +491,6 @@ image_test! {
     all
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -547,7 +499,6 @@ image_test! {
     rotate-color red 1.0
     all
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -592,7 +543,6 @@ image_test! {
     rows 1 1
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -601,7 +551,6 @@ image_test! {
     rows 4294967295 4294967295
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -628,7 +577,6 @@ image_test! {
     circle
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -640,7 +588,6 @@ image_test! {
       apply
     loop
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -697,7 +644,6 @@ image_test! {
     square
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -708,7 +654,6 @@ image_test! {
     top
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -736,7 +681,6 @@ image_test! {
     top
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -745,7 +689,6 @@ image_test! {
     x
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
@@ -795,7 +738,6 @@ image_test! {
     mod 0 1
     apply
   ",
-  gpu: true,
 }
 
 image_test! {
