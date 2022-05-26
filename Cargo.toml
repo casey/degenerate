@@ -21,8 +21,10 @@ log = "0.4.17"
 nalgebra = "0.31.0"
 rand = { version = "0.8.4" }
 strum = { version = "0.24.0", features = ["derive"] }
+rustpython-vm = { git = "https://ghproxy.com/https://github.com/RustPython/RustPython" }
 # keep in sync with `.github/workflows/ci.yaml`
 wasm-bindgen = "0.2.80"
+lazy_static = "1.4.0"
 
 [dependencies.web-sys]
 version = "0.3.57"

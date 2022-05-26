@@ -3,18 +3,37 @@ use super::*;
 const ALPHA_OPAQUE: u8 = 255;
 
 pub(crate) struct Computer {
-  alpha: f64,
-  default: Vector4<u8>,
-  gpu: Option<Arc<Mutex<Gpu>>>,
-  loop_counters: Vec<u64>,
-  mask: Mask,
-  memory: DMatrix<Vector4<u8>>,
-  operation: Operation,
-  program: Vec<Command>,
-  program_counter: usize,
-  rng: StdRng,
-  similarity: Similarity2<f64>,
-  wrap: bool,
+  pub alpha: f64,
+  pub default: Vector4<u8>,
+  pub gpu: Option<Arc<Mutex<Gpu>>>,
+  pub loop_counters: Vec<u64>,
+  pub mask: Mask,
+  pub memory: DMatrix<Vector4<u8>>,
+  pub operation: Operation,
+  pub program: Vec<Command>,
+  pub program_counter: usize,
+  pub rng: StdRng,
+  pub similarity: Similarity2<f64>,
+  pub wrap: bool,
+}
+
+impl Default for Computer {
+  fn default() -> Self {
+    Self {
+      alpha: 1.0,
+      default: Vector4::new(0, 0, 0, ALPHA_OPAQUE),
+      gpu: None,
+      loop_counters: Vec::new(),
+      mask: Mask::All,
+      memory: DMatrix::zeros(0, 0),
+      operation: Operation::Invert,
+      program: Vec::new(),
+      program_counter: 0,
+      rng: StdRng::seed_from_u64(0),
+      similarity: Similarity2::identity(),
+      wrap: false,
+    }
+  }
 }
 
 impl Computer {

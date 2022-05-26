@@ -1,5 +1,64 @@
 use super::*;
 
+use {
+  lazy_static::lazy_static,
+  rustpython_vm::{
+    builtins::PyCode, compile::Mode, object::PyRef, pymodule, Interpreter, VirtualMachine,
+  },
+};
+
+lazy_static! {
+  static ref GPU: Arc<Mutex<Gpu>> = Arc::new(Mutex::new(Gpu::new().unwrap()));
+}
+
+#[pymodule]
+mod degenerate {
+  use super::*;
+
+  #[pyfunction]
+  fn apply(vm: &VirtualMachine) {
+    let alpha = vm
+      .current_globals()
+      .get_item("alpha", vm)
+      .unwrap()
+      .try_to_f64(vm)
+      .unwrap()
+      .unwrap();
+
+    let mask = match vm
+      .current_globals()
+      .get_item("mask", vm)
+      .unwrap()
+      .try_to_value::<usize>(vm)
+      .unwrap()
+    {
+      0 => Mask::All,
+      1 => Mask::Circle,
+      _ => panic!("Invalid mask"),
+    };
+
+    let operation = match vm
+      .current_globals()
+      .get_item("operation", vm)
+      .unwrap()
+      .try_to_value::<usize>(vm)
+      .unwrap()
+    {
+      1 => Operation::Identity,
+      _ => panic!("Invalid operation"),
+    };
+
+    let computer = Computer {
+      alpha,
+      mask,
+      operation,
+      ..Default::default()
+    };
+
+    GPU.lock().unwrap().apply(&computer).unwrap();
+  }
+}
+
 pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
   animation_frame_pending: bool,
@@ -29,7 +88,7 @@ impl App {
     let stderr = Stderr::get();
 
     let gpu = if window.location().hash().map_err(JsValueError)? == "#gpu" {
-      Some(Arc::new(Mutex::new(Gpu::new(&canvas)?)))
+      Some(Arc::new(Mutex::new(Gpu::new()?)))
     } else {
       None
     };
@@ -131,6 +190,20 @@ impl App {
     if self.input {
       self.nav.set_class_name("fade-out");
 
+      let interpreter = Interpreter::with_init(Default::default(), |vm| {
+        vm.add_native_module("degenerate".to_owned(), Box::new(degenerate::make_module));
+      });
+
+      let code = interpreter.enter(|vm| -> Result<PyRef<PyCode>> {
+        let prelude = include_str!("prelude.py").to_owned();
+        let program = prelude + &self.textarea.value();
+        log::info!("{program}");
+        Ok(
+          vm.compile(&program, Mode::Exec, "<program>".to_owned())
+            .map_err(|err| format!("Failed to compile: {}", err))?,
+        )
+      })?;
+
       let program = Command::parse_program(&self.textarea.value())?;
 
       log::trace!("Program: {:?}", program);
@@ -143,17 +216,15 @@ impl App {
         // Make sure size is odd, so we don't get jaggies when drawing the X
         computer.resize((self.canvas.width().max(self.canvas.height()) | 1).try_into()?)?;
         self.computer = computer;
-      }
 
-      let run = !self.computer.done();
+        interpreter.enter(|vm| -> Result {
+          vm.run_code_obj(code, vm.new_scope_with_builtins())
+            .map_err(|err| format!("Failed to run code: {:?}", err))?;
+          Ok(())
+        })?;
 
-      if run {
-        self.computer.run(true)?;
-      }
-
-      if resize || program_changed || run {
-        if let Some(gpu) = self.gpu.clone() {
-          gpu.lock().unwrap().render_to_canvas()?;
+        if let Some(_) = self.gpu.clone() {
+          GPU.lock().unwrap().render_to_canvas()?;
         } else {
           let context = self
             .canvas
@@ -184,10 +255,6 @@ impl App {
               (self.canvas.height() as f64 - size as f64) / 2.0,
             )
             .map_err(JsValueError)?;
-        }
-
-        if !self.computer.done() {
-          self.request_animation_frame()?;
         }
       }
     }

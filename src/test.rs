@@ -20,7 +20,7 @@ fn test_inner(program: &str) -> Result<String> {
   canvas.set_width(256);
 
   let gpu = if window.location().hash().map_err(JsValueError)? == "#gpu" {
-    Some(Arc::new(Mutex::new(Gpu::new(&canvas)?)))
+    Some(Arc::new(Mutex::new(Gpu::new()?)))
   } else {
     None
   };

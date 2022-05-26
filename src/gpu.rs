@@ -12,6 +12,8 @@ pub(crate) struct Gpu {
   width: u32,
 }
 
+unsafe impl Send for Gpu {}
+
 struct Uniforms {
   alpha: WebGlUniformLocation,
   color_rotation: WebGlUniformLocation,
@@ -25,7 +27,13 @@ struct Uniforms {
 }
 
 impl Gpu {
-  pub(super) fn new(canvas: &HtmlCanvasElement) -> Result<Self> {
+  pub(super) fn new() -> Result<Self> {
+    let window = window();
+
+    let document = window.get_document();
+
+    let canvas = document.select("canvas")?.cast::<HtmlCanvasElement>()?;
+
     let mut context_options = WebGlContextAttributes::new();
 
     context_options
