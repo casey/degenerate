@@ -300,7 +300,7 @@ impl Gpu {
 
     self
       .gl
-      .uniform1ui(Some(&self.uniforms.resolution), self.resolution);
+      .uniform1f(Some(&self.uniforms.resolution), self.resolution as f32);
 
     self
       .gl
