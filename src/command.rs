@@ -66,6 +66,7 @@ impl FromStr for Command {
         b.parse()?,
       ))),
       ["for", count] => Ok(Self::For(count.parse()?)),
+      ["left"] => Ok(Self::Mask(Mask::Left)),
       ["identity"] => Ok(Self::Operation(Operation::Identity)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
       ["loop"] => Ok(Self::Loop),

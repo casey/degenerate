@@ -42,6 +42,8 @@ bool is_masked(ivec2 pixel, vec2 position) {
       return length(position) < 1.0;
     case CROSS:
       return abs(position.x) < 0.25 || abs(position.y) < 0.25;
+    case LEFT:
+      return position.x < 0.0 && position.y < 0.0;
     case MOD:
       return divisor == 0u ? false : ((resolution - 1u - uint(pixel.y)) * resolution + uint(pixel.x)) % divisor == remainder;
     case ROWS:

@@ -437,8 +437,8 @@ image_test! {
 image_test! {
   name: rotate,
   program: "
-    rotate 0.05
-    x
+    rotate 0.01
+    cross
     apply
   ",
   gpu: true,
@@ -832,5 +832,13 @@ image_test! {
     for 0
       apply
     loop
+  ",
+}
+
+image_test! {
+  name: left,
+  program: "
+    left
+    apply
   ",
 }

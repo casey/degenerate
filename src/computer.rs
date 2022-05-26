@@ -101,8 +101,8 @@ impl Computer {
       for col in 0..self.memory.ncols() {
         for row in 0..self.memory.nrows() {
           let i = Point2::new(col as f64, row as f64);
-          let v = transform.transform_point(&i);
-          let v = similarity.transform_point(&v);
+          let v = transform * i;
+          let v = similarity * v;
           let v = if self.wrap { v.wrap() } else { v };
           let i = inverse
             .transform_point(&v)
@@ -217,7 +217,8 @@ impl Computer {
       Matrix3::identity()
         .append_translation(&Vector2::from_element(0.5))
         .append_scaling(2.0 / self.size() as f64)
-        .append_translation(&Vector2::from_element(-1.0)),
+        .append_translation(&Vector2::from_element(-1.0))
+        .append_nonuniform_scaling(&Vector2::new(1.0, -1.0)),
     )
   }
 }
