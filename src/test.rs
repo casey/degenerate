@@ -21,42 +21,13 @@ fn test_inner(program: &str) -> Result<String> {
   canvas.set_height(RESOLUTION);
   canvas.set_width(RESOLUTION);
 
-  let gpu = if window.location().hash().map_err(JsValueError)? == "#gpu" {
-    Some(Arc::new(Mutex::new(Gpu::new(&canvas)?)))
-  } else {
-    None
-  };
+  let gpu = Arc::new(Mutex::new(Gpu::new(&canvas)?));
 
   let mut computer = Computer::new(gpu.clone());
   computer.load_program(&program);
   computer.resize(RESOLUTION as usize)?;
   computer.run(false)?;
-
-  if let Some(gpu) = gpu {
-    gpu.lock().unwrap().render_to_canvas()?;
-  } else {
-    let pixels = computer
-      .memory()
-      .transpose()
-      .iter()
-      .flatten()
-      .cloned()
-      .collect::<Vec<u8>>();
-
-    let image_data =
-      ImageData::new_with_u8_clamped_array(wasm_bindgen::Clamped(&pixels), RESOLUTION)
-        .map_err(JsValueError)?;
-
-    let context = canvas
-      .get_context("2d")
-      .map_err(JsValueError)?
-      .ok_or("failed to retrieve context")?
-      .cast::<CanvasRenderingContext2d>()?;
-
-    context
-      .put_image_data(&image_data, 0.0, 0.0)
-      .map_err(JsValueError)?;
-  }
+  gpu.lock().unwrap().render_to_canvas()?;
 
   Ok(canvas.to_data_url().map_err(JsValueError)?)
 }

@@ -118,10 +118,9 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
 
     let browser = browser().await;
 
-    // TODO: remove /#gpu
     let page = browser
       .inner
-      .new_page(format!("http://127.0.0.1:{}/#gpu", *SERVER_PORT))
+      .new_page(format!("http://127.0.0.1:{}", *SERVER_PORT))
       .await?;
 
     eprintln!("Waiting for module to load...");
