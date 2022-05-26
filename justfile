@@ -75,6 +75,6 @@ open:
 fix:
 	#!/usr/bin/env bash
 	set -euxo pipefail
-	for image in images/*.cpu.actual-memory.png; do
-		mv $image ${image%.cpu.actual-memory.png}.png
+	for image in images/*.gpu.actual-memory.png; do
+		mv $image ${image%.gpu.actual-memory.png}.png
 	done
