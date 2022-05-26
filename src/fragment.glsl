@@ -76,7 +76,7 @@ void main() {
   vec2 v = gl_FragCoord.xy / float(resolution) * 2.0 - 1.0;
   vec2 vt = (similarity * vec3(v, 1.0)).xy;
   vec2 vtw = wrap ? mod(vt + 1.0, 2.0) - 1.0 : vt;
-  ivec2 it = ivec2(((vtw + 1.0) / 2.0) * float(resolution));
+  ivec2 it = ivec2(floor(((vtw + 1.0) / 2.0) * float(resolution)));
   vec3 pt = texelFetch(source, it, 0).rgb;
   vec3 p = texelFetch(source, i, 0).rgb;
   if (is_masked(it, vtw)) {

@@ -842,3 +842,12 @@ image_test! {
     apply
   ",
 }
+
+image_test! {
+  name: gpu_extra_pixels,
+  program: "
+    rotate 0.01
+    apply
+    apply
+  ",
+}
