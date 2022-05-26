@@ -10,7 +10,7 @@ pub(crate) struct App {
   resize: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
-  gpu: Option<Arc<Mutex<Gpu>>>,
+  gpu: Arc<Mutex<Gpu>>,
   window: Window,
 }
 
@@ -28,11 +28,7 @@ impl App {
 
     let stderr = Stderr::get();
 
-    let gpu = if window.location().hash().map_err(JsValueError)? == "#gpu" {
-      Some(Arc::new(Mutex::new(Gpu::new(&canvas)?)))
-    } else {
-      None
-    };
+    let gpu = Arc::new(Mutex::new(Gpu::new(&canvas)?));
 
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
@@ -140,8 +136,7 @@ impl App {
       if resize || program_changed {
         let mut computer = Computer::new(self.gpu.clone());
         computer.load_program(&program);
-        // Make sure size is odd, so we don't get jaggies when drawing the X
-        computer.resize((self.canvas.width().max(self.canvas.height()) | 1).try_into()?)?;
+        computer.resize()?;
         self.computer = computer;
       }
 
@@ -152,39 +147,7 @@ impl App {
       }
 
       if resize || program_changed || run {
-        if let Some(gpu) = self.gpu.clone() {
-          gpu.lock().unwrap().render_to_canvas()?;
-        } else {
-          let context = self
-            .canvas
-            .get_context("2d")
-            .map_err(JsValueError)?
-            .ok_or("Failed to retrieve context")?
-            .cast::<CanvasRenderingContext2d>()?;
-
-          let pixels = self
-            .computer
-            .memory()
-            .transpose()
-            .iter()
-            .flatten()
-            .cloned()
-            .collect::<Vec<u8>>();
-
-          let size = self.computer.size();
-
-          let image_data =
-            ImageData::new_with_u8_clamped_array(wasm_bindgen::Clamped(&pixels), size.try_into()?)
-              .map_err(JsValueError)?;
-
-          context
-            .put_image_data(
-              &image_data,
-              (self.canvas.width() as f64 - size as f64) / 2.0,
-              (self.canvas.height() as f64 - size as f64) / 2.0,
-            )
-            .map_err(JsValueError)?;
-        }
+        self.gpu.lock().unwrap().render_to_canvas()?;
 
         if !self.computer.done() {
           self.request_animation_frame()?;
