@@ -1,7 +1,5 @@
 use super::*;
 
-const RESOLUTION: u32 = 256;
-
 #[wasm_bindgen]
 pub fn test(program: &str) -> Result<String, String> {
   test_inner(program).map_err(|err| err.to_string())
@@ -18,14 +16,14 @@ fn test_inner(program: &str) -> Result<String> {
     .map_err(JsValueError)?
     .cast::<HtmlCanvasElement>()?;
 
-  canvas.set_height(RESOLUTION);
-  canvas.set_width(RESOLUTION);
+  canvas.set_height(256);
+  canvas.set_width(256);
 
   let gpu = Arc::new(Mutex::new(Gpu::new(&canvas)?));
 
   let mut computer = Computer::new(gpu.clone());
   computer.load_program(&program);
-  computer.resize(RESOLUTION as usize)?;
+  computer.resize()?;
   computer.run(false)?;
   gpu.lock().unwrap().render_to_canvas()?;
 

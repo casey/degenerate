@@ -8,7 +8,6 @@ pub(crate) struct Computer {
   gpu: Arc<Mutex<Gpu>>,
   loop_counters: Vec<u64>,
   mask: Mask,
-  memory: DMatrix<Vector4<u8>>,
   operation: Operation,
   program: Vec<Command>,
   program_counter: usize,
@@ -37,10 +36,6 @@ impl Computer {
 
   pub(crate) fn wrap(&self) -> bool {
     self.wrap
-  }
-
-  pub(crate) fn memory(&self) -> &DMatrix<Vector4<u8>> {
-    &self.memory
   }
 
   pub(crate) fn done(&self) -> bool {
@@ -75,7 +70,6 @@ impl Computer {
       gpu,
       loop_counters: Vec::new(),
       mask: Mask::All,
-      memory: DMatrix::zeros(0, 0),
       operation: Operation::Invert,
       program: Vec::new(),
       program_counter: 0,
@@ -83,10 +77,6 @@ impl Computer {
       similarity: Similarity2::identity(),
       wrap: false,
     }
-  }
-
-  pub(crate) fn size(&self) -> usize {
-    self.memory.ncols()
   }
 
   fn apply(&mut self) -> Result {
@@ -161,18 +151,8 @@ impl Computer {
     Ok(())
   }
 
-  pub(crate) fn resize(&mut self, size: usize) -> Result {
+  pub(crate) fn resize(&mut self) -> Result {
     self.gpu.lock().unwrap().resize()?;
     Ok(())
-  }
-
-  fn transform(&self) -> Affine2<f64> {
-    Affine2::from_matrix_unchecked(
-      Matrix3::identity()
-        .append_translation(&Vector2::from_element(0.5))
-        .append_scaling(2.0 / self.size() as f64)
-        .append_translation(&Vector2::from_element(-1.0))
-        .append_nonuniform_scaling(&Vector2::new(1.0, -1.0)),
-    )
   }
 }
