@@ -8,4 +8,3 @@ INVERT = 1
 alpha = 1.0
 mask = ALL
 operation = INVERT
-
