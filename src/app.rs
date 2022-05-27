@@ -69,7 +69,6 @@ pub(crate) struct App {
   resize: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
-  gpu: Arc<Mutex<Gpu>>,
   window: Window,
 }
 
@@ -87,19 +86,16 @@ impl App {
 
     let stderr = Stderr::get();
 
-    let gpu = Arc::new(Mutex::new(Gpu::new()?));
-
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
       animation_frame_pending: false,
       canvas,
-      computer: Computer::new(gpu.clone()),
+      computer: Computer::new(GPU.clone()),
       input: false,
       nav,
       resize: true,
       stderr: stderr.clone(),
       textarea: textarea.clone(),
-      gpu,
       window: window.clone(),
     }));
 
@@ -184,19 +180,20 @@ impl App {
     }
 
     if self.input {
+      log::info!("input");
+
       self.nav.set_class_name("fade-out");
 
-      let interpreter = Interpreter::with_init(Default::default(), |vm| {
-        vm.add_native_module("degenerate".to_owned(), Box::new(degenerate::make_module));
-      });
+      let interpreter = Interpreter::without_stdlib(Default::default());
 
       let code = interpreter.enter(|vm| -> Result<PyRef<PyCode>> {
-        let prelude = include_str!("prelude.py").to_owned();
-        let program = prelude + &self.textarea.value();
-        log::info!("{program}");
         Ok(
-          vm.compile(&program, Mode::Exec, "<program>".to_owned())
-            .map_err(|err| format!("Failed to compile: {}", err))?,
+          vm.compile(
+            &format!("{}\n{}", include_str!("prelude.py"), &self.textarea.value()),
+            Mode::Exec,
+            "<program>".to_owned(),
+          )
+          .map_err(|err| format!("Failed to compile: {}", err))?,
         )
       })?;
 
@@ -207,7 +204,7 @@ impl App {
       let program_changed = program != self.computer.program();
 
       if resize || program_changed {
-        let mut computer = Computer::new(self.gpu.clone());
+        let mut computer = Computer::new(GPU.clone());
         computer.load_program(&program);
         computer.resize()?;
         self.computer = computer;
@@ -226,7 +223,7 @@ impl App {
       }
 
       if resize || program_changed || run {
-        self.gpu.lock().unwrap().render_to_canvas()?;
+        GPU.lock().unwrap().render_to_canvas()?;
 
         if !self.computer.done() {
           self.request_animation_frame()?;
