@@ -64,7 +64,7 @@ void main() {
   vec2 vtw = wrap ? mod(vt + 1.0, 2.0) - 1.0 : vt;
   vec2 it = floor(((vtw + 1.0) / 2.0) * resolution);
   vec3 pt = texelFetch(source, ivec2(it), 0).rgb;
-  vec3 p = texelFetch(source, ivec2(i), 0).rgb;
+  vec3 p = texture(source, gl_FragCoord.xy / resolution).rgb;
   if (is_masked(it, vtw)) {
     vec3 over = apply_operation(vtw, pt);
     color = vec4(over * alpha + p * (1.0 - alpha), 1.0);
