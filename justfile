@@ -5,7 +5,7 @@ export RUST_BACKTRACE := bt
 ci: check-lockfile test clippy fmt-check forbid
 
 build:
-	cargo build --release
+	cargo build
 
 test *args:
 	cargo test --all --all-targets -- {{args}}
@@ -64,10 +64,6 @@ serve:
 build-web:
 	cargo build --target wasm32-unknown-unknown
 	wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/debug/degenerate.wasm --out-dir www
-
-build-web-release:
-	cargo build --release --target wasm32-unknown-unknown
-	wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/release/degenerate.wasm --out-dir www
 
 open:
 	open http://localhost:8000
