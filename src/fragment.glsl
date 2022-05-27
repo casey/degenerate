@@ -58,7 +58,6 @@ bool is_masked(vec2 pixel, vec2 position) {
 }
 
 void main() {
-  vec2 i = gl_FragCoord.xy - 0.5;
   vec2 v = gl_FragCoord.xy / resolution * 2.0 - 1.0;
   vec2 vt = (similarity * vec3(v, 1.0)).xy;
   vec2 vtw = wrap ? mod(vt + 1.0, 2.0) - 1.0 : vt;
