@@ -34,7 +34,7 @@ vec3 apply_operation(vec2 position, vec3 pixel) {
   }
 }
 
-bool is_masked(ivec2 pixel, vec2 position) {
+bool is_masked(vec2 pixel, vec2 position) {
   switch (mask) {
     case ALL:
       return true;
@@ -58,13 +58,13 @@ bool is_masked(ivec2 pixel, vec2 position) {
 }
 
 void main() {
-  ivec2 i = ivec2(gl_FragCoord.xy - 0.5);
+  vec2 i = gl_FragCoord.xy - 0.5;
   vec2 v = gl_FragCoord.xy / resolution * 2.0 - 1.0;
   vec2 vt = (similarity * vec3(v, 1.0)).xy;
   vec2 vtw = wrap ? mod(vt + 1.0, 2.0) - 1.0 : vt;
-  ivec2 it = ivec2(floor(((vtw + 1.0) / 2.0) * resolution));
-  vec3 pt = texelFetch(source, it, 0).rgb;
-  vec3 p = texelFetch(source, i, 0).rgb;
+  vec2 it = floor(((vtw + 1.0) / 2.0) * resolution);
+  vec3 pt = texelFetch(source, ivec2(it), 0).rgb;
+  vec3 p = texelFetch(source, ivec2(i), 0).rgb;
   if (is_masked(it, vtw)) {
     vec3 over = apply_operation(vtw, pt);
     color = vec4(over * alpha + p * (1.0 - alpha), 1.0);
