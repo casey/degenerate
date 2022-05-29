@@ -20,16 +20,16 @@ uniform vec3 default_color;
 
 out vec4 output_color;
 
-vec3 apply(vec2 position, vec3 pixel) {
+vec3 apply(vec2 position, vec3 color) {
   switch (operation) {
     case DEBUG:
       return floor(vec3((position.x + 1.0) / 2.0, 0.0, 1.0 - (position.y + 1.0) / 2.0) * 16.0) / 16.0;
     case IDENTITY:
-      return pixel;
+      return color;
     case INVERT:
-      return 1.0 - pixel;
+      return 1.0 - color;
     case ROTATE_COLOR:
-      return (color_rotation * (pixel * 2.0 - 1.0) + 1.0) / 2.0;
+      return (color_rotation * (color * 2.0 - 1.0) + 1.0) / 2.0;
     default:
       return vec3(0.0, 1.0, 0.0);
   }
@@ -82,7 +82,7 @@ void main() {
   // Sample original color
   vec3 original_color = texture(source, gl_FragCoord.xy / resolution).rgb;
 
-  // Calculate pixel coordiantes
+  // Calculate position in pixel coordinates, [0, resolution)
   uvec2 pixel_position = uvec2((wrapped + 1.0) / 2.0 * resolution);
 
   // If within mask…
