@@ -47,7 +47,7 @@ bool masked(vec2 position, uvec2 pixel_position) {
       if (divisor == 0u) {
         return false;
       } else {
-        return ((uint(resolution) - 1u - pixel_position.y) * uint(resolution) + pixel_position.x) % divisor == remainder;
+        return (pixel_position.y * uint(resolution) + pixel_position.x) % divisor == remainder;
       }
     case ROWS:
       return (uint(resolution) - 1u - uint(pixel_position.y)) % (nrows + step) < nrows;
