@@ -5,6 +5,7 @@ use {
     js_value_error::JsValueError, mask::Mask, operation::Operation, select::Select, stderr::Stderr,
     window::window,
   },
+  js_sys::Float32Array,
   nalgebra::{Rotation3, Similarity2, UnitComplex, Vector3, Vector4},
   rand::{rngs::StdRng, seq::SliceRandom, SeedableRng},
   std::{
@@ -20,9 +21,9 @@ use {
   strum::{AsRefStr, EnumString, EnumVariantNames, VariantNames},
   wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue},
   web_sys::{
-    Document, Element, EventTarget, HtmlCanvasElement, HtmlElement, HtmlTextAreaElement,
-    WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
-    WebGlUniformLocation, Window,
+    AnalyserNode, AudioContext, Document, Element, EventTarget, HtmlAudioElement,
+    HtmlCanvasElement, HtmlElement, HtmlTextAreaElement, WebGl2RenderingContext,
+    WebGlContextAttributes, WebGlFramebuffer, WebGlTexture, WebGlUniformLocation, Window,
   },
 };
 

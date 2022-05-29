@@ -86,6 +86,7 @@ impl FromStr for Command {
       ["seed", seed] => Ok(Self::Seed(seed.parse()?)),
       ["square"] => Ok(Self::Mask(Mask::Square)),
       ["top"] => Ok(Self::Mask(Mask::Top)),
+      ["waveform"] => Ok(Self::Operation(Operation::Waveform)),
       ["wrap"] => Ok(Self::Wrap),
       ["x"] => Ok(Self::Mask(Mask::X)),
       _ => Err(format!("Invalid command: {}", s).into()),

@@ -12,6 +12,7 @@ pub(crate) struct App {
   textarea: HtmlTextAreaElement,
   gpu: Arc<Mutex<Gpu>>,
   window: Window,
+  audio_context: AudioContext,
 }
 
 impl App {
@@ -19,6 +20,19 @@ impl App {
     let window = window();
 
     let document = window.get_document();
+
+    let audio_element = document.select("audio")?.cast::<HtmlAudioElement>()?;
+    let audio_context = AudioContext::new().map_err(JsValueError)?;
+    let audio_analyzer = audio_context.create_analyser().map_err(JsValueError)?;
+    let source = audio_context
+      .create_media_element_source(&audio_element)
+      .map_err(JsValueError)?;
+    source
+      .connect_with_audio_node(&audio_analyzer)
+      .map_err(JsValueError)?;
+    source
+      .connect_with_audio_node(&audio_context.destination())
+      .map_err(JsValueError)?;
 
     let textarea = document.select("textarea")?.cast::<HtmlTextAreaElement>()?;
 
@@ -28,7 +42,7 @@ impl App {
 
     let stderr = Stderr::get();
 
-    let gpu = Arc::new(Mutex::new(Gpu::new(&canvas)?));
+    let gpu = Arc::new(Mutex::new(Gpu::new(&canvas, audio_analyzer)?));
 
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
@@ -42,6 +56,7 @@ impl App {
       textarea: textarea.clone(),
       gpu,
       window: window.clone(),
+      audio_context,
     }));
 
     let local = app.clone();
@@ -126,6 +141,7 @@ impl App {
 
     if self.input {
       self.nav.set_class_name("fade-out");
+      self.audio_context.resume();
 
       let program = Command::parse_program(&self.textarea.value())?;
 

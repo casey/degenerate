@@ -1,4 +1,4 @@
-use {super::*, Mask::*};
+use {super::*, Mask::*, WebGl2RenderingContext as Gl};
 
 pub(crate) struct Gpu {
   canvas: HtmlCanvasElement,
@@ -10,10 +10,12 @@ pub(crate) struct Gpu {
   textures: [WebGlTexture; 2],
   width: u32,
   uniforms: BTreeMap<String, WebGlUniformLocation>,
+  audio_analyzer: AnalyserNode,
+  audio_time_domain_texture: WebGlTexture,
 }
 
 impl Gpu {
-  pub(super) fn new(canvas: &HtmlCanvasElement) -> Result<Self> {
+  pub(super) fn new(canvas: &HtmlCanvasElement, audio_analyzer: AnalyserNode) -> Result<Self> {
     let mut context_options = WebGlContextAttributes::new();
 
     context_options
@@ -119,10 +121,47 @@ impl Gpu {
         let location = gl.get_uniform_location(&program, &name).unwrap();
         (name, location)
       })
-      .collect();
+      .collect::<BTreeMap<String, WebGlUniformLocation>>();
+
+    let audio_time_domain_texture = gl
+      .create_texture()
+      .ok_or("Failed to create audio_time_domain texture")?;
+
+    gl.active_texture(Gl::TEXTURE1);
+    gl.bind_texture(
+      WebGl2RenderingContext::TEXTURE_2D,
+      Some(&audio_time_domain_texture),
+    );
+
+    let fft_size = audio_analyzer.fft_size() as usize;
+
+    gl.tex_storage_2d(
+      WebGl2RenderingContext::TEXTURE_2D,
+      1,
+      WebGl2RenderingContext::R32F,
+      fft_size as i32,
+      1,
+    );
+
+    gl.tex_parameteri(
+      WebGl2RenderingContext::TEXTURE_2D,
+      WebGl2RenderingContext::TEXTURE_MIN_FILTER,
+      WebGl2RenderingContext::NEAREST.try_into()?,
+    );
+
+    gl.tex_parameteri(
+      WebGl2RenderingContext::TEXTURE_2D,
+      WebGl2RenderingContext::TEXTURE_MAG_FILTER,
+      WebGl2RenderingContext::NEAREST.try_into()?,
+    );
+
+    gl.uniform1i(Some(uniforms.get("source").unwrap()), 0);
+    gl.uniform1i(Some(uniforms.get("audio_time_domain").unwrap()), 1);
 
     Ok(Self {
       canvas: canvas.clone(),
+      audio_time_domain_texture,
+      audio_analyzer,
       frame_buffer,
       gl,
       height,
@@ -176,6 +215,41 @@ impl Gpu {
   }
 
   pub(crate) fn apply(&self, computer: &Computer) -> Result {
+    let fft_size = self.audio_analyzer.fft_size();
+    let mut time_domain_data = vec![0.0; fft_size as usize];
+    self
+      .audio_analyzer
+      .get_float_time_domain_data(&mut time_domain_data);
+    let array = Float32Array::new_with_length(fft_size);
+    array.copy_from(&time_domain_data);
+
+    // - set the active texture unit
+    // - bind the texture
+
+    self.gl.active_texture(Gl::TEXTURE1);
+    self.gl.bind_texture(
+      WebGl2RenderingContext::TEXTURE_2D,
+      Some(&self.audio_time_domain_texture),
+    );
+
+    // TODO:
+    // must bind texture units
+
+    self
+      .gl
+      .tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_array_buffer_view(
+        WebGl2RenderingContext::TEXTURE_2D,
+        0,
+        0,
+        0,
+        self.audio_analyzer.fft_size() as i32,
+        1,
+        WebGl2RenderingContext::RED,
+        WebGl2RenderingContext::FLOAT,
+        Some(&array),
+      )
+      .map_err(JsValueError)?;
+
     self.gl.bind_framebuffer(
       WebGl2RenderingContext::FRAMEBUFFER,
       Some(&self.frame_buffer),
@@ -189,6 +263,7 @@ impl Gpu {
       0,
     );
 
+    self.gl.active_texture(Gl::TEXTURE0);
     self.gl.bind_texture(
       WebGl2RenderingContext::TEXTURE_2D,
       Some(&self.textures[self.source_texture.get()]),

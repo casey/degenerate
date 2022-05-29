@@ -9,6 +9,7 @@ uniform float alpha;
 uniform float resolution;
 uniform mat3 color_rotation;
 uniform mat3 transform;
+uniform sampler2D audio_time_domain;
 uniform sampler2D source;
 uniform uint divisor;
 uniform uint mask;
@@ -30,6 +31,11 @@ vec3 apply(vec2 position, vec3 color) {
       return 1.0 - color;
     case ROTATE_COLOR:
       return (color_rotation * (color * 2.0 - 1.0) + 1.0) / 2.0;
+    case WAVEFORM:
+      // TODO:
+      // - how can this be invertable? Would xor if it was binary data.
+      // - could use audio intenisity as alpha value
+      return texture(audio_time_domain, vec2((position.x + 1.0) / 2.0, 0.5)).rrr;
     default:
       return vec3(0.0, 1.0, 0.0);
   }

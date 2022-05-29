@@ -19,7 +19,10 @@ fn test_inner(program: &str) -> Result<String> {
   canvas.set_height(256);
   canvas.set_width(256);
 
-  let gpu = Arc::new(Mutex::new(Gpu::new(&canvas)?));
+  let audio_context = AudioContext::new().map_err(JsValueError)?;
+  let audio_analyzer = audio_context.create_analyser().map_err(JsValueError)?;
+
+  let gpu = Arc::new(Mutex::new(Gpu::new(&canvas, audio_analyzer)?));
 
   let mut computer = Computer::new(gpu.clone());
   computer.load_program(&program);

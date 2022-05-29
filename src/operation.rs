@@ -7,4 +7,5 @@ pub(crate) enum Operation {
   Identity,
   Invert,
   RotateColor(ColorAxis, f32),
+  Waveform,
 }
