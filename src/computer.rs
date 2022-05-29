@@ -144,7 +144,7 @@ impl Computer {
       Command::Operation(operation) => self.operation = operation,
       Command::Rotate(turns) => self
         .transform
-        .append_rotation_mut(&UnitComplex::from_angle(turns * f32::consts::TAU)),
+        .append_rotation_mut(&UnitComplex::from_angle(-turns * f32::consts::TAU)),
       Command::Scale(scaling) => {
         self.transform.append_scaling_mut(scaling);
       }
