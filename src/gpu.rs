@@ -8,23 +8,8 @@ pub(crate) struct Gpu {
   resolution: u32,
   source_texture: Cell<usize>,
   textures: [WebGlTexture; 2],
-  uniforms: Uniforms,
   width: u32,
-}
-
-struct Uniforms {
-  alpha: WebGlUniformLocation,
-  color_rotation: WebGlUniformLocation,
-  default_color: WebGlUniformLocation,
-  divisor: WebGlUniformLocation,
-  mask: WebGlUniformLocation,
-  nrows: WebGlUniformLocation,
-  operation: WebGlUniformLocation,
-  remainder: WebGlUniformLocation,
-  resolution: WebGlUniformLocation,
-  transform: WebGlUniformLocation,
-  step: WebGlUniformLocation,
-  wrap: WebGlUniformLocation,
+  uniforms: BTreeMap<String, WebGlUniformLocation>,
 }
 
 impl Gpu {
@@ -122,19 +107,21 @@ impl Gpu {
       .create_framebuffer()
       .ok_or("Failed to create framebuffer")?;
 
-    let uniforms = Uniforms {
-      alpha: Self::get_uniform_location(&gl, &program, "alpha"),
-      color_rotation: Self::get_uniform_location(&gl, &program, "color_rotation"),
-      default_color: Self::get_uniform_location(&gl, &program, "default_color"),
-      divisor: Self::get_uniform_location(&gl, &program, "divisor"),
-      mask: Self::get_uniform_location(&gl, &program, "mask"),
-      nrows: Self::get_uniform_location(&gl, &program, "nrows"),
-      operation: Self::get_uniform_location(&gl, &program, "operation"),
-      remainder: Self::get_uniform_location(&gl, &program, "remainder"),
-      resolution: Self::get_uniform_location(&gl, &program, "resolution"),
-      transform: Self::get_uniform_location(&gl, &program, "transform"),
-      step: Self::get_uniform_location(&gl, &program, "step"),
-      wrap: Self::get_uniform_location(&gl, &program, "wrap"),
+    let uniforms = {
+      let mut names: BTreeMap<String, WebGlUniformLocation> = BTreeMap::new();
+
+      for i in 0.. {
+        match gl.get_active_uniform(&program, i) {
+          Some(info) => {
+            let name = info.name();
+            let location = gl.get_uniform_location(&program, &name).unwrap();
+            names.insert(name, location);
+          }
+          None => break,
+        }
+      }
+
+      names
     };
 
     Ok(Self {
@@ -212,10 +199,10 @@ impl Gpu {
 
     self
       .gl
-      .uniform1f(Some(&self.uniforms.alpha), computer.alpha() as f32);
+      .uniform1f(Some(&self.uniform("alpha")), computer.alpha() as f32);
 
     self.gl.uniform3f(
-      Some(&self.uniforms.default_color),
+      Some(&self.uniform("default_color")),
       computer.default().x as f32 / 255.0,
       computer.default().y as f32 / 255.0,
       computer.default().z as f32 / 255.0,
@@ -223,21 +210,21 @@ impl Gpu {
 
     match computer.mask() {
       Mod { divisor, remainder } => {
-        self.gl.uniform1ui(Some(&self.uniforms.divisor), *divisor);
+        self.gl.uniform1ui(Some(&self.uniform("divisor")), *divisor);
         self
           .gl
-          .uniform1ui(Some(&self.uniforms.remainder), *remainder);
+          .uniform1ui(Some(&self.uniform("remainder")), *remainder);
       }
       Rows { nrows, step } => {
-        self.gl.uniform1ui(Some(&self.uniforms.nrows), *nrows);
-        self.gl.uniform1ui(Some(&self.uniforms.step), *step);
+        self.gl.uniform1ui(Some(&self.uniform("nrows")), *nrows);
+        self.gl.uniform1ui(Some(&self.uniform("step")), *step);
       }
       _ => {}
     }
 
     if let Operation::RotateColor(axis, turns) = computer.operation() {
       self.gl.uniform_matrix3fv_with_f32_array(
-        Some(&self.uniforms.color_rotation),
+        Some(&self.uniform("color_rotation")),
         false,
         Rotation3::new(axis.vector() * *turns * f64::consts::TAU)
           .matrix()
@@ -247,7 +234,7 @@ impl Gpu {
     }
 
     self.gl.uniform_matrix3fv_with_f32_array(
-      Some(&self.uniforms.transform),
+      Some(&self.uniform("transform")),
       false,
       computer
         .transform()
@@ -259,10 +246,10 @@ impl Gpu {
 
     self
       .gl
-      .uniform1ui(Some(&self.uniforms.wrap), computer.wrap() as u32);
+      .uniform1ui(Some(&self.uniform("wrap")), computer.wrap() as u32);
 
     self.gl.uniform1ui(
-      Some(&self.uniforms.mask),
+      Some(&self.uniform("mask")),
       Mask::VARIANTS
         .iter()
         .position(|mask| *mask == computer.mask().as_ref())
@@ -271,7 +258,7 @@ impl Gpu {
     );
 
     self.gl.uniform1ui(
-      Some(&self.uniforms.operation),
+      Some(&self.uniform("operation")),
       Operation::VARIANTS
         .iter()
         .position(|operation| *operation == computer.operation().as_ref())
@@ -321,7 +308,7 @@ impl Gpu {
 
     self
       .gl
-      .uniform1f(Some(&self.uniforms.resolution), self.resolution as f32);
+      .uniform1f(Some(&self.uniform("resolution")), self.resolution as f32);
 
     self
       .gl
@@ -338,13 +325,7 @@ impl Gpu {
     Ok(())
   }
 
-  fn get_uniform_location(
-    gl: &WebGl2RenderingContext,
-    program: &WebGlProgram,
-    name: &str,
-  ) -> WebGlUniformLocation {
-    gl.get_uniform_location(program, name)
-      .ok_or_else(|| format!("Could not find uniform `{}`", name))
-      .unwrap()
+  fn uniform(&self, name: &str) -> &WebGlUniformLocation {
+    self.uniforms.get(name).unwrap()
   }
 }

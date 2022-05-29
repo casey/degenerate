@@ -9,6 +9,7 @@ use {
   rand::{rngs::StdRng, seq::SliceRandom, SeedableRng},
   std::{
     cell::Cell,
+    collections::BTreeMap,
     f64,
     fmt::{self, Formatter},
     ops::Deref,
