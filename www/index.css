@@ -15,6 +15,12 @@ a:hover {
   text-shadow: 0 0 5px #fff;
 }
 
+audio {
+  z-index: 3;
+  position: absolute;
+  bottom: var(--padding-vertical);
+}
+
 body {
   height: 100%;
   margin: 0;
@@ -45,7 +51,7 @@ nav {
   mix-blend-mode: difference;
   position: absolute;
   top: var(--padding-vertical);
-  z-index: 3;
+  z-index: 4;
 }
 
 nav > * {
