@@ -107,9 +107,14 @@ impl Gpu {
       .create_framebuffer()
       .ok_or("Failed to create framebuffer")?;
 
-    let uniforms = (0..)
-      .map_while(|i| gl.get_active_uniform(&program, i))
-      .map(|info| {
+    let uniform_count = gl
+      .get_program_parameter(&program, WebGl2RenderingContext::ACTIVE_UNIFORMS)
+      .cast::<js_sys::Number>()?
+      .value_of() as u32;
+
+    let uniforms = (0..uniform_count)
+      .map(|i| {
+        let info = gl.get_active_uniform(&program, i).unwrap();
         let name = info.name();
         let location = gl.get_uniform_location(&program, &name).unwrap();
         (name, location)
