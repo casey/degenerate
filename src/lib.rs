@@ -21,7 +21,7 @@ use {
   wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue},
   web_sys::{
     Document, Element, EventTarget, HtmlCanvasElement, HtmlElement, HtmlTextAreaElement,
-    WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlProgram, WebGlTexture,
+    WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
     WebGlUniformLocation, Window,
   },
 };

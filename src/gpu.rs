@@ -107,22 +107,14 @@ impl Gpu {
       .create_framebuffer()
       .ok_or("Failed to create framebuffer")?;
 
-    let uniforms = {
-      let mut names: BTreeMap<String, WebGlUniformLocation> = BTreeMap::new();
-
-      for i in 0.. {
-        match gl.get_active_uniform(&program, i) {
-          Some(info) => {
-            let name = info.name();
-            let location = gl.get_uniform_location(&program, &name).unwrap();
-            names.insert(name, location);
-          }
-          None => break,
-        }
-      }
-
-      names
-    };
+    let uniforms = (0..)
+      .map_while(|i| gl.get_active_uniform(&program, i))
+      .map(|info| {
+        let name = info.name();
+        let location = gl.get_uniform_location(&program, &name).unwrap();
+        (name, location)
+      })
+      .collect();
 
     Ok(Self {
       canvas: canvas.clone(),
@@ -199,10 +191,10 @@ impl Gpu {
 
     self
       .gl
-      .uniform1f(Some(&self.uniform("alpha")), computer.alpha() as f32);
+      .uniform1f(Some(self.uniform("alpha")), computer.alpha() as f32);
 
     self.gl.uniform3f(
-      Some(&self.uniform("default_color")),
+      Some(self.uniform("default_color")),
       computer.default().x as f32 / 255.0,
       computer.default().y as f32 / 255.0,
       computer.default().z as f32 / 255.0,
@@ -210,21 +202,21 @@ impl Gpu {
 
     match computer.mask() {
       Mod { divisor, remainder } => {
-        self.gl.uniform1ui(Some(&self.uniform("divisor")), *divisor);
+        self.gl.uniform1ui(Some(self.uniform("divisor")), *divisor);
         self
           .gl
-          .uniform1ui(Some(&self.uniform("remainder")), *remainder);
+          .uniform1ui(Some(self.uniform("remainder")), *remainder);
       }
       Rows { nrows, step } => {
-        self.gl.uniform1ui(Some(&self.uniform("nrows")), *nrows);
-        self.gl.uniform1ui(Some(&self.uniform("step")), *step);
+        self.gl.uniform1ui(Some(self.uniform("nrows")), *nrows);
+        self.gl.uniform1ui(Some(self.uniform("step")), *step);
       }
       _ => {}
     }
 
     if let Operation::RotateColor(axis, turns) = computer.operation() {
       self.gl.uniform_matrix3fv_with_f32_array(
-        Some(&self.uniform("color_rotation")),
+        Some(self.uniform("color_rotation")),
         false,
         Rotation3::new(axis.vector() * *turns * f64::consts::TAU)
           .matrix()
@@ -234,7 +226,7 @@ impl Gpu {
     }
 
     self.gl.uniform_matrix3fv_with_f32_array(
-      Some(&self.uniform("transform")),
+      Some(self.uniform("transform")),
       false,
       computer
         .transform()
@@ -246,10 +238,10 @@ impl Gpu {
 
     self
       .gl
-      .uniform1ui(Some(&self.uniform("wrap")), computer.wrap() as u32);
+      .uniform1ui(Some(self.uniform("wrap")), computer.wrap() as u32);
 
     self.gl.uniform1ui(
-      Some(&self.uniform("mask")),
+      Some(self.uniform("mask")),
       Mask::VARIANTS
         .iter()
         .position(|mask| *mask == computer.mask().as_ref())
@@ -258,7 +250,7 @@ impl Gpu {
     );
 
     self.gl.uniform1ui(
-      Some(&self.uniform("operation")),
+      Some(self.uniform("operation")),
       Operation::VARIANTS
         .iter()
         .position(|operation| *operation == computer.operation().as_ref())
@@ -308,7 +300,7 @@ impl Gpu {
 
     self
       .gl
-      .uniform1f(Some(&self.uniform("resolution")), self.resolution as f32);
+      .uniform1f(Some(self.uniform("resolution")), self.resolution as f32);
 
     self
       .gl
