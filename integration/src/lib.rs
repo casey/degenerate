@@ -5,6 +5,7 @@ use {
   std::{
     fs,
     net::SocketAddr,
+    path::PathBuf,
     str,
     sync::{Arc, Once, Weak},
     time::Duration,
@@ -144,11 +145,11 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
       &data_url["data:image/png;base64,".len()..],
     )?)?;
 
-    let want_path = format!("../images/{}.png", name);
+    let want_path = PathBuf::from(format!("../images/{}.png", name));
 
-    let want = image::open(&want_path)?;
+    let missing = !want_path.is_file();
 
-    if have != want {
+    if missing || have != image::open(&want_path)? {
       let destination = format!("../images/{}.actual-memory.png", name);
 
       have.save(&destination)?;
@@ -166,10 +167,19 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
         }
       }
 
-      panic!(
-        "Image test failed:\nExpected: {}\nActual:   {}",
-        want_path, destination,
-      );
+      if missing {
+        panic!(
+          "Image test failed:\nExpected image missing: {}\nActual:   {}",
+          want_path.display(),
+          destination,
+        );
+      } else {
+        panic!(
+          "Image test failed:\nExpected: {}\nActual:   {}",
+          want_path.display(),
+          destination,
+        );
+      }
     }
 
     Ok(())
@@ -270,7 +280,7 @@ image_test! {
 }
 
 image_test! {
-  name: default,
+  name: default_program,
   program: "",
 }
 
@@ -777,6 +787,15 @@ image_test! {
   program: "
     rotate 0.01
     apply
+    apply
+  ",
+}
+
+image_test! {
+  name: default_color,
+  program: "
+    default 255 0 255
+    rotate 0.01
     apply
   ",
 }

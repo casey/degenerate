@@ -8,7 +8,7 @@ uniform bool wrap;
 uniform float alpha;
 uniform float resolution;
 uniform mat3 color_rotation;
-uniform mat3 similarity;
+uniform mat3 transform;
 uniform sampler2D source;
 uniform uint divisor;
 uniform uint mask;
@@ -16,10 +16,11 @@ uniform uint nrows;
 uniform uint operation;
 uniform uint remainder;
 uniform uint step;
+uniform vec3 default_color;
 
-out vec4 color;
+out vec4 output_color;
 
-vec3 apply_operation(vec2 position, vec3 pixel) {
+vec3 apply(vec2 position, vec3 pixel) {
   switch (operation) {
     case DEBUG:
       return floor(vec3((position.x + 1.0) / 2.0, 0.0, 1.0 - (position.y + 1.0) / 2.0) * 16.0) / 16.0;
@@ -34,7 +35,7 @@ vec3 apply_operation(vec2 position, vec3 pixel) {
   }
 }
 
-bool is_masked(vec2 pixel, vec2 position) {
+bool masked(vec2 position, uvec2 pixel_position) {
   switch (mask) {
     case ALL:
       return true;
@@ -43,9 +44,13 @@ bool is_masked(vec2 pixel, vec2 position) {
     case CROSS:
       return abs(position.x) < 0.25 || abs(position.y) < 0.25;
     case MOD:
-      return divisor == 0u ? false : ((uint(resolution) - 1u - uint(pixel.y)) * uint(resolution) + uint(pixel.x)) % divisor == remainder;
+      if (divisor == 0u) {
+        return false;
+      } else {
+        return ((uint(resolution) - 1u - pixel_position.y) * uint(resolution) + pixel_position.x) % divisor == remainder;
+      }
     case ROWS:
-      return (uint(resolution) - 1u - uint(pixel.y)) % (nrows + step) < nrows;
+      return (uint(resolution) - 1u - uint(pixel_position.y)) % (nrows + step) < nrows;
     case SQUARE:
       return abs(position.x) < 0.5 && abs(position.y) < 0.5;
     case TOP:
@@ -58,16 +63,35 @@ bool is_masked(vec2 pixel, vec2 position) {
 }
 
 void main() {
-  vec2 v = gl_FragCoord.xy / resolution * 2.0 - 1.0;
-  vec2 vt = (similarity * vec3(v, 1.0)).xy;
-  vec2 vtw = wrap ? mod(vt + 1.0, 2.0) - 1.0 : vt;
-  vec2 it = floor(((vtw + 1.0) / 2.0) * resolution);
-  vec3 pt = texelFetch(source, ivec2(it), 0).rgb;
-  vec3 p = texture(source, gl_FragCoord.xy / resolution).rgb;
-  if (is_masked(it, vtw)) {
-    vec3 over = apply_operation(vtw, pt);
-    color = vec4(over * alpha + p * (1.0 - alpha), 1.0);
-  } else {
-    color = vec4(p, 1.0);
-  }
+  // Get fragment coordinates and transform to [-1, 1]
+  vec2 position = gl_FragCoord.xy / resolution * 2.0 - 1.0;
+
+  // Transform position by transform matrix
+  vec2 transformed = (transform * vec3(position, 1.0)).xy;
+
+  // Wrap transformed position to be within [-1, 1] if enabled
+  vec2 wrapped = wrap
+    ? mod(transformed + 1.0, 2.0) - 1.0
+    : transformed;
+
+  // Sample color if in-bounds, otherwise use default color
+  vec3 input_color = wrapped.x >= -1.0 && wrapped.x <= 1.0 && wrapped.y >= -1.0 && wrapped.y <= 1.0
+    ? texture(source, (wrapped + 1.0) / 2.0).rgb
+    : default_color;
+
+  // Sample original color
+  vec3 original_color = texture(source, gl_FragCoord.xy / resolution).rgb;
+
+  // Calculate pixel coordiantes
+  uvec2 pixel_position = uvec2((wrapped + 1.0) / 2.0 * resolution);
+
+  // If within mask…
+  vec3 output_color_rgb = masked(wrapped, pixel_position)
+    // …set output color to alpha blended output of operation…
+    ? apply(wrapped, input_color) * alpha + original_color * (1.0 - alpha)
+    // …otherwise use original color
+    : original_color;
+
+  // Extend output color with opaque alpha channel
+  output_color = vec4(output_color_rgb, 1.0);
 }

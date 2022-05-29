@@ -12,7 +12,7 @@ pub(crate) struct Computer {
   program: Vec<Command>,
   program_counter: usize,
   rng: StdRng,
-  similarity: Similarity2<f64>,
+  transform: Similarity2<f64>,
   wrap: bool,
 }
 
@@ -28,6 +28,10 @@ impl Computer {
     }
 
     Ok(())
+  }
+
+  pub(crate) fn default(&self) -> Vector4<u8> {
+    self.default
   }
 
   pub(crate) fn alpha(&self) -> f64 {
@@ -59,8 +63,8 @@ impl Computer {
     &self.operation
   }
 
-  pub(crate) fn similarity(&self) -> &Similarity2<f64> {
-    &self.similarity
+  pub(crate) fn transform(&self) -> &Similarity2<f64> {
+    &self.transform
   }
 
   pub(crate) fn new(gpu: Arc<Mutex<Gpu>>) -> Self {
@@ -74,7 +78,7 @@ impl Computer {
       program: Vec::new(),
       program_counter: 0,
       rng: StdRng::seed_from_u64(0),
-      similarity: Similarity2::identity(),
+      transform: Similarity2::identity(),
       wrap: false,
     }
   }
@@ -139,10 +143,10 @@ impl Computer {
       Command::Mask(mask) => self.mask = mask,
       Command::Operation(operation) => self.operation = operation,
       Command::Rotate(turns) => self
-        .similarity
+        .transform
         .append_rotation_mut(&UnitComplex::from_angle(turns * f64::consts::TAU)),
       Command::Scale(scaling) => {
-        self.similarity.append_scaling_mut(scaling);
+        self.transform.append_scaling_mut(scaling);
       }
       Command::Seed(seed) => self.rng = StdRng::seed_from_u64(seed),
       Command::Wrap => self.wrap = !self.wrap,

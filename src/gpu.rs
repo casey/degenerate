@@ -15,13 +15,14 @@ pub(crate) struct Gpu {
 struct Uniforms {
   alpha: WebGlUniformLocation,
   color_rotation: WebGlUniformLocation,
+  default_color: WebGlUniformLocation,
   divisor: WebGlUniformLocation,
   mask: WebGlUniformLocation,
   nrows: WebGlUniformLocation,
   operation: WebGlUniformLocation,
   remainder: WebGlUniformLocation,
   resolution: WebGlUniformLocation,
-  similarity: WebGlUniformLocation,
+  transform: WebGlUniformLocation,
   step: WebGlUniformLocation,
   wrap: WebGlUniformLocation,
 }
@@ -124,13 +125,14 @@ impl Gpu {
     let uniforms = Uniforms {
       alpha: Self::get_uniform_location(&gl, &program, "alpha"),
       color_rotation: Self::get_uniform_location(&gl, &program, "color_rotation"),
+      default_color: Self::get_uniform_location(&gl, &program, "default_color"),
       divisor: Self::get_uniform_location(&gl, &program, "divisor"),
       mask: Self::get_uniform_location(&gl, &program, "mask"),
       nrows: Self::get_uniform_location(&gl, &program, "nrows"),
       operation: Self::get_uniform_location(&gl, &program, "operation"),
       remainder: Self::get_uniform_location(&gl, &program, "remainder"),
       resolution: Self::get_uniform_location(&gl, &program, "resolution"),
-      similarity: Self::get_uniform_location(&gl, &program, "similarity"),
+      transform: Self::get_uniform_location(&gl, &program, "transform"),
       step: Self::get_uniform_location(&gl, &program, "step"),
       wrap: Self::get_uniform_location(&gl, &program, "wrap"),
     };
@@ -212,6 +214,13 @@ impl Gpu {
       .gl
       .uniform1f(Some(&self.uniforms.alpha), computer.alpha() as f32);
 
+    self.gl.uniform3f(
+      Some(&self.uniforms.default_color),
+      computer.default().x as f32 / 255.0,
+      computer.default().y as f32 / 255.0,
+      computer.default().z as f32 / 255.0,
+    );
+
     match computer.mask() {
       Mod { divisor, remainder } => {
         self.gl.uniform1ui(Some(&self.uniforms.divisor), *divisor);
@@ -238,10 +247,10 @@ impl Gpu {
     }
 
     self.gl.uniform_matrix3fv_with_f32_array(
-      Some(&self.uniforms.similarity),
+      Some(&self.uniforms.transform),
       false,
       computer
-        .similarity()
+        .transform()
         .inverse()
         .to_homogeneous()
         .map(|element| element as f32)
@@ -288,6 +297,18 @@ impl Gpu {
       WebGl2RenderingContext::RGBA8,
       resolution as i32,
       resolution as i32,
+    );
+
+    gl.tex_parameteri(
+      WebGl2RenderingContext::TEXTURE_2D,
+      WebGl2RenderingContext::TEXTURE_MIN_FILTER,
+      WebGl2RenderingContext::NEAREST.try_into()?,
+    );
+
+    gl.tex_parameteri(
+      WebGl2RenderingContext::TEXTURE_2D,
+      WebGl2RenderingContext::TEXTURE_MAG_FILTER,
+      WebGl2RenderingContext::NEAREST.try_into()?,
     );
 
     Ok(texture)
