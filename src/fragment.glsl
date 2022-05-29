@@ -50,7 +50,7 @@ bool masked(vec2 position, uvec2 pixel_position) {
         return (pixel_position.y * uint(resolution) + pixel_position.x) % divisor == remainder;
       }
     case ROWS:
-      return (uint(resolution) - 1u - uint(pixel_position.y)) % (nrows + step) < nrows;
+      return pixel_position.y % (nrows + step) < nrows;
     case SQUARE:
       return abs(position.x) < 0.5 && abs(position.y) < 0.5;
     case TOP:
