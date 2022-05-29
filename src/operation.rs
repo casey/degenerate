@@ -6,5 +6,5 @@ pub(crate) enum Operation {
   Debug,
   Identity,
   Invert,
-  RotateColor(ColorAxis, f64),
+  RotateColor(ColorAxis, f32),
 }

@@ -10,7 +10,7 @@ use {
   std::{
     cell::Cell,
     collections::BTreeMap,
-    f64,
+    f32,
     fmt::{self, Formatter},
     ops::Deref,
     str::FromStr,

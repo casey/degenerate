@@ -1,10 +1,10 @@
 use super::*;
 
-const ALPHA_OPAQUE: u8 = 255;
+const ALPHA_OPAQUE: f32 = 1.0;
 
 pub(crate) struct Computer {
-  alpha: f64,
-  default: Vector4<u8>,
+  alpha: f32,
+  default: Vector4<f32>,
   gpu: Arc<Mutex<Gpu>>,
   loop_counters: Vec<u64>,
   mask: Mask,
@@ -12,7 +12,7 @@ pub(crate) struct Computer {
   program: Vec<Command>,
   program_counter: usize,
   rng: StdRng,
-  transform: Similarity2<f64>,
+  transform: Similarity2<f32>,
   wrap: bool,
 }
 
@@ -30,11 +30,11 @@ impl Computer {
     Ok(())
   }
 
-  pub(crate) fn default(&self) -> Vector4<u8> {
+  pub(crate) fn default(&self) -> Vector4<f32> {
     self.default
   }
 
-  pub(crate) fn alpha(&self) -> f64 {
+  pub(crate) fn alpha(&self) -> f32 {
     self.alpha
   }
 
@@ -63,14 +63,14 @@ impl Computer {
     &self.operation
   }
 
-  pub(crate) fn transform(&self) -> &Similarity2<f64> {
+  pub(crate) fn transform(&self) -> &Similarity2<f32> {
     &self.transform
   }
 
   pub(crate) fn new(gpu: Arc<Mutex<Gpu>>) -> Self {
     Self {
       alpha: 1.0,
-      default: Vector4::new(0, 0, 0, ALPHA_OPAQUE),
+      default: Vector4::new(0.0, 0.0, 0.0, ALPHA_OPAQUE),
       gpu,
       loop_counters: Vec::new(),
       mask: Mask::All,
@@ -144,7 +144,7 @@ impl Computer {
       Command::Operation(operation) => self.operation = operation,
       Command::Rotate(turns) => self
         .transform
-        .append_rotation_mut(&UnitComplex::from_angle(turns * f64::consts::TAU)),
+        .append_rotation_mut(&UnitComplex::from_angle(turns * f32::consts::TAU)),
       Command::Scale(scaling) => {
         self.transform.append_scaling_mut(scaling);
       }

@@ -191,13 +191,13 @@ impl Gpu {
 
     self
       .gl
-      .uniform1f(Some(self.uniform("alpha")), computer.alpha() as f32);
+      .uniform1f(Some(self.uniform("alpha")), computer.alpha());
 
     self.gl.uniform3f(
       Some(self.uniform("default_color")),
-      computer.default().x as f32 / 255.0,
-      computer.default().y as f32 / 255.0,
-      computer.default().z as f32 / 255.0,
+      computer.default().x,
+      computer.default().y,
+      computer.default().z,
     );
 
     match computer.mask() {
@@ -218,9 +218,8 @@ impl Gpu {
       self.gl.uniform_matrix3fv_with_f32_array(
         Some(self.uniform("color_rotation")),
         false,
-        Rotation3::new(axis.vector() * *turns * f64::consts::TAU)
+        Rotation3::new(axis.vector() * *turns * f32::consts::TAU)
           .matrix()
-          .map(|element| element as f32)
           .as_slice(),
       );
     }
@@ -228,12 +227,7 @@ impl Gpu {
     self.gl.uniform_matrix3fv_with_f32_array(
       Some(self.uniform("transform")),
       false,
-      computer
-        .transform()
-        .inverse()
-        .to_homogeneous()
-        .map(|element| element as f32)
-        .as_slice(),
+      computer.transform().inverse().to_homogeneous().as_slice(),
     );
 
     self

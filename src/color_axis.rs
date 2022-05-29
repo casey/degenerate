@@ -12,7 +12,7 @@ pub(crate) enum ColorAxis {
 }
 
 impl ColorAxis {
-  pub(crate) fn vector(&self) -> Vector3<f64> {
+  pub(crate) fn vector(&self) -> Vector3<f32> {
     match self {
       ColorAxis::Red => Vector3::x(),
       ColorAxis::Green => Vector3::y(),
