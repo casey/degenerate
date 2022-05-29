@@ -318,6 +318,10 @@ impl Gpu {
   }
 
   fn uniform(&self, name: &str) -> &WebGlUniformLocation {
-    self.uniforms.get(name).unwrap()
+    self
+      .uniforms
+      .get(name)
+      .ok_or_else(|| format!("Uniform `{name}` is missing.",))
+      .unwrap()
   }
 }
