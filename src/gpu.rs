@@ -234,6 +234,8 @@ impl Gpu {
 
     // TODO:
     // must bind texture units
+    //
+    // What is range of time-domain data?
 
     self
       .gl
