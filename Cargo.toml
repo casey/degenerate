@@ -38,6 +38,7 @@ features = [
   "InputEvent",
   "Location",
   "WebGl2RenderingContext",
+  "WebGlActiveInfo",
   "WebGlBuffer",
   "WebGlContextAttributes",
   "WebGlFramebuffer",
