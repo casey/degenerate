@@ -209,6 +209,20 @@ impl Gpu {
       default_color.z,
     );
 
+    match state.mask {
+      Mod { divisor, remainder } => {
+        self.gl.uniform1ui(Some(self.uniform("divisor")), divisor);
+        self
+          .gl
+          .uniform1ui(Some(self.uniform("remainder")), remainder);
+      }
+      Rows { nrows, step } => {
+        self.gl.uniform1ui(Some(self.uniform("nrows")), nrows);
+        self.gl.uniform1ui(Some(self.uniform("step")), step);
+      }
+      _ => {}
+    }
+
     let similarity: Similarity2<f64> = Similarity2::identity();
 
     self.gl.uniform_matrix3fv_with_f32_array(

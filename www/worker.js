@@ -1,13 +1,18 @@
 // clear the environment
 
+
 const ALL = 'All';
 const CIRCLE = 'Circle';
 const SQUARE = 'Square';
 const X = 'X';
 
-// fix these
-const MOD = (divisor, remainder) => ['Mod', divisor, remainder]
-const ROWS = (nrows, step) => ['Rows', nrows, step]
+function MOD(divisor, remainder) {
+  return {Mod: {divisor: divisor, remainder: remainder}};
+}
+
+function ROWS(nrows, step) {
+  return {Rows: {nrows: nrows}};
+}
 
 const DEBUG = 'Debug';
 const IDENTITY = 'Identity'
