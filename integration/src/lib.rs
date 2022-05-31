@@ -19,18 +19,6 @@ use {
   unindent::Unindent,
 };
 
-macro_rules! image_test {
-  (
-    name: $name:ident,
-    program: $program:literal,
-  ) => {
-    #[test]
-    fn $name() -> Result {
-      image_test(stringify!($name), $program)
-    }
-  };
-}
-
 type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
 struct Browser {
@@ -186,609 +174,777 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
   })
 }
 
-image_test! {
-  name: all,
-  program: "
-    all
-    apply
-  ",
-}
-
-image_test! {
-  name: alpha,
-  program: "
-    alpha 0.5
-    x
-    apply
-  ",
-}
-
-image_test! {
-  name: apply,
-  program: "
-    apply
-  ",
-}
-
-image_test! {
-  name: brilliance,
-  program: "
-    x
-    rotate-color g 0.07
-    rotate 0.07
-    for 10
+#[test]
+fn all() -> Result {
+  image_test(
+    "all",
+    "
+      all
       apply
-    loop
-    rotate-color b 0.09
-    rotate 0.09
-    for 10
+    ",
+  )
+}
+
+#[test]
+fn alpha() -> Result {
+  image_test(
+    "alpha",
+    "
+      alpha 0.5
+      x
       apply
-    loop
-  ",
+    ",
+  )
 }
 
-image_test! {
-  name: carpet,
-  program: "
-    circle
-    scale 0.5
-    for 8
+#[test]
+fn apply() -> Result {
+  image_test(
+    "apply",
+    "
       apply
-      wrap
-    loop
-  ",
+    ",
+  )
 }
 
-image_test! {
-  name: circle,
-  program: "
-    circle
-    apply
-  ",
+#[test]
+fn brilliance() -> Result {
+  image_test(
+    "brilliance",
+    "
+      x
+      rotate-color g 0.07
+      rotate 0.07
+      for 10
+        apply
+      loop
+      rotate-color b 0.09
+      rotate 0.09
+      for 10
+        apply
+      loop
+    ",
+  )
 }
 
-image_test! {
-  name: circle_scale,
-  program: "
-    scale 0.5
-    circle
-    apply
-    all
-    scale 0.9
-    wrap
-    apply
-  ",
+#[test]
+fn carpet() -> Result {
+  image_test(
+    "carpet",
+    "
+      circle
+      scale 0.5
+      for 8
+        apply
+        wrap
+      loop
+    ",
+  )
 }
 
-image_test! {
-  name: concentric_circles,
-  program: "
-    scale 0.99
-    circle
-    for 100
-      apply
-    loop
-  ",
-}
-
-image_test! {
-  name: cross,
-  program: "
-    cross
-    apply
-  ",
-}
-
-image_test! {
-  name: default_program,
-  program: "",
-}
-
-image_test! {
-  name: diamonds,
-  program: "
-    rotate 0.3333
-    rotate-color g 0.05
-    circle
-    scale 0.5
-    wrap
-    for 8
-      apply
-    loop
-    rotate 0.8333
-    rotate-color b 0.05
-    for 8
-      apply
-    loop
-  ",
-}
-
-image_test! {
-  name: grain,
-  program: "
-    rotate 0.111
-    for 16
-      square
-      apply
+#[test]
+fn circle() -> Result {
+  image_test(
+    "circle",
+    "
       circle
       apply
-    loop
-  ",
+    ",
+  )
 }
 
-image_test! {
-  name: kaleidoscope,
-  program: "
-    rotate-color g 0.05
-    circle
-    scale 0.75
-    wrap
-    for 8
+#[test]
+fn circle_scale() -> Result {
+  image_test(
+    "circle_scale",
+    "
+      scale 0.5
+      circle
       apply
-    loop
-    rotate 0.8333
-    rotate-color b 0.05
-    for 8
-      apply
-    loop
-  ",
-}
-
-image_test! {
-  name: mod_3,
-  program: "
-    mod 3 0
-    apply
-  ",
-}
-
-image_test! {
-  name: orbs,
-  program: "
-    rotate-color g 0.05
-    circle
-    scale 0.75
-    wrap
-    for 8
-      apply
-    loop
-    rotate-color b 0.05
-    for 8
-      apply
-    loop
-  ",
-}
-
-image_test! {
-  name: pattern,
-  program: "
-    alpha 0.75
-    circle
-    scale 0.5
-    for 8
-      apply
+      all
+      scale 0.9
       wrap
-    loop
-  ",
-}
-
-image_test! {
-  name: choose_default_seed,
-  program: "
-    choose all circle cross square top x
-    apply
-  ",
-}
-
-image_test! {
-  name: choose_zero_seed,
-  program: "
-    choose all circle cross square top x
-    apply
-  ",
-}
-
-image_test! {
-  name: choose_nonzero_seed,
-  program: "
-    seed 2
-    choose all circle cross square top x
-    apply
-  ",
-}
-
-image_test! {
-  name: rotate,
-  program: "
-    rotate 0.05
-    x
-    apply
-  ",
-}
-
-image_test! {
-  name: rotate_0125_square,
-  program: "
-    rotate 0.125
-    square
-    apply
-  ",
-}
-
-image_test! {
-  name: rotate_1_square,
-  program: "
-    rotate 1.0
-    square
-    apply
-  ",
-}
-
-image_test! {
-  name: rotate_color_05_red,
-  program: "
-    rotate-color red 0.5
-    all
-    apply
-  ",
-}
-
-image_test! {
-  name: rotate_color_blue_05_all,
-  program: "
-    rotate-color blue 0.5
-    all
-    apply
-  ",
-}
-
-image_test! {
-  name: rotate_color_blue_1_all,
-  program: "
-    rotate-color blue 1.0
-    all
-    apply
-  ",
-}
-
-image_test! {
-  name: rotate_color_blue_all,
-  program: "
-    rotate-color b 0.5
-    all
-    apply
-  ",
-}
-
-image_test! {
-  name: rotate_color_g,
-  program: "
-    rotate-color g 0.5
-    all
-    apply
-  ",
-}
-
-image_test! {
-  name: rotate_color_green,
-  program: "
-    rotate-color green 0.5
-    all
-    apply
-  ",
-}
-
-image_test! {
-  name: rotate_color_green_all,
-  program: "
-    rotate-color green 1.0
-    all
-  ",
-}
-
-image_test! {
-  name: rotate_color_r,
-  program: "
-    rotate-color r 0.5
-    all
-    apply
-  ",
-}
-
-image_test! {
-  name: rotate_color_red_all,
-  program: "
-    rotate-color red 1.0
-    all
-  ",
-}
-
-image_test! {
-  name: rotate_scale_x,
-  program: "
-    rotate 0.05
-    scale 2
-    x
-    apply
-  ",
-}
-
-image_test! {
-  name: rotate_square,
-  program: "
-    rotate 0.05
-    square
-    for 2
       apply
-    loop
-  ",
+    ",
+  )
 }
 
-image_test! {
-  name: rotate_square_for_x,
-  program: "
-    rotate 0.05
-    square
-    for 2
+#[test]
+fn concentric_circles() -> Result {
+  image_test(
+    "concentric_circles",
+    "
+      scale 0.99
+      circle
+      for 100
+        apply
+      loop
+    ",
+  )
+}
+
+#[test]
+fn cross() -> Result {
+  image_test(
+    "cross",
+    "
+      cross
       apply
-    loop
-    x
-    for 1
-      apply
-    loop
-  ",
+    ",
+  )
 }
 
-image_test! {
-  name: rows,
-  program: "
-    rows 1 1
-    apply
-  ",
+#[test]
+fn default() -> Result {
+  image_test("default", "")
 }
 
-image_test! {
-  name: rows_overflow,
-  program: "
-    rows 4294967295 4294967295
-    apply
-  ",
-}
-
-image_test! {
-  name: rug,
-  program: "
-    rotate-color g 0.05
-    circle
-    scale 0.5
-    wrap
-    for 8
-      apply
-    loop
-    rotate-color b 0.05
-    for 8
-      apply
-    loop
-  ",
-}
-
-image_test! {
-  name: scale,
-  program: "
-    scale 0.5
-    circle
-    apply
-  ",
-}
-
-image_test! {
-  name: scale_circle_for,
-  program: "
-    circle
-    scale 0.5
-    for 8
-      apply
-    loop
-  ",
-}
-
-image_test! {
-  name: scale_circle_wrap,
-  program: "
-    scale 0.5
-    circle
-    wrap
-    apply
-  ",
-}
-
-image_test! {
-  name: scale_rotate,
-  program: "
-    scale 2
-    rotate 0.05
-    x
-    apply
-  ",
-}
-
-image_test! {
-  name: scale_x,
-  program: "
-    scale 2
-    x
-    apply
-  ",
-}
-
-image_test! {
-  name: smear,
-  program: "
-    seed 9
-    rotate-color g 0.01
-    rotate 0.01
-    for 100
-      choose all circle cross square top x
-      apply
-    loop
-    rotate-color b 0.01
-    rotate 0.01
-    for 100
-      choose all circle cross square top x
-      apply
-    loop
-  ",
-}
-
-image_test! {
-  name: square,
-  program: "
-    square
-    apply
-  ",
-}
-
-image_test! {
-  name: square_top,
-  program: "
-    square
-    apply
-    top
-    apply
-  ",
-}
-
-image_test! {
-  name: starburst,
-  program: "
-    seed 8
-    rotate-color g 0.1
-    rotate 0.1
-    for 10
-      choose all circle cross square top x
-      apply
-    loop
-    rotate-color b 0.1
-    rotate 0.1
-    for 10
-      choose all circle cross square top x
-      apply
-    loop
-  ",
-}
-
-image_test! {
-  name: top,
-  program: "
-    top
-    apply
-  ",
-}
-
-image_test! {
-  name: x,
-  program: "
-    x
-    apply
-  ",
-}
-
-image_test! {
-  name: x_loop,
-  program: "
-    x
-    scale 0.5
-    for 8
-      apply
+#[test]
+fn diamonds() -> Result {
+  image_test(
+    "diamonds",
+    "
+      rotate 0.3333
+      rotate-color g 0.05
+      circle
+      scale 0.5
       wrap
-    loop
-  ",
+      for 8
+        apply
+      loop
+      rotate 0.8333
+      rotate-color b 0.05
+      for 8
+        apply
+      loop
+    ",
+  )
 }
 
-image_test! {
-  name: x_scale,
-  program: "
-    x
-    scale 0.5
-    for 8
+#[test]
+fn grain() -> Result {
+  image_test(
+    "grain",
+    "
+      rotate 0.111
+      for 16
+        square
+        apply
+        circle
+        apply
+      loop
+    ",
+  )
+}
+
+#[test]
+fn kaleidoscope() -> Result {
+  image_test(
+    "kaleidoscope",
+    "
+      rotate-color g 0.05
+      circle
+      scale 0.75
+      wrap
+      for 8
+        apply
+      loop
+      rotate 0.8333
+      rotate-color b 0.05
+      for 8
+        apply
+      loop
+    ",
+  )
+}
+
+#[test]
+fn mod_3() -> Result {
+  image_test(
+    "mod_3",
+    "
+      mod 3 0
       apply
-    loop
-  ",
+    ",
+  )
 }
 
-image_test! {
-  name: x_wrap,
-  program: "
-    x
-    apply
-    scale 0.5
-    wrap
-    identity
-    all
-    apply
-  ",
+#[test]
+fn orbs() -> Result {
+  image_test(
+    "orbs",
+    "
+      rotate-color g 0.05
+      circle
+      scale 0.75
+      wrap
+      for 8
+        apply
+      loop
+      rotate-color b 0.05
+      for 8
+        apply
+      loop
+    ",
+  )
 }
 
-image_test! {
-  name: debug_operation,
-  program: "
-    debug
-    apply
-  ",
+#[test]
+fn pattern() -> Result {
+  image_test(
+    "pattern",
+    "
+      alpha 0.75
+      circle
+      scale 0.5
+      for 8
+        apply
+        wrap
+      loop
+    ",
+  )
 }
 
-image_test! {
-  name: mod_zero_is_always_false,
-  program: "
-    mod 0 1
-    apply
-  ",
-}
-
-image_test! {
-  name: square_colors,
-  program: "
-    rotate 0.01
-    rotate-color g 0.1
-    square
-    for 10
+#[test]
+fn choose_default_seed() -> Result {
+  image_test(
+    "choose_default_seed",
+    "
+      choose all circle cross square top x
       apply
-    loop
-  ",
+    ",
+  )
 }
 
-image_test! {
-  name: nested_for_loops,
-  program: "
-    circle
-    scale 0.9
+#[test]
+fn choose_zero_seed() -> Result {
+  image_test(
+    "choose_zero_seed",
+    "
+      choose all circle cross square top x
+      apply
+    ",
+  )
+}
 
-    for 2
+#[test]
+fn choose_nonzero_seed() -> Result {
+  image_test(
+    "choose_nonzero_seed",
+    "
+      seed 2
+      choose all circle cross square top x
+      apply
+    ",
+  )
+}
+
+#[test]
+fn rotate() -> Result {
+  image_test(
+    "rotate",
+    "
+      rotate 0.05
+      x
+      apply
+    ",
+  )
+}
+
+#[test]
+fn rotate_0125_square() -> Result {
+  image_test(
+    "rotate_0125_square",
+    "
+      rotate 0.125
+      square
+      apply
+    ",
+  )
+}
+
+#[test]
+fn rotate_1_square() -> Result {
+  image_test(
+    "rotate_1_square",
+    "
+      rotate 1.0
+      square
+      apply
+    ",
+  )
+}
+
+#[test]
+fn rotate_color_05_red() -> Result {
+  image_test(
+    "rotate_color_05_red",
+    "
+      rotate-color red 0.5
+      all
+      apply
+    ",
+  )
+}
+
+#[test]
+fn rotate_color_blue_05_all() -> Result {
+  image_test(
+    "rotate_color_blue_05_all",
+    "
+      rotate-color blue 0.5
+      all
+      apply
+    ",
+  )
+}
+
+#[test]
+fn rotate_color_blue_1_all() -> Result {
+  image_test(
+    "rotate_color_blue_1_all",
+    "
+      rotate-color blue 1.0
+      all
+      apply
+    ",
+  )
+}
+
+#[test]
+fn rotate_color_blue_all() -> Result {
+  image_test(
+    "rotate_color_blue_all",
+    "
+      rotate-color b 0.5
+      all
+      apply
+    ",
+  )
+}
+
+#[test]
+fn rotate_color_g() -> Result {
+  image_test(
+    "rotate_color_g",
+    "
+      rotate-color g 0.5
+      all
+      apply
+    ",
+  )
+}
+
+#[test]
+fn rotate_color_green() -> Result {
+  image_test(
+    "rotate_color_green",
+    "
+      rotate-color green 0.5
+      all
+      apply
+    ",
+  )
+}
+
+#[test]
+fn rotate_color_green_all() -> Result {
+  image_test(
+    "rotate_color_green_all",
+    "
+      rotate-color green 1.0
+      all
+    ",
+  )
+}
+
+#[test]
+fn rotate_color_r() -> Result {
+  image_test(
+    "rotate_color_r",
+    "
+      rotate-color r 0.5
+      all
+      apply
+    ",
+  )
+}
+
+#[test]
+fn rotate_color_red_all() -> Result {
+  image_test(
+    "rotate_color_red_all",
+    "
+      rotate-color red 1.0
+      all
+    ",
+  )
+}
+
+#[test]
+fn rotate_scale_x() -> Result {
+  image_test(
+    "rotate_scale_x",
+    "
+      rotate 0.05
+      scale 2
+      x
+      apply
+    ",
+  )
+}
+
+#[test]
+fn rotate_square() -> Result {
+  image_test(
+    "rotate_square",
+    "
+      rotate 0.05
+      square
       for 2
         apply
       loop
-    loop
-  ",
+    ",
+  )
 }
 
-image_test! {
-  name: for_zero,
-  program: "
-    circle
+#[test]
+fn rotate_square_for_x() -> Result {
+  image_test(
+    "rotate_square_for_x",
+    "
+      rotate 0.05
+      square
+      for 2
+        apply
+      loop
+      x
+      for 1
+        apply
+      loop
+    ",
+  )
+}
 
-    for 0
+#[test]
+fn rows() -> Result {
+  image_test(
+    "rows",
+    "
+      rows 1 1
       apply
-    loop
-  ",
+    ",
+  )
 }
 
-image_test! {
-  name: gpu_extra_pixels,
-  program: "
-    rotate 0.01
+#[test]
+fn rows_overflow() -> Result {
+  image_test(
+    "rows_overflow",
+    "
+      rows 4294967295 4294967295
+      apply
+    ",
+  )
+}
+
+#[test]
+fn rug() -> Result {
+  image_test(
+    "rug",
+    "
+      rotate-color g 0.05
+      circle
+      scale 0.5
+      wrap
+      for 8
+        apply
+      loop
+      rotate-color b 0.05
+      for 8
+        apply
+      loop
+    ",
+  )
+}
+
+#[test]
+fn scale() -> Result {
+  image_test(
+    "scale",
+    "
+      scale 0.5
+      circle
+      apply
+    ",
+  )
+}
+
+#[test]
+fn scale_circle_for() -> Result {
+  image_test(
+    "scale_circle_for",
+    "
+      circle
+      scale 0.5
+      for 8
+        apply
+      loop
+    ",
+  )
+}
+
+#[test]
+fn scale_circle_wrap() -> Result {
+  image_test(
+    "scale_circle_wrap",
+    "
+      scale 0.5
+      circle
+      wrap
+      apply
+    ",
+  )
+}
+
+#[test]
+fn scale_rotate() -> Result {
+  image_test(
+    "scale_rotate",
+    "
+      scale 2
+      rotate 0.05
+      x
+      apply
+    ",
+  )
+}
+
+#[test]
+fn scale_x() -> Result {
+  image_test(
+    "scale_x",
+    "
+      scale 2
+      x
+      apply
+    ",
+  )
+}
+
+#[test]
+fn smear() -> Result {
+  image_test(
+    "smear",
+    "
+      seed 9
+      rotate-color g 0.01
+      rotate 0.01
+      for 100
+        choose all circle cross square top x
+        apply
+      loop
+      rotate-color b 0.01
+      rotate 0.01
+      for 100
+        choose all circle cross square top x
+        apply
+      loop
+    ",
+  )
+}
+
+#[test]
+fn square() -> Result {
+  image_test(
+    "square",
+    "
+      square
+      apply
+    ",
+  )
+}
+
+#[test]
+fn square_top() -> Result {
+  image_test(
+    "square_top",
+    "
+    square
     apply
+    top
     apply
   ",
+  )
+}
+
+#[test]
+fn starburst() -> Result {
+  image_test(
+    "starburst",
+    "
+      seed 8
+      rotate-color g 0.1
+      rotate 0.1
+      for 10
+        choose all circle cross square top x
+        apply
+      loop
+      rotate-color b 0.1
+      rotate 0.1
+      for 10
+        choose all circle cross square top x
+        apply
+      loop
+    ",
+  )
+}
+
+#[test]
+fn top() -> Result {
+  image_test(
+    "top",
+    "
+      top
+      apply
+    ",
+  )
+}
+
+#[test]
+fn x() -> Result {
+  image_test(
+    "x",
+    "
+      x
+      apply
+    ",
+  )
+}
+
+#[test]
+fn x_loop() -> Result {
+  image_test(
+    "x_loop",
+    "
+      x
+      scale 0.5
+      for 8
+        apply
+        wrap
+      loop
+    ",
+  )
+}
+
+#[test]
+fn x_scale() -> Result {
+  image_test(
+    "x_scale",
+    "
+      x
+      scale 0.5
+      for 8
+        apply
+      loop
+    ",
+  )
+}
+
+#[test]
+fn x_wrap() -> Result {
+  image_test(
+    "x_wrap",
+    "
+      x
+      apply
+      scale 0.5
+      wrap
+      identity
+      all
+      apply
+    ",
+  )
+}
+
+#[test]
+fn debug_operation() -> Result {
+  image_test(
+    "debug_operation",
+    "
+      debug
+      apply
+    ",
+  )
+}
+
+#[test]
+fn mod_zero_is_always_false() -> Result {
+  image_test(
+    "mod_zero_is_always_false",
+    "
+      mod 0 1
+      apply
+    ",
+  )
+}
+
+#[test]
+fn square_colors() -> Result {
+  image_test(
+    "square_colors",
+    "
+      rotate 0.01
+      rotate-color g 0.1
+      square
+      for 10
+        apply
+      loop
+    ",
+  )
+}
+
+#[test]
+fn nested_for_loops() -> Result {
+  image_test(
+    "nested_for_loops",
+    "
+      circle
+      scale 0.9
+
+      for 2
+        for 2
+          apply
+        loop
+      loop
+    ",
+  )
+}
+
+#[test]
+fn for_zero() -> Result {
+  image_test(
+    "for_zero",
+    "
+      circle
+
+      for 0
+        apply
+      loop
+    ",
+  )
+}
+
+#[test]
+fn gpu_extra_pixels() -> Result {
+  image_test(
+    "gpu_extra_pixels",
+    "
+      rotate 0.01
+      apply
+      apply
+    ",
+  )
 }
 
 image_test! {
