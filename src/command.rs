@@ -8,7 +8,6 @@ pub(crate) enum Command {
   Operation(Operation),
   Rotate(f32),
   Scale(f32),
-  Seed(u64),
   Wrap,
 }
 
@@ -69,7 +68,6 @@ impl FromStr for Command {
         step: step.parse()?,
       })),
       ["scale", scaling] => Ok(Self::Scale(scaling.parse()?)),
-      ["seed", seed] => Ok(Self::Seed(seed.parse()?)),
       ["square"] => Ok(Self::Mask(Mask::Square)),
       ["top"] => Ok(Self::Mask(Mask::Top)),
       ["wrap"] => Ok(Self::Wrap),

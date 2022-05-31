@@ -184,7 +184,7 @@ impl App {
           )?))
           .map_err(JsValueError)?;
 
-        self.request_animation_frame()?;
+        // self.request_animation_frame()?;
       }
     }
 

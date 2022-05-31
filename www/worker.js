@@ -1,6 +1,5 @@
 // clear the environment
 
-
 const ALL = 'All';
 const CIRCLE = 'Circle';
 const SQUARE = 'Square';
@@ -22,16 +21,34 @@ function ROTATE_COLOR(axis, turns) {
   return {RotateColor: [axis, turns]};
 }
 
+function ROTATE(value) {
+  rotation += value;
+}
+
+function SCALE(value) {
+  scale *= value;
+}
+
+function DEFAULT_COLOR(x, y, z) {
+  default_color = [x, y, z];
+}
+
 let alpha = 1.0;
+let default_color = [0.0, 0.0, 0.0];
 let mask = ALL;
 let operation = INVERT;
+let rotation = 0.0;
+let scale = 1.0;
 let wrap = false;
 
 function apply() {
   self.postMessage(JSON.stringify({
     alpha,
+    default_color,
     mask,
     operation,
+    rotation,
+    scale,
     wrap
   }));
 }

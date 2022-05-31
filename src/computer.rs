@@ -10,7 +10,6 @@ pub(crate) struct Computer {
   operation: Operation,
   program: String,
   program_counter: usize,
-  rng: StdRng,
   transform: Similarity2<f32>,
   wrap: bool,
 }
@@ -53,7 +52,6 @@ impl Computer {
       operation: Operation::Invert,
       program: String::new(),
       program_counter: 0,
-      rng: StdRng::seed_from_u64(0),
       transform: Similarity2::identity(),
       wrap: false,
     }
@@ -73,7 +71,6 @@ impl Computer {
       Command::Scale(scaling) => {
         self.transform.append_scaling_mut(scaling);
       }
-      Command::Seed(seed) => self.rng = StdRng::seed_from_u64(seed),
       Command::Wrap => self.wrap = !self.wrap,
     }
 

@@ -200,13 +200,11 @@ impl Gpu {
       .gl
       .uniform1f(Some(&self.uniform("alpha")), state.alpha as f32);
 
-    let default_color: Vector4<f32> = Vector4::new(0.0, 0.0, 0.0, 1.0);
-
     self.gl.uniform3f(
       Some(self.uniform("default_color")),
-      default_color.x,
-      default_color.y,
-      default_color.z,
+      state.default_color[0],
+      state.default_color[1],
+      state.default_color[2],
     );
 
     match state.mask {
@@ -233,7 +231,9 @@ impl Gpu {
       );
     }
 
-    let similarity: Similarity2<f64> = Similarity2::identity();
+    let mut similarity: Similarity2<f32> = Similarity2::identity();
+    similarity.append_rotation_mut(&UnitComplex::from_angle(-state.rotation * f32::consts::TAU));
+    similarity.append_scaling_mut(state.scale);
 
     self.gl.uniform_matrix3fv_with_f32_array(
       Some(&self.uniform("transform")),
