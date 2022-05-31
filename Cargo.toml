@@ -20,6 +20,8 @@ js-sys = "0.3.57"
 log = "0.4.17"
 nalgebra = "0.31.0"
 rand = { version = "0.8.4" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 strum = { version = "0.24.0", features = ["derive"] }
 # keep in sync with `.github/workflows/ci.yaml`
 wasm-bindgen = "0.2.80"
@@ -37,6 +39,7 @@ features = [
   "ImageData",
   "InputEvent",
   "Location",
+  "MessageEvent",
   "WebGl2RenderingContext",
   "WebGlBuffer",
   "WebGlContextAttributes",
@@ -46,6 +49,7 @@ features = [
   "WebGlTexture",
   "WebGlUniformLocation",
   "Window",
+  "Worker",
   "console",
 ]
 

@@ -6,7 +6,7 @@ pub fn test(program: &str) -> Result<String, String> {
 }
 
 fn test_inner(program: &str) -> Result<String> {
-  let program = Command::parse_program(program)?;
+  // let program = Command::parse_program(program)?;
 
   let window = window();
 
@@ -22,9 +22,9 @@ fn test_inner(program: &str) -> Result<String> {
   let gpu = Arc::new(Mutex::new(Gpu::new(&canvas)?));
 
   let mut computer = Computer::new(gpu.clone());
-  computer.load_program(&program);
+  computer.load_program(program.into());
   computer.resize()?;
-  computer.run(false)?;
+  // computer.run(false)?;
   gpu.lock().unwrap().render_to_canvas()?;
 
   Ok(canvas.to_data_url().map_err(JsValueError)?)

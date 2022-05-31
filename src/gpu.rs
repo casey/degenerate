@@ -277,6 +277,56 @@ impl Gpu {
     Ok(())
   }
 
+  pub(crate) fn apply_state(&self, state: &State) -> Result {
+    log::info!("Applying state {:?}", state);
+
+    self.gl.bind_framebuffer(
+      WebGl2RenderingContext::FRAMEBUFFER,
+      Some(&self.frame_buffer),
+    );
+
+    self.gl.framebuffer_texture_2d(
+      WebGl2RenderingContext::FRAMEBUFFER,
+      WebGl2RenderingContext::COLOR_ATTACHMENT0,
+      WebGl2RenderingContext::TEXTURE_2D,
+      Some(&self.textures[self.source_texture.get() ^ 1]),
+      0,
+    );
+
+    self.gl.bind_texture(
+      WebGl2RenderingContext::TEXTURE_2D,
+      Some(&self.textures[self.source_texture.get()]),
+    );
+
+    self
+      .gl
+      .uniform1f(Some(&self.uniforms.alpha), state.alpha as f32);
+
+    self.gl.uniform1ui(
+      Some(&self.uniforms.mask),
+      Mask::VARIANTS
+        .iter()
+        .position(|mask| *mask == Mask::All.as_ref())
+        .expect("Mask should always be present")
+        .try_into()?,
+    );
+
+    self.gl.uniform1ui(
+      Some(&self.uniforms.operation),
+      Operation::VARIANTS
+        .iter()
+        .position(|operation| *operation == Operation::Invert.as_ref())
+        .expect("Operation should always be present")
+        .try_into()?,
+    );
+
+    self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 3);
+
+    self.source_texture.set(self.source_texture.get() ^ 1);
+
+    Ok(())
+  }
+
   fn create_texture(gl: &WebGl2RenderingContext, resolution: u32) -> Result<WebGlTexture> {
     let texture = gl.create_texture().ok_or("Failed to create texture")?;
 

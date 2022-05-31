@@ -4,14 +4,29 @@ pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
   animation_frame_pending: bool,
   canvas: HtmlCanvasElement,
-  computer: Computer,
+  gpu: Arc<Mutex<Gpu>>,
   input: bool,
   nav: HtmlElement,
+  program: String,
   resize: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
-  gpu: Arc<Mutex<Gpu>>,
   window: Window,
+  worker: Worker,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+enum MessageType {
+  Script,
+  Run,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct Message<'a> {
+  message_type: MessageType,
+  payload: Option<&'a str>,
 }
 
 impl App {
@@ -30,18 +45,21 @@ impl App {
 
     let gpu = Arc::new(Mutex::new(Gpu::new(&canvas)?));
 
+    let worker = Worker::new("/worker.js").map_err(JsValueError)?;
+
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
       animation_frame_pending: false,
       canvas,
-      computer: Computer::new(gpu.clone()),
+      gpu,
       input: false,
       nav,
+      program: String::new(),
       resize: true,
       stderr: stderr.clone(),
       textarea: textarea.clone(),
-      gpu,
       window: window.clone(),
+      worker: worker.clone(),
     }));
 
     let local = app.clone();
@@ -59,9 +77,18 @@ impl App {
       app.stderr.update(result);
     })?;
 
+    let local = app.clone();
     textarea.add_event_listener("input", move || {
-      let mut app = app.lock().unwrap();
+      let mut app = local.lock().unwrap();
       let result = app.on_input();
+      app.stderr.update(result);
+    })?;
+
+    worker.add_event_listener_with_event("message", move |event| {
+      let app = app.lock().unwrap();
+      let state: State = serde_json::from_str(&event.data().as_string().unwrap()).unwrap();
+      app.gpu.lock().unwrap().apply_state(&state).unwrap();
+      let result = app.gpu.lock().unwrap().render_to_canvas();
       stderr.update(result);
     })?;
 
@@ -127,31 +154,39 @@ impl App {
     if self.input {
       self.nav.set_class_name("fade-out");
 
-      let program = Command::parse_program(&self.textarea.value())?;
+      self
+        .worker
+        .post_message(&wasm_bindgen::JsValue::from_str(&serde_json::to_string(
+          &Message {
+            message_type: MessageType::Script,
+            payload: Some(&self.textarea.value()),
+          },
+        )?))
+        .map_err(JsValueError)?;
+
+      let program = self.textarea.value();
 
       log::trace!("Program: {:?}", program);
 
-      let program_changed = program != self.computer.program();
+      let program_changed = program != self.program;
 
       if resize || program_changed {
-        let mut computer = Computer::new(self.gpu.clone());
-        computer.load_program(&program);
-        computer.resize()?;
-        self.computer = computer;
-      }
+        self.program = program;
+        self.gpu.lock().unwrap().resize()?;
 
-      let run = !self.computer.done();
+        self
+          .worker
+          .post_message(&wasm_bindgen::JsValue::from_str(&serde_json::to_string(
+            &Message {
+              message_type: MessageType::Run,
+              payload: None,
+            },
+          )?))
+          .map_err(JsValueError)?;
 
-      if run {
-        self.computer.run(true)?;
-      }
+        // self.gpu.lock().unwrap().render_to_canvas()?;
 
-      if resize || program_changed || run {
-        self.gpu.lock().unwrap().render_to_canvas()?;
-
-        if !self.computer.done() {
-          self.request_animation_frame()?;
-        }
+        self.request_animation_frame()?;
       }
     }
 

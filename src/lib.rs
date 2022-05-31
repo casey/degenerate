@@ -2,11 +2,12 @@ use {
   crate::{
     add_event_listener::AddEventListener, app::App, cast::Cast, color_axis::ColorAxis,
     command::Command, computer::Computer, get_document::GetDocument, gpu::Gpu,
-    js_value_error::JsValueError, mask::Mask, operation::Operation, select::Select, stderr::Stderr,
-    window::window,
+    js_value_error::JsValueError, mask::Mask, operation::Operation, select::Select, state::State,
+    stderr::Stderr, window::window,
   },
   nalgebra::{Rotation3, Similarity2, UnitComplex, Vector3, Vector4},
   rand::{rngs::StdRng, seq::SliceRandom, SeedableRng},
+  serde::{Deserialize, Serialize},
   std::{
     cell::Cell,
     f64,
@@ -21,7 +22,7 @@ use {
   web_sys::{
     Document, Element, EventTarget, HtmlCanvasElement, HtmlElement, HtmlTextAreaElement,
     WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlProgram, WebGlTexture,
-    WebGlUniformLocation, Window,
+    WebGlUniformLocation, Window, Worker,
   },
 };
 
@@ -40,6 +41,7 @@ mod js_value_error;
 mod mask;
 mod operation;
 mod select;
+mod state;
 mod stderr;
 pub mod test;
 mod window;
