@@ -87,7 +87,7 @@ impl App {
     worker.add_event_listener_with_event("message", move |event| {
       let app = app.lock().unwrap();
       let state: State = serde_json::from_str(&event.data().as_string().unwrap()).unwrap();
-      app.gpu.lock().unwrap().apply_state(&state).unwrap();
+      app.gpu.lock().unwrap().apply(&state).unwrap();
       let result = app.gpu.lock().unwrap().render_to_canvas();
       stderr.update(result);
     })?;

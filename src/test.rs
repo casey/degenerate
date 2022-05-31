@@ -23,7 +23,7 @@ fn test_inner(program: &str) -> Result<String> {
 
   let mut computer = Computer::new(gpu.clone());
   computer.load_program(program.into());
-  computer.resize()?;
+  // computer.resize()?;
   // computer.run(false)?;
   gpu.lock().unwrap().render_to_canvas()?;
 

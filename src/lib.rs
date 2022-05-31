@@ -10,7 +10,8 @@ use {
   serde::{Deserialize, Serialize},
   std::{
     cell::Cell,
-    f64,
+    collections::BTreeMap,
+    f32,
     fmt::{self, Formatter},
     ops::Deref,
     str::FromStr,

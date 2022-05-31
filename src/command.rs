@@ -2,14 +2,14 @@ use super::*;
 
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) enum Command {
-  Alpha(f64),
+  Alpha(f32),
   Apply,
   Choose(Vec<Command>),
-  Default(Vector3<u8>),
+  Default(Vector3<f32>),
   Mask(Mask),
   Operation(Operation),
-  Rotate(f64),
-  Scale(f64),
+  Rotate(f32),
+  Scale(f32),
   Seed(u64),
   Wrap,
 }
@@ -59,9 +59,9 @@ impl FromStr for Command {
       ["cross"] => Ok(Self::Mask(Mask::Cross)),
       ["debug"] => Ok(Self::Operation(Operation::Debug)),
       ["default", r, g, b] => Ok(Self::Default(Vector3::new(
-        r.parse()?,
-        g.parse()?,
-        b.parse()?,
+        r.parse::<f32>()?.clamp(0.0, 1.0),
+        g.parse::<f32>()?.clamp(0.0, 1.0),
+        b.parse::<f32>()?.clamp(0.0, 1.0),
       ))),
       ["identity"] => Ok(Self::Operation(Operation::Identity)),
       ["invert"] => Ok(Self::Operation(Operation::Invert)),
