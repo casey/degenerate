@@ -68,7 +68,7 @@ build-web:
 open:
 	open http://localhost:8000
 
-fix-images:
+update-test-images:
 	#!/usr/bin/env bash
 	set -euo pipefail
 	for image in images/*.actual-memory.png; do
