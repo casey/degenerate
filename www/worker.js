@@ -18,15 +18,21 @@ const DEBUG = 'Debug';
 const IDENTITY = 'Identity'
 const INVERT = 'Invert';
 
+function ROTATE_COLOR(axis, turns) {
+  return {RotateColor: [axis, turns]};
+}
+
 let alpha = 1.0;
 let mask = ALL;
 let operation = INVERT;
+let wrap = false;
 
 function apply() {
   self.postMessage(JSON.stringify({
-    'alpha': alpha,
-    'mask': mask,
-    'operation': operation
+    alpha,
+    mask,
+    operation,
+    wrap
   }));
 }
 

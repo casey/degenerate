@@ -3,8 +3,6 @@ use super::*;
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) enum Command {
   Alpha(f32),
-  Apply,
-  Choose(Vec<Command>),
   Default(Vector3<f32>),
   Mask(Mask),
   Operation(Operation),
@@ -47,14 +45,6 @@ impl FromStr for Command {
     match s.split_whitespace().collect::<Vec<&str>>().as_slice() {
       ["all"] => Ok(Self::Mask(Mask::All)),
       ["alpha", alpha] => Ok(Self::Alpha(alpha.parse()?)),
-      ["apply"] => Ok(Self::Apply),
-      ["choose", words @ ..] => Ok(Self::Choose(
-        words
-          .iter()
-          .cloned()
-          .map(Command::from_str)
-          .collect::<Result<Vec<Command>>>()?,
-      )),
       ["circle"] => Ok(Self::Mask(Mask::Circle)),
       ["cross"] => Ok(Self::Mask(Mask::Cross)),
       ["debug"] => Ok(Self::Operation(Operation::Debug)),
@@ -86,59 +76,5 @@ impl FromStr for Command {
       ["x"] => Ok(Self::Mask(Mask::X)),
       _ => Err(format!("Invalid command: {}", s).into()),
     }
-  }
-}
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-
-  fn case(program: &str, expected_commands: &[Command]) {
-    assert_eq!(Command::parse_program(program).unwrap(), expected_commands);
-  }
-
-  #[test]
-  fn semicolons_can_be_used_to_separate_commands() {
-    case("apply;apply", &[Command::Apply, Command::Apply]);
-  }
-
-  #[test]
-  fn leading_blank_lines_are_ignored() {
-    case("\napply", &[Command::Apply]);
-  }
-
-  #[test]
-  fn trailing_blank_lines_are_ignored() {
-    case("apply\n", &[Command::Apply]);
-  }
-
-  #[test]
-  fn intermediate_blank_lines_are_ignored() {
-    case("apply\n\napply", &[Command::Apply, Command::Apply]);
-  }
-
-  #[test]
-  fn extra_whitespace_between_arguments_is_ignored() {
-    case("scale  0.5", &[Command::Scale(0.5)]);
-  }
-
-  #[test]
-  fn leading_whitespace_is_ignored() {
-    case("  apply", &[Command::Apply]);
-  }
-
-  #[test]
-  fn trailing_whitespace_is_ignored() {
-    case("apply  ", &[Command::Apply]);
-  }
-
-  #[test]
-  fn comments_are_ignored() {
-    case("# foo", &[]);
-  }
-
-  #[test]
-  fn empty_lines_with_extra_whitespace_are_ignored() {
-    case("  ", &[]);
   }
 }

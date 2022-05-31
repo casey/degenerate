@@ -58,4 +58,25 @@ impl Computer {
       wrap: false,
     }
   }
+
+  fn execute(&mut self, command: Command) -> Result<()> {
+    match command {
+      Command::Alpha(alpha) => self.alpha = alpha,
+      Command::Default(default) => {
+        self.default = Vector4::new(default.x, default.y, default.z, ALPHA_OPAQUE);
+      }
+      Command::Mask(mask) => self.mask = mask,
+      Command::Operation(operation) => self.operation = operation,
+      Command::Rotate(turns) => self
+        .transform
+        .append_rotation_mut(&UnitComplex::from_angle(-turns * f32::consts::TAU)),
+      Command::Scale(scaling) => {
+        self.transform.append_scaling_mut(scaling);
+      }
+      Command::Seed(seed) => self.rng = StdRng::seed_from_u64(seed),
+      Command::Wrap => self.wrap = !self.wrap,
+    }
+
+    Ok(())
+  }
 }

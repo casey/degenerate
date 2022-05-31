@@ -223,6 +223,16 @@ impl Gpu {
       _ => {}
     }
 
+    if let Operation::RotateColor(axis, turns) = state.operation {
+      self.gl.uniform_matrix3fv_with_f32_array(
+        Some(self.uniform("color_rotation")),
+        false,
+        Rotation3::new(axis.vector() * turns * f32::consts::TAU)
+          .matrix()
+          .as_slice(),
+      );
+    }
+
     let similarity: Similarity2<f64> = Similarity2::identity();
 
     self.gl.uniform_matrix3fv_with_f32_array(
