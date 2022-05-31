@@ -295,8 +295,8 @@ fn cross() -> Result {
 }
 
 #[test]
-fn default() -> Result {
-  image_test("default", "")
+fn default_program() -> Result {
+  image_test("default_program", "")
 }
 
 #[test]
@@ -947,11 +947,14 @@ fn gpu_extra_pixels() -> Result {
   )
 }
 
-image_test! {
-  name: default_color,
-  program: "
-    default 255 0 255
-    rotate 0.01
-    apply
-  ",
+#[test]
+fn default_color() -> Result {
+  image_test(
+    "default_color",
+    "
+      default 255 0 255
+      rotate 0.01
+      apply
+    ",
+  )
 }
