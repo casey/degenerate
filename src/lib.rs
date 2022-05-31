@@ -1,11 +1,10 @@
 use {
   crate::{
-    add_event_listener::AddEventListener, app::App, cast::Cast, color_axis::ColorAxis,
-    get_document::GetDocument, gpu::Gpu, js_value_error::JsValueError, mask::Mask,
-    operation::Operation, select::Select, state::State, stderr::Stderr, window::window,
+    add_event_listener::AddEventListener, app::App, cast::Cast, get_document::GetDocument,
+    gpu::Gpu, js_value_error::JsValueError, select::Select, state::State, stderr::Stderr,
+    window::window,
   },
-  nalgebra::{Rotation3, Similarity2, UnitComplex, Vector3, Vector4},
-  rand::{rngs::StdRng, seq::SliceRandom, SeedableRng},
+  nalgebra::{Similarity2, UnitComplex},
   serde::{Deserialize, Serialize},
   std::{
     cell::Cell,
@@ -13,15 +12,13 @@ use {
     f32,
     fmt::{self, Formatter},
     ops::Deref,
-    str::FromStr,
     string::ToString,
     sync::{Arc, Mutex},
   },
-  strum::{AsRefStr, EnumString, EnumVariantNames, VariantNames},
   wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue},
   web_sys::{
     Document, Element, EventTarget, HtmlCanvasElement, HtmlElement, HtmlTextAreaElement,
-    WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlProgram, WebGlTexture,
+    WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
     WebGlUniformLocation, Window, Worker,
   },
 };
@@ -32,12 +29,9 @@ type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 mod add_event_listener;
 mod app;
 mod cast;
-mod color_axis;
 mod get_document;
 pub mod gpu;
 mod js_value_error;
-mod mask;
-mod operation;
 mod select;
 mod state;
 mod stderr;

@@ -1,6 +1,18 @@
 #version 300 es
 
-// INSERT_GENERATED_CODE_HERE
+const uint MASK_ALL = 0u;
+const uint MASK_CIRCLE = 1u;
+const uint MASK_CROSS = 2u;
+const uint MASK_MOD = 3u;
+const uint MASK_ROWS = 4u;
+const uint MASK_SQUARE = 5u;
+const uint MASK_TOP = 6u;
+const uint MASK_X = 7u;
+
+const uint OPERATION_DEBUG = 0u;
+const uint OPERATION_IDENTITY = 1u;
+const uint OPERATION_INVERT = 2u;
+const uint OPERATION_ROTATE_COLOR = 3u;
 
 precision highp float;
 
@@ -22,13 +34,13 @@ out vec4 output_color;
 
 vec3 apply(vec2 position, vec3 color) {
   switch (operation) {
-    case DEBUG:
+    case OPERATION_DEBUG:
       return floor(vec3((position.x + 1.0) / 2.0, 0.0, 1.0 - (position.y + 1.0) / 2.0) * 16.0) / 16.0;
-    case IDENTITY:
+    case OPERATION_IDENTITY:
       return color;
-    case INVERT:
+    case OPERATION_INVERT:
       return 1.0 - color;
-    case ROTATE_COLOR:
+    case OPERATION_ROTATE_COLOR:
       return (color_rotation * (color * 2.0 - 1.0) + 1.0) / 2.0;
     default:
       return vec3(0.0, 1.0, 0.0);
@@ -37,25 +49,25 @@ vec3 apply(vec2 position, vec3 color) {
 
 bool masked(vec2 position, uvec2 pixel_position) {
   switch (mask) {
-    case ALL:
+    case MASK_ALL:
       return true;
-    case CIRCLE:
+    case MASK_CIRCLE:
       return length(position) < 1.0;
-    case CROSS:
+    case MASK_CROSS:
       return abs(position.x) < 0.25 || abs(position.y) < 0.25;
-    case MOD:
+    case MASK_MOD:
       if (divisor == 0u) {
         return false;
       } else {
         return (pixel_position.y * uint(resolution) + pixel_position.x) % divisor == remainder;
       }
-    case ROWS:
+    case MASK_ROWS:
       return pixel_position.y % (nrows + step) < nrows;
-    case SQUARE:
+    case MASK_SQUARE:
       return abs(position.x) < 0.5 && abs(position.y) < 0.5;
-    case TOP:
+    case MASK_TOP:
       return position.y > 0.0;
-    case X:
+    case MASK_X:
       return abs(abs(position.x) - abs(position.y)) < 0.25;
     default:
       return false;

@@ -1,57 +1,119 @@
-// clear the environment
+'use strict';
 
-const ALL = 'All';
-const CIRCLE = 'Circle';
-const SQUARE = 'Square';
-const X = 'X';
+class Computer {
+  static MASK_ALL = 0;
+  static MASK_CIRCLE = 1;
+  static MASK_CROSS = 2;
+  static MASK_MOD = 3;
+  static MASK_ROWS = 4;
+  static MASK_SQUARE = 5;
+  static MASK_TOP = 6;
+  static MASK_X = 7;
 
-function MOD(divisor, remainder) {
-  return {Mod: {divisor: divisor, remainder: remainder}};
+  static OPERATION_DEBUG = 0;
+  static OPERATION_IDENTITY = 1;
+  static OPERATION_INVERT = 2;
+  static OPERATION_ROTATE_COLOR = 3;
+
+  static OPERATION_ROTATE_COLOR_AXIS_RED = 0;
+  static OPERATION_ROTATE_COLOR_AXIS_GREEN = 1;
+  static OPERATION_ROTATE_COLOR_AXIS_BLUE = 2;
+
+  constructor() {
+    this.state = {
+      alpha: 1.0,
+      defaultColor: [0.0, 0.0, 0.0],
+      mask: Computer.MASK_ALL,
+      maskModDivisor: 0,
+      maskModRemainder: 0,
+      maskRowsRows: 0,
+      maskRowsStep: 0,
+      operation: Computer.OPERATION_INVERT,
+      rotation: 0.0,
+      scale: 1.0,
+      wrap: false,
+    }
+  }
+
+  apply() {
+    self.postMessage(JSON.stringify(this.state));
+  }
+
+  alpha(alpha) {
+    this.state.alpha = alpha;
+  }
+
+  all() {
+    this.state.mask = Computer.MASK_ALL;
+  }
+
+  circle() {
+    this.state.mask = Computer.MASK_CIRCLE;
+  }
+
+  cross() {
+    this.state.mask = Computer.MASK_CROSS;
+  }
+
+  mod(divisor, remainder) {
+    this.state.maskModDivisor = divisor;
+    this.state.maskModRemainder = remainder;
+    this.state.mask = Computer.MASK_MOD;
+  }
+
+  rows(nrows, step) {
+    this.state.maskRowsRows = nrows;
+    this.state.maskRowsStep = step;
+    this.state.mask = Computer.MASK_ROWS;
+  }
+
+  square() {
+    this.state.mask = Computer.MASK_SQUARE;
+  }
+
+  top() {
+    this.state.mask = Computer.MASK_TOP;
+  }
+
+  x() {
+    this.state.mask = Computer.MASK_X;
+  }
+
+  debug() {
+    this.state.operation = OPERATION_DEBUG;
+  }
+
+  identity() {
+    this.state.operation = Computer.OPERATION_IDENTITY;
+  }
+
+  invert() {
+    this.state.operation = Computer.OPERATION_INVERT;
+  }
+
+  rotateColor(matrix) {
+    this.state.operationRotateColorMatrix = matrix;
+    this.state.operation = OPERATION_ROTATE_COLOR;
+  }
+
+  scale(scale) {
+    this.state.scale *= scale;
+  }
+
+  rotate(rotation) {
+    this.state.rotation += rotation;
+  }
+
+  defaultColor(defaultColor) {
+    this.state.defaultColor = defaultColor;
+  }
+
+  wrap(wrap) {
+    this.state.wrap = wrap;
+  }
 }
 
-function ROWS(nrows, step) {
-  return {Rows: {nrows: nrows}};
-}
-
-const DEBUG = 'Debug';
-const IDENTITY = 'Identity'
-const INVERT = 'Invert';
-
-function ROTATE_COLOR(axis, turns) {
-  return {RotateColor: [axis, turns]};
-}
-
-function ROTATE(value) {
-  rotation += value;
-}
-
-function SCALE(value) {
-  scale *= value;
-}
-
-function DEFAULT_COLOR(x, y, z) {
-  default_color = [x, y, z];
-}
-
-let alpha = 1.0;
-let default_color = [0.0, 0.0, 0.0];
-let mask = ALL;
-let operation = INVERT;
-let rotation = 0.0;
-let scale = 1.0;
-let wrap = false;
-
-function apply() {
-  self.postMessage(JSON.stringify({
-    alpha,
-    default_color,
-    mask,
-    operation,
-    rotation,
-    scale,
-    wrap
-  }));
-}
+const computer = new Computer();
 
 let f = new Function();
 
