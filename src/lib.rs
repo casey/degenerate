@@ -1,9 +1,8 @@
 use {
   crate::{
     add_event_listener::AddEventListener, app::App, cast::Cast, color_axis::ColorAxis,
-    command::Command, computer::Computer, get_document::GetDocument, gpu::Gpu,
-    js_value_error::JsValueError, mask::Mask, operation::Operation, select::Select, state::State,
-    stderr::Stderr, window::window,
+    get_document::GetDocument, gpu::Gpu, js_value_error::JsValueError, mask::Mask,
+    operation::Operation, select::Select, state::State, stderr::Stderr, window::window,
   },
   nalgebra::{Rotation3, Similarity2, UnitComplex, Vector3, Vector4},
   rand::{rngs::StdRng, seq::SliceRandom, SeedableRng},
@@ -34,8 +33,6 @@ mod add_event_listener;
 mod app;
 mod cast;
 mod color_axis;
-mod command;
-mod computer;
 mod get_document;
 pub mod gpu;
 mod js_value_error;

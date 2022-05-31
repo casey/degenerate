@@ -6,8 +6,6 @@ pub fn test(program: &str) -> Result<String, String> {
 }
 
 fn test_inner(program: &str) -> Result<String> {
-  // let program = Command::parse_program(program)?;
-
   let window = window();
 
   let canvas = window
@@ -20,12 +18,6 @@ fn test_inner(program: &str) -> Result<String> {
   canvas.set_width(256);
 
   let gpu = Arc::new(Mutex::new(Gpu::new(&canvas)?));
-
-  let mut computer = Computer::new(gpu.clone());
-  computer.load_program(program.into());
-  // computer.resize()?;
-  // computer.run(false)?;
-  gpu.lock().unwrap().render_to_canvas()?;
 
   Ok(canvas.to_data_url().map_err(JsValueError)?)
 }
