@@ -302,6 +302,20 @@ impl Gpu {
       .gl
       .uniform1f(Some(&self.uniforms.alpha), state.alpha as f32);
 
+    let similarity: Similarity2<f64> = Similarity2::identity();
+
+    self.gl.uniform_matrix3fv_with_f32_array(
+      Some(&self.uniforms.similarity),
+      false,
+      similarity
+        .inverse()
+        .to_homogeneous()
+        .map(|element| element as f32)
+        .as_slice(),
+    );
+
+    self.gl.uniform1ui(Some(&self.uniforms.wrap), 0);
+
     self.gl.uniform1ui(
       Some(&self.uniforms.mask),
       Mask::VARIANTS

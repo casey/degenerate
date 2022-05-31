@@ -184,9 +184,6 @@ impl App {
           )?))
           .map_err(JsValueError)?;
 
-        // TODO: ???
-        // self.gpu.lock().unwrap().render_to_canvas()?;
-
         self.request_animation_frame()?;
       }
     }

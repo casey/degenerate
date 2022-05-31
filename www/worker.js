@@ -2,10 +2,12 @@
 
 const ALL = 'All';
 const CIRCLE = 'Circle';
-const MOD = (divisor, remainder) => ['Mod', divisor, remainder]
-const ROWS = (nrows, step) => ['Rows', nrows, step]
 const SQUARE = 'Square';
 const X = 'X';
+
+// fix these
+const MOD = (divisor, remainder) => ['Mod', divisor, remainder]
+const ROWS = (nrows, step) => ['Rows', nrows, step]
 
 const DEBUG = 'Debug';
 const IDENTITY = 'Identity'
