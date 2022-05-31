@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(AsRefStr, Copy, Clone, Debug, EnumVariantNames, PartialEq)]
+#[derive(AsRefStr, Copy, Clone, Debug, Deserialize, EnumVariantNames, PartialEq)]
 #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 pub(crate) enum Operation {
   Debug,

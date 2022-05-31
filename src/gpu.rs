@@ -306,7 +306,7 @@ impl Gpu {
       Some(&self.uniforms.mask),
       Mask::VARIANTS
         .iter()
-        .position(|mask| *mask == Mask::All.as_ref())
+        .position(|mask| *mask == state.mask.as_ref())
         .expect("Mask should always be present")
         .try_into()?,
     );
@@ -315,7 +315,7 @@ impl Gpu {
       Some(&self.uniforms.operation),
       Operation::VARIANTS
         .iter()
-        .position(|operation| *operation == Operation::Invert.as_ref())
+        .position(|operation| *operation == state.operation.as_ref())
         .expect("Operation should always be present")
         .try_into()?,
     );

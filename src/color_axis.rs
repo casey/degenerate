@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Debug, Copy, Clone, EnumString, PartialEq)]
+#[derive(Debug, Copy, Clone, Deserialize, EnumString, PartialEq)]
 #[strum(serialize_all = "kebab-case")]
 pub(crate) enum ColorAxis {
   #[strum(serialize = "r", serialize = "red")]

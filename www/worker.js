@@ -1,13 +1,25 @@
 // clear the environment
 
-const ALL = 0;
+const ALL = 'All';
+const CIRCLE = 'Circle';
+const MOD = (divisor, remainder) => ['Mod', divisor, remainder]
+const ROWS = (nrows, step) => ['Rows', nrows, step]
+const SQUARE = 'Square';
+const X = 'X';
 
-let mask = ALL;
+const DEBUG = 'Debug';
+const IDENTITY = 'Identity'
+const INVERT = 'Invert';
+
 let alpha = 1.0;
+let mask = ALL;
+let operation = INVERT;
 
 function apply() {
   self.postMessage(JSON.stringify({
     'alpha': alpha,
+    'mask': mask,
+    'operation': operation
   }));
 }
 
@@ -17,12 +29,10 @@ self.addEventListener("message", function(event) {
   const data = JSON.parse(event.data);
   switch (data.messageType) {
     case "script":
-      console.log('Setting program...');
       let script = data.payload;
       f = new Function(script);
       break;
     case "run":
-      console.log('Running program...');
       f();
       break;
   }
