@@ -108,24 +108,27 @@ class Computer {
     this.state.defaultColor = defaultColor;
   }
 
-  wrap(wrap) {
-    this.state.wrap = wrap;
+  wrap() {
+    this.state.wrap = !this.state.wrap;
   }
 }
 
 const computer = new Computer();
 
-let f = new Function();
+const GeneratorFunction = Object.getPrototypeOf(function*(){}).constructor;
+let f = new GeneratorFunction();
+let g = f();
 
 self.addEventListener("message", function(event) {
   const data = JSON.parse(event.data);
   switch (data.messageType) {
     case "script":
       let script = data.payload;
-      f = new Function(script);
+      f = new GeneratorFunction(script);
+      g = f();
       break;
     case "run":
-      f();
+      g.next();
       break;
   }
 });
