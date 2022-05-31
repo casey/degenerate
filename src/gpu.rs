@@ -230,7 +230,9 @@ impl Gpu {
         .as_slice(),
     );
 
-    self.gl.uniform1ui(Some(&self.uniform("wrap")), state.wrap);
+    self
+      .gl
+      .uniform1ui(Some(&self.uniform("wrap")), state.wrap as u32);
 
     self.gl.uniform1ui(Some(&self.uniform("mask")), state.mask);
 
