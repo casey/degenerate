@@ -29,22 +29,24 @@ class Computer {
       maskRowsRows: 0,
       maskRowsStep: 0,
       operation: Computer.OPERATION_INVERT,
+      operationRotateColorAxis: 'r',
+      operationRotateColorTurns: 1.0,
       rotation: 0.0,
       scale: 1.0,
       wrap: false,
     }
   }
 
-  apply() {
-    self.postMessage(JSON.stringify(this.state));
+  all() {
+    this.state.mask = Computer.MASK_ALL;
   }
 
   alpha(alpha) {
     this.state.alpha = alpha;
   }
 
-  all() {
-    this.state.mask = Computer.MASK_ALL;
+  apply() {
+    self.postMessage(JSON.stringify(this.state));
   }
 
   circle() {
@@ -55,32 +57,12 @@ class Computer {
     this.state.mask = Computer.MASK_CROSS;
   }
 
-  mod(divisor, remainder) {
-    this.state.maskModDivisor = divisor;
-    this.state.maskModRemainder = remainder;
-    this.state.mask = Computer.MASK_MOD;
-  }
-
-  rows(nrows, step) {
-    this.state.maskRowsRows = nrows;
-    this.state.maskRowsStep = step;
-    this.state.mask = Computer.MASK_ROWS;
-  }
-
-  square() {
-    this.state.mask = Computer.MASK_SQUARE;
-  }
-
-  top() {
-    this.state.mask = Computer.MASK_TOP;
-  }
-
-  x() {
-    this.state.mask = Computer.MASK_X;
-  }
-
   debug() {
     this.state.operation = OPERATION_DEBUG;
+  }
+
+  defaultColor(defaultColor) {
+    this.state.defaultColor = defaultColor;
   }
 
   identity() {
@@ -91,41 +73,58 @@ class Computer {
     this.state.operation = Computer.OPERATION_INVERT;
   }
 
-  rotateColor(matrix) {
-    this.state.operationRotateColorMatrix = matrix;
-    this.state.operation = OPERATION_ROTATE_COLOR;
-  }
-
-  scale(scale) {
-    this.state.scale *= scale;
+  mod(divisor, remainder) {
+    this.state.maskModDivisor = divisor;
+    this.state.maskModRemainder = remainder;
+    this.state.mask = Computer.MASK_MOD;
   }
 
   rotate(rotation) {
     this.state.rotation += rotation;
   }
 
-  defaultColor(defaultColor) {
-    this.state.defaultColor = defaultColor;
+  rotateColor(axis, turns) {
+    this.state.operationRotateColorAxis = axis;
+    this.state.operationRotateColorTurns = turns;
+    this.state.operation = Computer.OPERATION_ROTATE_COLOR;
+  }
+
+  rows(nrows, step) {
+    this.state.maskRowsRows = nrows;
+    this.state.maskRowsStep = step;
+    this.state.mask = Computer.MASK_ROWS;
+  }
+
+  scale(scale) {
+    this.state.scale *= scale;
+  }
+
+  square() {
+    this.state.mask = Computer.MASK_SQUARE;
+  }
+
+  top() {
+    this.state.mask = Computer.MASK_TOP;
   }
 
   wrap() {
     this.state.wrap = !this.state.wrap;
   }
+
+  x() {
+    this.state.mask = Computer.MASK_X;
+  }
 }
 
 const computer = new Computer();
 
-const GeneratorFunction = Object.getPrototypeOf(function*(){}).constructor;
-let f = new GeneratorFunction();
-let g = f();
+let g;
 
 self.addEventListener("message", function(event) {
   const data = JSON.parse(event.data);
   switch (data.messageType) {
     case "script":
-      let script = data.payload;
-      f = new GeneratorFunction(script);
-      g = f();
+      g = Object.getPrototypeOf(function*(){}).constructor(data.payload)();
       break;
     case "run":
       g.next();

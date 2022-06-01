@@ -15,20 +15,6 @@ pub(crate) struct App {
   worker: Worker,
 }
 
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-enum MessageType {
-  Script,
-  Run,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct Message<'a> {
-  message_type: MessageType,
-  payload: Option<&'a str>,
-}
-
 impl App {
   pub(super) fn init() -> Result {
     let window = window();

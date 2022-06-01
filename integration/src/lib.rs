@@ -179,8 +179,8 @@ fn all() -> Result {
   image_test(
     "all",
     "
-      all
-      apply
+      computer.all();
+      computer.apply();
     ",
   )
 }
@@ -190,9 +190,9 @@ fn alpha() -> Result {
   image_test(
     "alpha",
     "
-      alpha 0.5
-      x
-      apply
+      computer.alpha(0.5);
+      computer.x();
+      computer.apply();
     ",
   )
 }
@@ -202,7 +202,7 @@ fn apply() -> Result {
   image_test(
     "apply",
     "
-      apply
+      computer.apply();
     ",
   )
 }
@@ -212,17 +212,17 @@ fn brilliance() -> Result {
   image_test(
     "brilliance",
     "
-      x
-      rotate-color g 0.07
-      rotate 0.07
-      for 10
-        apply
-      loop
-      rotate-color b 0.09
-      rotate 0.09
-      for 10
-        apply
-      loop
+      computer.x();
+      computer.rotateColor('g', 0.07);
+      computer.rotate(0.07);
+      for (let i = 0; i < 10; i++) {
+        computer.apply();
+      }
+      computer.rotateColor('b', 0.09);
+      computer.rotate(0.09);
+      for (let i = 0; i < 10; i++) {
+        computer.apply();
+      }
     ",
   )
 }
@@ -232,12 +232,12 @@ fn carpet() -> Result {
   image_test(
     "carpet",
     "
-      circle
-      scale 0.5
-      for 8
-        apply
-        wrap
-      loop
+      computer.circle();
+      computer.scale(0.5);
+      for (let i = 0; i < 8; i++) {
+        computer.apply();
+        computer.wrap();
+      }
     ",
   )
 }
@@ -247,8 +247,8 @@ fn circle() -> Result {
   image_test(
     "circle",
     "
-      circle
-      apply
+      computer.circle();
+      computer.apply();
     ",
   )
 }
@@ -258,13 +258,13 @@ fn circle_scale() -> Result {
   image_test(
     "circle_scale",
     "
-      scale 0.5
-      circle
-      apply
-      all
-      scale 0.9
-      wrap
-      apply
+      computer.scale(0.5);
+      computer.circle();
+      computer.apply();
+      computer.all();
+      computer.scale(0.9);
+      computer.wrap();
+      computer.apply();
     ",
   )
 }
@@ -274,11 +274,11 @@ fn concentric_circles() -> Result {
   image_test(
     "concentric_circles",
     "
-      scale 0.99
-      circle
-      for 100
-        apply
-      loop
+      computer.scale(0.99);
+      computer.circle();
+      for (let i = 0; i < 100; i++) {
+        computer.apply();
+      }
     ",
   )
 }
@@ -288,8 +288,8 @@ fn cross() -> Result {
   image_test(
     "cross",
     "
-      cross
-      apply
+      computer.cross();
+      computer.apply();
     ",
   )
 }
@@ -304,19 +304,19 @@ fn diamonds() -> Result {
   image_test(
     "diamonds",
     "
-      rotate 0.3333
-      rotate-color g 0.05
-      circle
-      scale 0.5
-      wrap
-      for 8
-        apply
-      loop
-      rotate 0.8333
-      rotate-color b 0.05
-      for 8
-        apply
-      loop
+      computer.rotate(0.3333);
+      computer.rotateColor('g', 0.05);
+      computer.circle();
+      computer.scale(0.5);
+      computer.wrap();
+      for (let i = 0; i < 8; i++) {
+        computer.apply();
+      }
+      computer.rotate(0.8333);
+      computer.rotateColor('b', 0.05);
+      for (let i = 0; i < 8; i++) {
+        computer.apply();
+      }
     ",
   )
 }
@@ -326,13 +326,13 @@ fn grain() -> Result {
   image_test(
     "grain",
     "
-      rotate 0.111
-      for 16
-        square
-        apply
-        circle
-        apply
-      loop
+      computer.rotate(0.111);
+      for (let i = 0; i < 16; i++) {
+        computer.square();
+        computer.apply();
+        computer.circle();
+        computer.apply();
+      }
     ",
   )
 }
@@ -342,18 +342,18 @@ fn kaleidoscope() -> Result {
   image_test(
     "kaleidoscope",
     "
-      rotate-color g 0.05
-      circle
-      scale 0.75
-      wrap
-      for 8
-        apply
-      loop
-      rotate 0.8333
-      rotate-color b 0.05
-      for 8
-        apply
-      loop
+      computer.rotateColor('g', 0.05);
+      computer.circle();
+      computer.scale(0.75);
+      computer.wrap();
+      for (let i = 0; i < 8; i++) {
+        computer.apply();
+      }
+      computer.rotate(0.8333);
+      computer.rotateColor('b', 0.05);
+      for (let i = 0; i < 8; i++) {
+        computer.apply();
+      }
     ",
   )
 }
@@ -363,8 +363,8 @@ fn mod_3() -> Result {
   image_test(
     "mod_3",
     "
-      mod 3 0
-      apply
+      computer.mod(3, 0);
+      computer.apply();
     ",
   )
 }
@@ -374,17 +374,17 @@ fn orbs() -> Result {
   image_test(
     "orbs",
     "
-      rotate-color g 0.05
-      circle
-      scale 0.75
-      wrap
-      for 8
-        apply
-      loop
-      rotate-color b 0.05
-      for 8
-        apply
-      loop
+      computer.rotateColor('g', 0.05);
+      computer.circle();
+      computer.scale(0.75);
+      computer.wrap();
+      for (let i = 0; i < 8; i++) {
+        computer.apply();
+      }
+      computer.rotateColor('b', 0.05);
+      for (let i = 0; i < 8; i++) {
+        computer.apply();
+      }
     ",
   )
 }
@@ -394,13 +394,13 @@ fn pattern() -> Result {
   image_test(
     "pattern",
     "
-      alpha 0.75
-      circle
-      scale 0.5
-      for 8
-        apply
-        wrap
-      loop
+      computer.alpha(0.75);
+      computer.circle();
+      computer.scale(0.5);
+      for (let i = 0; i < 8; i++) {
+        computer.apply();
+        computer.wrap();
+      }
     ",
   )
 }
@@ -444,9 +444,9 @@ fn rotate() -> Result {
   image_test(
     "rotate",
     "
-      rotate 0.05
-      x
-      apply
+      computer.rotate(0.05);
+      computer.x();
+      computer.apply();
     ",
   )
 }
@@ -456,9 +456,9 @@ fn rotate_0125_square() -> Result {
   image_test(
     "rotate_0125_square",
     "
-      rotate 0.125
-      square
-      apply
+      computer.rotate(0.125);
+      computer.square();
+      computer.apply();
     ",
   )
 }
@@ -468,9 +468,9 @@ fn rotate_1_square() -> Result {
   image_test(
     "rotate_1_square",
     "
-      rotate 1.0
-      square
-      apply
+      computer.rotate(1.0);
+      computer.square();
+      computer.apply();
     ",
   )
 }
@@ -480,9 +480,9 @@ fn rotate_color_05_red() -> Result {
   image_test(
     "rotate_color_05_red",
     "
-      rotate-color red 0.5
-      all
-      apply
+      computer.rotateColor('r', 0.5);
+      computer.all();
+      computer.apply();
     ",
   )
 }
@@ -492,9 +492,9 @@ fn rotate_color_blue_05_all() -> Result {
   image_test(
     "rotate_color_blue_05_all",
     "
-      rotate-color blue 0.5
-      all
-      apply
+      computer.rotateColor('b', 0.5);
+      computer.all();
+      computer.apply();
     ",
   )
 }
@@ -504,9 +504,9 @@ fn rotate_color_blue_1_all() -> Result {
   image_test(
     "rotate_color_blue_1_all",
     "
-      rotate-color blue 1.0
-      all
-      apply
+      computer.rotateColor('b', 1.0);
+      computer.all();
+      computer.apply();
     ",
   )
 }
@@ -516,9 +516,9 @@ fn rotate_color_blue_all() -> Result {
   image_test(
     "rotate_color_blue_all",
     "
-      rotate-color b 0.5
-      all
-      apply
+      computer.rotateColor('b', 0.5);
+      computer.all();
+      computer.apply();
     ",
   )
 }
@@ -528,9 +528,9 @@ fn rotate_color_g() -> Result {
   image_test(
     "rotate_color_g",
     "
-      rotate-color g 0.5
-      all
-      apply
+      computer.rotateColor('g', 0.5);
+      computer.all();
+      computer.apply();
     ",
   )
 }
@@ -540,9 +540,9 @@ fn rotate_color_green() -> Result {
   image_test(
     "rotate_color_green",
     "
-      rotate-color green 0.5
-      all
-      apply
+      computer.rotateColor('g', 0.5);
+      computer.all();
+      computer.apply();
     ",
   )
 }
@@ -552,8 +552,9 @@ fn rotate_color_green_all() -> Result {
   image_test(
     "rotate_color_green_all",
     "
-      rotate-color green 1.0
-      all
+      computer.rotateColor('g', 1.0);
+      computer.all();
+      computer.apply();
     ",
   )
 }
@@ -586,10 +587,10 @@ fn rotate_scale_x() -> Result {
   image_test(
     "rotate_scale_x",
     "
-      rotate 0.05
-      scale 2
-      x
-      apply
+      computer.rotate(0.05);
+      comuter.scale(2.0);
+      computer.x();
+      computer.apply();
     ",
   )
 }
@@ -599,11 +600,11 @@ fn rotate_square() -> Result {
   image_test(
     "rotate_square",
     "
-      rotate 0.05
-      square
-      for 2
-        apply
-      loop
+      computer.rotate(0.05);
+      computer.square();
+      for (let i = 0; i < 2; i++) {
+        computer.apply();
+      }
     ",
   )
 }
@@ -613,15 +614,15 @@ fn rotate_square_for_x() -> Result {
   image_test(
     "rotate_square_for_x",
     "
-      rotate 0.05
-      square
-      for 2
-        apply
-      loop
-      x
-      for 1
-        apply
-      loop
+      computer.rotate(0.05);
+      computer.square();
+      for (let i = 0; i < 2; i++) {
+        computer.apply();
+      }
+      computer.x();
+      for (let i = 0; i < 1; i++) {
+        computer.apply();
+      }
     ",
   )
 }
@@ -631,8 +632,8 @@ fn rows() -> Result {
   image_test(
     "rows",
     "
-      rows 1 1
-      apply
+      computer.rows(1, 1);
+      computer.apply();
     ",
   )
 }
@@ -642,8 +643,8 @@ fn rows_overflow() -> Result {
   image_test(
     "rows_overflow",
     "
-      rows 4294967295 4294967295
-      apply
+      computer.rows(4294967295, 4294967295);
+      computer.apply();
     ",
   )
 }
@@ -653,17 +654,17 @@ fn rug() -> Result {
   image_test(
     "rug",
     "
-      rotate-color g 0.05
-      circle
-      scale 0.5
-      wrap
-      for 8
-        apply
-      loop
-      rotate-color b 0.05
-      for 8
-        apply
-      loop
+      computer.rotateColor('g', 0.05);
+      computer.circle();
+      computer.scale(0.5);
+      computer.wrap();
+      for (let i = 0; i < 8; i++) {
+        computer.apply();
+      }
+      computer.rotateColor('b', 0.05);
+      for (let i = 0; i < 8; i++) {
+        computer.apply();
+      }
     ",
   )
 }
@@ -673,9 +674,9 @@ fn scale() -> Result {
   image_test(
     "scale",
     "
-      scale 0.5
-      circle
-      apply
+      computer.scale(0.5);
+      computer.circle();
+      computer.apply();
     ",
   )
 }
@@ -685,11 +686,11 @@ fn scale_circle_for() -> Result {
   image_test(
     "scale_circle_for",
     "
-      circle
-      scale 0.5
-      for 8
-        apply
-      loop
+      computer.circle();
+      computer.scale(0.5);
+      for (let i = 0; i < 8; i++) {
+        computer.apply();
+      }
     ",
   )
 }
@@ -699,10 +700,10 @@ fn scale_circle_wrap() -> Result {
   image_test(
     "scale_circle_wrap",
     "
-      scale 0.5
-      circle
-      wrap
-      apply
+      comuter.scale(0.5);
+      computer.circle();
+      computer.wrap();
+      computer.apply();
     ",
   )
 }
@@ -712,10 +713,10 @@ fn scale_rotate() -> Result {
   image_test(
     "scale_rotate",
     "
-      scale 2
-      rotate 0.05
-      x
-      apply
+      computer.scale(2);
+      computer.rotate(0.05);
+      computer.x();
+      computer.apply();
     ",
   )
 }
@@ -725,9 +726,9 @@ fn scale_x() -> Result {
   image_test(
     "scale_x",
     "
-      scale 2
-      x
-      apply
+      computer.scale(2);
+      computer.x();
+      computer.apply();
     ",
   )
 }
@@ -759,8 +760,8 @@ fn square() -> Result {
   image_test(
     "square",
     "
-      square
-      apply
+      computer.square();
+      computer.apply();
     ",
   )
 }
@@ -770,11 +771,11 @@ fn square_top() -> Result {
   image_test(
     "square_top",
     "
-    square
-    apply
-    top
-    apply
-  ",
+      computer.square();
+      computer.apply();
+      computer.top();
+      computer.apply();
+   ",
   )
 }
 
@@ -805,8 +806,8 @@ fn top() -> Result {
   image_test(
     "top",
     "
-      top
-      apply
+      computer.top();
+      computer.apply();
     ",
   )
 }
@@ -816,8 +817,8 @@ fn x() -> Result {
   image_test(
     "x",
     "
-      x
-      apply
+      computer.x();
+      computer.apply();
     ",
   )
 }
@@ -827,12 +828,12 @@ fn x_loop() -> Result {
   image_test(
     "x_loop",
     "
-      x
-      scale 0.5
-      for 8
-        apply
-        wrap
-      loop
+      computer.x();
+      computer.scale(0.5);
+      for (let i = 0; i < 8; i++) {
+        computer.apply();
+        computer.wrap();
+      }
     ",
   )
 }
@@ -842,11 +843,11 @@ fn x_scale() -> Result {
   image_test(
     "x_scale",
     "
-      x
-      scale 0.5
-      for 8
-        apply
-      loop
+      computer.x();
+      computer.scale(0.5);
+      for (let i = 0; i < 8; i++) {
+        computer.apply();
+      }
     ",
   )
 }
@@ -856,13 +857,13 @@ fn x_wrap() -> Result {
   image_test(
     "x_wrap",
     "
-      x
-      apply
-      scale 0.5
-      wrap
-      identity
-      all
-      apply
+      computer.x();
+      computer.apply();
+      computer.scale(0.5);
+      computer.wrap();
+      computer.identity();
+      computer.all();
+      comuter.apply();
     ",
   )
 }
@@ -872,8 +873,8 @@ fn debug_operation() -> Result {
   image_test(
     "debug_operation",
     "
-      debug
-      apply
+      computer.debug();
+      computer.apply();
     ",
   )
 }
@@ -883,8 +884,8 @@ fn mod_zero_is_always_false() -> Result {
   image_test(
     "mod_zero_is_always_false",
     "
-      mod 0 1
-      apply
+      computer.mod(0, 1);
+      computer.apply();
     ",
   )
 }
@@ -894,12 +895,12 @@ fn square_colors() -> Result {
   image_test(
     "square_colors",
     "
-      rotate 0.01
-      rotate-color g 0.1
-      square
-      for 10
-        apply
-      loop
+      computer.rotate(0.01);
+      computer.rotateColor('g', 0.1);
+      computer.square();
+      for (let i = 0; i < 10; i++) {
+        computer.apply();
+      }
     ",
   )
 }
@@ -909,14 +910,13 @@ fn nested_for_loops() -> Result {
   image_test(
     "nested_for_loops",
     "
-      circle
-      scale 0.9
-
-      for 2
-        for 2
-          apply
-        loop
-      loop
+      computer.circle();
+      computer.scale(0.9);
+      for (let i = 0; i < 2; i++) {
+        for (let j = 0; j < 2; j++) {
+          computer.apply();
+        }
+      }
     ",
   )
 }
@@ -926,11 +926,11 @@ fn for_zero() -> Result {
   image_test(
     "for_zero",
     "
-      circle
+      computer.circle();
 
-      for 0
-        apply
-      loop
+      for (let i = 0; i < 0; i++) {
+        computer.apply();
+      }
     ",
   )
 }
@@ -940,9 +940,9 @@ fn gpu_extra_pixels() -> Result {
   image_test(
     "gpu_extra_pixels",
     "
-      rotate 0.01
-      apply
-      apply
+      computer.rotate(0.01);
+      computer.apply();
+      computer.apply();
     ",
   )
 }
@@ -952,9 +952,9 @@ fn default_color() -> Result {
   image_test(
     "default_color",
     "
-      default 255 0 255
-      rotate 0.01
-      apply
+      computer.defaultColor([255, 0, 255]);
+      computer.rotate(0.01);
+      computer.apply();
     ",
   )
 }

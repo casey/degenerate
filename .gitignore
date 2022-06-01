@@ -1,3 +1,4 @@
+/bin/serve/target
 /generate
 /images/*.actual-memory.png
 /integration/target

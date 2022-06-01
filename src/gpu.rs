@@ -1,4 +1,7 @@
-use super::*;
+use {
+  super::*,
+  nalgebra::{Rotation3, Vector3},
+};
 
 pub(crate) struct Gpu {
   canvas: HtmlCanvasElement,
@@ -197,24 +200,33 @@ impl Gpu {
     self
       .gl
       .uniform1ui(Some(self.uniform("divisor")), state.mask_mod_divisor);
+
     self
       .gl
       .uniform1ui(Some(self.uniform("remainder")), state.mask_mod_remainder);
+
     self
       .gl
       .uniform1ui(Some(self.uniform("nrows")), state.mask_rows_rows);
+
     self
       .gl
       .uniform1ui(Some(self.uniform("step")), state.mask_rows_step);
 
-    // TODO: npm install glmatrix
-    // self.gl.uniform_matrix3fv_with_f32_array(
-    //   Some(self.uniform("color_rotation")),
-    //   false,
-    //   Rotation3::new(state.operation_rotate_color_axis.vector() * state.operation_rotate_color_turns * f32::consts::TAU)
-    //     .matrix()
-    //     .as_slice(),
-    // );
+    let axis_vector = match state.operation_rotate_color_axis.as_ref() {
+      "r" | "red" => Vector3::x(),
+      "g" | "green" => Vector3::y(),
+      "b" | "blue" => Vector3::z(),
+      _ => panic!("Invalid color rotation axis"),
+    };
+
+    self.gl.uniform_matrix3fv_with_f32_array(
+      Some(self.uniform("color_rotation")),
+      false,
+      Rotation3::new(axis_vector * state.operation_rotate_color_turns * f32::consts::TAU)
+        .matrix()
+        .as_slice(),
+    );
 
     let mut similarity: Similarity2<f32> = Similarity2::identity();
     similarity.append_rotation_mut(&UnitComplex::from_angle(-state.rotation * f32::consts::TAU));

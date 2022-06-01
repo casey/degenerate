@@ -1,7 +1,15 @@
 use {
   crate::{
-    add_event_listener::AddEventListener, app::App, cast::Cast, get_document::GetDocument,
-    gpu::Gpu, js_value_error::JsValueError, select::Select, state::State, stderr::Stderr,
+    add_event_listener::AddEventListener,
+    app::App,
+    cast::Cast,
+    get_document::GetDocument,
+    gpu::Gpu,
+    js_value_error::JsValueError,
+    message::{Message, MessageType},
+    select::Select,
+    state::State,
+    stderr::Stderr,
     window::window,
   },
   nalgebra::{Similarity2, UnitComplex},
@@ -24,7 +32,7 @@ use {
 };
 
 type Error = Box<dyn std::error::Error>;
-type Result<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
+type Result<T = (), E = Error> = std::result::Result<T, E>;
 
 mod add_event_listener;
 mod app;
@@ -32,6 +40,7 @@ mod cast;
 mod get_document;
 pub mod gpu;
 mod js_value_error;
+mod message;
 mod select;
 mod state;
 mod stderr;
