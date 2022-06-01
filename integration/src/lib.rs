@@ -405,6 +405,7 @@ fn pattern() -> Result {
   )
 }
 
+// TODO
 #[test]
 fn choose_default_seed() -> Result {
   image_test(
@@ -416,6 +417,7 @@ fn choose_default_seed() -> Result {
   )
 }
 
+// TODO
 #[test]
 fn choose_zero_seed() -> Result {
   image_test(
@@ -427,6 +429,7 @@ fn choose_zero_seed() -> Result {
   )
 }
 
+// TODO
 #[test]
 fn choose_nonzero_seed() -> Result {
   image_test(
@@ -480,7 +483,7 @@ fn rotate_color_05_red() -> Result {
   image_test(
     "rotate_color_05_red",
     "
-      computer.rotateColor('r', 0.5);
+      computer.rotateColor('red', 0.5);
       computer.all();
       computer.apply();
     ",
@@ -492,7 +495,7 @@ fn rotate_color_blue_05_all() -> Result {
   image_test(
     "rotate_color_blue_05_all",
     "
-      computer.rotateColor('b', 0.5);
+      computer.rotateColor('blue', 0.5);
       computer.all();
       computer.apply();
     ",
@@ -504,7 +507,7 @@ fn rotate_color_blue_1_all() -> Result {
   image_test(
     "rotate_color_blue_1_all",
     "
-      computer.rotateColor('b', 1.0);
+      computer.rotateColor('blue', 1.0);
       computer.all();
       computer.apply();
     ",
@@ -540,7 +543,7 @@ fn rotate_color_green() -> Result {
   image_test(
     "rotate_color_green",
     "
-      computer.rotateColor('g', 0.5);
+      computer.rotateColor('green', 0.5);
       computer.all();
       computer.apply();
     ",
@@ -552,7 +555,7 @@ fn rotate_color_green_all() -> Result {
   image_test(
     "rotate_color_green_all",
     "
-      computer.rotateColor('g', 1.0);
+      computer.rotateColor('green', 1.0);
       computer.all();
       computer.apply();
     ",
@@ -564,9 +567,9 @@ fn rotate_color_r() -> Result {
   image_test(
     "rotate_color_r",
     "
-      rotate-color r 0.5
-      all
-      apply
+      computer.rotateColor('r', 0.5);
+      computer.all();
+      computer.apply();
     ",
   )
 }
@@ -576,8 +579,9 @@ fn rotate_color_red_all() -> Result {
   image_test(
     "rotate_color_red_all",
     "
-      rotate-color red 1.0
-      all
+      computer.rotateColor('red', 1.0);
+      computer.all();
+      computer.apply();
     ",
   )
 }
@@ -588,7 +592,7 @@ fn rotate_scale_x() -> Result {
     "rotate_scale_x",
     "
       computer.rotate(0.05);
-      comuter.scale(2.0);
+      comuter.scale(2);
       computer.x();
       computer.apply();
     ",
@@ -733,6 +737,7 @@ fn scale_x() -> Result {
   )
 }
 
+// TODO
 #[test]
 fn smear() -> Result {
   image_test(
@@ -779,6 +784,7 @@ fn square_top() -> Result {
   )
 }
 
+// TODO
 #[test]
 fn starburst() -> Result {
   image_test(
@@ -927,7 +933,6 @@ fn for_zero() -> Result {
     "for_zero",
     "
       computer.circle();
-
       for (let i = 0; i < 0; i++) {
         computer.apply();
       }
