@@ -26,21 +26,25 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install Rust Toolchain Components
-      uses: actions-rs/toolchain@v1
+    - uses: actions/setup-node@v2
       with:
-        target: wasm32-unknown-unknown
-        toolchain: stable
+        node-version: '14.x'
 
-    - uses: Swatinem/rust-cache@v1
+    - name: Install dependencies
+      run: npm ci
 
-    - name: Install `wasm-bindgen`
-      uses: jetli/wasm-bindgen-action@v0.1.0
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+
+    - name: Run Playwright tests
+      run: npx playwright test
+
+    - uses: actions/upload-artifact@v2
+      if: always()
       with:
-        version: ${{ env.WASM_BINDGEN_VERSION }}
-
-    - name: Test
-      run: cargo test --all --all-targets
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
 
   check:
     name: Check

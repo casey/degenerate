@@ -1,4 +1,5 @@
 /bin/serve/target
+/diff.png
 /generate
 /images/*.actual-memory.png
 /integration/target
@@ -11,4 +12,3 @@
 /www/degenerate.js
 /www/degenerate_bg.wasm
 /www/man
-/diff.png
