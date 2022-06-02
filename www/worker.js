@@ -1,28 +1,28 @@
 "use strict";
 
 class Rng {
-  static MIN = -2147483648;
-  static MAX = 2147483647;
-
   constructor(seed) {
     this._seed = seed;
-    this._value = seed;
+    this.a = 1103515245;
+    this.c = 12345;
+    this.m = 0x80000000;
   }
 
-  map(val, minFrom, maxFrom, minTo, maxTo) {
-    return ((val - minFrom) / (maxFrom - minFrom)) * (maxTo - minTo) + minTo;
+  choose(masks) {
+    masks[this.#nextRange(0, masks.length - 1)]();
   }
 
-  next(min, max) {
-    this._value = this.shift(this._value);
-    return Math.floor(this.map(this._value, Rng.MIN, Rng.MAX, min, max + 1));
+  seed(seed) {
+    this._seed = seed;
   }
 
-  shift(value) {
-    value ^= value << 13;
-    value ^= value >> 17;
-    value ^= value << 5;
-    return value;
+  #nextInt() {
+    this._seed = (this.a * this._seed + this.c) % this.m;
+    return this._seed;
+  }
+
+  #nextRange(min, max) {
+    return min + Math.floor((this.#nextInt() / this.m) * (max - min))
   }
 }
 
@@ -41,12 +41,7 @@ class Computer {
   static OPERATION_INVERT = 2;
   static OPERATION_ROTATE_COLOR = 3;
 
-  static OPERATION_ROTATE_COLOR_AXIS_RED = 0;
-  static OPERATION_ROTATE_COLOR_AXIS_GREEN = 1;
-  static OPERATION_ROTATE_COLOR_AXIS_BLUE = 2;
-
   constructor() {
-    this.rng = new Rng(0);
     this.state = {
       alpha: 1.0,
       defaultColor: [0.0, 0.0, 0.0],
@@ -74,31 +69,6 @@ class Computer {
 
   apply() {
     self.postMessage(JSON.stringify({ apply: this.state }));
-  }
-
-  choose(masks) {
-    switch (masks[this.rng.next(0, masks.length - 1)]) {
-      case "all":
-        this.all();
-        break;
-      case "circle":
-        this.circle();
-        break;
-      case "cross":
-        this.cross();
-        break;
-      case "square":
-        this.square();
-        break;
-      case "top":
-        this.top();
-        break;
-      case "x":
-        this.x();
-        break;
-      default:
-        throw 'Invalid mask';
-    }
   }
 
   circle() {
@@ -147,10 +117,6 @@ class Computer {
     this.state.mask = Computer.MASK_ROWS;
   }
 
-  seed(seed) {
-    this.rng = new Rng(seed);
-  }
-
   scale(scale) {
     this.state.scale *= scale;
   }
@@ -172,6 +138,7 @@ class Computer {
   }
 }
 
+const rng = new Rng(0);
 const computer = new Computer();
 
 let g;

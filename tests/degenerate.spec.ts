@@ -3,7 +3,7 @@ import { cmd } from './common';
 import { decode } from 'node-libpng';
 import { test, expect, Page } from '@playwright/test';
 
-const VERBOSE = false;
+const VERBOSE = true;
 
 test.describe.configure({ mode: 'serial' });
 
@@ -64,13 +64,13 @@ const imageTest = (name, program) => {
   });
 };
 
-// imageTest(
-//   'all',
-//   `
-//     computer.all();
-//     computer.apply();
-//   `
-// );
+imageTest(
+  'all',
+  `
+    computer.all();
+    computer.apply();
+  `
+);
 
 imageTest(
   'alpha',
@@ -247,31 +247,52 @@ imageTest(
   `
 );
 
-// imageTest(
-//   'choose_default_seed',
-//   `
-//     computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
-//     computer.apply();
-//   `
-// );
+imageTest(
+  'choose_default_seed',
+  `
+    rng.choose([
+      () => computer.all(),
+      () => computer.circle(),
+      () => computer.cross(),
+      () => computer.square(),
+      () => computer.top(),
+      () => computer.x()
+    ]);
+    computer.apply();
+  `
+);
 
-// imageTest(
-//   'choose_zero_seed',
-//   `
-//     computer.seed(0);
-//     computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
-//     computer.apply();
-//   `
-// );
+imageTest(
+  'choose_zero_seed',
+  `
+    computer.seed(0);
+    rng.choose([
+      () => computer.all(),
+      () => computer.circle(),
+      () => computer.cross(),
+      () => computer.square(),
+      () => computer.top(),
+      () => computer.x()
+    ]);
+    computer.apply();
+  `
+);
 
-// imageTest(
-//   'choose_nonzero_seed',
-//   `
-//     computer.seed(2);
-//     computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
-//     computer.apply();
-//   `
-// );
+imageTest(
+  'choose_nonzero_seed',
+  `
+    computer.seed(2);
+    rng.choose([
+      () => computer.all(),
+      () => computer.circle(),
+      () => computer.cross(),
+      () => computer.square(),
+      () => computer.top(),
+      () => computer.x()
+    ]);
+    computer.apply();
+  `
+);
 
 imageTest(
   'rotate',
@@ -499,24 +520,32 @@ imageTest(
   `
 );
 
-// imageTest(
-//   'smear',
-//   `
-//     computer.seed(9);
-//     computer.rotateColor('g', 0.01);
-//     computer.rotate(0.01);
-//     for (let i = 0; i < 100; i++) {
-//       computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
-//       computer.apply();
-//     }
-//     computer.rotateColor('b', 0.01);
-//     computer.rotate(0.01);
-//     for (let i = 0; i < 100; i++) {
-//       computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
-//       computer.apply();
-//     }
-//   `
-// );
+imageTest(
+  'smear',
+  `
+    const masks = ([
+      () => computer.all(),
+      () => computer.circle(),
+      () => computer.cross(),
+      () => computer.square(),
+      () => computer.top(),
+      () => computer.x()
+    ]);
+    rng.seed(9);
+    computer.rotateColor('g', 0.01);
+    computer.rotate(0.01);
+    for (let i = 0; i < 100; i++) {
+      rng.choose(masks);
+      computer.apply();
+    }
+    computer.rotateColor('b', 0.01);
+    computer.rotate(0.01);
+    for (let i = 0; i < 100; i++) {
+      rng.choose(masks);
+      computer.apply();
+    }
+  `
+);
 
 imageTest(
   'square',
@@ -536,28 +565,36 @@ imageTest(
  `
 );
 
-// imageTest(
-//   'starburst',
-//   `
-//     computer.seed(8);
-//     computer.rotateColor('g', 0.1);
-//     computer.rotate(0.1);
-//     for (let i = 0; i < 10; i++) {
-//       computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
-//       computer.apply();
-//     }
-//     for (let i = 0; i < 10; i++) {
-//       computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
-//       computer.apply();
-//     }
-//     computer.rotateColor('b', 0.1);
-//     computer.rotate(0.1);
-//     for (let i = 0; i < 10; i++) {
-//       computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
-//       computer.apply();
-//     }
-//   `
-// );
+imageTest(
+  'starburst',
+  `
+    const masks = ([
+      () => computer.all(),
+      () => computer.circle(),
+      () => computer.cross(),
+      () => computer.square(),
+      () => computer.top(),
+      () => computer.x()
+    ]);
+    rng.seed(8);
+    computer.rotateColor('g', 0.1);
+    computer.rotate(0.1);
+    for (let i = 0; i < 10; i++) {
+      computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
+      computer.apply();
+    }
+    for (let i = 0; i < 10; i++) {
+      rng.choose(masks);
+      computer.apply();
+    }
+    computer.rotateColor('b', 0.1);
+    computer.rotate(0.1);
+    for (let i = 0; i < 10; i++) {
+      rng.choose(masks);
+      computer.apply();
+    }
+  `
+);
 
 imageTest(
   'top',
