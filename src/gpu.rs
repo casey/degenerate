@@ -63,7 +63,7 @@ impl Gpu {
         .create_shader(WebGl2RenderingContext::FRAGMENT_SHADER)
         .ok_or("Failed to create shader")?;
 
-      gl.shader_source(&fragment, &include_str!("fragment.glsl"));
+      gl.shader_source(&fragment, include_str!("fragment.glsl"));
       gl.compile_shader(&fragment);
 
       if !gl.get_shader_parameter(&fragment, WebGl2RenderingContext::COMPILE_STATUS) {
@@ -196,7 +196,7 @@ impl Gpu {
 
     self
       .gl
-      .uniform1f(Some(&self.uniform("alpha")), state.alpha as f32);
+      .uniform1f(Some(self.uniform("alpha")), state.alpha as f32);
 
     self.gl.uniform3f(
       Some(self.uniform("default_color")),
@@ -241,7 +241,7 @@ impl Gpu {
     similarity.append_scaling_mut(state.scale);
 
     self.gl.uniform_matrix3fv_with_f32_array(
-      Some(&self.uniform("transform")),
+      Some(self.uniform("transform")),
       false,
       similarity
         .inverse()
@@ -252,13 +252,13 @@ impl Gpu {
 
     self
       .gl
-      .uniform1ui(Some(&self.uniform("wrap")), state.wrap as u32);
+      .uniform1ui(Some(self.uniform("wrap")), state.wrap as u32);
 
-    self.gl.uniform1ui(Some(&self.uniform("mask")), state.mask);
+    self.gl.uniform1ui(Some(self.uniform("mask")), state.mask);
 
     self
       .gl
-      .uniform1ui(Some(&self.uniform("operation")), state.operation);
+      .uniform1ui(Some(self.uniform("operation")), state.operation);
 
     self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 3);
 

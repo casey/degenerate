@@ -30,6 +30,17 @@ jobs:
       with:
         node-version: '14.x'
 
+    - name: Install Rust Toolchain Components
+      uses: actions-rs/toolchain@v1
+      with:
+        target: wasm32-unknown-unknown
+        toolchain: stable
+
+    - name: Install `wasm-bindgen`
+      uses: jetli/wasm-bindgen-action@v0.1.0
+      with:
+        version: ${{ env.WASM_BINDGEN_VERSION }}
+
     - name: Install dependencies
       working-directory: tests
       run: npm ci
