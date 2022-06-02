@@ -78,7 +78,6 @@ jobs:
 
     - name: Clippy
       run: |
-        cargo clippy --package integration --tests
         cargo clippy --target wasm32-unknown-unknown
 
     - name: Check for Forbidden Words
