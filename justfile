@@ -8,7 +8,7 @@ build:
   cargo build
 
 test *args:
-  npx playwright test
+  cd tests && npx playwright test {{args}}
 
 clippy:
   cargo clippy --package integration --tests
