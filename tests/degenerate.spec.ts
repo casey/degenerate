@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import { exec } from 'child_process';
 import { test, expect, Page } from '@playwright/test';
-import { decode } from "node-libpng";
-import express from 'express';
+import { decode } from 'node-libpng';
+
 
 // TODO:
 // - Run server on free port before tests run
@@ -15,17 +15,7 @@ import express from 'express';
 // - [~x] tests be flaky in serial
 // - make them parallel
 
-const VERBOSE = true;
-
-const clean = async () => {
-  const files = await fs.promises.opendir('../images');
-  for await (const file of files) {
-    const path = `../images/${file.name}`;
-    if (path.endsWith('.actual-memory.png')) {
-      await fs.promises.unlink(path);
-    }
-  }
-};
+const VERBOSE = false;
 
 const cmd = (command) => {
   exec(command, (err, _stdout, _stderr) => {
@@ -35,36 +25,15 @@ const cmd = (command) => {
 
 test.describe.configure({ mode: 'serial' });
 
-let server = null;
-
-test.beforeAll(async () => {
-  await clean();
-
-  cmd(`
-    cd ..
-    cargo build --target wasm32-unknown-unknown
-    wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/debug/degenerate.wasm --out-dir www
-  `);
-
-  const app = express();
-  app.use(express.static('../www'))
-  server = app.listen(0);
-});
-
 test.beforeEach(async ({ page }) => {
   await page.waitForTimeout(1000);
   await page.setViewportSize({ width: 256, height: 256 });
-  await page.goto(`http://localhost:${server.address().port}`);
+  await page.goto(`http://localhost:${process.env.PORT}`);
   await page.evaluate('window.test = true');
   page.on('pageerror', (error) => console.log(error.message));
-  page.on('console', (message) =>  {
-    if (VERBOSE || message.type() == 'error')
-      console.log(message);
+  page.on('console', (message) => {
+    if (VERBOSE || message.type() == 'error') console.log(message);
   });
-});
-
-test.afterAll(async () => {
-  server.close();
 });
 
 const imageTest = (name, program) => {
@@ -74,9 +43,7 @@ const imageTest = (name, program) => {
     await page.locator('textarea').fill(program);
 
     await page.waitForSelector('nav.input');
-
     await page.waitForSelector('nav.fade-out');
-
     await page.waitForSelector('canvas.done');
 
     const encoded = (
@@ -93,10 +60,8 @@ const imageTest = (name, program) => {
 
     if (
       missing ||
-      Buffer.compare(
-        have,
-        decode(await fs.promises.readFile(wantPath)).data
-      ) != 0
+      Buffer.compare(have, decode(await fs.promises.readFile(wantPath)).data) !=
+        0
     ) {
       const destination = `../images/${name}.actual-memory.png`;
 
