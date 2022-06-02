@@ -1,27 +1,9 @@
 import * as fs from 'fs';
-import { exec } from 'child_process';
-import { test, expect, Page } from '@playwright/test';
+import { cmd } from './common';
 import { decode } from 'node-libpng';
-
-
-// TODO:
-// - Run server on free port before tests run
-// - Get tests to pass
-//   - Buffer compare fails
-//   - Fix RNG in js
-// - Tests in parallel?
-//
-// 2 problems!
-// - [~x] tests be flaky in serial
-// - make them parallel
+import { test, expect, Page } from '@playwright/test';
 
 const VERBOSE = false;
-
-const cmd = (command) => {
-  exec(command, (err, _stdout, _stderr) => {
-    if (err) throw `error: ${err.message}`;
-  });
-};
 
 test.describe.configure({ mode: 'serial' });
 
@@ -38,12 +20,8 @@ test.beforeEach(async ({ page }) => {
 
 const imageTest = (name, program) => {
   test(name, async ({ page }) => {
-    await page.waitForSelector('canvas.ready');
-
     await page.locator('textarea').fill(program);
 
-    await page.waitForSelector('nav.input');
-    await page.waitForSelector('nav.fade-out');
     await page.waitForSelector('canvas.done');
 
     const encoded = (

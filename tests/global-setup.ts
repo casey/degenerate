@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import express from 'express';
-import { exec } from 'child_process';
+import { cmd } from './common';
 
 const clean = async () => {
   const files = await fs.promises.opendir('../images');
@@ -10,12 +10,6 @@ const clean = async () => {
       await fs.promises.unlink(path);
     }
   }
-};
-
-const cmd = (command) => {
-  exec(command, (err, _stdout, _stderr) => {
-    if (err) throw `error: ${err.message}`;
-  });
 };
 
 async function globalSetup() {
@@ -34,7 +28,7 @@ async function globalSetup() {
 
   return () => {
     server.close();
-  }
+  };
 }
 
 export default globalSetup;

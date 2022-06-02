@@ -77,7 +77,6 @@ impl App {
       app.stderr.update(result);
     })?;
 
-    let local = canvas.clone();
     worker.add_event_listener_with_event("message", move |event| {
       let mut app = app.lock().unwrap();
       let event: WorkerEvent = serde_json::from_str(&event.data().as_string().unwrap()).unwrap();
@@ -88,12 +87,10 @@ impl App {
           app.request_animation_frame().unwrap();
         }
         WorkerEvent::Done => {
-          local.class_list().add_1("done").unwrap();
+          canvas.set_class_name("done");
         }
       }
     })?;
-
-    canvas.class_list().add_1("ready").map_err(JsValueError)?;
 
     Ok(())
   }
@@ -105,7 +102,6 @@ impl App {
   }
 
   pub(super) fn on_input(&mut self) -> Result {
-    self.nav.class_list().add_1("input").map_err(JsValueError)?;
     self.input = true;
     self.request_animation_frame()?;
     Ok(())
@@ -156,11 +152,7 @@ impl App {
     }
 
     if self.input {
-      self
-        .nav
-        .class_list()
-        .add_1("fade-out")
-        .map_err(JsValueError)?;
+      self.nav.set_class_name("fade-out");
 
       self
         .worker
