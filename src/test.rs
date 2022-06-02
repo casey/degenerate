@@ -1,11 +1,11 @@
 use super::*;
 
 #[wasm_bindgen]
-pub fn test(program: &str) -> Result<String, String> {
+pub fn test(program: &str) -> Result<(), String> {
   test_inner(program).map_err(|err| err.to_string())
 }
 
-fn test_inner(program: &str) -> Result<String> {
+fn test_inner(program: &str) -> Result {
   let window = window();
 
   let canvas = window
@@ -25,6 +25,7 @@ fn test_inner(program: &str) -> Result<String> {
     let state: State = serde_json::from_str(&event.data().as_string().unwrap()).unwrap();
     gpu.lock().unwrap().apply(&state).unwrap();
     gpu.lock().unwrap().render_to_canvas().unwrap();
+    js_sys::eval("window.dataURL = document.getElementsByTagName('canvas')[0].toDataURL()").unwrap();
   })?;
 
   worker
@@ -45,5 +46,5 @@ fn test_inner(program: &str) -> Result<String> {
     )?))
     .map_err(JsValueError)?;
 
-  Ok(canvas.to_data_url().map_err(JsValueError)?)
+  Ok(())
 }

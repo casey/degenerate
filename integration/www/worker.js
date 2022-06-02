@@ -1,46 +1,5 @@
 'use strict';
 
-class Rng {
-	static MIN = -2147483648;
-	static MAX = 2147483647;
-
-	constructor(seed) {
-    this.seed = seed;
-    this.value = seed;
-	}
-
-	next(min = 0, pseudoMax = 1) {
-		this.recalculate();
-		return this.map(this.value, Rng.MIN, Rng.MAX, min, pseudoMax);
-	}
-
-	nextInt(min = 10, max = 100) {
-		this.recalculate();
-		return Math.floor(this.map(this._value, Rng.MIN, Rng.MAX, min, max + 1));
-	}
-
-	skip(iterations = 1) {
-		while (iterations-- > 0) {
-			this.recalculate();
-		}
-	}
-
-	recalculate() {
-		this.value = this.shift(this.value);
-	}
-
-	shift(value) {
-		value ^= value << 13;
-		value ^= value >> 17;
-		value ^= value << 5;
-		return value;
-	}
-
-	map(val, minFrom, maxFrom, minTo, maxTo) {
-		return ((val - minFrom) / (maxFrom - minFrom)) * (maxTo - minTo) + minTo;
-	}
-}
-
 class Computer {
   static MASK_ALL = 0;
   static MASK_CIRCLE = 1;
@@ -87,7 +46,7 @@ class Computer {
   }
 
   apply() {
-    self.postMessage(JSON.stringify({"apply": this.state}));
+    self.postMessage(JSON.stringify(this.state));
   }
 
   circle() {
@@ -168,9 +127,7 @@ self.addEventListener("message", function(event) {
       g = Object.getPrototypeOf(function*(){}).constructor(data.payload)();
       break;
     case "run":
-      let result = g.next();
-      if (result.done)
-        self.postMessage(JSON.stringify("done"));
+      g.next();
       break;
   }
 });

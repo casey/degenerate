@@ -15,6 +15,13 @@ pub(crate) struct App {
   worker: Worker,
 }
 
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+enum WorkerEvent {
+  Apply(State),
+  Done,
+}
+
 impl App {
   pub(super) fn init() -> Result {
     let window = window();
@@ -36,7 +43,7 @@ impl App {
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
       animation_frame_pending: false,
-      canvas,
+      canvas: canvas.clone(),
       gpu,
       input: false,
       nav,
@@ -72,10 +79,17 @@ impl App {
 
     worker.add_event_listener_with_event("message", move |event| {
       let app = app.lock().unwrap();
-      let state: State = serde_json::from_str(&event.data().as_string().unwrap()).unwrap();
-      app.gpu.lock().unwrap().apply(&state).unwrap();
-      let result = app.gpu.lock().unwrap().render_to_canvas();
-      stderr.update(result);
+      let event: WorkerEvent = serde_json::from_str(&event.data().as_string().unwrap()).unwrap();
+      match event {
+        WorkerEvent::Apply(state) => {
+          app.gpu.lock().unwrap().apply(&state).unwrap();
+          let result = app.gpu.lock().unwrap().render_to_canvas();
+          stderr.update(result);
+        }
+        WorkerEvent::Done => {
+          canvas.set_class_name("done");
+        }
+      }
     })?;
 
     Ok(())

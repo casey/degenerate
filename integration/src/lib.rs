@@ -124,10 +124,17 @@ pub(crate) fn image_test(name: &str, program: &str) -> Result {
 
     eprintln!("Running test...");
 
-    let data_url = page
+    page
       .evaluate(format!("window.test(`{}`)", program.unindent()))
-      .await?
-      .into_value::<String>()?;
+      .await?;
+
+    let data_url = loop {
+      if let Some(data_url) = page.evaluate("window.dataURL").await?.value() {
+        break data_url.as_str().ok_or("Failed to convert")?.to_owned();
+      }
+
+      tokio::time::sleep(Duration::from_millis(100)).await;
+    };
 
     let have = image::load_from_memory(&base64::decode(
       &data_url["data:image/png;base64,".len()..],

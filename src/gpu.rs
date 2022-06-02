@@ -25,6 +25,14 @@ impl Gpu {
       .depth(false)
       .stencil(false);
 
+    if js_sys::eval("window.test")
+      .map_err(JsValueError)?
+      .as_bool()
+      .is_some()
+    {
+      context_options.preserve_drawing_buffer(true);
+    }
+
     let gl = canvas
       .get_context_with_context_options("webgl2", &context_options.into())
       .map_err(JsValueError)?

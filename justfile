@@ -5,36 +5,36 @@ export RUST_BACKTRACE := bt
 ci: check-lockfile test clippy fmt-check forbid
 
 build:
-	cargo build
+  cargo build
 
 test *args:
-	cargo test --all --all-targets -- {{args}}
+  npx playwright test
 
 clippy:
-	cargo clippy --package integration --tests
-	cargo clippy --target wasm32-unknown-unknown
+  cargo clippy --package integration --tests
+  cargo clippy --target wasm32-unknown-unknown
 
 fmt:
-	cargo fmt --all
+  cargo fmt --all
 
 fmt-check:
-	cargo fmt --all -- --check
+  cargo fmt --all -- --check
 
 check:
-	cargo check --target wasm32-unknown-unknown
-	cargo check --package integration --tests
+  cargo check --target wasm32-unknown-unknown
+  cargo check --package integration --tests
 
 check-lockfile:
-	cargo update --locked --package degenerate
+  cargo update --locked --package degenerate
 
 forbid:
-	./bin/forbid
+  ./bin/forbid
 
 watch +args='test --all --all-targets':
-	cargo watch --clear --exec "{{args}}"
+  cargo watch --clear --exec "{{args}}"
 
 build-manual:
-	mdbook build man
+  mdbook build man
 
 # publish current GitHub master branch
 publish:
@@ -51,26 +51,26 @@ publish:
   rm -rf tmp/release
 
 clean:
-	cargo clean
-	rm -f integration/www/degenerate.js
-	rm -f integration/www/degenerate_bg.wasm
+  cargo clean
+  rm -f integration/www/degenerate.js
+  rm -f integration/www/degenerate_bg.wasm
 
 doc-web:
-	cargo doc --open --target wasm32-unknown-unknown
+  cargo doc --open --target wasm32-unknown-unknown
 
 serve:
-	cargo run --package serve
+  cargo run --package serve
 
 build-web:
-	cargo build --target wasm32-unknown-unknown
-	wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/debug/degenerate.wasm --out-dir www
+  cargo build --target wasm32-unknown-unknown
+  wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/debug/degenerate.wasm --out-dir www
 
 open:
-	open http://localhost:8000
+  open http://localhost:8000
 
 update-test-images:
-	#!/usr/bin/env bash
-	set -euo pipefail
-	for image in images/*.actual-memory.png; do
-		mv $image ${image%.actual-memory.png}.png
-	done
+  #!/usr/bin/env bash
+  set -euo pipefail
+  for image in images/*.actual-memory.png; do
+    mv $image ${image%.actual-memory.png}.png
+  done
