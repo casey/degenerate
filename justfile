@@ -11,7 +11,6 @@ test *args:
   cd tests && npx playwright test {{args}}
 
 clippy:
-  cargo clippy --package integration --tests
   cargo clippy --target wasm32-unknown-unknown
 
 fmt:
@@ -22,7 +21,6 @@ fmt-check:
 
 check:
   cargo check --target wasm32-unknown-unknown
-  cargo check --package integration --tests
 
 check-lockfile:
   cargo update --locked --package degenerate
@@ -52,8 +50,6 @@ publish:
 
 clean:
   cargo clean
-  rm -f integration/www/degenerate.js
-  rm -f integration/www/degenerate_bg.wasm
 
 doc-web:
   cargo doc --open --target wasm32-unknown-unknown
