@@ -1,44 +1,44 @@
-'use strict';
+"use strict";
 
 class Rng {
-	static MIN = -2147483648;
-	static MAX = 2147483647;
+  static MIN = -2147483648;
+  static MAX = 2147483647;
 
-	constructor(seed) {
+  constructor(seed) {
     this.seed = seed;
     this.value = seed;
-	}
+  }
 
-	next(min = 0, pseudoMax = 1) {
-		this.recalculate();
-		return this.map(this.value, Rng.MIN, Rng.MAX, min, pseudoMax);
-	}
+  next(min = 0, pseudoMax = 1) {
+    this.recalculate();
+    return this.map(this.value, Rng.MIN, Rng.MAX, min, pseudoMax);
+  }
 
-	nextInt(min = 10, max = 100) {
-		this.recalculate();
-		return Math.floor(this.map(this._value, Rng.MIN, Rng.MAX, min, max + 1));
-	}
+  nextInt(min = 10, max = 100) {
+    this.recalculate();
+    return Math.floor(this.map(this._value, Rng.MIN, Rng.MAX, min, max + 1));
+  }
 
-	skip(iterations = 1) {
-		while (iterations-- > 0) {
-			this.recalculate();
-		}
-	}
+  skip(iterations = 1) {
+    while (iterations-- > 0) {
+      this.recalculate();
+    }
+  }
 
-	recalculate() {
-		this.value = this.shift(this.value);
-	}
+  recalculate() {
+    this.value = this.shift(this.value);
+  }
 
-	shift(value) {
-		value ^= value << 13;
-		value ^= value >> 17;
-		value ^= value << 5;
-		return value;
-	}
+  shift(value) {
+    value ^= value << 13;
+    value ^= value >> 17;
+    value ^= value << 5;
+    return value;
+  }
 
-	map(val, minFrom, maxFrom, minTo, maxTo) {
-		return ((val - minFrom) / (maxFrom - minFrom)) * (maxTo - minTo) + minTo;
-	}
+  map(val, minFrom, maxFrom, minTo, maxTo) {
+    return ((val - minFrom) / (maxFrom - minFrom)) * (maxTo - minTo) + minTo;
+  }
 }
 
 class Computer {
@@ -70,12 +70,12 @@ class Computer {
       maskRowsRows: 0,
       maskRowsStep: 0,
       operation: Computer.OPERATION_INVERT,
-      operationRotateColorAxis: 'r',
+      operationRotateColorAxis: "r",
       operationRotateColorTurns: 1.0,
       rotation: 0.0,
       scale: 1.0,
       wrap: false,
-    }
+    };
   }
 
   all() {
@@ -87,7 +87,7 @@ class Computer {
   }
 
   apply() {
-    self.postMessage(JSON.stringify({"apply": this.state}));
+    self.postMessage(JSON.stringify({ apply: this.state }));
   }
 
   circle() {
@@ -161,16 +161,15 @@ const computer = new Computer();
 
 let g;
 
-self.addEventListener("message", function(event) {
+self.addEventListener("message", function (event) {
   const data = JSON.parse(event.data);
   switch (data.messageType) {
     case "script":
-      g = Object.getPrototypeOf(function*(){}).constructor(data.payload)();
+      g = Object.getPrototypeOf(function* () {}).constructor(data.payload)();
       break;
     case "run":
       let result = g.next();
-      if (result.done)
-        self.postMessage(JSON.stringify("done"));
+      if (result.done) self.postMessage(JSON.stringify("done"));
       break;
   }
 });
