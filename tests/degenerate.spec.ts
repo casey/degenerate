@@ -21,6 +21,8 @@ const cmd = (command) => {
   });
 };
 
+test.describe.configure({ mode: 'serial' });
+
 test.beforeAll(async () => {
   await clean();
   cmd(`
