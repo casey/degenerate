@@ -78,13 +78,13 @@ impl App {
     })?;
 
     worker.add_event_listener_with_event("message", move |event| {
-      let app = app.lock().unwrap();
+      let mut app = app.lock().unwrap();
       let event: WorkerEvent = serde_json::from_str(&event.data().as_string().unwrap()).unwrap();
       match event {
         WorkerEvent::Apply(state) => {
           app.gpu.lock().unwrap().apply(&state).unwrap();
-          let result = app.gpu.lock().unwrap().render_to_canvas();
-          stderr.update(result);
+          stderr.update(app.gpu.lock().unwrap().render_to_canvas());
+          app.request_animation_frame().unwrap();
         }
         WorkerEvent::Done => {
           canvas.set_class_name("done");
@@ -172,6 +172,7 @@ impl App {
 
       if resize || program_changed {
         self.program = program;
+
         self.gpu.lock().unwrap().resize()?;
 
         self
@@ -183,8 +184,6 @@ impl App {
             },
           )?))
           .map_err(JsValueError)?;
-
-        self.request_animation_frame()?;
       }
     }
 
