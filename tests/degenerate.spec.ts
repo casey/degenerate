@@ -59,21 +59,29 @@ const imageTest = (name, program) => {
 
     await page.waitForSelector('canvas.done');
 
-    const dataURL = await page.evaluate(() =>
-      document.getElementsByTagName('canvas')[0].toDataURL()
-    );
-
-    const encoded = dataURL.slice('data:image/png;base64,'.length);
+    const encoded = (
+      await page.evaluate(() =>
+        document.getElementsByTagName('canvas')[0].toDataURL()
+      )
+    ).slice('data:image/png;base64,'.length);
 
     const have = UPNG.decode(Buffer.from(encoded, 'base64')).data;
 
     const wantPath = `../images/${name}.png`;
 
-    const want = UPNG.decode(await fs.promises.readFile(wantPath)).data;
+    const missing = !fs.existsSync(wantPath);
 
-    if (Buffer.compare(have, want) != 0) {
+    if (
+      missing ||
+      Buffer.compare(
+        have,
+        UPNG.decode(await fs.promises.readFile(wantPath)).data
+      ) != 0
+    ) {
       const destination = `../images/${name}.actual-memory.png`;
+
       await fs.promises.writeFile(destination, encoded, 'base64');
+
       if (process.platform === 'darwin') {
         cmd(`
           xattr \
@@ -83,7 +91,12 @@ const imageTest = (name, program) => {
           ${destination}
         `);
       }
-      throw `Image test failed: expected ${wantPath}, got ${destination}`;
+
+      if (missing) {
+        throw `Image test failed: expected image missing ${wantPath}, got ${destination}`;
+      } else {
+        throw `Image test failed: expected ${wantPath}, got ${destination}`;
+      }
     }
   });
 };
