@@ -9,7 +9,7 @@ const clean = async () => {
   const files = await fs.promises.opendir('../images');
   for await (const file of files) {
     const path = `../images/${file.name}`;
-    if (path.endsWith('.actual-memory.png') && fs.existsSync(path)) {
+    if (path.endsWith('.actual-memory.png')) {
       await fs.promises.unlink(path);
     }
   }
@@ -69,6 +69,15 @@ const imageTest = (name, program) => {
     if (Buffer.compare(have, want) != 0) {
       const destination = `../images/${name}.actual-memory.png`;
       await fs.promises.writeFile(destination, encoded, 'base64');
+      if (process.platform === 'darwin') {
+        cmd(`
+          xattr \
+          -wx \
+          com.apple.FinderInfo \
+          0000000000000000000C00000000000000000000000000000000000000000000 \
+          ${destination}
+        `);
+      }
       throw `Image test failed: expected ${wantPath}, got ${destination}`;
     }
   });
