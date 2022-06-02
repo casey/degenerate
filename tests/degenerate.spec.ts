@@ -1,11 +1,11 @@
-import { test, expect, Page } from '@playwright/test';
 import * as fs from 'fs';
+import { exec } from 'child_process';
+import { test, expect, Page } from '@playwright/test';
 import UPNG from 'upng-js';
 
-test.beforeAll(async () => {
-  // TODO:
-  // - build wasm binary
-  // - run server
+const VERBOSE = false;
+
+const clean = async () => {
   const files = await fs.promises.opendir('../images');
   for await (const file of files) {
     const path = `../images/${file.name}`;
@@ -13,13 +13,37 @@ test.beforeAll(async () => {
       await fs.promises.unlink(path);
     }
   }
+};
+
+const cmd = (command) => {
+  exec(command, (err, _stdout, _stderr) => {
+    if (err) console.log(`error: ${err.message}`);
+  });
+};
+
+test.beforeAll(async () => {
+  await clean();
+  cmd(`
+    cd ..
+    cargo build --target wasm32-unknown-unknown
+    wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/debug/degenerate.wasm --out-dir www
+    cargo run --package serve
+  `);
 });
 
 test.beforeEach(async ({ page }) => {
+  await page.waitForTimeout(1000);
   await page.setViewportSize({ width: 256, height: 256 });
   await page.goto('http://localhost:8000');
   await page.evaluate('window.test = true');
-  page.on('pageerror', (err) => console.log(err.message));
+  if (VERBOSE) {
+    page.on('console', (message) => console.log(message));
+    page.on('pageerror', (error) => console.log(error.message));
+  }
+});
+
+test.afterAll(async () => {
+  cmd('npx kill-port 8000');
 });
 
 const imageTest = (name, program) => {
@@ -32,9 +56,9 @@ const imageTest = (name, program) => {
       document.getElementsByTagName('canvas')[0].toDataURL()
     );
 
-    const have = UPNG.decode(
-      Buffer.from(dataURL.slice('data:image/png;base64,'.length), 'base64')
-    ).data;
+    const encoded = dataURL.slice('data:image/png;base64,'.length);
+
+    const have = UPNG.decode(Buffer.from(encoded, 'base64')).data;
 
     const wantPath = `../images/${name}.png`;
 
@@ -42,8 +66,8 @@ const imageTest = (name, program) => {
 
     if (Buffer.compare(have, want) != 0) {
       const destination = `../images/${name}.actual-memory.png`;
-      await fs.promises.writeFile(destination, new Buffer(have, 'base64'));
-      throw `Image test failed:\nExpected: ${wantPath}\nActual: ${destination}`;
+      await fs.promises.writeFile(destination, encoded, 'base64');
+      throw `Image test failed: expected ${wantPath}, got ${destination}`;
     }
   });
 };
@@ -649,17 +673,17 @@ imageTest(
 imageTest(
   'gpu_extra_pixels',
   `
-  computer.rotate(0.01);
-  computer.apply();
-  computer.apply();
+    computer.rotate(0.01);
+    computer.apply();
+    computer.apply();
   `
 );
 
 imageTest(
   'default_color',
   `
-  computer.defaultColor([255, 0, 255]);
-  computer.rotate(0.01);
-  computer.apply();
+    computer.defaultColor([255, 0, 255]);
+    computer.rotate(0.01);
+    computer.apply();
   `
 );
