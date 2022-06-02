@@ -70,3 +70,7 @@ update-test-images:
   for image in images/*.actual-memory.png; do
     mv $image ${image%.actual-memory.png}.png
   done
+
+diff name:
+  -compare images/{{name}}.png images/{{name}}.actual-memory.png diff.png
+  open diff.png

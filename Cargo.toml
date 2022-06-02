@@ -51,6 +51,7 @@ features = [
   "WebGlUniformLocation",
   "Window",
   "Worker",
+  "DomTokenList",
   "console",
 ]
 

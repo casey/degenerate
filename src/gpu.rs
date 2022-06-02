@@ -174,7 +174,7 @@ impl Gpu {
   }
 
   pub(crate) fn apply(&self, state: &State) -> Result {
-    log::info!("Applying state {:?}", state);
+    log::trace!("Applying state {:?}", state);
 
     self.gl.bind_framebuffer(
       WebGl2RenderingContext::FRAMEBUFFER,

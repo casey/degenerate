@@ -110,7 +110,7 @@ class Computer {
   }
 
   debug() {
-    this.state.operation = OPERATION_DEBUG;
+    this.state.operation = Computer.OPERATION_DEBUG;
   }
 
   defaultColor(defaultColor) {
