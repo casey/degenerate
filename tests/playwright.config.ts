@@ -4,7 +4,7 @@ import { devices } from '@playwright/test';
 const config: PlaywrightTestConfig = {
   expect: { timeout: 5000 },
   forbidOnly: !!process.env.CI,
-  fullyParallel: true,
+  fullyParallel: false,
   globalSetup: require.resolve('./global-setup'),
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   reporter: [['html', { open: 'never' }]],

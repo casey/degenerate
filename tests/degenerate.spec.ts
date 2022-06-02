@@ -64,13 +64,13 @@ const imageTest = (name, program) => {
   });
 };
 
-imageTest(
-  'all',
-  `
-    computer.all();
-    computer.apply();
-  `
-);
+// imageTest(
+//   'all',
+//   `
+//     computer.all();
+//     computer.apply();
+//   `
+// );
 
 imageTest(
   'alpha',
