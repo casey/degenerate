@@ -5,6 +5,11 @@ import UPNG from 'upng-js';
 
 const VERBOSE = false;
 
+// TODO:
+// - Run server on free port before tests run
+// - Get tests to pass
+// - Tests in parallel?
+
 const clean = async () => {
   const files = await fs.promises.opendir('../images');
   for await (const file of files) {

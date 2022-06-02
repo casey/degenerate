@@ -25,7 +25,8 @@ fn test_inner(program: &str) -> Result {
     let state: State = serde_json::from_str(&event.data().as_string().unwrap()).unwrap();
     gpu.lock().unwrap().apply(&state).unwrap();
     gpu.lock().unwrap().render_to_canvas().unwrap();
-    js_sys::eval("window.dataURL = document.getElementsByTagName('canvas')[0].toDataURL()").unwrap();
+    js_sys::eval("window.dataURL = document.getElementsByTagName('canvas')[0].toDataURL()")
+      .unwrap();
   })?;
 
   worker
