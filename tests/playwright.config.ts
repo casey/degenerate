@@ -8,7 +8,7 @@ const config: PlaywrightTestConfig = {
   globalSetup: require.resolve('./global-setup'),
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   reporter: [['html', { open: 'never' }]],
-  retries: 0,
+  retries: process.env.CI ? 2 : 0,
   testDir: '.',
   timeout: 30 * 1000,
   use: { actionTimeout: 0, trace: 'on-first-retry' },
