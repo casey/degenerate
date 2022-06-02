@@ -3,12 +3,12 @@ import { exec } from 'child_process';
 import { test, expect, Page } from '@playwright/test';
 import UPNG from 'upng-js';
 
-const VERBOSE = false;
-
 // TODO:
 // - Run server on free port before tests run
 // - Get tests to pass
 // - Tests in parallel?
+
+const VERBOSE = false;
 
 const clean = async () => {
   const files = await fs.promises.opendir('../images');
@@ -284,33 +284,31 @@ imageTest(
   `
 );
 
-// TODO
-// imageTest(
-//   'choose_default_seed',
-//   `
-//     choose all circle cross square top x
-//     apply
-//   `,
-// );
+imageTest(
+  'choose_default_seed',
+  `
+    computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
+    computer.apply();
+  `
+);
 
-// TODO
-// imageTest(
-//   'choose_zero_seed',
-//   `
-//     choose all circle cross square top x
-//     apply
-//   `,
-// );
+imageTest(
+  'choose_zero_seed',
+  `
+    computer.seed(0);
+    computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
+    computer.apply();
+  `
+);
 
-// TODO
-// imageTest(
-//   'choose_nonzero_seed',
-//   `
-//     seed 2
-//     choose all circle cross square top x
-//     apply
-//   `,
-// );
+imageTest(
+  'choose_nonzero_seed',
+  `
+    computer.seed(2);
+    computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
+    computer.apply();
+  `
+);
 
 imageTest(
   'rotate',
@@ -538,25 +536,24 @@ imageTest(
   `
 );
 
-// TODO
-// imageTest(
-//   'smear',
-//   `
-//     seed 9
-//     rotate-color g 0.01
-//     rotate 0.01
-//     for 100
-//       choose all circle cross square top x
-//       apply
-//     loop
-//     rotate-color b 0.01
-//     rotate 0.01
-//     for 100
-//       choose all circle cross square top x
-//       apply
-//     loop
-//   `,
-// );
+imageTest(
+  'smear',
+  `
+    computer.seed(9);
+    computer.rotateColor('g', 0.01);
+    computer.rotate(0.01);
+    for (let i = 0; i < 100; i++) {
+      computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
+      computer.apply();
+    }
+    computer.rotateColor('b', 0.01);
+    computer.rotate(0.01);
+    for (let i = 0; i < 100; i++) {
+      computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
+      computer.apply();
+    }
+  `
+);
 
 imageTest(
   'square',
@@ -576,25 +573,28 @@ imageTest(
  `
 );
 
-// TODO
-// imageTest(
-//   'starburst',
-//   `
-//     seed 8
-//     rotate-color g 0.1
-//     rotate 0.1
-//     for 10
-//       choose all circle cross square top x
-//       apply
-//     loop
-//     rotate-color b 0.1
-//     rotate 0.1
-//     for 10
-//       choose all circle cross square top x
-//       apply
-//     loop
-//   `,
-// );
+imageTest(
+  'starburst',
+  `
+    computer.seed(8);
+    computer.rotateColor('g', 0.1);
+    computer.rotate(0.1);
+    for (let i = 0; i < 10; i++) {
+      computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
+      computer.apply();
+    }
+    for (let i = 0; i < 10; i++) {
+      computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
+      computer.apply();
+    }
+    computer.rotateColor('b', 0.1);
+    computer.rotate(0.1);
+    for (let i = 0; i < 10; i++) {
+      computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
+      computer.apply();
+    }
+  `
+);
 
 imageTest(
   'top',
