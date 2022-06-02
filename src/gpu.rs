@@ -1,7 +1,4 @@
-use {
-  super::*,
-  nalgebra::{Rotation3, Vector3},
-};
+use super::*;
 
 pub(crate) struct Gpu {
   canvas: HtmlCanvasElement,
@@ -11,8 +8,8 @@ pub(crate) struct Gpu {
   resolution: u32,
   source_texture: Cell<usize>,
   textures: [WebGlTexture; 2],
-  width: u32,
   uniforms: BTreeMap<String, WebGlUniformLocation>,
+  width: u32,
 }
 
 impl Gpu {

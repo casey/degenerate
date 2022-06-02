@@ -15,13 +15,6 @@ pub(crate) struct App {
   worker: Worker,
 }
 
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-enum WorkerEvent {
-  Apply(State),
-  Done,
-}
-
 impl App {
   pub(super) fn init() -> Result {
     let window = window();

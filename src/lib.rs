@@ -11,8 +11,9 @@ use {
     state::State,
     stderr::Stderr,
     window::window,
+    worker_event::WorkerEvent,
   },
-  nalgebra::{Similarity2, UnitComplex},
+  nalgebra::{Rotation3, Similarity2, UnitComplex, Vector3},
   serde::{Deserialize, Serialize},
   std::{
     cell::Cell,
@@ -26,7 +27,7 @@ use {
   wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue},
   web_sys::{
     Document, Element, EventTarget, HtmlCanvasElement, HtmlElement, HtmlTextAreaElement,
-    WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
+    MessageEvent, WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
     WebGlUniformLocation, Window, Worker,
   },
 };
@@ -38,14 +39,14 @@ mod add_event_listener;
 mod app;
 mod cast;
 mod get_document;
-pub mod gpu;
+mod gpu;
 mod js_value_error;
 mod message;
 mod select;
 mod state;
 mod stderr;
-pub mod test;
 mod window;
+mod worker_event;
 
 #[wasm_bindgen]
 pub fn run() {

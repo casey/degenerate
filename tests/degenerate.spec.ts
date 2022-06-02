@@ -3,7 +3,7 @@ import { cmd } from './common';
 import { decode } from 'node-libpng';
 import { test, expect, Page } from '@playwright/test';
 
-const VERBOSE = true;
+const VERBOSE = false;
 
 test.describe.configure({ mode: 'serial' });
 

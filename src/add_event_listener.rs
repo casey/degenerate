@@ -1,7 +1,5 @@
 use super::*;
 
-use web_sys::MessageEvent;
-
 pub(crate) trait AddEventListener {
   fn add_event_listener(&self, event: &str, function: impl FnMut() + 'static) -> Result;
   fn add_event_listener_with_event(
