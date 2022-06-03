@@ -22,10 +22,10 @@ impl Gpu {
       .depth(false)
       .stencil(false);
 
-    if js_sys::eval("window.test")
+    if js_sys::eval("window.preserveDrawingBuffer")
       .map_err(JsValueError)?
       .as_bool()
-      .is_some()
+      == Some(true)
     {
       context_options.preserve_drawing_buffer(true);
     }
@@ -170,7 +170,7 @@ impl Gpu {
     Ok(())
   }
 
-  pub(crate) fn apply(&self, state: &State) -> Result {
+  pub(crate) fn render(&self, state: &State) -> Result {
     log::trace!("Applying state {:?}", state);
 
     self.gl.bind_framebuffer(
@@ -191,9 +191,7 @@ impl Gpu {
       Some(&self.textures[self.source_texture.get()]),
     );
 
-    self
-      .gl
-      .uniform1f(Some(self.uniform("alpha")), state.alpha as f32);
+    self.gl.uniform1f(Some(self.uniform("alpha")), state.alpha);
 
     self.gl.uniform3f(
       Some(self.uniform("default_color")),
@@ -219,11 +217,11 @@ impl Gpu {
       .uniform1ui(Some(self.uniform("step")), state.mask_rows_step);
 
     let axis_vector = match state.operation_rotate_color_axis.as_ref() {
-      "r" | "red" => Vector3::x(),
-      "g" | "green" => Vector3::y(),
-      "b" | "blue" => Vector3::z(),
-      _ => panic!("Invalid color rotation axis"),
-    };
+      "r" | "red" => Ok(Vector3::x()),
+      "g" | "green" => Ok(Vector3::y()),
+      "b" | "blue" => Ok(Vector3::z()),
+      _ => Err("Invalid color rotation axis"),
+    }?;
 
     self.gl.uniform_matrix3fv_with_f32_array(
       Some(self.uniform("color_rotation")),
@@ -233,18 +231,14 @@ impl Gpu {
         .as_slice(),
     );
 
-    let mut similarity: Similarity2<f32> = Similarity2::identity();
+    let mut similarity = Similarity2::<f32>::identity();
     similarity.append_rotation_mut(&UnitComplex::from_angle(-state.rotation * f32::consts::TAU));
     similarity.append_scaling_mut(state.scale);
 
     self.gl.uniform_matrix3fv_with_f32_array(
       Some(self.uniform("transform")),
       false,
-      similarity
-        .inverse()
-        .to_homogeneous()
-        .map(|element| element as f32)
-        .as_slice(),
+      similarity.inverse().to_homogeneous().as_slice(),
     );
 
     self

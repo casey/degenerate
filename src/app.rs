@@ -4,10 +4,9 @@ pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
   animation_frame_pending: bool,
   canvas: HtmlCanvasElement,
-  gpu: Arc<Mutex<Gpu>>,
+  gpu: Gpu,
   input: bool,
   nav: HtmlElement,
-  program: String,
   resize: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
@@ -29,7 +28,7 @@ impl App {
 
     let stderr = Stderr::get();
 
-    let gpu = Arc::new(Mutex::new(Gpu::new(&canvas)?));
+    let gpu = Gpu::new(&canvas)?;
 
     let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
@@ -40,7 +39,6 @@ impl App {
       gpu,
       input: false,
       nav,
-      program: String::new(),
       resize: true,
       stderr: stderr.clone(),
       textarea: textarea.clone(),
@@ -70,18 +68,17 @@ impl App {
       app.stderr.update(result);
     })?;
 
-    let local = canvas.clone();
     worker.add_event_listener_with_event("message", move |event| {
       let mut app = app.lock().unwrap();
-      let event: WorkerEvent = serde_json::from_str(&event.data().as_string().unwrap()).unwrap();
+      let event: WorkerMessage = serde_json::from_str(&event.data().as_string().unwrap()).unwrap();
       match event {
-        WorkerEvent::Apply(state) => {
-          app.gpu.lock().unwrap().apply(&state).unwrap();
-          stderr.update(app.gpu.lock().unwrap().render_to_canvas());
+        WorkerMessage::Render(state) => {
+          app.gpu.render(&state).unwrap();
+          stderr.update(app.gpu.render_to_canvas());
           app.request_animation_frame().unwrap();
         }
-        WorkerEvent::Done => {
-          local.class_list().add_1("done").unwrap();
+        WorkerMessage::Done => {
+          app.canvas.class_list().add_1("done").unwrap();
         }
       }
     })?;
@@ -153,10 +150,7 @@ impl App {
       self
         .worker
         .post_message(&wasm_bindgen::JsValue::from_str(&serde_json::to_string(
-          &Message {
-            message_type: MessageType::Script,
-            payload: Some(&self.textarea.value()),
-          },
+          &AppMessage::Script(&self.textarea.value()),
         )?))
         .map_err(JsValueError)?;
 
@@ -164,20 +158,13 @@ impl App {
 
       log::trace!("Program: {:?}", program);
 
-      let program_changed = program != self.program;
-
-      if resize || program_changed {
-        self.program = program;
-
-        self.gpu.lock().unwrap().resize()?;
+      if resize {
+        self.gpu.resize()?;
 
         self
           .worker
           .post_message(&wasm_bindgen::JsValue::from_str(&serde_json::to_string(
-            &Message {
-              message_type: MessageType::Run,
-              payload: None,
-            },
+            &AppMessage::Run,
           )?))
           .map_err(JsValueError)?;
       }

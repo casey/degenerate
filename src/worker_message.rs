@@ -2,7 +2,7 @@ use super::*;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) enum WorkerEvent {
-  Apply(State),
+pub(crate) enum WorkerMessage {
+  Render(State),
   Done,
 }

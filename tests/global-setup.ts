@@ -18,8 +18,8 @@ const buildWasm = async () => {
     cd ..
     cargo build --target wasm32-unknown-unknown
     wasm-bindgen --target web --no-typescript \
-    target/wasm32-unknown-unknown/debug/degenerate.wasm \
-    --out-dir www
+      target/wasm32-unknown-unknown/debug/degenerate.wasm \
+      --out-dir www
   `);
 };
 
@@ -42,7 +42,7 @@ async function globalSetup() {
 
   return () => {
     server.close();
-  }
+  };
 }
 
 export default globalSetup;

@@ -9,6 +9,10 @@
 /output.txt
 /program.degen
 /target
+/tests/node_modules
+/tests/playwright-report
+/tests/playwright/.cache
+/tests/test-results
 /www/degenerate.js
 /www/degenerate_bg.wasm
 /www/man

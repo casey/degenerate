@@ -1,17 +1,8 @@
 use {
   crate::{
-    add_event_listener::AddEventListener,
-    app::App,
-    cast::Cast,
-    get_document::GetDocument,
-    gpu::Gpu,
-    js_value_error::JsValueError,
-    message::{Message, MessageType},
-    select::Select,
-    state::State,
-    stderr::Stderr,
-    window::window,
-    worker_event::WorkerEvent,
+    add_event_listener::AddEventListener, app::App, app_message::AppMessage, cast::Cast,
+    get_document::GetDocument, gpu::Gpu, js_value_error::JsValueError, select::Select,
+    state::State, stderr::Stderr, window::window, worker_message::WorkerMessage,
   },
   nalgebra::{Rotation3, Similarity2, UnitComplex, Vector3},
   serde::{Deserialize, Serialize},
@@ -37,16 +28,16 @@ type Result<T = (), E = Error> = std::result::Result<T, E>;
 
 mod add_event_listener;
 mod app;
+mod app_message;
 mod cast;
 mod get_document;
 mod gpu;
 mod js_value_error;
-mod message;
 mod select;
 mod state;
 mod stderr;
 mod window;
-mod worker_event;
+mod worker_message;
 
 #[wasm_bindgen]
 pub fn run() {

@@ -26,10 +26,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: "14.x"
-
     - name: Install Rust Toolchain Components
       uses: actions-rs/toolchain@v1
       with:
@@ -43,22 +39,17 @@ jobs:
 
     - name: Install dependencies
       working-directory: tests
-      run: npm ci
-
-    - name: Install Playwright Browsers
-      working-directory: tests
-      run: npx playwright install --with-deps
+      run: npm clean-install
 
     - name: Run Playwright tests
       working-directory: tests
       run: npx playwright test
 
     - uses: actions/upload-artifact@v2
-      if: always()
       with:
         name: playwright-report
         path: tests/playwright-report/
-        retention-days: 30
+        retention-days: 365
 
   check:
     name: Check

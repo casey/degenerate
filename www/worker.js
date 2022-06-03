@@ -10,7 +10,7 @@ class Rng {
   }
 
   choose(masks) {
-    masks[this._rng.nextU32() % masks.length]();
+    return masks[this._rng.nextU32() % masks.length];
   }
 
   seed(seed) {
@@ -46,7 +46,7 @@ class Computer {
       maskRowsStep: 0,
       operation: Computer.OPERATION_INVERT,
       operationRotateColorAxis: "r",
-      operationRotateColorTurns: 1.0,
+      operationRotateColorTurns: 0,
       rotation: 0.0,
       scale: 1.0,
       wrap: false,
@@ -61,8 +61,8 @@ class Computer {
     this.state.alpha = alpha;
   }
 
-  apply() {
-    self.postMessage(JSON.stringify({ apply: this.state }));
+  render() {
+    self.postMessage(JSON.stringify({ render: this.state }));
   }
 
   circle() {
@@ -139,13 +139,10 @@ let g;
 
 self.addEventListener("message", function (event) {
   const data = JSON.parse(event.data);
-  switch (data.messageType) {
-    case "script":
-      g = Object.getPrototypeOf(function* () {}).constructor(data.payload)();
-      break;
-    case "run":
-      let result = g.next();
-      if (result.done) self.postMessage(JSON.stringify("done"));
-      break;
+  if (data.script) {
+    g = Object.getPrototypeOf(function* () {}).constructor(data.script)();
+  } else {
+    let result = g.next();
+    if (result.done) self.postMessage(JSON.stringify("done"));
   }
 });

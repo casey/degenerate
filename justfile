@@ -14,6 +14,7 @@ clippy:
   cargo clippy --target wasm32-unknown-unknown
 
 fmt:
+  prettier --write tests
   cargo fmt --all
 
 fmt-check:
@@ -49,6 +50,7 @@ publish:
   rm -rf tmp/release
 
 clean:
+  rm www/degenerate{.js,_bg.wasm}
   cargo clean
 
 doc-web:

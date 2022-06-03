@@ -10,7 +10,7 @@ const config: PlaywrightTestConfig = {
   reporter: [['html', { open: 'never' }]],
   retries: 3,
   testDir: '.',
-  timeout: 30 * 1000,
+  timeout: 5 * 1000,
   use: { actionTimeout: 0, trace: 'on-first-retry' },
 };
 
