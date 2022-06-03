@@ -17,6 +17,8 @@ test.beforeEach(async ({ page }) => {
 
 const imageTest = (name, program) => {
   test(name, async ({ page }) => {
+    await page.waitForSelector('canvas.ready');
+
     await page.locator('textarea').fill(program);
 
     await page.waitForSelector('canvas.done');

@@ -12,7 +12,6 @@ const config: PlaywrightTestConfig = {
   testDir: '.',
   timeout: 30 * 1000,
   use: { actionTimeout: 0, trace: 'on-first-retry' },
-  workers: 1,
 };
 
 export default config;
