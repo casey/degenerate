@@ -1,8 +1,8 @@
-import { exec } from 'child_process';
+import { exec as nodeExec } from 'child_process';
 import { promisify } from 'util';
 
-const cmd = async (command) => {
-  await promisify(exec)(command);
+const exec = async (command) => {
+  await promisify(nodeExec)(command);
 };
 
-export { cmd };
+export { exec };

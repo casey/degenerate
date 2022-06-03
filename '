@@ -1,0 +1,42 @@
+Install chromium only on ci
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch js
+# Your branch is up to date with 'origin/js'.
+#
+# Changes to be committed:
+#	modified:   .github/workflows/ci.yaml
+#	modified:   www/worker.js
+#
+# ------------------------ >8 ------------------------
+# Do not modify or remove the line above.
+# Everything below it will be ignored.
+diff --git a/.github/workflows/ci.yaml b/.github/workflows/ci.yaml
+index 938b8dd..8ea3a5c 100644
+--- a/.github/workflows/ci.yaml
++++ b/.github/workflows/ci.yaml
+@@ -37,6 +37,10 @@ jobs:
+       with:
+         version: ${{ env.WASM_BINDGEN_VERSION }}
+
++    - name: Install chromium
++      working-directory: tests
++      run: npx playwright install chromium
++
+     - name: Install dependencies
+       working-directory: tests
+       run: npm clean-install
+diff --git a/www/worker.js b/www/worker.js
+index 80f91f3..6550358 100644
+--- a/www/worker.js
++++ b/www/worker.js
+@@ -46,7 +46,7 @@ class Computer {
+       maskRowsStep: 0,
+       operation: Computer.OPERATION_INVERT,
+       operationRotateColorAxis: "r",
+-      operationRotateColorTurns: 0,
++      operationRotateColorTurns: 0.0,
+       rotation: 0.0,
+       scale: 1.0,
+       wrap: false,

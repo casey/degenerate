@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import express from 'express';
-import { cmd } from './common';
+import { exec } from './common';
 
 const clean = async () => {
   const files = await fs.promises.opendir('../images');
@@ -14,7 +14,7 @@ const clean = async () => {
 };
 
 const buildWasm = async () => {
-  await cmd(`
+  await exec(`
     cd ..
     cargo build --target wasm32-unknown-unknown
     wasm-bindgen --target web --no-typescript \

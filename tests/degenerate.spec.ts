@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import axios from 'axios';
-import { cmd } from './common';
+import { exec } from './common';
 import * as png from 'node-libpng';
 import { test, expect, Page } from '@playwright/test';
 
@@ -54,7 +54,7 @@ const imageTest = (name, program) => {
       await fs.promises.writeFile(destination, encoded, 'base64');
 
       if (process.platform === 'darwin') {
-        await cmd(`
+        await exec(`
           xattr \
           -wx \
           com.apple.FinderInfo \
