@@ -5,8 +5,6 @@ import { test, expect, Page } from '@playwright/test';
 
 const VERBOSE = false;
 
-test.describe.configure({ mode: 'serial' });
-
 test.beforeEach(async ({ page }) => {
   await page.waitForTimeout(1000);
   await page.setViewportSize({ width: 256, height: 256 });
@@ -265,7 +263,7 @@ imageTest(
 imageTest(
   'choose_zero_seed',
   `
-    computer.seed(0);
+    rng.seed(0);
     rng.choose([
       () => computer.all(),
       () => computer.circle(),
@@ -281,7 +279,7 @@ imageTest(
 imageTest(
   'choose_nonzero_seed',
   `
-    computer.seed(2);
+    rng.seed(3);
     rng.choose([
       () => computer.all(),
       () => computer.circle(),
@@ -580,7 +578,7 @@ imageTest(
     computer.rotateColor('g', 0.1);
     computer.rotate(0.1);
     for (let i = 0; i < 10; i++) {
-      computer.choose(['all', 'circle', 'cross', 'square', 'top', 'x']);
+      rng.choose(masks);
       computer.apply();
     }
     for (let i = 0; i < 10; i++) {

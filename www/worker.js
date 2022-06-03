@@ -1,28 +1,22 @@
 "use strict";
 
+importScripts('randchacha_browser.min.js');
+
 class Rng {
   constructor(seed) {
-    this._seed = seed;
-    this.a = 1103515245;
-    this.c = 12345;
-    this.m = 0x80000000;
+    const _seed = new Uint8Array(32);
+    _seed[0] = seed;
+    this._rng = new randchacha.ChaChaRng(_seed);
   }
 
   choose(masks) {
-    masks[this.#nextRange(0, masks.length - 1)]();
+    masks[this._rng.nextU32() % masks.length]();
   }
 
   seed(seed) {
-    this._seed = seed;
-  }
-
-  #nextInt() {
-    this._seed = (this.a * this._seed + this.c) % this.m;
-    return this._seed;
-  }
-
-  #nextRange(min, max) {
-    return min + Math.floor((this.#nextInt() / this.m) * (max - min))
+    const _seed = new Uint8Array(32);
+    _seed[0] = seed;
+    this._rng = new randchacha.ChaChaRng(_seed);
   }
 }
 
