@@ -3,10 +3,10 @@ name: CI
 on:
   push:
     branches:
-      - master
+    - master
   pull_request:
     branches:
-      - master
+    - master
 
 defaults:
   run:
@@ -24,41 +24,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v2
-        with:
-          node-version: "14.x"
+    - uses: actions/setup-node@v2
+      with:
+        node-version: "14.x"
 
-      - name: Install Rust Toolchain Components
-        uses: actions-rs/toolchain@v1
-        with:
-          target: wasm32-unknown-unknown
-          toolchain: stable
+    - name: Install Rust Toolchain Components
+      uses: actions-rs/toolchain@v1
+      with:
+        target: wasm32-unknown-unknown
+        toolchain: stable
 
-      - name: Install `wasm-bindgen`
-        uses: jetli/wasm-bindgen-action@v0.1.0
-        with:
-          version: ${{ env.WASM_BINDGEN_VERSION }}
+    - name: Install `wasm-bindgen`
+      uses: jetli/wasm-bindgen-action@v0.1.0
+      with:
+        version: ${{ env.WASM_BINDGEN_VERSION }}
 
-      - name: Install dependencies
-        working-directory: tests
-        run: npm ci
+    - name: Install dependencies
+      working-directory: tests
+      run: npm ci
 
-      - name: Install Playwright Browsers
-        working-directory: tests
-        run: npx playwright install --with-deps
+    - name: Install Playwright Browsers
+      working-directory: tests
+      run: npx playwright install --with-deps
 
-      - name: Run Playwright tests
-        working-directory: tests
-        run: npx playwright test
+    - name: Run Playwright tests
+      working-directory: tests
+      run: npx playwright test
 
-      - uses: actions/upload-artifact@v2
-        if: always()
-        with:
-          name: playwright-report
-          path: tests/playwright-report/
-          retention-days: 30
+    - uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: playwright-report
+        path: tests/playwright-report/
+        retention-days: 30
 
   check:
     name: Check
@@ -66,36 +66,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-      - name: Install Rust Toolchain Components
-        uses: actions-rs/toolchain@v1
-        with:
-          components: clippy, rustfmt
-          target: wasm32-unknown-unknown
-          toolchain: stable
+    - name: Install Rust Toolchain Components
+      uses: actions-rs/toolchain@v1
+      with:
+        components: clippy, rustfmt
+        target: wasm32-unknown-unknown
+        toolchain: stable
 
-      - uses: Swatinem/rust-cache@v1
-      - name: Check Lockfile
-        run: cargo update --locked --package degenerate
+    - uses: Swatinem/rust-cache@v1
+    - name: Check Lockfile
+      run: cargo update --locked --package degenerate
 
-      - name: Install `wasm-bindgen`
-        uses: jetli/wasm-bindgen-action@v0.1.0
-        with:
-          version: ${{ env.WASM_BINDGEN_VERSION }}
+    - name: Install `wasm-bindgen`
+      uses: jetli/wasm-bindgen-action@v0.1.0
+      with:
+        version: ${{ env.WASM_BINDGEN_VERSION }}
 
-      - name: Format
-        run: cargo fmt --all -- --check
+    - name: Format
+      run: cargo fmt --all -- --check
 
-      - name: Clippy
-        run: |
-          cargo clippy --target wasm32-unknown-unknown
+    - name: Clippy
+      run: |
+        cargo clippy --target wasm32-unknown-unknown
 
-      - name: Check for Forbidden Words
-        run: |
-          sudo apt-get update
-          sudo apt-get install ripgrep
-          ./bin/forbid
+    - name: Check for Forbidden Words
+      run: |
+        sudo apt-get update
+        sudo apt-get install ripgrep
+        ./bin/forbid
 
   pages:
     name: Pages
@@ -103,43 +103,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-      - name: Install Rust Toolchain Components
-        uses: actions-rs/toolchain@v1
-        with:
-          target: wasm32-unknown-unknown
-          toolchain: stable
+    - name: Install Rust Toolchain Components
+      uses: actions-rs/toolchain@v1
+      with:
+        target: wasm32-unknown-unknown
+        toolchain: stable
 
-      - name: Install `wasm-bindgen`
-        uses: jetli/wasm-bindgen-action@v0.1.0
-        with:
-          version: ${{ env.WASM_BINDGEN_VERSION }}
+    - name: Install `wasm-bindgen`
+      uses: jetli/wasm-bindgen-action@v0.1.0
+      with:
+        version: ${{ env.WASM_BINDGEN_VERSION }}
 
-      - name: Install `mdbook`
-        uses: peaceiris/actions-mdbook@v1
-        with:
-          mdbook-version: latest
+    - name: Install `mdbook`
+      uses: peaceiris/actions-mdbook@v1
+      with:
+        mdbook-version: latest
 
-      - name: Build Book
-        run: mdbook build man
+    - name: Build Book
+      run: mdbook build man
 
-      - name: Build WASM
-        run: |
-          cargo build --release --target wasm32-unknown-unknown
-          wasm-bindgen \
-            --target web \
-            --no-typescript \
-            --out-dir www \
-            target/wasm32-unknown-unknown/release/degenerate.wasm
+    - name: Build WASM
+      run: |
+        cargo build --release --target wasm32-unknown-unknown
+        wasm-bindgen \
+          --target web \
+          --no-typescript \
+          --out-dir www \
+          target/wasm32-unknown-unknown/release/degenerate.wasm
 
-      - name: Record Git Revision
-        run: git rev-parse --verify HEAD > www/commit.txt
+    - name: Record Git Revision
+      run: git rev-parse --verify HEAD > www/commit.txt
 
-      - name: Deploy Pages
-        uses: peaceiris/actions-gh-pages@v3
-        if: github.ref == 'refs/heads/master'
-        with:
-          github_token: ${{secrets.GITHUB_TOKEN}}
-          publish_branch: gh-pages
-          publish_dir: www
+    - name: Deploy Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/master'
+      with:
+        github_token: ${{secrets.GITHUB_TOKEN}}
+        publish_branch: gh-pages
+        publish_dir: www
