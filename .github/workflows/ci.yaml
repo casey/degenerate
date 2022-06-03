@@ -37,6 +37,10 @@ jobs:
       with:
         version: ${{ env.WASM_BINDGEN_VERSION }}
 
+    - name: Install chromium
+      working-directory: tests
+      run: npx playwright install chromium
+
     - name: Install dependencies
       working-directory: tests
       run: npm clean-install

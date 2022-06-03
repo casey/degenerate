@@ -46,7 +46,7 @@ class Computer {
       maskRowsStep: 0,
       operation: Computer.OPERATION_INVERT,
       operationRotateColorAxis: "r",
-      operationRotateColorTurns: 0,
+      operationRotateColorTurns: 0.0,
       rotation: 0.0,
       scale: 1.0,
       wrap: false,
