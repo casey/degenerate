@@ -54,7 +54,7 @@ const imageTest = (name, program) => {
       await fs.promises.writeFile(destination, encoded, 'base64');
 
       if (process.platform === 'darwin') {
-        cmd(`
+        await cmd(`
           xattr \
           -wx \
           com.apple.FinderInfo \

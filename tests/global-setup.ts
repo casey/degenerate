@@ -13,8 +13,8 @@ const clean = async () => {
   }
 };
 
-const buildWasm = () => {
-  cmd(`
+const buildWasm = async () => {
+  await cmd(`
     cd ..
     cargo build --target wasm32-unknown-unknown
     wasm-bindgen --target web --no-typescript \
@@ -36,7 +36,7 @@ const runServer = () => {
 async function globalSetup() {
   await clean();
 
-  buildWasm();
+  await buildWasm();
 
   const server = runServer();
 

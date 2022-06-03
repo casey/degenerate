@@ -1,9 +1,8 @@
 import { exec } from 'child_process';
+import { promisify } from 'util';
 
-const cmd = (command) => {
-  exec(command, (err, _stdout, _stderr) => {
-    if (err) throw `error: ${err.message}`;
-  });
+const cmd = async (command) => {
+  await promisify(exec)(command);
 };
 
 export { cmd };
