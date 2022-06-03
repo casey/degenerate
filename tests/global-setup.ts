@@ -33,18 +33,12 @@ const runServer = () => {
   return server;
 };
 
-const sleep = async (secs) => {
-  return new Promise(resolve => setTimeout(resolve, secs * 1000));
-}
-
 async function globalSetup() {
   await clean();
 
   buildWasm();
 
   const server = runServer();
-
-  await sleep(1);
 
   return () => {
     server.close();

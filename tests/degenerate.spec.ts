@@ -1,9 +1,18 @@
 import * as fs from 'fs';
+import axios from 'axios';
 import { cmd } from './common';
 import { decode } from 'node-libpng';
 import { test, expect, Page } from '@playwright/test';
 
 const VERBOSE = false;
+
+test.beforeAll(async () => {
+  let done = false;
+  while (!done) {
+    const res = await axios.get(`http://localhost:${process.env.PORT}`);
+    done = res.status === 200;
+  }
+});
 
 test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 256, height: 256 });
