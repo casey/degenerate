@@ -6,7 +6,6 @@ import { test, expect, Page } from '@playwright/test';
 const VERBOSE = false;
 
 test.beforeEach(async ({ page }) => {
-  await page.waitForTimeout(1000);
   await page.setViewportSize({ width: 256, height: 256 });
   await page.goto(`http://localhost:${process.env.PORT}`);
   await page.evaluate('window.test = true');
