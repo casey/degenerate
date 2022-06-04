@@ -4,8 +4,8 @@ import { exec } from './common';
 import * as png from 'node-libpng';
 import { test, expect, Page } from '@playwright/test';
 
-const sleep = async (secs) => {
-  return new Promise((resolve) => setTimeout(resolve, secs * 1000));
+const sleep = async (msecs) => {
+  return new Promise((resolve) => setTimeout(resolve, msecs));
 };
 
 test.beforeAll(async () => {
@@ -13,7 +13,7 @@ test.beforeAll(async () => {
   while (!done) {
     const res = await axios.get(`http://localhost:${process.env.PORT}`);
     done = res.status === 200;
-    await sleep(1);
+    await sleep(100);
   }
 });
 

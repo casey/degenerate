@@ -32,6 +32,8 @@ jobs:
         target: wasm32-unknown-unknown
         toolchain: stable
 
+    - uses: Swatinem/rust-cache@v1
+
     - name: Install `wasm-bindgen`
       uses: jetli/wasm-bindgen-action@v0.1.0
       with:

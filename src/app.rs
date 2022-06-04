@@ -71,31 +71,36 @@ impl App {
     })?;
 
     let local_html = html.clone();
-    worker.add_event_listener_with_event("message", move |event| -> Result<(), String> {
+    worker.add_event_listener_with_event("message", move |event| {
       let mut app = app.lock().unwrap();
 
-      let event: WorkerMessage = serde_json::from_str(
-        &event
-          .data()
-          .as_string()
-          .ok_or("Failed to retrieve event data as a string")?,
-      )
-      .map_err(|err| err.to_string())?;
+      let mut handle_event = || -> Result {
+        let event = serde_json::from_str(
+          &event
+            .data()
+            .as_string()
+            .ok_or("Failed to retrieve event data as a string")?,
+        )?;
 
-      match event {
-        WorkerMessage::Render(state) => {
-          app.gpu.render(&state).map_err(|err| err.to_string())?;
-          stderr.update(app.gpu.render_to_canvas());
-          app
-            .request_animation_frame()
-            .map_err(|err| err.to_string())?;
+        match event {
+          WorkerMessage::Render(state) => {
+            app.gpu.render(&state)?;
+            stderr.update(app.gpu.render_to_canvas());
+            app
+              .request_animation_frame()
+              .map_err(|_| "Failed to request animation frame")?;
+          }
+          WorkerMessage::Done => {
+            local_html.set_class_name("done");
+          }
         }
-        WorkerMessage::Done => {
-          local_html.set_class_name("done");
-        }
-      }
 
-      Ok(())
+        Ok(())
+      };
+
+      let result = handle_event();
+
+      app.stderr.update(result);
     })?;
 
     html.set_class_name("ready");

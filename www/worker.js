@@ -9,8 +9,8 @@ class Rng {
     this._rng = new randchacha.ChaChaRng(_seed);
   }
 
-  choose(masks) {
-    return masks[this._rng.nextU32() % masks.length];
+  choose(array) {
+    return array[this._rng.nextU32() % array.length];
   }
 
   seed(seed) {
