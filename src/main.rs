@@ -1,6 +1,6 @@
 use {
   crate::{
-    add_class::AddClass, add_event_listener::AddEventListener, app::App, app_message::AppMessage,
+    add_event_listener::AddEventListener, app::App, app_message::AppMessage,
     cast::Cast, get_document::GetDocument, gpu::Gpu, js_value_error::JsValueError, select::Select,
     state::State, stderr::Stderr, window::window, worker_message::WorkerMessage,
   },
@@ -26,7 +26,6 @@ use {
 type Error = Box<dyn std::error::Error>;
 type Result<T = (), E = Error> = std::result::Result<T, E>;
 
-mod add_class;
 mod add_event_listener;
 mod app;
 mod app_message;

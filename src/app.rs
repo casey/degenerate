@@ -81,12 +81,12 @@ impl App {
           app.request_animation_frame().unwrap();
         }
         WorkerMessage::Done => {
-          local_html.add_class("done").unwrap();
+          local_html.set_class_name("done");
         }
       }
     })?;
 
-    html.add_class("ready")?;
+    html.set_class_name("ready");
 
     Ok(())
   }
