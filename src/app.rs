@@ -71,19 +71,31 @@ impl App {
     })?;
 
     let local_html = html.clone();
-    worker.add_event_listener_with_event("message", move |event| {
+    worker.add_event_listener_with_event("message", move |event| -> Result<(), String> {
       let mut app = app.lock().unwrap();
-      let event: WorkerMessage = serde_json::from_str(&event.data().as_string().unwrap()).unwrap();
+
+      let event: WorkerMessage = serde_json::from_str(
+        &event
+          .data()
+          .as_string()
+          .ok_or("Failed to retrieve event data as a string")?,
+      )
+      .map_err(|err| err.to_string())?;
+
       match event {
         WorkerMessage::Render(state) => {
-          app.gpu.render(&state).unwrap();
+          app.gpu.render(&state).map_err(|err| err.to_string())?;
           stderr.update(app.gpu.render_to_canvas());
-          app.request_animation_frame().unwrap();
+          app
+            .request_animation_frame()
+            .map_err(|err| err.to_string())?;
         }
         WorkerMessage::Done => {
           local_html.set_class_name("done");
         }
       }
+
+      Ok(())
     })?;
 
     html.set_class_name("ready");
