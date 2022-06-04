@@ -37,7 +37,7 @@ impl App {
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
       animation_frame_pending: false,
-      canvas: canvas.clone(),
+      canvas,
       gpu,
       input: false,
       nav,
