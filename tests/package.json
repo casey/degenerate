@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@playwright/test": "^1.22.2",
+    "axios": "^0.27.2",
+    "express": "^4.18.1",
+    "node-libpng": "^0.2.20"
+  }
+}

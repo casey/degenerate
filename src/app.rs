@@ -4,14 +4,14 @@ pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
   animation_frame_pending: bool,
   canvas: HtmlCanvasElement,
-  computer: Computer,
+  gpu: Gpu,
   input: bool,
   nav: HtmlElement,
   resize: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
-  gpu: Arc<Mutex<Gpu>>,
   window: Window,
+  worker: Worker,
 }
 
 impl App {
@@ -19,6 +19,8 @@ impl App {
     let window = window();
 
     let document = window.get_document();
+
+    let html = document.select("html")?.cast::<HtmlElement>()?;
 
     let textarea = document.select("textarea")?.cast::<HtmlTextAreaElement>()?;
 
@@ -28,20 +30,22 @@ impl App {
 
     let stderr = Stderr::get();
 
-    let gpu = Arc::new(Mutex::new(Gpu::new(&canvas)?));
+    let gpu = Gpu::new(&canvas)?;
+
+    let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
       animation_frame_pending: false,
       canvas,
-      computer: Computer::new(gpu.clone()),
+      gpu,
       input: false,
       nav,
       resize: true,
       stderr: stderr.clone(),
       textarea: textarea.clone(),
-      gpu,
       window: window.clone(),
+      worker: worker.clone(),
     }));
 
     let local = app.clone();
@@ -59,11 +63,47 @@ impl App {
       app.stderr.update(result);
     })?;
 
+    let local = app.clone();
     textarea.add_event_listener("input", move || {
-      let mut app = app.lock().unwrap();
+      let mut app = local.lock().unwrap();
       let result = app.on_input();
-      stderr.update(result);
+      app.stderr.update(result);
     })?;
+
+    let local_html = html.clone();
+    worker.add_event_listener_with_event("message", move |event| {
+      let mut app = app.lock().unwrap();
+
+      let mut handle_event = || -> Result {
+        let event = serde_json::from_str(
+          &event
+            .data()
+            .as_string()
+            .ok_or("Failed to retrieve event data as a string")?,
+        )?;
+
+        match event {
+          WorkerMessage::Render(state) => {
+            app.gpu.render(&state)?;
+            stderr.update(app.gpu.render_to_canvas());
+            app
+              .request_animation_frame()
+              .map_err(|_| "Failed to request animation frame")?;
+          }
+          WorkerMessage::Done => {
+            local_html.set_class_name("done");
+          }
+        }
+
+        Ok(())
+      };
+
+      let result = handle_event();
+
+      app.stderr.update(result);
+    })?;
+
+    html.set_class_name("ready");
 
     Ok(())
   }
@@ -127,31 +167,26 @@ impl App {
     if self.input {
       self.nav.set_class_name("fade-out");
 
-      let program = Command::parse_program(&self.textarea.value())?;
+      self
+        .worker
+        .post_message(&JsValue::from_str(&serde_json::to_string(
+          &AppMessage::Script(&self.textarea.value()),
+        )?))
+        .map_err(JsValueError)?;
+
+      let program = self.textarea.value();
 
       log::trace!("Program: {:?}", program);
 
-      let program_changed = program != self.computer.program();
+      if resize {
+        self.gpu.resize()?;
 
-      if resize || program_changed {
-        let mut computer = Computer::new(self.gpu.clone());
-        computer.load_program(&program);
-        computer.resize()?;
-        self.computer = computer;
-      }
-
-      let run = !self.computer.done();
-
-      if run {
-        self.computer.run(true)?;
-      }
-
-      if resize || program_changed || run {
-        self.gpu.lock().unwrap().render_to_canvas()?;
-
-        if !self.computer.done() {
-          self.request_animation_frame()?;
-        }
+        self
+          .worker
+          .post_message(&JsValue::from_str(&serde_json::to_string(
+            &AppMessage::Run,
+          )?))
+          .map_err(JsValueError)?;
       }
     }
 

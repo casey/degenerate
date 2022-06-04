@@ -6,5 +6,6 @@ which rg
 
 ! rg \
   --glob !bin/forbid \
+  --glob !tests/package-lock.json \
   --ignore-case \
   'dbg!|fixme|todo|xxx'

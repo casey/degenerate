@@ -1,4 +1,4 @@
-use {super::*, Mask::*};
+use super::*;
 
 pub(crate) struct Gpu {
   canvas: HtmlCanvasElement,
@@ -8,8 +8,8 @@ pub(crate) struct Gpu {
   resolution: u32,
   source_texture: Cell<usize>,
   textures: [WebGlTexture; 2],
-  width: u32,
   uniforms: BTreeMap<String, WebGlUniformLocation>,
+  width: u32,
 }
 
 impl Gpu {
@@ -21,6 +21,14 @@ impl Gpu {
       .antialias(false)
       .depth(false)
       .stencil(false);
+
+    if js_sys::eval("window.preserveDrawingBuffer")
+      .map_err(JsValueError)?
+      .as_bool()
+      == Some(true)
+    {
+      context_options.preserve_drawing_buffer(true);
+    }
 
     let gl = canvas
       .get_context_with_context_options("webgl2", &context_options.into())
@@ -52,20 +60,7 @@ impl Gpu {
         .create_shader(WebGl2RenderingContext::FRAGMENT_SHADER)
         .ok_or("Failed to create shader")?;
 
-      let mut constants = String::new();
-
-      for (index, mask) in Mask::VARIANTS.iter().enumerate() {
-        constants.push_str(&format!("const uint {} = {}u;\n", mask, index));
-      }
-
-      for (index, operation) in Operation::VARIANTS.iter().enumerate() {
-        constants.push_str(&format!("const uint {} = {}u;\n", operation, index));
-      }
-
-      gl.shader_source(
-        &fragment,
-        &include_str!("fragment.glsl").replace("// INSERT_GENERATED_CODE_HERE", &constants),
-      );
+      gl.shader_source(&fragment, include_str!("fragment.glsl"));
       gl.compile_shader(&fragment);
 
       if !gl.get_shader_parameter(&fragment, WebGl2RenderingContext::COMPILE_STATUS) {
@@ -175,7 +170,9 @@ impl Gpu {
     Ok(())
   }
 
-  pub(crate) fn apply(&self, computer: &Computer) -> Result {
+  pub(crate) fn render(&self, state: &State) -> Result {
+    log::trace!("Applying state {:?}", state);
+
     self.gl.bind_framebuffer(
       WebGl2RenderingContext::FRAMEBUFFER,
       Some(&self.frame_buffer),
@@ -194,68 +191,65 @@ impl Gpu {
       Some(&self.textures[self.source_texture.get()]),
     );
 
-    self
-      .gl
-      .uniform1f(Some(self.uniform("alpha")), computer.alpha());
+    self.gl.uniform1f(Some(self.uniform("alpha")), state.alpha);
 
     self.gl.uniform3f(
       Some(self.uniform("default_color")),
-      computer.default().x,
-      computer.default().y,
-      computer.default().z,
+      state.default_color[0],
+      state.default_color[1],
+      state.default_color[2],
     );
 
-    match computer.mask() {
-      Mod { divisor, remainder } => {
-        self.gl.uniform1ui(Some(self.uniform("divisor")), *divisor);
-        self
-          .gl
-          .uniform1ui(Some(self.uniform("remainder")), *remainder);
-      }
-      Rows { nrows, step } => {
-        self.gl.uniform1ui(Some(self.uniform("nrows")), *nrows);
-        self.gl.uniform1ui(Some(self.uniform("step")), *step);
-      }
-      _ => {}
-    }
+    self
+      .gl
+      .uniform1ui(Some(self.uniform("divisor")), state.mask_mod_divisor);
 
-    if let Operation::RotateColor(axis, turns) = computer.operation() {
-      self.gl.uniform_matrix3fv_with_f32_array(
-        Some(self.uniform("color_rotation")),
-        false,
-        Rotation3::new(axis.vector() * *turns * f32::consts::TAU)
-          .matrix()
-          .as_slice(),
-      );
-    }
+    self
+      .gl
+      .uniform1ui(Some(self.uniform("remainder")), state.mask_mod_remainder);
+
+    self
+      .gl
+      .uniform1ui(Some(self.uniform("nrows")), state.mask_rows_rows);
+
+    self
+      .gl
+      .uniform1ui(Some(self.uniform("step")), state.mask_rows_step);
+
+    let axis_vector = match state.operation_rotate_color_axis.as_ref() {
+      "r" | "red" => Ok(Vector3::x()),
+      "g" | "green" => Ok(Vector3::y()),
+      "b" | "blue" => Ok(Vector3::z()),
+      _ => Err("Invalid color rotation axis"),
+    }?;
+
+    self.gl.uniform_matrix3fv_with_f32_array(
+      Some(self.uniform("color_rotation")),
+      false,
+      Rotation3::new(axis_vector * state.operation_rotate_color_turns * f32::consts::TAU)
+        .matrix()
+        .as_slice(),
+    );
+
+    let mut similarity = Similarity2::<f32>::identity();
+    similarity.append_rotation_mut(&UnitComplex::from_angle(-state.rotation * f32::consts::TAU));
+    similarity.append_scaling_mut(state.scale);
 
     self.gl.uniform_matrix3fv_with_f32_array(
       Some(self.uniform("transform")),
       false,
-      computer.transform().inverse().to_homogeneous().as_slice(),
+      similarity.inverse().to_homogeneous().as_slice(),
     );
 
     self
       .gl
-      .uniform1ui(Some(self.uniform("wrap")), computer.wrap() as u32);
+      .uniform1ui(Some(self.uniform("wrap")), state.wrap as u32);
 
-    self.gl.uniform1ui(
-      Some(self.uniform("mask")),
-      Mask::VARIANTS
-        .iter()
-        .position(|mask| *mask == computer.mask().as_ref())
-        .expect("Mask should always be present")
-        .try_into()?,
-    );
+    self.gl.uniform1ui(Some(self.uniform("mask")), state.mask);
 
-    self.gl.uniform1ui(
-      Some(self.uniform("operation")),
-      Operation::VARIANTS
-        .iter()
-        .position(|operation| *operation == computer.operation().as_ref())
-        .expect("Operation should always be present")
-        .try_into()?,
-    );
+    self
+      .gl
+      .uniform1ui(Some(self.uniform("operation")), state.operation);
 
     self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 3);
 

@@ -39,8 +39,23 @@ jobs:
       with:
         version: ${{ env.WASM_BINDGEN_VERSION }}
 
-    - name: Test
-      run: cargo test --all --all-targets
+    - name: Install chromium
+      working-directory: tests
+      run: npx playwright install chromium
+
+    - name: Install dependencies
+      working-directory: tests
+      run: npm clean-install
+
+    - name: Run Playwright tests
+      working-directory: tests
+      run: npx playwright test
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: playwright-report
+        path: tests/playwright-report/
+        retention-days: 365
 
   check:
     name: Check
@@ -71,7 +86,6 @@ jobs:
 
     - name: Clippy
       run: |
-        cargo clippy --package integration --tests
         cargo clippy --target wasm32-unknown-unknown
 
     - name: Check for Forbidden Words
