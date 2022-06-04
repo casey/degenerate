@@ -20,6 +20,8 @@ impl App {
 
     let document = window.get_document();
 
+    let html = document.select("html")?.cast::<HtmlElement>()?;
+
     let textarea = document.select("textarea")?.cast::<HtmlTextAreaElement>()?;
 
     let canvas = document.select("canvas")?.cast::<HtmlCanvasElement>()?;
@@ -68,6 +70,7 @@ impl App {
       app.stderr.update(result);
     })?;
 
+    let local_html = html.clone();
     worker.add_event_listener_with_event("message", move |event| {
       let mut app = app.lock().unwrap();
       let event: WorkerMessage = serde_json::from_str(&event.data().as_string().unwrap()).unwrap();
@@ -78,12 +81,12 @@ impl App {
           app.request_animation_frame().unwrap();
         }
         WorkerMessage::Done => {
-          app.canvas.class_list().add_1("done").unwrap();
+          local_html.add_class("done").unwrap();
         }
       }
     })?;
 
-    canvas.class_list().add_1("ready").map_err(JsValueError)?;
+    html.add_class("ready")?;
 
     Ok(())
   }

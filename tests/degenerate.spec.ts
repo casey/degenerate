@@ -29,11 +29,11 @@ test.beforeEach(async ({ page }) => {
 
 const imageTest = (name, program) => {
   test(name, async ({ page }) => {
-    await page.waitForSelector('canvas.ready');
+    await page.waitForSelector('html.ready');
 
     await page.locator('textarea').fill(program);
 
-    await page.waitForSelector('canvas.done');
+    await page.waitForSelector('html.done');
 
     const encoded = (
       await page.evaluate(() =>
