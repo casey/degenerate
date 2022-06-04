@@ -9,9 +9,6 @@ autotests = false
 [workspace]
 members = [".", "bin/serve"]
 
-[lib]
-crate-type = ["cdylib"]
-
 [dependencies]
 console_error_panic_hook = "0.1.7"
 console_log = "0.2.0"

@@ -149,7 +149,7 @@ impl App {
 
       self
         .worker
-        .post_message(&wasm_bindgen::JsValue::from_str(&serde_json::to_string(
+        .post_message(&JsValue::from_str(&serde_json::to_string(
           &AppMessage::Script(&self.textarea.value()),
         )?))
         .map_err(JsValueError)?;
@@ -163,7 +163,7 @@ impl App {
 
         self
           .worker
-          .post_message(&wasm_bindgen::JsValue::from_str(&serde_json::to_string(
+          .post_message(&JsValue::from_str(&serde_json::to_string(
             &AppMessage::Run,
           )?))
           .map_err(JsValueError)?;

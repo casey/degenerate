@@ -15,7 +15,7 @@ use {
     string::ToString,
     sync::{Arc, Mutex},
   },
-  wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue},
+  wasm_bindgen::{closure::Closure, JsCast, JsValue},
   web_sys::{
     Document, Element, EventTarget, HtmlCanvasElement, HtmlElement, HtmlTextAreaElement,
     MessageEvent, WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
@@ -39,8 +39,7 @@ mod stderr;
 mod window;
 mod worker_message;
 
-#[wasm_bindgen]
-pub fn run() {
+fn main() {
   console_error_panic_hook::set_once();
   console_log::init_with_level(log::Level::Trace).unwrap();
   Stderr::get().update(App::init());

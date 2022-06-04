@@ -5,8 +5,8 @@ import * as png from 'node-libpng';
 import { test, expect, Page } from '@playwright/test';
 
 const sleep = async (secs) => {
-  return new Promise(resolve => setTimeout(resolve, secs * 1000));
-}
+  return new Promise((resolve) => setTimeout(resolve, secs * 1000));
+};
 
 test.beforeAll(async () => {
   let done = false;
