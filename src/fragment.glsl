@@ -3,13 +3,14 @@
 precision highp float;
 
 const uint MASK_ALL = 0u;
-const uint MASK_CIRCLE = 1u;
-const uint MASK_CROSS = 2u;
-const uint MASK_MOD = 3u;
-const uint MASK_ROWS = 4u;
-const uint MASK_SQUARE = 5u;
-const uint MASK_TOP = 6u;
-const uint MASK_X = 7u;
+const uint MASK_CHECK = 1u;
+const uint MASK_CIRCLE = 2u;
+const uint MASK_CROSS = 3u;
+const uint MASK_MOD = 4u;
+const uint MASK_ROWS = 5u;
+const uint MASK_SQUARE = 6u;
+const uint MASK_TOP = 7u;
+const uint MASK_X = 8u;
 
 const uint OPERATION_DEBUG = 0u;
 const uint OPERATION_IDENTITY = 1u;
@@ -51,6 +52,9 @@ bool masked(vec2 position, uvec2 pixel_position) {
   switch (mask) {
     case MASK_ALL:
       return true;
+    case MASK_CHECK:
+      ivec2 i = ivec2((position + 1.0) * 4.0);
+      return i.x % 2 != i.y % 2;
     case MASK_CIRCLE:
       return length(position) < 1.0;
     case MASK_CROSS:
