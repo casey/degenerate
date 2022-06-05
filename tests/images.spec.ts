@@ -105,12 +105,12 @@ imageTest(
   'brilliance',
   `
     computer.x();
-    computer.rotateColor('g', 0.07);
+    computer.rotateColor('green', 0.07);
     computer.rotate(0.07);
     for (let i = 0; i < 10; i++) {
       computer.render();
     }
-    computer.rotateColor('b', 0.09);
+    computer.rotateColor('blue', 0.09);
     computer.rotate(0.09);
     for (let i = 0; i < 10; i++) {
       computer.render();
@@ -176,7 +176,7 @@ imageTest(
   'diamonds',
   `
     computer.rotate(0.3333);
-    computer.rotateColor('g', 0.05);
+    computer.rotateColor('green', 0.05);
     computer.circle();
     computer.scale(0.5);
     computer.wrap();
@@ -184,7 +184,7 @@ imageTest(
       computer.render();
     }
     computer.rotate(0.8333);
-    computer.rotateColor('b', 0.05);
+    computer.rotateColor('blue', 0.05);
     for (let i = 0; i < 8; i++) {
       computer.render();
     }
@@ -207,7 +207,7 @@ imageTest(
 imageTest(
   'kaleidoscope',
   `
-    computer.rotateColor('g', 0.05);
+    computer.rotateColor('green', 0.05);
     computer.circle();
     computer.scale(0.75);
     computer.wrap();
@@ -215,7 +215,7 @@ imageTest(
       computer.render();
     }
     computer.rotate(0.8333);
-    computer.rotateColor('b', 0.05);
+    computer.rotateColor('blue', 0.05);
     for (let i = 0; i < 8; i++) {
       computer.render();
     }
@@ -233,14 +233,14 @@ imageTest(
 imageTest(
   'orbs',
   `
-    computer.rotateColor('g', 0.05);
+    computer.rotateColor('green', 0.05);
     computer.circle();
     computer.scale(0.75);
     computer.wrap();
     for (let i = 0; i < 8; i++) {
       computer.render();
     }
-    computer.rotateColor('b', 0.05);
+    computer.rotateColor('blue', 0.05);
     for (let i = 0; i < 8; i++) {
       computer.render();
     }
@@ -364,7 +364,7 @@ imageTest(
 imageTest(
   'rotate_color_blue_all',
   `
-    computer.rotateColor('b', 0.5);
+    computer.rotateColor('blue', 0.5);
     computer.all();
     computer.render();
   `
@@ -373,7 +373,7 @@ imageTest(
 imageTest(
   'rotate_color_g',
   `
-    computer.rotateColor('g', 0.5);
+    computer.rotateColor('green', 0.5);
     computer.all();
     computer.render();
   `
@@ -400,7 +400,7 @@ imageTest(
 imageTest(
   'rotate_color_r',
   `
-    computer.rotateColor('r', 0.5);
+    computer.rotateColor('red', 0.5);
     computer.all();
     computer.render();
   `
@@ -470,14 +470,14 @@ imageTest(
 imageTest(
   'rug',
   `
-    computer.rotateColor('g', 0.05);
+    computer.rotateColor('green', 0.05);
     computer.circle();
     computer.scale(0.5);
     computer.wrap();
     for (let i = 0; i < 8; i++) {
       computer.render();
     }
-    computer.rotateColor('b', 0.05);
+    computer.rotateColor('blue', 0.05);
     for (let i = 0; i < 8; i++) {
       computer.render();
     }
@@ -545,13 +545,13 @@ imageTest(
       () => computer.x()
     ]);
     rng.seed(9);
-    computer.rotateColor('g', 0.01);
+    computer.rotateColor('green', 0.01);
     computer.rotate(0.01);
     for (let i = 0; i < 100; i++) {
       rng.choose(masks)();
       computer.render();
     }
-    computer.rotateColor('b', 0.01);
+    computer.rotateColor('blue', 0.01);
     computer.rotate(0.01);
     for (let i = 0; i < 100; i++) {
       rng.choose(masks)();
@@ -590,7 +590,7 @@ imageTest(
       () => computer.x()
     ]);
     rng.seed(3);
-    computer.rotateColor('g', 0.1);
+    computer.rotateColor('green', 0.1);
     computer.rotate(0.1);
     for (let i = 0; i < 10; i++) {
       rng.choose(masks)();
@@ -600,7 +600,7 @@ imageTest(
       rng.choose(masks)();
       computer.render();
     }
-    computer.rotateColor('b', 0.1);
+    computer.rotateColor('blue', 0.1);
     computer.rotate(0.1);
     for (let i = 0; i < 10; i++) {
       rng.choose(masks)();
@@ -681,7 +681,7 @@ imageTest(
   'square_colors',
   `
     computer.rotate(0.01);
-    computer.rotateColor('g', 0.1);
+    computer.rotateColor('green', 0.1);
     computer.square();
     for (let i = 0; i < 10; i++) {
       computer.render();
