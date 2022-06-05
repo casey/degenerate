@@ -82,7 +82,9 @@ jobs:
         version: ${{ env.WASM_BINDGEN_VERSION }}
 
     - name: Format
-      run: cargo fmt --all -- --check
+      run: |
+        npx prettier --check tests
+        cargo fmt --all -- --check
 
     - name: Clippy
       run: |
