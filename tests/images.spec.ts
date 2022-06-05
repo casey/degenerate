@@ -335,87 +335,6 @@ imageTest(
 );
 
 imageTest(
-  'rotate_color_05_red',
-  `
-    computer.rotateColor('red', 0.5);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_blue_05_all',
-  `
-    computer.rotateColor('blue', 0.5);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_blue_1_all',
-  `
-    computer.rotateColor('blue', 1.0);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_blue_all',
-  `
-    computer.rotateColor('blue', 0.5);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_g',
-  `
-    computer.rotateColor('green', 0.5);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_green',
-  `
-    computer.rotateColor('green', 0.5);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_green_all',
-  `
-    computer.rotateColor('green', 1.0);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_r',
-  `
-    computer.rotateColor('red', 0.5);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_red_all',
-  `
-    computer.rotateColor('red', 1.0);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
   'rotate_scale_x',
   `
     computer.rotate(0.05);
@@ -726,6 +645,60 @@ imageTest(
   `
     computer.defaultColor([255, 0, 255]);
     computer.rotate(0.01);
+    computer.render();
+  `
+);
+
+imageTest(
+  'rotate_color_05_red',
+  `
+    computer.rotateColor('red', 0.5);
+    computer.all();
+    computer.render();
+  `
+);
+
+imageTest(
+  'rotate_color_blue_05_all',
+  `
+    computer.rotateColor('blue', 0.5);
+    computer.all();
+    computer.render();
+  `
+);
+
+imageTest(
+  'rotate_color_green',
+  `
+    computer.rotateColor('green', 0.5);
+    computer.all();
+    computer.render();
+  `
+);
+
+imageTest(
+  'rotate_color_blue_1_all',
+  `
+    computer.rotateColor('blue', 1.0);
+    computer.all();
+    computer.render();
+  `
+);
+
+imageTest(
+  'rotate_color_green_all',
+  `
+    computer.rotateColor('green', 1.0);
+    computer.all();
+    computer.render();
+  `
+);
+
+imageTest(
+  'rotate_color_red_all',
+  `
+    computer.rotateColor('red', 1.0);
+    computer.all();
     computer.render();
   `
 );
