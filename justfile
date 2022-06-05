@@ -18,6 +18,7 @@ fmt:
   cargo fmt --all
 
 fmt-check:
+  prettier --check tests
   cargo fmt --all -- --check
 
 check:
