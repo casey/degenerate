@@ -77,70 +77,45 @@ const imageTest = (name, program) => {
   });
 };
 
-imageTest(
-  'all',
-  `
+const tests = {
+  all: `
     computer.all();
     computer.render();
-  `
-);
-
-imageTest(
-  'alpha',
-  `
+  `,
+  alpha: `
     computer.alpha(0.5);
     computer.x();
     computer.render();
-  `
-);
-
-imageTest(
-  'render',
-  `
+  `,
+  render: `
     computer.render();
-  `
-);
-
-imageTest(
-  'brilliance',
-  `
+  `,
+  brilliance: `
     computer.x();
-    computer.rotateColor('g', 0.07);
+    computer.rotateColor('green', 0.07);
     computer.rotate(0.07);
     for (let i = 0; i < 10; i++) {
       computer.render();
     }
-    computer.rotateColor('b', 0.09);
+    computer.rotateColor('blue', 0.09);
     computer.rotate(0.09);
     for (let i = 0; i < 10; i++) {
       computer.render();
     }
-  `
-);
-
-imageTest(
-  'carpet',
-  `
+  `,
+  carpet: `
     computer.circle();
     computer.scale(0.5);
     for (let i = 0; i < 8; i++) {
       computer.render();
       computer.wrap();
     }
-  `
-);
-
-imageTest(
-  'circle',
-  `
+  `,
+  circle: `
     computer.circle();
     computer.render();
-  `
-);
-
-imageTest(
-  'circle_scale',
-  `
+  `,
+  circle_scale: `
     computer.scale(0.5);
     computer.circle();
     computer.render();
@@ -148,35 +123,22 @@ imageTest(
     computer.scale(0.9);
     computer.wrap();
     computer.render();
-  `
-);
-
-imageTest(
-  'concentric_circles',
-  `
+  `,
+  concentric_circles: `
     computer.scale(0.99);
     computer.circle();
     for (let i = 0; i < 100; i++) {
       computer.render();
     }
-  `
-);
-
-imageTest(
-  'cross',
-  `
+  `,
+  cross: `
     computer.cross();
     computer.render();
-  `
-);
-
-imageTest('default_program', ` `);
-
-imageTest(
-  'diamonds',
-  `
+  `,
+  default_program: ` `,
+  diamonds: `
     computer.rotate(0.3333);
-    computer.rotateColor('g', 0.05);
+    computer.rotateColor('green', 0.05);
     computer.circle();
     computer.scale(0.5);
     computer.wrap();
@@ -184,16 +146,12 @@ imageTest(
       computer.render();
     }
     computer.rotate(0.8333);
-    computer.rotateColor('b', 0.05);
+    computer.rotateColor('blue', 0.05);
     for (let i = 0; i < 8; i++) {
       computer.render();
     }
-  `
-);
-
-imageTest(
-  'grain',
-  `
+  `,
+  grain: `
     computer.rotate(0.111);
     for (let i = 0; i < 16; i++) {
       computer.square();
@@ -201,13 +159,9 @@ imageTest(
       computer.circle();
       computer.render();
     }
-  `
-);
-
-imageTest(
-  'kaleidoscope',
-  `
-    computer.rotateColor('g', 0.05);
+  `,
+  kaleidoscope: `
+    computer.rotateColor('green', 0.05);
     computer.circle();
     computer.scale(0.75);
     computer.wrap();
@@ -215,41 +169,29 @@ imageTest(
       computer.render();
     }
     computer.rotate(0.8333);
-    computer.rotateColor('b', 0.05);
+    computer.rotateColor('blue', 0.05);
     for (let i = 0; i < 8; i++) {
       computer.render();
     }
-  `
-);
-
-imageTest(
-  'mod_3',
-  `
+  `,
+  mod_3: `
     computer.mod(3, 0);
     computer.render();
-  `
-);
-
-imageTest(
-  'orbs',
-  `
-    computer.rotateColor('g', 0.05);
+  `,
+  orbs: `
+    computer.rotateColor('green', 0.05);
     computer.circle();
     computer.scale(0.75);
     computer.wrap();
     for (let i = 0; i < 8; i++) {
       computer.render();
     }
-    computer.rotateColor('b', 0.05);
+    computer.rotateColor('blue', 0.05);
     for (let i = 0; i < 8; i++) {
       computer.render();
     }
-  `
-);
-
-imageTest(
-  'pattern',
-  `
+  `,
+  pattern: `
     computer.alpha(0.75);
     computer.circle();
     computer.scale(0.5);
@@ -257,12 +199,8 @@ imageTest(
       computer.render();
       computer.wrap();
     }
-  `
-);
-
-imageTest(
-  'choose_default_seed',
-  `
+  `,
+  choose_default_seed: `
     rng.choose([
       () => computer.all(),
       () => computer.circle(),
@@ -272,12 +210,8 @@ imageTest(
       () => computer.x()
     ])();
     computer.render();
-  `
-);
-
-imageTest(
-  'choose_zero_seed',
-  `
+  `,
+  choose_zero_seed: `
     rng.seed(0);
     rng.choose([
       () => computer.all(),
@@ -288,12 +222,8 @@ imageTest(
       () => computer.x()
     ])();
     computer.render();
-  `
-);
-
-imageTest(
-  'choose_nonzero_seed',
-  `
+  `,
+  choose_nonzero_seed: `
     rng.seed(3);
     rng.choose([
       () => computer.all(),
@@ -304,141 +234,36 @@ imageTest(
       () => computer.x()
     ])();
     computer.render();
-  `
-);
-
-imageTest(
-  'rotate',
-  `
+  `,
+  rotate: `
     computer.rotate(0.05);
     computer.x();
     computer.render();
-  `
-);
-
-imageTest(
-  'rotate_0125_square',
-  `
+  `,
+  rotate_0125_square: `
     computer.rotate(0.125);
     computer.square();
     computer.render();
-  `
-);
-
-imageTest(
-  'rotate_1_square',
-  `
+  `,
+  rotate_1_square: `
     computer.rotate(1.0);
     computer.square();
     computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_05_red',
-  `
-    computer.rotateColor('red', 0.5);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_blue_05_all',
-  `
-    computer.rotateColor('blue', 0.5);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_blue_1_all',
-  `
-    computer.rotateColor('blue', 1.0);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_blue_all',
-  `
-    computer.rotateColor('b', 0.5);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_g',
-  `
-    computer.rotateColor('g', 0.5);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_green',
-  `
-    computer.rotateColor('green', 0.5);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_green_all',
-  `
-    computer.rotateColor('green', 1.0);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_r',
-  `
-    computer.rotateColor('r', 0.5);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_color_red_all',
-  `
-    computer.rotateColor('red', 1.0);
-    computer.all();
-    computer.render();
-  `
-);
-
-imageTest(
-  'rotate_scale_x',
-  `
+  `,
+  rotate_scale_x: `
     computer.rotate(0.05);
     computer.scale(2);
     computer.x();
     computer.render();
-  `
-);
-
-imageTest(
-  'rotate_square',
-  `
+  `,
+  rotate_square: `
     computer.rotate(0.05);
     computer.square();
     for (let i = 0; i < 2; i++) {
       computer.render();
     }
-  `
-);
-
-imageTest(
-  'rotate_square_for_x',
-  `
+  `,
+  rotate_square_for_x: `
     computer.rotate(0.05);
     computer.square();
     for (let i = 0; i < 2; i++) {
@@ -448,94 +273,58 @@ imageTest(
     for (let i = 0; i < 1; i++) {
       computer.render();
     }
-  `
-);
-
-imageTest(
-  'rows',
-  `
+  `,
+  rows: `
     computer.rows(1, 1);
     computer.render();
-  `
-);
-
-imageTest(
-  'rows_overflow',
-  `
+  `,
+  rows_overflow: `
     computer.rows(4294967295, 4294967295);
     computer.render();
-  `
-);
-
-imageTest(
-  'rug',
-  `
-    computer.rotateColor('g', 0.05);
+  `,
+  rug: `
+    computer.rotateColor('green', 0.05);
     computer.circle();
     computer.scale(0.5);
     computer.wrap();
     for (let i = 0; i < 8; i++) {
       computer.render();
     }
-    computer.rotateColor('b', 0.05);
+    computer.rotateColor('blue', 0.05);
     for (let i = 0; i < 8; i++) {
       computer.render();
     }
-  `
-);
-
-imageTest(
-  'scale',
-  `
+  `,
+  scale: `
     computer.scale(0.5);
     computer.circle();
     computer.render();
-  `
-);
-
-imageTest(
-  'scale_circle_for',
-  `
+  `,
+  scale_circle_for: `
     computer.circle();
     computer.scale(0.5);
     for (let i = 0; i < 8; i++) {
       computer.render();
     }
-  `
-);
-
-imageTest(
-  'scale_circle_wrap',
-  `
+  `,
+  scale_circle_wrap: `
     computer.scale(0.5);
     computer.circle();
     computer.wrap();
     computer.render();
-  `
-);
-
-imageTest(
-  'scale_rotate',
-  `
+  `,
+  scale_rotate: `
     computer.scale(2);
     computer.rotate(0.05);
     computer.x();
     computer.render();
-  `
-);
-
-imageTest(
-  'scale_x',
-  `
+  `,
+  scale_x: `
     computer.scale(2);
     computer.x();
     computer.render();
-  `
-);
-
-imageTest(
-  'smear',
-  `
+  `,
+  smear: `
     const masks = ([
       () => computer.all(),
       () => computer.circle(),
@@ -545,42 +334,30 @@ imageTest(
       () => computer.x()
     ]);
     rng.seed(9);
-    computer.rotateColor('g', 0.01);
+    computer.rotateColor('green', 0.01);
     computer.rotate(0.01);
     for (let i = 0; i < 100; i++) {
       rng.choose(masks)();
       computer.render();
     }
-    computer.rotateColor('b', 0.01);
+    computer.rotateColor('blue', 0.01);
     computer.rotate(0.01);
     for (let i = 0; i < 100; i++) {
       rng.choose(masks)();
       computer.render();
     }
-  `
-);
-
-imageTest(
-  'square',
-  `
+  `,
+  square: `
     computer.square();
     computer.render();
-  `
-);
-
-imageTest(
-  'square_top',
-  `
+  `,
+  square_top: `
     computer.square();
     computer.render();
     computer.top();
     computer.render();
- `
-);
-
-imageTest(
-  'starburst',
-  `
+  `,
+  starburst: `
     const masks = ([
       () => computer.all(),
       () => computer.circle(),
@@ -590,7 +367,7 @@ imageTest(
       () => computer.x()
     ]);
     rng.seed(3);
-    computer.rotateColor('g', 0.1);
+    computer.rotateColor('green', 0.1);
     computer.rotate(0.1);
     for (let i = 0; i < 10; i++) {
       rng.choose(masks)();
@@ -600,57 +377,37 @@ imageTest(
       rng.choose(masks)();
       computer.render();
     }
-    computer.rotateColor('b', 0.1);
+    computer.rotateColor('blue', 0.1);
     computer.rotate(0.1);
     for (let i = 0; i < 10; i++) {
       rng.choose(masks)();
       computer.render();
     }
-  `
-);
-
-imageTest(
-  'top',
-  `
+  `,
+  top: `
     computer.top();
     computer.render();
-  `
-);
-
-imageTest(
-  'x',
-  `
+  `,
+  x: `
     computer.x();
     computer.render();
-  `
-);
-
-imageTest(
-  'x_loop',
-  `
+  `,
+  x_loop: `
     computer.x();
     computer.scale(0.5);
     for (let i = 0; i < 8; i++) {
       computer.render();
       computer.wrap();
     }
-  `
-);
-
-imageTest(
-  'x_scale',
-  `
+  `,
+  x_scale: `
     computer.x();
     computer.scale(0.5);
     for (let i = 0; i < 8; i++) {
       computer.render();
     }
-  `
-);
-
-imageTest(
-  'x_wrap',
-  `
+  `,
+  x_wrap: `
     computer.x();
     computer.render();
     computer.scale(0.5);
@@ -658,40 +415,24 @@ imageTest(
     computer.identity();
     computer.all();
     computer.render();
-  `
-);
-
-imageTest(
-  'debug_operation',
-  `
+  `,
+  debug_operation: `
     computer.debug();
     computer.render();
-  `
-);
-
-imageTest(
-  'mod_zero_is_always_false',
-  `
+  `,
+  mod_zero_is_always_false: `
     computer.mod(0, 1);
     computer.render();
-  `
-);
-
-imageTest(
-  'square_colors',
-  `
+  `,
+  square_colors: `
     computer.rotate(0.01);
-    computer.rotateColor('g', 0.1);
+    computer.rotateColor('green', 0.1);
     computer.square();
     for (let i = 0; i < 10; i++) {
       computer.render();
     }
-  `
-);
-
-imageTest(
-  'nested_for_loops',
-  `
+  `,
+  nested_for_loops: `
     computer.circle();
     computer.scale(0.9);
     for (let i = 0; i < 2; i++) {
@@ -699,33 +440,67 @@ imageTest(
         computer.render();
       }
     }
-  `
-);
-
-imageTest(
-  'for_zero',
-  `
+  `,
+  for_zero: `
     computer.circle();
     for (let i = 0; i < 0; i++) {
       computer.render();
     }
-  `
-);
-
-imageTest(
-  'gpu_extra_pixels',
-  `
+  `,
+  gpu_extra_pixels: `
     computer.rotate(0.01);
     computer.render();
     computer.render();
-  `
-);
-
-imageTest(
-  'default_color',
-  `
+  `,
+  default_color: `
     computer.defaultColor([255, 0, 255]);
     computer.rotate(0.01);
     computer.render();
-  `
-);
+  `,
+  rotate_color_05_red: `
+    computer.rotateColor('red', 0.5);
+    computer.all();
+    computer.render();
+  `,
+  rotate_color_blue_05_all: `
+    computer.rotateColor('blue', 0.5);
+    computer.all();
+    computer.render();
+  `,
+  rotate_color_green: `
+    computer.rotateColor('green', 0.5);
+    computer.all();
+    computer.render();
+  `,
+  rotate_color_blue_1_all: `
+    computer.rotateColor('blue', 1.0);
+    computer.all();
+    computer.render();
+  `,
+  rotate_color_green_all: `
+    computer.rotateColor('green', 1.0);
+    computer.all();
+    computer.render();
+  `,
+  rotate_color_red_all: `
+    computer.rotateColor('red', 1.0);
+    computer.all();
+    computer.render();
+  `,
+};
+
+for (const name in tests) {
+  imageTest(name, tests[name]);
+}
+
+test('forbid-unused-images', async () => {
+  let images = new Set();
+  for (const filename of await fs.promises.readdir('../images')) {
+    if (filename !== '.DS_Store') {
+      images.add(filename.replace(/\.png$/, ''));
+    }
+  }
+
+  let testNames = new Set(Object.getOwnPropertyNames(tests));
+  expect(images).toEqual(testNames);
+});

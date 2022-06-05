@@ -217,9 +217,9 @@ impl Gpu {
       .uniform1ui(Some(self.uniform("step")), state.mask_rows_step);
 
     let axis_vector = match state.operation_rotate_color_axis.as_ref() {
-      "r" | "red" => Ok(Vector3::x()),
-      "g" | "green" => Ok(Vector3::y()),
-      "b" | "blue" => Ok(Vector3::z()),
+      "red" => Ok(Vector3::x()),
+      "green" => Ok(Vector3::y()),
+      "blue" => Ok(Vector3::z()),
       _ => Err("Invalid color rotation axis"),
     }?;
 
