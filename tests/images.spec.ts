@@ -493,10 +493,10 @@ for (const name in tests) {
   imageTest(name, tests[name]);
 }
 
-test("forbid-unused-images", async () => {
+test('forbid-unused-images', async () => {
   let images = new Set();
-  for (const filename of await fs.promises.readdir("../images")) {
-    if (filename !== ".DS_Store") {
+  for (const filename of await fs.promises.readdir('../images')) {
+    if (filename !== '.DS_Store') {
       images.add(filename.replace(/\.png$/, ''));
     }
   }
