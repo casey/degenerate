@@ -1,7 +1,7 @@
 import * as fs from 'fs';
+import * as png from 'fast-png';
 import axios from 'axios';
 import { exec } from './common';
-import * as png from 'node-libpng';
 import { test, expect, Page } from '@playwright/test';
 
 const sleep = async (msecs) => {
