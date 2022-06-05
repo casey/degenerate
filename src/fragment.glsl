@@ -1,5 +1,7 @@
 #version 300 es
 
+precision highp float;
+
 const uint MASK_ALL = 0u;
 const uint MASK_CIRCLE = 1u;
 const uint MASK_CROSS = 2u;
@@ -13,8 +15,6 @@ const uint OPERATION_DEBUG = 0u;
 const uint OPERATION_IDENTITY = 1u;
 const uint OPERATION_INVERT = 2u;
 const uint OPERATION_ROTATE_COLOR = 3u;
-
-precision highp float;
 
 uniform bool wrap;
 uniform float alpha;
