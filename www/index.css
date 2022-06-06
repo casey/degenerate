@@ -86,13 +86,16 @@ samp {
 }
 
 textarea {
+  -webkit-text-stroke-color: black;
+  -webkit-text-stroke-width: 1px;
   background-color: transparent;
   border: 0;
   box-sizing: border-box;
   color: white;
+  font-size: 1.5em;
+  font-weight: 900;
   height: 100%;
   left: 0;
-  mix-blend-mode: difference;
   outline: none;
   padding: 1em;
   position: absolute;
