@@ -2,12 +2,10 @@ use super::*;
 
 pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
-  animation_frame_pending: bool,
-  canvas: HtmlCanvasElement,
+  document: Document,
   gpu: Gpu,
-  input: bool,
+  html: HtmlElement,
   nav: HtmlElement,
-  resize: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
   window: Window,
@@ -30,21 +28,19 @@ impl App {
 
     let stderr = Stderr::get();
 
-    let gpu = Gpu::new(&canvas)?;
+    let gpu = Gpu::new(&canvas, &window)?;
 
     let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
     let app = Arc::new(Mutex::new(Self {
+      document,
+      html,
       animation_frame_callback: None,
-      animation_frame_pending: false,
-      canvas,
       gpu,
-      input: false,
       nav,
-      resize: true,
-      stderr: stderr.clone(),
+      stderr,
       textarea: textarea.clone(),
-      window: window.clone(),
+      window,
       worker: worker.clone(),
     }));
 
@@ -57,74 +53,45 @@ impl App {
       as Box<dyn FnMut(f64)>));
 
     let local = app.clone();
-    window.add_event_listener("resize", move || {
+    textarea.add_event_listener("input", move || {
+      local.lock().unwrap().nav.set_class_name("fade-out");
+    })?;
+
+    let local = app.clone();
+    textarea.add_event_listener_with_event("keydown", move |event| {
       let mut app = local.lock().unwrap();
-      let result = app.on_resize();
+      let result = app.on_keydown(event);
       app.stderr.update(result);
     })?;
 
     let local = app.clone();
-    textarea.add_event_listener("input", move || {
+    worker.add_event_listener_with_event("message", move |event: MessageEvent| {
       let mut app = local.lock().unwrap();
-      let result = app.on_input();
+      let result = app.on_message(event);
       app.stderr.update(result);
     })?;
 
-    let local_html = html.clone();
-    worker.add_event_listener_with_event("message", move |event| {
-      let mut app = app.lock().unwrap();
-
-      let mut handle_event = || -> Result {
-        let event = serde_json::from_str(
-          &event
-            .data()
-            .as_string()
-            .ok_or("Failed to retrieve event data as a string")?,
-        )?;
-
-        match event {
-          WorkerMessage::Render(state) => {
-            app.gpu.render(&state)?;
-            stderr.update(app.gpu.render_to_canvas());
-            app
-              .request_animation_frame()
-              .map_err(|_| "Failed to request animation frame")?;
-          }
-          WorkerMessage::Done => {
-            local_html.set_class_name("done");
-          }
-        }
-
-        Ok(())
-      };
-
-      let result = handle_event();
-
-      app.stderr.update(result);
-    })?;
-
-    html.set_class_name("ready");
+    let mut app = app.lock().unwrap();
+    app.request_animation_frame()?;
+    app.html.set_class_name("ready");
 
     Ok(())
   }
 
-  pub(super) fn on_resize(&mut self) -> Result {
-    self.resize = true;
-    self.request_animation_frame()?;
-    Ok(())
-  }
-
-  pub(super) fn on_input(&mut self) -> Result {
-    self.input = true;
-    self.request_animation_frame()?;
+  pub(super) fn on_keydown(&mut self, event: KeyboardEvent) -> Result {
+    if event.shift_key() && event.key() == "Enter" {
+      event.prevent_default();
+      self
+        .worker
+        .post_message(&JsValue::from_str(&serde_json::to_string(
+          &AppMessage::Script(&self.textarea.value()),
+        )?))
+        .map_err(JsValueError)?;
+    }
     Ok(())
   }
 
   fn request_animation_frame(&mut self) -> Result {
-    if self.animation_frame_pending {
-      return Ok(());
-    }
-
     self
       .window
       .request_animation_frame(
@@ -137,56 +104,59 @@ impl App {
           .unwrap(),
       )
       .map_err(JsValueError)?;
-
-    self.animation_frame_pending = true;
-
     Ok(())
   }
 
   fn on_animation_frame(&mut self, timestamp: f64) -> Result {
-    self.animation_frame_pending = false;
+    self.request_animation_frame()?;
+
+    self.gpu.resize()?;
 
     log::trace!("Animation frame timestamp {}s", timestamp);
 
-    let resize = self.resize;
+    self
+      .worker
+      .post_message(&JsValue::from_str(&serde_json::to_string(
+        &AppMessage::Frame,
+      )?))
+      .map_err(JsValueError)?;
 
-    if self.resize {
-      let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
-      let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
+    Ok(())
+  }
 
-      let device_pixel_ratio = self.window.device_pixel_ratio();
-      let device_pixel_height = css_pixel_height * device_pixel_ratio;
-      let device_pixel_width = css_pixel_width * device_pixel_ratio;
+  fn on_message(&mut self, event: MessageEvent) -> Result {
+    let event = serde_json::from_str(
+      &event
+        .data()
+        .as_string()
+        .ok_or("Failed to retrieve event data as a string")?,
+    )?;
 
-      self.canvas.set_height(device_pixel_height.ceil() as u32);
-      self.canvas.set_width(device_pixel_width.ceil() as u32);
-
-      self.resize = false;
-    }
-
-    if self.input {
-      self.nav.set_class_name("fade-out");
-
-      self
-        .worker
-        .post_message(&JsValue::from_str(&serde_json::to_string(
-          &AppMessage::Script(&self.textarea.value()),
-        )?))
-        .map_err(JsValueError)?;
-
-      let program = self.textarea.value();
-
-      log::trace!("Program: {:?}", program);
-
-      if resize {
-        self.gpu.resize()?;
-
-        self
-          .worker
-          .post_message(&JsValue::from_str(&serde_json::to_string(
-            &AppMessage::Run,
-          )?))
-          .map_err(JsValueError)?;
+    match event {
+      WorkerMessage::Done => {
+        self.html.set_class_name("done");
+      }
+      WorkerMessage::Render(state) => {
+        self.gpu.render(&state)?;
+        self.gpu.present()?;
+      }
+      WorkerMessage::Resolution(resolution) => {
+        self.gpu.lock_resolution(resolution);
+      }
+      WorkerMessage::Save => {
+        let image = self.gpu.save_image()?;
+        let mut png = Cursor::new(Vec::new());
+        image.write_to(&mut png, ImageOutputFormat::Png)?;
+        let a = self
+          .document
+          .create_element("a")
+          .map_err(JsValueError)?
+          .cast::<HtmlAnchorElement>()?;
+        a.set_download("degenerate.png");
+        let mut href = String::from("data:image/png;base64,");
+        base64::encode_config_buf(png.get_ref(), base64::STANDARD, &mut href);
+        a.set_href(&href);
+        a.click();
       }
     }
 

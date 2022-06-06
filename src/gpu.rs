@@ -6,14 +6,16 @@ pub(crate) struct Gpu {
   gl: WebGl2RenderingContext,
   height: u32,
   resolution: u32,
+  lock_resolution: bool,
   source_texture: Cell<usize>,
   textures: [WebGlTexture; 2],
   uniforms: BTreeMap<String, WebGlUniformLocation>,
   width: u32,
+  window: Window,
 }
 
 impl Gpu {
-  pub(super) fn new(canvas: &HtmlCanvasElement) -> Result<Self> {
+  pub(super) fn new(canvas: &HtmlCanvasElement, window: &Window) -> Result<Self> {
     let mut context_options = WebGlContextAttributes::new();
 
     context_options
@@ -121,15 +123,17 @@ impl Gpu {
       frame_buffer,
       gl,
       height,
+      lock_resolution: false,
       resolution,
       source_texture: Cell::new(0),
       textures,
       uniforms,
       width,
+      window: window.clone(),
     })
   }
 
-  pub(crate) fn render_to_canvas(&self) -> Result {
+  pub(crate) fn present(&self) -> Result {
     self.gl.bind_framebuffer(
       WebGl2RenderingContext::READ_FRAMEBUFFER,
       Some(&self.frame_buffer),
@@ -170,8 +174,10 @@ impl Gpu {
     Ok(())
   }
 
-  pub(crate) fn render(&self, state: &State) -> Result {
+  pub(crate) fn render(&mut self, state: &State) -> Result {
     log::trace!("Applying state {:?}", state);
+
+    self.resize()?;
 
     self.gl.bind_framebuffer(
       WebGl2RenderingContext::FRAMEBUFFER,
@@ -286,10 +292,37 @@ impl Gpu {
     Ok(texture)
   }
 
+  pub(crate) fn lock_resolution(&mut self, resolution: u32) {
+    self.width = resolution;
+    self.height = resolution;
+    self.resolution = resolution;
+    self.lock_resolution = true;
+  }
+
   pub(crate) fn resize(&mut self) -> Result {
-    self.width = self.canvas.width();
-    self.height = self.canvas.height();
-    self.resolution = self.width.max(self.height);
+    if self.lock_resolution {
+      if self.canvas.height() == self.height && self.canvas.width() == self.width {
+        return Ok(());
+      }
+    } else {
+      let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
+      let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
+
+      let device_pixel_ratio = self.window.device_pixel_ratio();
+      let device_pixel_height = (css_pixel_height * device_pixel_ratio).ceil() as u32;
+      let device_pixel_width = (css_pixel_width * device_pixel_ratio).ceil() as u32;
+
+      if self.canvas.height() == device_pixel_height && self.canvas.width() == device_pixel_width {
+        return Ok(());
+      }
+
+      self.width = device_pixel_width;
+      self.height = device_pixel_height;
+      self.resolution = self.width.max(self.height);
+    }
+
+    self.canvas.set_height(self.height);
+    self.canvas.set_width(self.width);
 
     self
       .gl
@@ -307,7 +340,35 @@ impl Gpu {
       Self::create_texture(&self.gl, self.resolution)?,
     ];
 
+    self.present()?;
+
     Ok(())
+  }
+
+  pub(crate) fn save_image(&self) -> Result<ImageBuffer<image::Rgba<u8>, Vec<u8>>> {
+    self.gl.bind_framebuffer(
+      WebGl2RenderingContext::FRAMEBUFFER,
+      Some(&self.frame_buffer),
+    );
+
+    let mut array = vec![0; (self.resolution * self.resolution * 4) as usize];
+    self
+      .gl
+      .read_pixels_with_opt_u8_array(
+        0,
+        0,
+        self.resolution as i32,
+        self.resolution as i32,
+        WebGl2RenderingContext::RGBA,
+        WebGl2RenderingContext::UNSIGNED_BYTE,
+        Some(&mut array),
+      )
+      .map_err(JsValueError)?;
+
+    let image = ImageBuffer::from_raw(self.resolution, self.resolution, array)
+      .ok_or("Failed to create ImageBuffer")?;
+
+    Ok(image)
   }
 
   fn uniform(&self, name: &str) -> &WebGlUniformLocation {

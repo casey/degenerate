@@ -10,9 +10,11 @@ autotests = false
 members = [".", "bin/serve"]
 
 [dependencies]
+base64 = "0.13.0"
 console_error_panic_hook = "0.1.7"
 console_log = "0.2.0"
 getrandom = { version = "0.2.6", features = ["js"] }
+image = "0.24.2"
 js-sys = "0.3.57"
 log = "0.4.17"
 nalgebra = "0.31.0"
@@ -30,12 +32,14 @@ features = [
   "Document",
   "DomTokenList",
   "Element",
+  "HtmlAnchorElement",
   "HtmlCanvasElement",
   "HtmlCollection",
   "HtmlElement",
   "HtmlTextAreaElement",
   "ImageData",
   "InputEvent",
+  "KeyboardEvent",
   "Location",
   "MessageEvent",
   "WebGl2RenderingContext",
