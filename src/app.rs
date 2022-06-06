@@ -4,12 +4,12 @@ pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
   canvas: HtmlCanvasElement,
   gpu: Gpu,
+  html: HtmlElement,
   nav: HtmlElement,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
   window: Window,
   worker: Worker,
-  html: HtmlElement,
 }
 
 impl App {
@@ -123,7 +123,7 @@ impl App {
       self.canvas.set_height(device_pixel_height);
       self.canvas.set_width(device_pixel_width);
       self.gpu.resize()?;
-      self.stderr.update(self.gpu.render_to_canvas());
+      self.gpu.render_to_canvas()?;
     }
 
     self
