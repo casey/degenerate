@@ -2,7 +2,6 @@ use super::*;
 
 pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
-  canvas: HtmlCanvasElement,
   document: Document,
   gpu: Gpu,
   html: HtmlElement,
@@ -29,7 +28,7 @@ impl App {
 
     let stderr = Stderr::get();
 
-    let gpu = Gpu::new(&canvas)?;
+    let gpu = Gpu::new(&canvas, &window)?;
 
     let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
@@ -37,7 +36,6 @@ impl App {
       document,
       html,
       animation_frame_callback: None,
-      canvas,
       gpu,
       nav,
       stderr: stderr.clone(),
@@ -68,7 +66,7 @@ impl App {
 
     let local = app.clone();
     worker.add_event_listener_with_event("message", move |event: MessageEvent| {
-      let app = local.lock().unwrap();
+      let mut app = local.lock().unwrap();
       let result = app.on_message(event);
       app.stderr.update(result);
     })?;
@@ -112,21 +110,9 @@ impl App {
   fn on_animation_frame(&mut self, timestamp: f64) -> Result {
     self.request_animation_frame()?;
 
+    self.gpu.resize()?;
+
     log::trace!("Animation frame timestamp {}s", timestamp);
-
-    let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
-    let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
-
-    let device_pixel_ratio = self.window.device_pixel_ratio();
-    let device_pixel_height = (css_pixel_height * device_pixel_ratio).ceil() as u32;
-    let device_pixel_width = (css_pixel_width * device_pixel_ratio).ceil() as u32;
-
-    if self.canvas.height() != device_pixel_height || self.canvas.width() != device_pixel_width {
-      self.canvas.set_height(device_pixel_height);
-      self.canvas.set_width(device_pixel_width);
-      self.gpu.resize()?;
-      self.gpu.present()?;
-    }
 
     self
       .worker
@@ -138,7 +124,7 @@ impl App {
     Ok(())
   }
 
-  fn on_message(&self, event: MessageEvent) -> Result {
+  fn on_message(&mut self, event: MessageEvent) -> Result {
     let event = serde_json::from_str(
       &event
         .data()

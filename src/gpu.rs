@@ -10,10 +10,11 @@ pub(crate) struct Gpu {
   textures: [WebGlTexture; 2],
   uniforms: BTreeMap<String, WebGlUniformLocation>,
   width: u32,
+  window: Window,
 }
 
 impl Gpu {
-  pub(super) fn new(canvas: &HtmlCanvasElement) -> Result<Self> {
+  pub(super) fn new(canvas: &HtmlCanvasElement, window: &Window) -> Result<Self> {
     let mut context_options = WebGlContextAttributes::new();
 
     context_options
@@ -126,6 +127,7 @@ impl Gpu {
       textures,
       uniforms,
       width,
+      window: window.clone(),
     })
   }
 
@@ -170,7 +172,7 @@ impl Gpu {
     Ok(())
   }
 
-  pub(crate) fn render(&self, state: &State) -> Result {
+  pub(crate) fn render(&mut self, state: &State) -> Result {
     log::trace!("Applying state {:?}", state);
 
     self.gl.bind_framebuffer(
@@ -287,6 +289,20 @@ impl Gpu {
   }
 
   pub(crate) fn resize(&mut self) -> Result {
+    let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
+    let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
+
+    let device_pixel_ratio = self.window.device_pixel_ratio();
+    let device_pixel_height = (css_pixel_height * device_pixel_ratio).ceil() as u32;
+    let device_pixel_width = (css_pixel_width * device_pixel_ratio).ceil() as u32;
+
+    if self.canvas.height() == device_pixel_height && self.canvas.width() == device_pixel_width {
+      return Ok(());
+    }
+
+    self.canvas.set_height(device_pixel_height);
+    self.canvas.set_width(device_pixel_width);
+
     self.width = self.canvas.width();
     self.height = self.canvas.height();
     self.resolution = self.width.max(self.height);
@@ -306,6 +322,8 @@ impl Gpu {
       Self::create_texture(&self.gl, self.resolution)?,
       Self::create_texture(&self.gl, self.resolution)?,
     ];
+
+    self.present()?;
 
     Ok(())
   }
