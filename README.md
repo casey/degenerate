@@ -1,5 +1,5 @@
 <h1 align="center"><code>degenerate</code></h1>
-<div align="center">A generative image programming language</div>
+<div align="center">An prorammable generative art engine</div>
 <br>
 <div align="center">
   <a href="https://github.com/casey/degenerate/actions">
@@ -7,6 +7,10 @@
   </a>
 </div>
 <br>
+
+Degenerate is an programmable generative art engine that runs in the browser
+and that can be programmed with JavaScript. It is deployed at
+[degenerate.computer](https://degenerate.computer).
 
 ## Quick Start
 
