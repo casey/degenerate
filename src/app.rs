@@ -2,12 +2,9 @@ use super::*;
 
 pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
-  animation_frame_pending: bool,
   canvas: HtmlCanvasElement,
   gpu: Gpu,
-  input: bool,
   nav: HtmlElement,
-  resize: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
   window: Window,
@@ -36,12 +33,9 @@ impl App {
 
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
-      animation_frame_pending: false,
       canvas,
       gpu,
-      input: false,
       nav,
-      resize: true,
       stderr: stderr.clone(),
       textarea: textarea.clone(),
       window: window.clone(),
@@ -57,24 +51,23 @@ impl App {
       as Box<dyn FnMut(f64)>));
 
     let local = app.clone();
-    window.add_event_listener("resize", move || {
-      let mut app = local.lock().unwrap();
-      let result = app.on_resize();
-      app.stderr.update(result);
+    textarea.add_event_listener("input", move || {
+      local.lock().unwrap().nav.set_class_name("fade-out");
     })?;
 
     let local = app.clone();
-    textarea.add_event_listener("input", move || {
+    textarea.add_event_listener_with_event("keydown", move |event| {
       let mut app = local.lock().unwrap();
-      let result = app.on_input();
+      let result = app.on_keydown(event);
       app.stderr.update(result);
     })?;
 
     let local_html = html.clone();
-    worker.add_event_listener_with_event("message", move |event| {
-      let mut app = app.lock().unwrap();
+    let local = app.clone();
+    worker.add_event_listener_with_event("message", move |event: MessageEvent| {
+      let app = local.lock().unwrap();
 
-      let mut handle_event = || -> Result {
+      let handle_event = || -> Result {
         let event = serde_json::from_str(
           &event
             .data()
@@ -86,9 +79,6 @@ impl App {
           WorkerMessage::Render(state) => {
             app.gpu.render(&state)?;
             stderr.update(app.gpu.render_to_canvas());
-            app
-              .request_animation_frame()
-              .map_err(|_| "Failed to request animation frame")?;
           }
           WorkerMessage::Done => {
             local_html.set_class_name("done");
@@ -103,28 +93,27 @@ impl App {
       app.stderr.update(result);
     })?;
 
+    app.lock().unwrap().request_animation_frame()?;
+
     html.set_class_name("ready");
 
     Ok(())
   }
 
-  pub(super) fn on_resize(&mut self) -> Result {
-    self.resize = true;
-    self.request_animation_frame()?;
-    Ok(())
-  }
-
-  pub(super) fn on_input(&mut self) -> Result {
-    self.input = true;
-    self.request_animation_frame()?;
+  pub(super) fn on_keydown(&mut self, event: KeyboardEvent) -> Result {
+    if event.shift_key() && event.key() == "Enter" {
+      event.prevent_default();
+      self
+        .worker
+        .post_message(&JsValue::from_str(&serde_json::to_string(
+          &AppMessage::Script(&self.textarea.value()),
+        )?))
+        .map_err(JsValueError)?;
+    }
     Ok(())
   }
 
   fn request_animation_frame(&mut self) -> Result {
-    if self.animation_frame_pending {
-      return Ok(());
-    }
-
     self
       .window
       .request_animation_frame(
@@ -137,58 +126,34 @@ impl App {
           .unwrap(),
       )
       .map_err(JsValueError)?;
-
-    self.animation_frame_pending = true;
-
     Ok(())
   }
 
   fn on_animation_frame(&mut self, timestamp: f64) -> Result {
-    self.animation_frame_pending = false;
+    self.request_animation_frame()?;
 
     log::trace!("Animation frame timestamp {}s", timestamp);
 
-    let resize = self.resize;
+    let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
+    let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
 
-    if self.resize {
-      let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
-      let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
+    let device_pixel_ratio = self.window.device_pixel_ratio();
+    let device_pixel_height = (css_pixel_height * device_pixel_ratio).ceil() as u32;
+    let device_pixel_width = (css_pixel_width * device_pixel_ratio).ceil() as u32;
 
-      let device_pixel_ratio = self.window.device_pixel_ratio();
-      let device_pixel_height = css_pixel_height * device_pixel_ratio;
-      let device_pixel_width = css_pixel_width * device_pixel_ratio;
-
-      self.canvas.set_height(device_pixel_height.ceil() as u32);
-      self.canvas.set_width(device_pixel_width.ceil() as u32);
-
-      self.resize = false;
+    if self.canvas.height() != device_pixel_height || self.canvas.width() != device_pixel_width {
+      self.canvas.set_height(device_pixel_height);
+      self.canvas.set_width(device_pixel_width);
+      self.gpu.resize()?;
+      self.stderr.update(self.gpu.render_to_canvas());
     }
 
-    if self.input {
-      self.nav.set_class_name("fade-out");
-
-      self
-        .worker
-        .post_message(&JsValue::from_str(&serde_json::to_string(
-          &AppMessage::Script(&self.textarea.value()),
-        )?))
-        .map_err(JsValueError)?;
-
-      let program = self.textarea.value();
-
-      log::trace!("Program: {:?}", program);
-
-      if resize {
-        self.gpu.resize()?;
-
-        self
-          .worker
-          .post_message(&JsValue::from_str(&serde_json::to_string(
-            &AppMessage::Run,
-          )?))
-          .map_err(JsValueError)?;
-      }
-    }
+    self
+      .worker
+      .post_message(&JsValue::from_str(&serde_json::to_string(
+        &AppMessage::Frame,
+      )?))
+      .map_err(JsValueError)?;
 
     Ok(())
   }

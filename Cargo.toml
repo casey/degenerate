@@ -36,6 +36,7 @@ features = [
   "HtmlTextAreaElement",
   "ImageData",
   "InputEvent",
+  "KeyboardEvent",
   "Location",
   "MessageEvent",
   "WebGl2RenderingContext",

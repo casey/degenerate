@@ -15,11 +15,11 @@ use {
     string::ToString,
     sync::{Arc, Mutex},
   },
-  wasm_bindgen::{closure::Closure, JsCast, JsValue},
+  wasm_bindgen::{closure::Closure, convert::FromWasmAbi, JsCast, JsValue},
   web_sys::{
     Document, Element, EventTarget, HtmlCanvasElement, HtmlElement, HtmlTextAreaElement,
-    MessageEvent, WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
-    WebGlUniformLocation, Window, Worker,
+    KeyboardEvent, MessageEvent, WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer,
+    WebGlTexture, WebGlUniformLocation, Window, Worker,
   },
 };
 

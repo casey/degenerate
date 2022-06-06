@@ -33,6 +33,9 @@ const imageTest = (name, program) => {
 
     await page.locator('textarea').fill(program);
 
+    await page.keyboard.down('Shift');
+    await page.keyboard.press('Enter');
+
     await page.waitForSelector('html.done');
 
     const encoded = (
