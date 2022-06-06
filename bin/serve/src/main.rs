@@ -27,7 +27,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   let mut watch = Command::new("cargo")
     .arg("watch")
     .arg("--shell")
-    .arg("cargo build --target wasm32-unknown-unknown && wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/debug/degenerate.wasm --out-dir www")
+    .arg("cargo build --release --target wasm32-unknown-unknown && wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/release/degenerate.wasm --out-dir www")
     .spawn()?;
 
   ctrlc::set_handler(move || {
