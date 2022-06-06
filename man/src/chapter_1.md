@@ -19,7 +19,7 @@ operation to color rotation by one half rotation about the green axis, do
 
 ```javascript
 computer.x();
-computer.rotateColor('green', 0.5)`;
+computer.rotateColor('green', 0.5);
 computer.render();
 ```
 
