@@ -32,6 +32,8 @@ that can be programmed with JavaScript. It is deployed at
   }
   ```
 
+- Press `Shift + Enter`
+
 - It should look like this:
 
 ![gorgeous example image](example.jpg)
