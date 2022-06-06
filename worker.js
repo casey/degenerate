@@ -4,9 +4,7 @@ importScripts('randchacha_browser.min.js');
 
 class Rng {
   constructor(seed) {
-    const _seed = new Uint8Array(32);
-    _seed[0] = seed;
-    this._rng = new randchacha.ChaChaRng(_seed);
+    this.seed(0);
   }
 
   choose(array) {
@@ -62,8 +60,20 @@ class Computer {
     this.state.alpha = alpha;
   }
 
+  async frame() {
+    await new Promise((resolve, reject) => {
+      frameResolvers.push(resolve);
+    });
+  }
+
   render() {
     self.postMessage(JSON.stringify({ render: this.state }));
+  }
+
+  resolution(resolution) {
+    if (Number.isInteger(resolution)) {
+      self.postMessage(JSON.stringify({ resolution }));
+    }
   }
 
   check() {
@@ -116,6 +126,10 @@ class Computer {
     this.state.mask = Computer.MASK_ROWS;
   }
 
+  save() {
+    self.postMessage(JSON.stringify("save"));
+  }
+
   scale(scale) {
     this.state.scale *= scale;
   }
@@ -137,17 +151,23 @@ class Computer {
   }
 }
 
-const rng = new Rng(0);
+const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+const rng = new Rng();
 const computer = new Computer();
+let frameResolvers= [];
 
-let g;
-
-self.addEventListener("message", function (event) {
-  const data = JSON.parse(event.data);
-  if (data.script) {
-    g = Object.getPrototypeOf(function* () {}).constructor(data.script)();
-  } else {
-    let result = g.next();
-    if (result.done) self.postMessage(JSON.stringify("done"));
+self.addEventListener("message", async function (event) {
+  const message = JSON.parse(event.data);
+  switch (message.tag) {
+    case "script":
+      await (new AsyncFunction(message.content))();
+      self.postMessage(JSON.stringify("done"));
+      break;
+    case "frame":
+      for (var resolve of frameResolvers) {
+        resolve();
+      }
+      frameResolvers = [];
+      break;
   }
 });

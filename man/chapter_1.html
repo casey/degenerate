@@ -135,6 +135,63 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="chapter-1"><a class="header" href="#chapter-1">Chapter 1</a></h1>
+<p>The Degenerate Programmers Manual is bit spare at the moment. Apologies!</p>
+<h2 id="execution-model"><a class="header" href="#execution-model">Execution Model</a></h2>
+<p>Degenerate operates as a chain of filters, with the output of each filter
+feeding into the next. Commands are issued to change the state of the current
+filter, which is then applied with <code>computer.render()</code>.</p>
+<p>The primary components of a filter are a &quot;mask&quot;, which determines which pixels
+the filter will operate on, and an &quot;operation&quot;, which determines what will
+happen to those pixels.</p>
+<p>For example, to set the mask to an X, you can do <code>computer.x()</code>, and to set the
+operation to color rotation by one half rotation about the green axis, do
+<code>computer.rotateColor('green', 0.5)</code>. An finally, to see the results, do
+<code>computer.render()</code>. The complete program looks like this:</p>
+<pre><code class="language-javascript">computer.x();
+computer.rotateColor('green', 0.5)`;
+computer.render();
+</code></pre>
+<p>Go to <a href="https://degenerate.computer">degenerate.computer</a> and copy and paste the
+program into the text area.</p>
+<p>Nothing happened, because you have to hit <code>Shift + Enter</code> for the program to
+run. Try it!</p>
+<h2 id="language"><a class="header" href="#language">Language</a></h2>
+<p>Degenerate is programmed with JavaScript. An introduction to JavaScript is
+outside of the scope of this document. The reader is referred the excellent
+<a href="https://developer.mozilla.org/en-US/">Mozilla Developer Network</a>
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript">introduction to JavaScript</a>,
+<a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript">JavaScript tutorial</a>.
+and
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference">JavaScript reference</a>,</p>
+<h2 id="reference"><a class="header" href="#reference">Reference</a></h2>
+<p>Given the paucity of this manual, the current primary reference to degenerate
+is the code itself.</p>
+<p>First off, check out
+<a href="https://github.com/casey/degenerate/blob/master/www/worker.js">worker.js</a>,
+which provides the environment in which degenerate programs run. The primary
+interface is the <code>Computer</code> class. One is ready in the <code>computer</code> variable for
+you to use.</p>
+<p>Secondly, check out
+<a href="https://github.com/casey/degenerate/blob/master/src/fragment.glsl">fragment.glsl</a>,
+the fragment shader that runs on the GPU and does the hard work of rendering
+filters.</p>
+<p>And finally, check out
+<a href="https://github.com/casey/degenerate/blob/master/tests/images.spec.ts">image.spec.ts</a>,
+which contains test programs, and
+<a href="https://github.com/casey/degenerate/tree/master/images">the images directory</a>,
+which contains the corresponding images. Most test programs are simple, and
+exercise individual features, but some are more complex, like <code>smear</code>,
+<code>kaleidoscope</code>, <code>grain</code>, and <code>pattern</code>.</p>
+<h2 id="suggestions"><a class="header" href="#suggestions">Suggestions</a></h2>
+<p>Experiment, experiment, experiment! Clever combinations of commands give
+surprising results. Try changing the filter state and rendering in a loop, or
+just mash <code>Shift + Enter</code> over and over again to see what happens.</p>
+<h2 id="saving-your-creations"><a class="header" href="#saving-your-creations">Saving your creations</a></h2>
+<ol>
+<li>Make the resolution nice and large with <code>computer.resolution(4096)</code></li>
+<li>Render something cool</li>
+<li>Save it with <code>computer.save()</code></li>
+</ol>
 
                     </main>
 
