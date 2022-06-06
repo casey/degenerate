@@ -158,7 +158,6 @@ impl App {
         let image = self.gpu.save_image()?;
         let mut png = Cursor::new(Vec::new());
         image.write_to(&mut png, ImageOutputFormat::Png)?;
-
         let a = self
           .document
           .create_element("a")
