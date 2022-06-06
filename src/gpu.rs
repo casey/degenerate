@@ -129,7 +129,7 @@ impl Gpu {
     })
   }
 
-  pub(crate) fn render_to_canvas(&self) -> Result {
+  pub(crate) fn present(&self) -> Result {
     self.gl.bind_framebuffer(
       WebGl2RenderingContext::READ_FRAMEBUFFER,
       Some(&self.frame_buffer),

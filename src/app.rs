@@ -125,7 +125,7 @@ impl App {
       self.canvas.set_height(device_pixel_height);
       self.canvas.set_width(device_pixel_width);
       self.gpu.resize()?;
-      self.gpu.render_to_canvas()?;
+      self.gpu.present()?;
     }
 
     self
@@ -152,7 +152,7 @@ impl App {
       }
       WorkerMessage::Render(state) => {
         self.gpu.render(&state)?;
-        self.gpu.render_to_canvas()?;
+        self.gpu.present()?;
       }
       WorkerMessage::Save => {
         let image = self.gpu.save_image()?;
