@@ -38,9 +38,9 @@ impl App {
       animation_frame_callback: None,
       gpu,
       nav,
-      stderr: stderr.clone(),
+      stderr,
       textarea: textarea.clone(),
-      window: window.clone(),
+      window,
       worker: worker.clone(),
     }));
 
