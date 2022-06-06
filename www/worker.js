@@ -149,7 +149,6 @@ class Computer {
   x() {
     this.state.mask = Computer.MASK_X;
   }
-
 }
 
 const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;

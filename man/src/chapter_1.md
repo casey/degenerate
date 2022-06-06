@@ -1,6 +1,6 @@
 # Chapter 1
 
-The Degenerate Programmers Manual is bit sparse at the moment. Apologies!
+The Degenerate Programmers Manual is bit spare at the moment. Apologies!
 
 ## Execution Model
 
@@ -12,8 +12,8 @@ The primary components of a filter are a "mask", which determines which pixels
 the filter will operate on, and an "operation", which determines what will
 happen to those pixels.
 
-For example, to set the mask to an X, you can do `computer.x()`, and to to set
-the operation to color rotation by one half rotation about the green axis, do
+For example, to set the mask to an X, you can do `computer.x()`, and to set the
+operation to color rotation by one half rotation about the green axis, do
 `computer.rotateColor('green', 0.5)`. An finally, to see the results, do
 `computer.render()`. The complete program looks like this:
 
@@ -26,8 +26,8 @@ computer.render();
 Go to [degenerate.computer](https://degenerate.computer) and copy and paste the
 program into the text area.
 
-Nothing happened, because you have to hit `Shift + Enter` for the program to be
-executed. Try it!
+Nothing happened, because you have to hit `Shift + Enter` for the program to
+run. Try it!
 
 ## Langauge
 
@@ -41,16 +41,19 @@ and
 
 ## Reference
 
-Given the paucity of this manual, the primary reference is the code itself.
+Given the paucity of this manual, the current primary reference to degenerate
+is the code itself.
 
 First off, check out
 [worker.js](https://github.com/casey/degenerate/blob/master/www/worker.js),
 which provides the environment in which degenerate programs run. The primary
-interface is `Computer` class. One is initialized as `computer` for you to use.
+interface is the `Computer` class. One is ready in the `computer` variable for
+you to use.
 
 Secondly, check out
 [fragment.glsl](https://github.com/casey/degenerate/blob/master/src/fragment.glsl),
-the fragment shader that runs on the GPU and renders filters.
+the fragment shader that runs on the GPU and does the hard work of rendering
+filters.
 
 And finally, check out
 [image.spec.ts](https://github.com/casey/degenerate/blob/master/tests/images.spec.ts),
@@ -59,3 +62,9 @@ which contains test programs, and
 which contains the corresponding images. Most test programs are simple, and
 exercise individual features, but some are more complex, like `smear`,
 `kaleidoscope`, `grain`, and `pattern`.
+
+## Suggestions
+
+Experiment, experiment, experiment! Clever combinations of commands give
+surprising results. Try changing the filter state and rendering in a loop, or
+just mash `Shift + Enter` over and over again to see what happens.

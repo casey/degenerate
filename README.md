@@ -9,14 +9,14 @@
 <br>
 
 Degenerate is an programmable generative art engine that runs in the browser
-and that can be programmed with JavaScript. It is deployed at
+that can be programmed with JavaScript. It is deployed at
 [degenerate.computer](https://degenerate.computer).
 
 ## Quick Start
 
 - Go to https://degenerate.computer
 
-- Paste this code into the page:
+- Paste this code into the text area:
   ```
 computer.rotateColor('green', 0.05);
 computer.circle();
