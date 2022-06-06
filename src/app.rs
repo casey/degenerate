@@ -9,6 +9,7 @@ pub(crate) struct App {
   textarea: HtmlTextAreaElement,
   window: Window,
   worker: Worker,
+  html: HtmlElement,
 }
 
 impl App {
@@ -32,6 +33,7 @@ impl App {
     let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
     let app = Arc::new(Mutex::new(Self {
+      html,
       animation_frame_callback: None,
       canvas,
       gpu,
@@ -62,40 +64,16 @@ impl App {
       app.stderr.update(result);
     })?;
 
-    let local_html = html.clone();
     let local = app.clone();
     worker.add_event_listener_with_event("message", move |event: MessageEvent| {
       let app = local.lock().unwrap();
-
-      let handle_event = || -> Result {
-        let event = serde_json::from_str(
-          &event
-            .data()
-            .as_string()
-            .ok_or("Failed to retrieve event data as a string")?,
-        )?;
-
-        match event {
-          WorkerMessage::Render(state) => {
-            app.gpu.render(&state)?;
-            stderr.update(app.gpu.render_to_canvas());
-          }
-          WorkerMessage::Done => {
-            local_html.set_class_name("done");
-          }
-        }
-
-        Ok(())
-      };
-
-      let result = handle_event();
-
+      let result = app.on_message(event);
       app.stderr.update(result);
     })?;
 
-    app.lock().unwrap().request_animation_frame()?;
-
-    html.set_class_name("ready");
+    let mut app = app.lock().unwrap();
+    app.request_animation_frame()?;
+    app.html.set_class_name("ready");
 
     Ok(())
   }
@@ -154,6 +132,27 @@ impl App {
         &AppMessage::Frame,
       )?))
       .map_err(JsValueError)?;
+
+    Ok(())
+  }
+
+  fn on_message(&self, event: MessageEvent) -> Result {
+    let event = serde_json::from_str(
+      &event
+        .data()
+        .as_string()
+        .ok_or("Failed to retrieve event data as a string")?,
+    )?;
+
+    match event {
+      WorkerMessage::Render(state) => {
+        self.gpu.render(&state)?;
+        self.gpu.render_to_canvas()?;
+      }
+      WorkerMessage::Done => {
+        self.html.set_class_name("done");
+      }
+    }
 
     Ok(())
   }
