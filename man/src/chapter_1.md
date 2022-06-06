@@ -29,7 +29,7 @@ program into the text area.
 Nothing happened, because you have to hit `Shift + Enter` for the program to
 run. Try it!
 
-## Langauge
+## Language
 
 Degenerate is programmed with JavaScript. An introduction to JavaScript is
 outside of the scope of this document. The reader is referred the excellent
@@ -68,3 +68,9 @@ exercise individual features, but some are more complex, like `smear`,
 Experiment, experiment, experiment! Clever combinations of commands give
 surprising results. Try changing the filter state and rendering in a loop, or
 just mash `Shift + Enter` over and over again to see what happens.
+
+## Saving your creations
+
+1. Make the resolution nice and large with `computer.resolution(4096)`
+2. Render something cool
+3. Save it with `computer.save()`
