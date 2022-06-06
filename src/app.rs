@@ -3,6 +3,7 @@ use super::*;
 pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
   canvas: HtmlCanvasElement,
+  document: Document,
   gpu: Gpu,
   html: HtmlElement,
   nav: HtmlElement,
@@ -33,6 +34,7 @@ impl App {
     let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
     let app = Arc::new(Mutex::new(Self {
+      document,
       html,
       animation_frame_callback: None,
       canvas,
@@ -145,12 +147,28 @@ impl App {
     )?;
 
     match event {
+      WorkerMessage::Done => {
+        self.html.set_class_name("done");
+      }
       WorkerMessage::Render(state) => {
         self.gpu.render(&state)?;
         self.gpu.render_to_canvas()?;
       }
-      WorkerMessage::Done => {
-        self.html.set_class_name("done");
+      WorkerMessage::Save => {
+        let image = self.gpu.save_image()?;
+        let mut png = Cursor::new(Vec::new());
+        image.write_to(&mut png, ImageOutputFormat::Png)?;
+
+        let a = self
+          .document
+          .create_element("a")
+          .map_err(JsValueError)?
+          .cast::<HtmlAnchorElement>()?;
+        a.set_download("degenerate.png");
+        let mut href = String::from("data:image/png;base64,");
+        base64::encode_config_buf(png.get_ref(), base64::STANDARD, &mut href);
+        a.set_href(&href);
+        a.click();
       }
     }
 

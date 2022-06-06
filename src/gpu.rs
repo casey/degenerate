@@ -310,6 +310,32 @@ impl Gpu {
     Ok(())
   }
 
+  pub(crate) fn save_image(&self) -> Result<ImageBuffer<image::Rgba<u8>, Vec<u8>>> {
+    self.gl.bind_framebuffer(
+      WebGl2RenderingContext::FRAMEBUFFER,
+      Some(&self.frame_buffer),
+    );
+
+    let mut array = vec![0; (self.resolution * self.resolution * 4) as usize];
+    self
+      .gl
+      .read_pixels_with_opt_u8_array(
+        0,
+        0,
+        self.resolution as i32,
+        self.resolution as i32,
+        WebGl2RenderingContext::RGBA,
+        WebGl2RenderingContext::UNSIGNED_BYTE,
+        Some(&mut array),
+      )
+      .map_err(JsValueError)?;
+
+    let image = ImageBuffer::from_raw(self.resolution, self.resolution, array)
+      .ok_or("Failed to create ImageBuffer")?;
+
+    Ok(image)
+  }
+
   fn uniform(&self, name: &str) -> &WebGlUniformLocation {
     self
       .uniforms

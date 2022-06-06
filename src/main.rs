@@ -4,6 +4,7 @@ use {
     get_document::GetDocument, gpu::Gpu, js_value_error::JsValueError, select::Select,
     state::State, stderr::Stderr, window::window, worker_message::WorkerMessage,
   },
+  image::{ImageBuffer, ImageOutputFormat},
   nalgebra::{Rotation3, Similarity2, UnitComplex, Vector3},
   serde::{Deserialize, Serialize},
   std::{
@@ -11,15 +12,16 @@ use {
     collections::BTreeMap,
     f32,
     fmt::{self, Formatter},
+    io::Cursor,
     ops::Deref,
     string::ToString,
     sync::{Arc, Mutex},
   },
   wasm_bindgen::{closure::Closure, convert::FromWasmAbi, JsCast, JsValue},
   web_sys::{
-    Document, Element, EventTarget, HtmlCanvasElement, HtmlElement, HtmlTextAreaElement,
-    KeyboardEvent, MessageEvent, WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer,
-    WebGlTexture, WebGlUniformLocation, Window, Worker,
+    Document, Element, EventTarget, HtmlAnchorElement, HtmlCanvasElement, HtmlElement,
+    HtmlTextAreaElement, KeyboardEvent, MessageEvent, WebGl2RenderingContext,
+    WebGlContextAttributes, WebGlFramebuffer, WebGlTexture, WebGlUniformLocation, Window, Worker,
   },
 };
 

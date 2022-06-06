@@ -120,6 +120,10 @@ class Computer {
     this.state.mask = Computer.MASK_ROWS;
   }
 
+  save() {
+    self.postMessage(JSON.stringify("save"));
+  }
+
   scale(scale) {
     this.state.scale *= scale;
   }
