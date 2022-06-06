@@ -5,5 +5,6 @@ use super::*;
 pub(crate) enum WorkerMessage {
   Done,
   Render(State),
+  Resolution(u32),
   Save,
 }

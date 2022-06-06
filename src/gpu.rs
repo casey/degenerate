@@ -6,6 +6,7 @@ pub(crate) struct Gpu {
   gl: WebGl2RenderingContext,
   height: u32,
   resolution: u32,
+  lock_resolution: bool,
   source_texture: Cell<usize>,
   textures: [WebGlTexture; 2],
   uniforms: BTreeMap<String, WebGlUniformLocation>,
@@ -122,6 +123,7 @@ impl Gpu {
       frame_buffer,
       gl,
       height,
+      lock_resolution: false,
       resolution,
       source_texture: Cell::new(0),
       textures,
@@ -174,6 +176,8 @@ impl Gpu {
 
   pub(crate) fn render(&mut self, state: &State) -> Result {
     log::trace!("Applying state {:?}", state);
+
+    self.resize()?;
 
     self.gl.bind_framebuffer(
       WebGl2RenderingContext::FRAMEBUFFER,
@@ -288,24 +292,37 @@ impl Gpu {
     Ok(texture)
   }
 
+  pub(crate) fn lock_resolution(&mut self, resolution: u32) {
+    self.width = resolution;
+    self.height = resolution;
+    self.resolution = resolution;
+    self.lock_resolution = true;
+  }
+
   pub(crate) fn resize(&mut self) -> Result {
-    let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
-    let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
+    if self.lock_resolution {
+      if self.canvas.height() == self.height && self.canvas.width() == self.width {
+        return Ok(());
+      }
+    } else {
+      let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
+      let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
 
-    let device_pixel_ratio = self.window.device_pixel_ratio();
-    let device_pixel_height = (css_pixel_height * device_pixel_ratio).ceil() as u32;
-    let device_pixel_width = (css_pixel_width * device_pixel_ratio).ceil() as u32;
+      let device_pixel_ratio = self.window.device_pixel_ratio();
+      let device_pixel_height = (css_pixel_height * device_pixel_ratio).ceil() as u32;
+      let device_pixel_width = (css_pixel_width * device_pixel_ratio).ceil() as u32;
 
-    if self.canvas.height() == device_pixel_height && self.canvas.width() == device_pixel_width {
-      return Ok(());
+      if self.canvas.height() == device_pixel_height && self.canvas.width() == device_pixel_width {
+        return Ok(());
+      }
+
+      self.width = device_pixel_width;
+      self.height = device_pixel_height;
+      self.resolution = self.width.max(self.height);
     }
 
-    self.canvas.set_height(device_pixel_height);
-    self.canvas.set_width(device_pixel_width);
-
-    self.width = self.canvas.width();
-    self.height = self.canvas.height();
-    self.resolution = self.width.max(self.height);
+    self.canvas.set_height(self.height);
+    self.canvas.set_width(self.width);
 
     self
       .gl

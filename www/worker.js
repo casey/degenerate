@@ -70,6 +70,12 @@ class Computer {
     self.postMessage(JSON.stringify({ render: this.state }));
   }
 
+  resolution(resolution) {
+    if (Number.isInteger(resolution)) {
+      self.postMessage(JSON.stringify({ resolution }));
+    }
+  }
+
   check() {
     this.state.mask = Computer.MASK_CHECK;
   }

@@ -140,6 +140,9 @@ impl App {
         self.gpu.render(&state)?;
         self.gpu.present()?;
       }
+      WorkerMessage::Resolution(resolution) => {
+        self.gpu.lock_resolution(resolution);
+      }
       WorkerMessage::Save => {
         let image = self.gpu.save_image()?;
         let mut png = Cursor::new(Vec::new());
