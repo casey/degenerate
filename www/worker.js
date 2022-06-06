@@ -22,13 +22,14 @@ class Rng {
 
 class Computer {
   static MASK_ALL = 0;
-  static MASK_CIRCLE = 1;
-  static MASK_CROSS = 2;
-  static MASK_MOD = 3;
-  static MASK_ROWS = 4;
-  static MASK_SQUARE = 5;
-  static MASK_TOP = 6;
-  static MASK_X = 7;
+  static MASK_CHECK = 1;
+  static MASK_CIRCLE = 2;
+  static MASK_CROSS = 3;
+  static MASK_MOD = 4;
+  static MASK_ROWS = 5;
+  static MASK_SQUARE = 6;
+  static MASK_TOP = 7;
+  static MASK_X = 8;
 
   static OPERATION_DEBUG = 0;
   static OPERATION_IDENTITY = 1;
@@ -63,6 +64,10 @@ class Computer {
 
   render() {
     self.postMessage(JSON.stringify({ render: this.state }));
+  }
+
+  check() {
+    this.state.mask = Computer.MASK_CHECK;
   }
 
   circle() {

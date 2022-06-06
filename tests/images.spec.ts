@@ -200,6 +200,10 @@ const tests = {
       computer.wrap();
     }
   `,
+  check: `
+    computer.check();
+    computer.render();
+  `,
   choose_default_seed: `
     rng.choose([
       () => computer.all(),
@@ -494,13 +498,20 @@ for (const name in tests) {
 }
 
 test('forbid-unused-images', async () => {
-  let images = new Set();
+  let testNames = new Set(Object.getOwnPropertyNames(tests));
+  let unused = [];
+
   for (const filename of await fs.promises.readdir('../images')) {
-    if (filename !== '.DS_Store') {
-      images.add(filename.replace(/\.png$/, ''));
+    if (filename === '.DS_Store' || filename.endsWith('.actual-memory.png')) {
+      continue;
+    }
+
+    let name = filename.replace(/\.png$/, '');
+
+    if (!testNames.has(name)) {
+      unused.push(name);
     }
   }
 
-  let testNames = new Set(Object.getOwnPropertyNames(tests));
-  expect(images).toEqual(testNames);
+  expect(unused).toEqual([]);
 });
