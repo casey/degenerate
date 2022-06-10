@@ -152,8 +152,17 @@ class Computer {
 }
 
 const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+
 const rng = new Rng();
+
 const computer = new Computer();
+
+function* range(iterations) {
+  for (let i = 0; i < iterations; i++) {
+    yield i;
+  }
+}
+
 let frameResolvers= [];
 
 self.addEventListener("message", async function (event) {
