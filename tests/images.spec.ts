@@ -127,6 +127,16 @@ const tests = {
     computer.wrap();
     computer.render();
   `,
+  circle_scale_chain: `
+    computer
+      .scale(0.5)
+      .circle()
+      .render()
+      .all()
+      .scale(0.9)
+      .wrap()
+      .render();
+  `,
   concentric_circles: `
     computer.scale(0.99);
     computer.circle();
@@ -464,6 +474,13 @@ const tests = {
     computer.rotate(0.01);
     computer.render();
   `,
+  range_loop: `
+    computer.scale(0.5);
+    computer.circle();
+    for (_ of range(10)) {
+      computer.render();
+    }
+  `,
   rotate_color_05_red: `
     computer.rotateColor('red', 0.5);
     computer.all();
@@ -493,13 +510,6 @@ const tests = {
     computer.rotateColor('red', 1.0);
     computer.all();
     computer.render();
-  `,
-  range_loop: `
-    computer.scale(0.5);
-    computer.circle();
-    for (_ of range(10)) {
-      computer.render();
-    }
   `,
 };
 

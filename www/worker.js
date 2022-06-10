@@ -54,10 +54,12 @@ class Computer {
 
   all() {
     this.state.mask = Computer.MASK_ALL;
+    return this;
   }
 
   alpha(alpha) {
     this.state.alpha = alpha;
+    return this;
   }
 
   async frame() {
@@ -68,6 +70,7 @@ class Computer {
 
   render() {
     self.postMessage(JSON.stringify({ render: this.state }));
+    return this;
   }
 
   resolution(resolution) {
@@ -78,76 +81,93 @@ class Computer {
 
   check() {
     this.state.mask = Computer.MASK_CHECK;
+    return this;
   }
 
   circle() {
     this.state.mask = Computer.MASK_CIRCLE;
+    return this;
   }
 
   cross() {
     this.state.mask = Computer.MASK_CROSS;
+    return this;
   }
 
   debug() {
     this.state.operation = Computer.OPERATION_DEBUG;
+    return this;
   }
 
   defaultColor(defaultColor) {
     this.state.defaultColor = defaultColor;
+    return this;
   }
 
   identity() {
     this.state.operation = Computer.OPERATION_IDENTITY;
+    return this;
   }
 
   invert() {
     this.state.operation = Computer.OPERATION_INVERT;
+    return this;
   }
 
   mod(divisor, remainder) {
     this.state.maskModDivisor = divisor;
     this.state.maskModRemainder = remainder;
     this.state.mask = Computer.MASK_MOD;
+    return this;
   }
 
   rotate(rotation) {
     this.state.rotation += rotation;
+    return this;
   }
 
   rotateColor(axis, turns) {
     this.state.operationRotateColorAxis = axis;
     this.state.operationRotateColorTurns = turns;
     this.state.operation = Computer.OPERATION_ROTATE_COLOR;
+    return this;
   }
 
   rows(nrows, step) {
     this.state.maskRowsRows = nrows;
     this.state.maskRowsStep = step;
     this.state.mask = Computer.MASK_ROWS;
+    return this;
   }
 
   save() {
     self.postMessage(JSON.stringify("save"));
+    return this;
   }
 
   scale(scale) {
     this.state.scale *= scale;
+    return this;
   }
 
   square() {
     this.state.mask = Computer.MASK_SQUARE;
+    return this;
   }
 
   top() {
     this.state.mask = Computer.MASK_TOP;
+    return this;
   }
 
   wrap() {
     this.state.wrap = !this.state.wrap;
+    return this;
   }
 
   x() {
     this.state.mask = Computer.MASK_X;
+    return this;
   }
 }
 
