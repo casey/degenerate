@@ -494,6 +494,13 @@ const tests = {
     computer.all();
     computer.render();
   `,
+  range_loop: `
+    computer.scale(0.5);
+    computer.circle();
+    for (_ of range(10)) {
+      computer.render();
+    }
+  `,
 };
 
 for (const name in tests) {
