@@ -91,6 +91,7 @@ select {
   right: 0;
   top: 0;
   width: 10%;
+  z-index: 3;
 }
 
 textarea {
@@ -109,7 +110,7 @@ textarea {
   position: absolute;
   resize: none;
   top: 0;
-  width: 90%;
+  width: 100%;
   z-index: 2;
 }
 
