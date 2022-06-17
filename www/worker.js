@@ -33,21 +33,8 @@ const OPERATION_IDENTITY = 1;
 const OPERATION_INVERT = 2;
 const OPERATION_ROTATE_COLOR = 3;
 
-let state = {
-  alpha: 1.0,
-  defaultColor: [0.0, 0.0, 0.0],
-  mask: MASK_ALL,
-  maskModDivisor: 0,
-  maskModRemainder: 0,
-  maskRowsRows: 0,
-  maskRowsStep: 0,
-  operation: OPERATION_INVERT,
-  operationRotateColorAxis: 'red',
-  operationRotateColorTurns: 0.0,
-  rotation: 0.0,
-  scale: 1.0,
-  wrap: false,
-};
+let state;
+reset();
 
 function all() {
   state.mask = MASK_ALL;
