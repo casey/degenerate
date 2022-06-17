@@ -516,7 +516,7 @@ const tests = {
     render();
     reboot();
     render();
-  `
+  `,
 };
 
 for (const name in tests) {
