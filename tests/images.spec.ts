@@ -501,11 +501,22 @@ const tests = {
       render();
     }
   `,
+  clear: `
+    render();
+    clear();
+  `,
+  reset: `
+    x();
+    render();
+    reset();
+    render();
+  `,
   reboot: `
+    x();
     render();
     reboot();
     render();
-  `,
+  `
 };
 
 for (const name in tests) {
