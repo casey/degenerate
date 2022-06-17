@@ -82,433 +82,423 @@ const imageTest = (name, program) => {
 
 const tests = {
   all: `
-    computer.all();
-    computer.render();
+    all();
+    render();
   `,
   alpha: `
-    computer.alpha(0.5);
-    computer.x();
-    computer.render();
+    alpha(0.5);
+    x();
+    render();
   `,
   render: `
-    computer.render();
+    render();
   `,
   brilliance: `
-    computer.x();
-    computer.rotateColor('green', 0.07);
-    computer.rotate(0.07);
+    x();
+    rotateColor('green', 0.07);
+    rotate(0.07);
     for (let i = 0; i < 10; i++) {
-      computer.render();
+      render();
     }
-    computer.rotateColor('blue', 0.09);
-    computer.rotate(0.09);
+    rotateColor('blue', 0.09);
+    rotate(0.09);
     for (let i = 0; i < 10; i++) {
-      computer.render();
+      render();
     }
   `,
   carpet: `
-    computer.circle();
-    computer.scale(0.5);
+    circle();
+    scale(0.5);
     for (let i = 0; i < 8; i++) {
-      computer.render();
-      computer.wrap();
+      render();
+      wrap();
     }
   `,
   circle: `
-    computer.circle();
-    computer.render();
+    circle();
+    render();
   `,
   circle_scale: `
-    computer.scale(0.5);
-    computer.circle();
-    computer.render();
-    computer.all();
-    computer.scale(0.9);
-    computer.wrap();
-    computer.render();
-  `,
-  circle_scale_chain: `
-    computer
-      .scale(0.5)
-      .circle()
-      .render()
-      .all()
-      .scale(0.9)
-      .wrap()
-      .render();
+    scale(0.5);
+    circle();
+    render();
+    all();
+    scale(0.9);
+    wrap();
+    render();
   `,
   concentric_circles: `
-    computer.scale(0.99);
-    computer.circle();
+    scale(0.99);
+    circle();
     for (let i = 0; i < 100; i++) {
-      computer.render();
+      render();
     }
   `,
   cross: `
-    computer.cross();
-    computer.render();
+    cross();
+    render();
   `,
   default_program: ` `,
   diamonds: `
-    computer.rotate(0.3333);
-    computer.rotateColor('green', 0.05);
-    computer.circle();
-    computer.scale(0.5);
-    computer.wrap();
+    rotate(0.3333);
+    rotateColor('green', 0.05);
+    circle();
+    scale(0.5);
+    wrap();
     for (let i = 0; i < 8; i++) {
-      computer.render();
+      render();
     }
-    computer.rotate(0.8333);
-    computer.rotateColor('blue', 0.05);
+    rotate(0.8333);
+    rotateColor('blue', 0.05);
     for (let i = 0; i < 8; i++) {
-      computer.render();
+      render();
     }
   `,
   grain: `
-    computer.rotate(0.111);
+    rotate(0.111);
     for (let i = 0; i < 16; i++) {
-      computer.square();
-      computer.render();
-      computer.circle();
-      computer.render();
+      square();
+      render();
+      circle();
+      render();
     }
   `,
   kaleidoscope: `
-    computer.rotateColor('green', 0.05);
-    computer.circle();
-    computer.scale(0.75);
-    computer.wrap();
+    rotateColor('green', 0.05);
+    circle();
+    scale(0.75);
+    wrap();
     for (let i = 0; i < 8; i++) {
-      computer.render();
+      render();
     }
-    computer.rotate(0.8333);
-    computer.rotateColor('blue', 0.05);
+    rotate(0.8333);
+    rotateColor('blue', 0.05);
     for (let i = 0; i < 8; i++) {
-      computer.render();
+      render();
     }
   `,
   mod_3: `
-    computer.mod(3, 0);
-    computer.render();
+    mod(3, 0);
+    render();
   `,
   orbs: `
-    computer.rotateColor('green', 0.05);
-    computer.circle();
-    computer.scale(0.75);
-    computer.wrap();
+    rotateColor('green', 0.05);
+    circle();
+    scale(0.75);
+    wrap();
     for (let i = 0; i < 8; i++) {
-      computer.render();
+      render();
     }
-    computer.rotateColor('blue', 0.05);
+    rotateColor('blue', 0.05);
     for (let i = 0; i < 8; i++) {
-      computer.render();
+      render();
     }
   `,
   pattern: `
-    computer.alpha(0.75);
-    computer.circle();
-    computer.scale(0.5);
+    alpha(0.75);
+    circle();
+    scale(0.5);
     for (let i = 0; i < 8; i++) {
-      computer.render();
-      computer.wrap();
+      render();
+      wrap();
     }
   `,
   check: `
-    computer.check();
-    computer.render();
+    check();
+    render();
   `,
   choose_default_seed: `
     rng.choose([
-      () => computer.all(),
-      () => computer.circle(),
-      () => computer.cross(),
-      () => computer.square(),
-      () => computer.top(),
-      () => computer.x()
+      () => all(),
+      () => circle(),
+      () => cross(),
+      () => square(),
+      () => top(),
+      () => x()
     ])();
-    computer.render();
+    render();
   `,
   choose_zero_seed: `
     rng.seed(0);
     rng.choose([
-      () => computer.all(),
-      () => computer.circle(),
-      () => computer.cross(),
-      () => computer.square(),
-      () => computer.top(),
-      () => computer.x()
+      () => all(),
+      () => circle(),
+      () => cross(),
+      () => square(),
+      () => top(),
+      () => x()
     ])();
-    computer.render();
+    render();
   `,
   choose_nonzero_seed: `
     rng.seed(3);
     rng.choose([
-      () => computer.all(),
-      () => computer.circle(),
-      () => computer.cross(),
-      () => computer.square(),
-      () => computer.top(),
-      () => computer.x()
+      () => all(),
+      () => circle(),
+      () => cross(),
+      () => square(),
+      () => top(),
+      () => x()
     ])();
-    computer.render();
+    render();
   `,
   rotate: `
-    computer.rotate(0.05);
-    computer.x();
-    computer.render();
+    rotate(0.05);
+    x();
+    render();
   `,
   rotate_0125_square: `
-    computer.rotate(0.125);
-    computer.square();
-    computer.render();
+    rotate(0.125);
+    square();
+    render();
   `,
   rotate_1_square: `
-    computer.rotate(1.0);
-    computer.square();
-    computer.render();
+    rotate(1.0);
+    square();
+    render();
   `,
   rotate_scale_x: `
-    computer.rotate(0.05);
-    computer.scale(2);
-    computer.x();
-    computer.render();
+    rotate(0.05);
+    scale(2);
+    x();
+    render();
   `,
   rotate_square: `
-    computer.rotate(0.05);
-    computer.square();
+    rotate(0.05);
+    square();
     for (let i = 0; i < 2; i++) {
-      computer.render();
+      render();
     }
   `,
   rotate_square_for_x: `
-    computer.rotate(0.05);
-    computer.square();
+    rotate(0.05);
+    square();
     for (let i = 0; i < 2; i++) {
-      computer.render();
+      render();
     }
-    computer.x();
+    x();
     for (let i = 0; i < 1; i++) {
-      computer.render();
+      render();
     }
   `,
   rows: `
-    computer.rows(1, 1);
-    computer.render();
+    rows(1, 1);
+    render();
   `,
   rows_overflow: `
-    computer.rows(4294967295, 4294967295);
-    computer.render();
+    rows(4294967295, 4294967295);
+    render();
   `,
   rug: `
-    computer.rotateColor('green', 0.05);
-    computer.circle();
-    computer.scale(0.5);
-    computer.wrap();
+    rotateColor('green', 0.05);
+    circle();
+    scale(0.5);
+    wrap();
     for (let i = 0; i < 8; i++) {
-      computer.render();
+      render();
     }
-    computer.rotateColor('blue', 0.05);
+    rotateColor('blue', 0.05);
     for (let i = 0; i < 8; i++) {
-      computer.render();
+      render();
     }
   `,
   scale: `
-    computer.scale(0.5);
-    computer.circle();
-    computer.render();
+    scale(0.5);
+    circle();
+    render();
   `,
   scale_circle_for: `
-    computer.circle();
-    computer.scale(0.5);
+    circle();
+    scale(0.5);
     for (let i = 0; i < 8; i++) {
-      computer.render();
+      render();
     }
   `,
   scale_circle_wrap: `
-    computer.scale(0.5);
-    computer.circle();
-    computer.wrap();
-    computer.render();
+    scale(0.5);
+    circle();
+    wrap();
+    render();
   `,
   scale_rotate: `
-    computer.scale(2);
-    computer.rotate(0.05);
-    computer.x();
-    computer.render();
+    scale(2);
+    rotate(0.05);
+    x();
+    render();
   `,
   scale_x: `
-    computer.scale(2);
-    computer.x();
-    computer.render();
+    scale(2);
+    x();
+    render();
   `,
   smear: `
     const masks = ([
-      () => computer.all(),
-      () => computer.circle(),
-      () => computer.cross(),
-      () => computer.square(),
-      () => computer.top(),
-      () => computer.x()
+      () => all(),
+      () => circle(),
+      () => cross(),
+      () => square(),
+      () => top(),
+      () => x()
     ]);
     rng.seed(9);
-    computer.rotateColor('green', 0.01);
-    computer.rotate(0.01);
+    rotateColor('green', 0.01);
+    rotate(0.01);
     for (let i = 0; i < 100; i++) {
       rng.choose(masks)();
-      computer.render();
+      render();
     }
-    computer.rotateColor('blue', 0.01);
-    computer.rotate(0.01);
+    rotateColor('blue', 0.01);
+    rotate(0.01);
     for (let i = 0; i < 100; i++) {
       rng.choose(masks)();
-      computer.render();
+      render();
     }
   `,
   square: `
-    computer.square();
-    computer.render();
+    square();
+    render();
   `,
   square_top: `
-    computer.square();
-    computer.render();
-    computer.top();
-    computer.render();
+    square();
+    render();
+    top();
+    render();
   `,
   starburst: `
     const masks = ([
-      () => computer.all(),
-      () => computer.circle(),
-      () => computer.cross(),
-      () => computer.square(),
-      () => computer.top(),
-      () => computer.x()
+      () => all(),
+      () => circle(),
+      () => cross(),
+      () => square(),
+      () => top(),
+      () => x()
     ]);
     rng.seed(3);
-    computer.rotateColor('green', 0.1);
-    computer.rotate(0.1);
+    rotateColor('green', 0.1);
+    rotate(0.1);
     for (let i = 0; i < 10; i++) {
       rng.choose(masks)();
-      computer.render();
+      render();
     }
     for (let i = 0; i < 10; i++) {
       rng.choose(masks)();
-      computer.render();
+      render();
     }
-    computer.rotateColor('blue', 0.1);
-    computer.rotate(0.1);
+    rotateColor('blue', 0.1);
+    rotate(0.1);
     for (let i = 0; i < 10; i++) {
       rng.choose(masks)();
-      computer.render();
+      render();
     }
   `,
   top: `
-    computer.top();
-    computer.render();
+    top();
+    render();
   `,
   x: `
-    computer.x();
-    computer.render();
+    x();
+    render();
   `,
   x_loop: `
-    computer.x();
-    computer.scale(0.5);
+    x();
+    scale(0.5);
     for (let i = 0; i < 8; i++) {
-      computer.render();
-      computer.wrap();
+      render();
+      wrap();
     }
   `,
   x_scale: `
-    computer.x();
-    computer.scale(0.5);
+    x();
+    scale(0.5);
     for (let i = 0; i < 8; i++) {
-      computer.render();
+      render();
     }
   `,
   x_wrap: `
-    computer.x();
-    computer.render();
-    computer.scale(0.5);
-    computer.wrap();
-    computer.identity();
-    computer.all();
-    computer.render();
+    x();
+    render();
+    scale(0.5);
+    wrap();
+    identity();
+    all();
+    render();
   `,
   debug_operation: `
-    computer.debug();
-    computer.render();
+    debug();
+    render();
   `,
   mod_zero_is_always_false: `
-    computer.mod(0, 1);
-    computer.render();
+    mod(0, 1);
+    render();
   `,
   square_colors: `
-    computer.rotate(0.01);
-    computer.rotateColor('green', 0.1);
-    computer.square();
+    rotate(0.01);
+    rotateColor('green', 0.1);
+    square();
     for (let i = 0; i < 10; i++) {
-      computer.render();
+      render();
     }
   `,
   nested_for_loops: `
-    computer.circle();
-    computer.scale(0.9);
+    circle();
+    scale(0.9);
     for (let i = 0; i < 2; i++) {
       for (let j = 0; j < 2; j++) {
-        computer.render();
+        render();
       }
     }
   `,
   for_zero: `
-    computer.circle();
+    circle();
     for (let i = 0; i < 0; i++) {
-      computer.render();
+      render();
     }
   `,
   gpu_extra_pixels: `
-    computer.rotate(0.01);
-    computer.render();
-    computer.render();
+    rotate(0.01);
+    render();
+    render();
   `,
   default_color: `
-    computer.defaultColor([255, 0, 255]);
-    computer.rotate(0.01);
-    computer.render();
+    defaultColor([255, 0, 255]);
+    rotate(0.01);
+    render();
   `,
   rotate_color_05_red: `
-    computer.rotateColor('red', 0.5);
-    computer.all();
-    computer.render();
+    rotateColor('red', 0.5);
+    all();
+    render();
   `,
   rotate_color_blue_05_all: `
-    computer.rotateColor('blue', 0.5);
-    computer.all();
-    computer.render();
+    rotateColor('blue', 0.5);
+    all();
+    render();
   `,
   rotate_color_green: `
-    computer.rotateColor('green', 0.5);
-    computer.all();
-    computer.render();
+    rotateColor('green', 0.5);
+    all();
+    render();
   `,
   rotate_color_blue_1_all: `
-    computer.rotateColor('blue', 1.0);
-    computer.all();
-    computer.render();
+    rotateColor('blue', 1.0);
+    all();
+    render();
   `,
   rotate_color_green_all: `
-    computer.rotateColor('green', 1.0);
-    computer.all();
-    computer.render();
+    rotateColor('green', 1.0);
+    all();
+    render();
   `,
   rotate_color_red_all: `
-    computer.rotateColor('red', 1.0);
-    computer.all();
-    computer.render();
+    rotateColor('red', 1.0);
+    all();
+    render();
   `,
   range_loop: `
-    computer.scale(0.5);
-    computer.circle();
+    scale(0.5);
+    circle();
     for (_ of range(10)) {
-      computer.render();
+      render();
     }
   `,
 };
@@ -542,10 +532,10 @@ test('all-example', async ({ page }) => {
   await page.selectOption('select', { label: 'all' });
 
   await expect(await page.locator('textarea')).toHaveValue(`// Set the all mask
-computer.all();
+all();
 
 // Render to the canvas
-computer.render();
+render();
 
 // Press \`Shift + Enter\` to execute
 `);
