@@ -529,7 +529,7 @@ test('forbid-unused-images', async () => {
 test('all-example', async ({ page }) => {
   await page.waitForSelector('html.ready');
 
-  await page.selectOption('select', { label: 'all'});
+  await page.selectOption('select', { label: 'all' });
 
   await expect(await page.locator('textarea')).toHaveValue(`// Set the all mask
 computer.all();
@@ -538,6 +538,5 @@ computer.all();
 computer.render();
 
 // Press \`Shift + Enter\` to execute
-`
-  );
+`);
 });
