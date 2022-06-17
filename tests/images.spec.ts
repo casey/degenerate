@@ -208,38 +208,17 @@ const tests = {
     render();
   `,
   choose_default_seed: `
-    rng.choose([
-      () => all(),
-      () => circle(),
-      () => cross(),
-      () => square(),
-      () => top(),
-      () => x()
-    ])();
+    rng.choose([all, circle, cross, square, top, x])();
     render();
   `,
   choose_zero_seed: `
     rng.seed(0);
-    rng.choose([
-      () => all(),
-      () => circle(),
-      () => cross(),
-      () => square(),
-      () => top(),
-      () => x()
-    ])();
+    rng.choose([all, circle, cross, square, top, x])();
     render();
   `,
   choose_nonzero_seed: `
     rng.seed(3);
-    rng.choose([
-      () => all(),
-      () => circle(),
-      () => cross(),
-      () => square(),
-      () => top(),
-      () => x()
-    ])();
+    rng.choose([all, circle, cross, square, top, x])();
     render();
   `,
   rotate: `
@@ -332,14 +311,7 @@ const tests = {
     render();
   `,
   smear: `
-    const masks = ([
-      () => all(),
-      () => circle(),
-      () => cross(),
-      () => square(),
-      () => top(),
-      () => x()
-    ]);
+    const masks = [all, circle, cross, square, top, x];
     rng.seed(9);
     rotateColor('green', 0.01);
     rotate(0.01);
@@ -365,14 +337,7 @@ const tests = {
     render();
   `,
   starburst: `
-    const masks = ([
-      () => all(),
-      () => circle(),
-      () => cross(),
-      () => square(),
-      () => top(),
-      () => x()
-    ]);
+    const masks = [all, circle, cross, square, top, x];
     rng.seed(3);
     rotateColor('green', 0.1);
     rotate(0.1);
