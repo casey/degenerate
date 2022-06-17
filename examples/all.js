@@ -1,7 +1,7 @@
 // Set the all mask
-computer.all();
+all();
 
 // Render to the canvas
-computer.render();
+render();
 
 // Press `Shift + Enter` to execute
