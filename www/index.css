@@ -85,6 +85,14 @@ samp {
   z-index: 2;
 }
 
+select {
+  margin: 0.5rem;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 3;
+}
+
 textarea {
   -webkit-text-stroke-color: black;
   -webkit-text-stroke-width: 1px;
