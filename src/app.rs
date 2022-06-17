@@ -75,7 +75,7 @@ impl App {
 
     let local = app.clone();
     textarea.add_event_listener("input", move || {
-      local.lock().unwrap().nav.set_class_name("fade-out");
+      local.lock().unwrap().hide_nav();
     })?;
 
     let local = app.clone();
@@ -192,9 +192,13 @@ impl App {
   }
 
   fn on_selection_changed(&mut self) -> Result {
-    self.nav.set_class_name("fade-out");
+    self.hide_nav();
     self.textarea.set_value(&self.select.value());
     self.textarea.focus().map_err(JsValueError)?;
     Ok(())
+  }
+
+  fn hide_nav(&self) {
+    self.nav.set_class_name("fade-out");
   }
 }
