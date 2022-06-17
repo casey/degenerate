@@ -6,6 +6,7 @@ pub(crate) struct App {
   gpu: Gpu,
   html: HtmlElement,
   nav: HtmlElement,
+  select: HtmlSelectElement,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
   window: Window,
@@ -26,6 +27,25 @@ impl App {
 
     let nav = document.select("nav")?.cast::<HtmlElement>()?;
 
+    let select = document.select("select")?.cast::<HtmlSelectElement>()?;
+
+    let examples = &[("all", include_str!("../examples/all.js"))];
+
+    for (name, program) in examples {
+      let option = document
+        .create_element("option")
+        .map_err(JsValueError)?
+        .cast::<HtmlOptionElement>()?;
+
+      option.set_text(name);
+
+      option.set_value(program);
+
+      select
+        .add_with_html_option_element(&option)
+        .map_err(JsValueError)?;
+    }
+
     let stderr = Stderr::get();
 
     let gpu = Gpu::new(&canvas, &window)?;
@@ -33,11 +53,12 @@ impl App {
     let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
     let app = Arc::new(Mutex::new(Self {
-      document,
-      html,
       animation_frame_callback: None,
+      document,
       gpu,
+      html,
       nav,
+      select: select.clone(),
       stderr,
       textarea: textarea.clone(),
       window,
@@ -54,13 +75,20 @@ impl App {
 
     let local = app.clone();
     textarea.add_event_listener("input", move || {
-      local.lock().unwrap().nav.set_class_name("fade-out");
+      local.lock().unwrap().hide_nav();
     })?;
 
     let local = app.clone();
     textarea.add_event_listener_with_event("keydown", move |event| {
       let mut app = local.lock().unwrap();
       let result = app.on_keydown(event);
+      app.stderr.update(result);
+    })?;
+
+    let local = app.clone();
+    select.add_event_listener("change", move || {
+      let mut app = local.lock().unwrap();
+      let result = app.on_selection_changed();
       app.stderr.update(result);
     })?;
 
@@ -161,5 +189,16 @@ impl App {
     }
 
     Ok(())
+  }
+
+  fn on_selection_changed(&mut self) -> Result {
+    self.hide_nav();
+    self.textarea.set_value(&self.select.value());
+    self.textarea.focus().map_err(JsValueError)?;
+    Ok(())
+  }
+
+  fn hide_nav(&self) {
+    self.nav.set_class_name("fade-out");
   }
 }
