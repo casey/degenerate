@@ -332,13 +332,7 @@ impl Gpu {
       .gl
       .viewport(0, 0, self.resolution as i32, self.resolution as i32);
 
-    self.gl.delete_texture(Some(&self.textures[0]));
-    self.gl.delete_texture(Some(&self.textures[1]));
-
-    self.textures = [
-      Self::create_texture(&self.gl, self.resolution)?,
-      Self::create_texture(&self.gl, self.resolution)?,
-    ];
+    self.clear()?;
 
     self.present()?;
 
@@ -377,5 +371,19 @@ impl Gpu {
       .get(name)
       .ok_or_else(|| format!("Uniform `{name}` is missing.",))
       .unwrap()
+  }
+
+  pub(crate) fn clear(&mut self) -> Result {
+    self.gl.clear(WebGl2RenderingContext::COLOR_BUFFER_BIT);
+
+    self.gl.delete_texture(Some(&self.textures[0]));
+    self.gl.delete_texture(Some(&self.textures[1]));
+
+    self.textures = [
+      Self::create_texture(&self.gl, self.resolution)?,
+      Self::create_texture(&self.gl, self.resolution)?,
+    ];
+
+    Ok(())
   }
 }

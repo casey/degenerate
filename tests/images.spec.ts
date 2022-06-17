@@ -501,6 +501,22 @@ const tests = {
       render();
     }
   `,
+  clear: `
+    render();
+    clear();
+  `,
+  reset: `
+    x();
+    render();
+    reset();
+    render();
+  `,
+  reboot: `
+    x();
+    render();
+    reboot();
+    render();
+  `,
 };
 
 for (const name in tests) {
@@ -531,7 +547,11 @@ test('all-example', async ({ page }) => {
 
   await page.selectOption('select', { label: 'all' });
 
-  await expect(await page.locator('textarea')).toHaveValue(`// Set the all mask
+  await expect(await page.locator('textarea'))
+    .toHaveValue(`// Reset state and clear the canvas
+reboot();
+
+// Set the all mask
 all();
 
 // Render to the canvas
