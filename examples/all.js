@@ -1,3 +1,6 @@
+// Reset the state
+reset();
+
 // Set the all mask
 all();
 
