@@ -161,6 +161,9 @@ impl App {
     )?;
 
     match event {
+      WorkerMessage::Clear => {
+        self.gpu.clear()?;
+      }
       WorkerMessage::Done => {
         self.html.set_class_name("done");
       }

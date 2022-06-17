@@ -81,6 +81,10 @@ function circle() {
   state.mask = MASK_CIRCLE;
 }
 
+function clear() {
+  self.postMessage(JSON.stringify('clear'));
+}
+
 function cross() {
   state.mask = MASK_CROSS;
 }
@@ -123,6 +127,11 @@ function reset() {
     scale: 1.0,
     wrap: false,
   };
+}
+
+function reboot() {
+  reset();
+  clear();
 }
 
 function rotate(rotation) {

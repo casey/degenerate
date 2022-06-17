@@ -1,4 +1,4 @@
-// Reset the state
+// Reset state
 reset();
 
 // Set the all mask
