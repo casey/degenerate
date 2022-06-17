@@ -525,3 +525,19 @@ test('forbid-unused-images', async () => {
 
   expect(unused).toEqual([]);
 });
+
+test('all-example', async ({ page }) => {
+  await page.waitForSelector('html.ready');
+
+  await page.selectOption('select', { label: 'all'});
+
+  await expect(await page.locator('textarea')).toHaveValue(`// Set the all mask
+computer.all();
+
+// Render to the canvas
+computer.render();
+
+// Press \`Shift + Enter\` to execute
+`
+  );
+});
