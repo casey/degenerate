@@ -18,17 +18,17 @@ that can be programmed with JavaScript. It is deployed at
 
 - Paste this code into the text area:
   ```
-  computer.rotateColor('green', 0.05);
-  computer.circle();
-  computer.scale(0.75);
-  computer.wrap();
+  rotateColor('green', 0.05);
+  circle();
+  scale(0.75);
+  wrap();
   for (let i = 0; i < 8; i++) {
-    computer.render();
+    render();
   }
-  computer.rotate(0.8333);
-  computer.rotateColor('blue', 0.05);
+  rotate(0.8333);
+  rotateColor('blue', 0.05);
   for (let i = 0; i < 8; i++) {
-    computer.render();
+    render();
   }
   ```
 
