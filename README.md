@@ -2,6 +2,9 @@
 <div align="center">An prorammable generative art engine</div>
 <br>
 <div align="center">
+  <a href="https://discord.gg/87cjuz4FYg">
+    <img src="https://img.shields.io/discord/695580069837406228?logo=discord" alt="chat on discord">
+  </a>
   <a href="https://github.com/casey/degenerate/actions">
     <img src="https://github.com/casey/degenerate/workflows/CI/badge.svg" alt="build status">
   </a>
