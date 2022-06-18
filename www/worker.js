@@ -92,6 +92,10 @@ function invert() {
   state.operation = OPERATION_INVERT;
 }
 
+function mic() {
+  state.mic = !state.mic;
+}
+
 function mod(divisor, remainder) {
   state.maskModDivisor = divisor;
   state.maskModRemainder = remainder;
