@@ -6,21 +6,21 @@ The Degenerate Programmers Manual is bit spare at the moment. Apologies!
 
 Degenerate operates as a chain of filters, with the output of each filter
 feeding into the next. Commands are issued to change the state of the current
-filter, which is then applied with `computer.render()`.
+filter, which is then applied with `render()`.
 
 The primary components of a filter are a "mask", which determines which pixels
 the filter will operate on, and an "operation", which determines what will
 happen to those pixels.
 
-For example, to set the mask to an X, you can do `computer.x()`, and to set the
+For example, to set the mask to an X, you can do `x()`, and to set the
 operation to color rotation by one half rotation about the green axis, do
-`computer.rotateColor('green', 0.5)`. An finally, to see the results, do
-`computer.render()`. The complete program looks like this:
+`rotateColor('green', 0.5)`. An finally, to see the results, do `render()`. The
+complete program looks like this:
 
 ```javascript
-computer.x();
-computer.rotateColor('green', 0.5);
-computer.render();
+x();
+rotateColor('green', 0.5);
+render();
 ```
 
 Go to [degenerate.computer](https://degenerate.computer) and copy and paste the
@@ -46,9 +46,8 @@ is the code itself.
 
 First off, check out
 [worker.js](https://github.com/casey/degenerate/blob/master/www/worker.js),
-which provides the environment in which degenerate programs run. The primary
-interface is the `Computer` class. One is ready in the `computer` variable for
-you to use.
+which provides the environment in which degenerate programs run. A variety of
+functions are available for manipulating the current state.
 
 Secondly, check out
 [fragment.glsl](https://github.com/casey/degenerate/blob/master/src/fragment.glsl),
@@ -71,6 +70,6 @@ just mash `Shift + Enter` over and over again to see what happens.
 
 ## Saving your creations
 
-1. Make the resolution nice and large with `computer.resolution(4096)`
+1. Make the resolution nice and large with `resolution(4096)`
 2. Render something cool
-3. Save it with `computer.save()`
+3. Save it with `save()`
