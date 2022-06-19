@@ -84,6 +84,10 @@ function defaultColor(defaultColor) {
   state.defaultColor = defaultColor;
 }
 
+function elapsed() {
+  return Date.now() - start;
+}
+
 function identity() {
   state.operation = OPERATION_IDENTITY;
 }
@@ -168,6 +172,7 @@ function* range(iterations) {
 }
 
 const rng = new Rng();
+const start = Date.now();
 
 let frameResolvers = [];
 
