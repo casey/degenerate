@@ -1,12 +1,16 @@
 use super::*;
 
 pub(crate) struct Gpu {
+  analyser_node: AnalyserNode,
+  audio_time_domain_texture: WebGlTexture,
+  audio_time_domain_data: Vec<f32>,
+  audio_time_domain_array: Float32Array,
   canvas: HtmlCanvasElement,
   frame_buffer: WebGlFramebuffer,
   gl: WebGl2RenderingContext,
   height: u32,
-  resolution: u32,
   lock_resolution: bool,
+  resolution: u32,
   source_texture: Cell<usize>,
   textures: [WebGlTexture; 2],
   uniforms: BTreeMap<String, WebGlUniformLocation>,
@@ -18,7 +22,7 @@ impl Gpu {
   pub(super) fn new(
     window: &Window,
     canvas: &HtmlCanvasElement,
-    analyser_node: AnalyserNode,
+    analyser_node: &AnalyserNode,
   ) -> Result<Self> {
     let mut context_options = WebGlContextAttributes::new();
 
@@ -120,9 +124,48 @@ impl Gpu {
         let location = gl.get_uniform_location(&program, &name).unwrap();
         (name, location)
       })
-      .collect();
+      .collect::<BTreeMap<String, WebGlUniformLocation>>();
+
+    gl.uniform1i(Some(uniforms.get("source").unwrap()), 0);
+    gl.uniform1i(Some(uniforms.get("audio_time_domain").unwrap()), 1);
+
+    let audio_time_domain_texture = gl
+      .create_texture()
+      .ok_or("Failed to create audio_time_domain texture")?;
+
+    gl.active_texture(WebGl2RenderingContext::TEXTURE1);
+    gl.bind_texture(
+      WebGl2RenderingContext::TEXTURE_2D,
+      Some(&audio_time_domain_texture),
+    );
+
+    gl.tex_parameteri(
+      WebGl2RenderingContext::TEXTURE_2D,
+      WebGl2RenderingContext::TEXTURE_MIN_FILTER,
+      WebGl2RenderingContext::NEAREST.try_into()?,
+    );
+
+    gl.tex_parameteri(
+      WebGl2RenderingContext::TEXTURE_2D,
+      WebGl2RenderingContext::TEXTURE_MAG_FILTER,
+      WebGl2RenderingContext::NEAREST.try_into()?,
+    );
+
+    let fft_size = analyser_node.fft_size();
+
+    gl.tex_storage_2d(
+      WebGl2RenderingContext::TEXTURE_2D,
+      1,
+      WebGl2RenderingContext::R32F,
+      fft_size as i32,
+      1,
+    );
 
     Ok(Self {
+      analyser_node: analyser_node.clone(),
+      audio_time_domain_array: Float32Array::new_with_length(fft_size),
+      audio_time_domain_data: vec![0.0; fft_size as usize],
+      audio_time_domain_texture,
       canvas: canvas.clone(),
       frame_buffer,
       gl,
@@ -196,10 +239,37 @@ impl Gpu {
       0,
     );
 
+    self.gl.active_texture(WebGl2RenderingContext::TEXTURE0);
     self.gl.bind_texture(
       WebGl2RenderingContext::TEXTURE_2D,
       Some(&self.textures[self.source_texture.get()]),
     );
+
+    self.gl.active_texture(WebGl2RenderingContext::TEXTURE1);
+    self.gl.bind_texture(
+      WebGl2RenderingContext::TEXTURE_2D,
+      Some(&self.audio_time_domain_texture),
+    );
+    self
+      .analyser_node
+      .get_float_time_domain_data(&mut self.audio_time_domain_data);
+    self
+      .audio_time_domain_array
+      .copy_from(&self.audio_time_domain_data);
+    self
+      .gl
+      .tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_array_buffer_view(
+        WebGl2RenderingContext::TEXTURE_2D,
+        0,
+        0,
+        0,
+        self.audio_time_domain_data.len() as i32,
+        1,
+        WebGl2RenderingContext::RED,
+        WebGl2RenderingContext::FLOAT,
+        Some(&self.audio_time_domain_array),
+      )
+      .map_err(JsValueError)?;
 
     self.gl.uniform1f(Some(self.uniform("alpha")), state.alpha);
 

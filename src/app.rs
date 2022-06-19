@@ -12,6 +12,7 @@ pub(crate) struct App {
   textarea: HtmlTextAreaElement,
   window: Window,
   worker: Worker,
+  analyser_node: AnalyserNode,
 }
 
 impl App {
@@ -53,17 +54,7 @@ impl App {
 
     let analyser_node = audio_context.create_analyser().map_err(JsValueError)?;
 
-    // let source = audio_context
-    //   .create_media_element_source(&audio_element)
-    //   .map_err(JsValueError)?;
-    // source
-    //   .connect_with_audio_node(&audio_analyzer)
-    //   .map_err(JsValueError)?;
-    // source
-    //   .connect_with_audio_node(&audio_context.destination())
-    //   .map_err(JsValueError)?;
-
-    let gpu = Gpu::new(&window, &canvas, analyser_node)?;
+    let gpu = Gpu::new(&window, &canvas, &analyser_node)?;
 
     let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
@@ -79,6 +70,7 @@ impl App {
       textarea: textarea.clone(),
       window,
       worker: worker.clone(),
+      analyser_node,
     }));
 
     let local = app.clone();
@@ -186,9 +178,13 @@ impl App {
       WorkerMessage::Render(state) => {
         if state.mic {
           let audio_context = self.audio_context.clone();
+          let analyser_node = self.analyser_node.clone();
           let closure = Closure::wrap(Box::new(move |stream: JsValue| {
             audio_context
               .create_media_stream_source(&stream.cast::<MediaStream>().unwrap())
+              .unwrap()
+              .connect_with_audio_node(&analyser_node)
+              .map_err(JsValueError)
               .unwrap();
           }) as Box<dyn FnMut(JsValue)>);
           let _ = self

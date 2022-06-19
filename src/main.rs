@@ -5,6 +5,7 @@ use {
     state::State, stderr::Stderr, window::window, worker_message::WorkerMessage,
   },
   image::{ImageBuffer, ImageOutputFormat},
+  js_sys::Float32Array,
   nalgebra::{Rotation3, Similarity2, UnitComplex, Vector3},
   serde::{Deserialize, Serialize},
   std::{
