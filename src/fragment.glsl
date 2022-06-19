@@ -2,6 +2,8 @@
 
 precision highp float;
 
+#include <hsl.glsl>
+
 const uint MASK_ALL = 0u;
 const uint MASK_CHECK = 1u;
 const uint MASK_CIRCLE = 2u;
@@ -46,7 +48,11 @@ vec3 apply(vec2 position, vec3 color) {
     case OPERATION_ROTATE_COLOR:
       return (color_rotation * (color * 2.0 - 1.0) + 1.0) / 2.0;
     case OPERATION_SAMPLE:
-      return abs(texture(audio_time_domain, vec2((position.x + 1.0) / 2.0, 0.5)).rrr);
+      float lightness = abs(texture(audio_time_domain, vec2((position.x + 1.0) / 2.0, 0.5)).r);
+      vec3 hsl = rgb2hsl(color);
+      hsl.z = lightness;
+      vec3 rgb = hsl2rgb(hsl);
+      return rgb;
     default:
       return vec3(0.0, 1.0, 0.0);
   }
