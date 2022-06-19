@@ -19,10 +19,10 @@ use {
   },
   wasm_bindgen::{closure::Closure, convert::FromWasmAbi, JsCast, JsValue},
   web_sys::{
-    Document, Element, EventTarget, HtmlAnchorElement, HtmlCanvasElement, HtmlElement,
-    HtmlOptionElement, HtmlSelectElement, HtmlTextAreaElement, KeyboardEvent, MediaStream,
-    MediaStreamConstraints, MessageEvent, WebGl2RenderingContext, WebGlContextAttributes,
-    WebGlFramebuffer, WebGlTexture, WebGlUniformLocation, Window, Worker,
+    AnalyserNode, AudioContext, Document, Element, EventTarget, HtmlAnchorElement,
+    HtmlCanvasElement, HtmlElement, HtmlOptionElement, HtmlSelectElement, HtmlTextAreaElement,
+    KeyboardEvent, MediaStream, MediaStreamConstraints, MessageEvent, WebGl2RenderingContext,
+    WebGlContextAttributes, WebGlFramebuffer, WebGlTexture, WebGlUniformLocation, Window, Worker,
   },
 };
 

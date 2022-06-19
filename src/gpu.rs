@@ -15,7 +15,11 @@ pub(crate) struct Gpu {
 }
 
 impl Gpu {
-  pub(super) fn new(canvas: &HtmlCanvasElement, window: &Window) -> Result<Self> {
+  pub(super) fn new(
+    window: &Window,
+    canvas: &HtmlCanvasElement,
+    analyser_node: AnalyserNode,
+  ) -> Result<Self> {
     let mut context_options = WebGlContextAttributes::new();
 
     context_options

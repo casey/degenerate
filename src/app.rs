@@ -2,6 +2,7 @@ use super::*;
 
 pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
+  audio_context: AudioContext,
   document: Document,
   gpu: Gpu,
   html: HtmlElement,
@@ -48,12 +49,27 @@ impl App {
 
     let stderr = Stderr::get();
 
-    let gpu = Gpu::new(&canvas, &window)?;
+    let audio_context = AudioContext::new().map_err(JsValueError)?;
+
+    let analyser_node = audio_context.create_analyser().map_err(JsValueError)?;
+
+    // let source = audio_context
+    //   .create_media_element_source(&audio_element)
+    //   .map_err(JsValueError)?;
+    // source
+    //   .connect_with_audio_node(&audio_analyzer)
+    //   .map_err(JsValueError)?;
+    // source
+    //   .connect_with_audio_node(&audio_context.destination())
+    //   .map_err(JsValueError)?;
+
+    let gpu = Gpu::new(&window, &canvas, analyser_node)?;
 
     let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
+      audio_context,
       document,
       gpu,
       html,
@@ -169,7 +185,12 @@ impl App {
       }
       WorkerMessage::Render(state) => {
         if state.mic {
-          let closure = Closure::wrap(Box::new(|stream| {}) as Box<dyn FnMut(JsValue)>);
+          let audio_context = self.audio_context.clone();
+          let closure = Closure::wrap(Box::new(move |stream: JsValue| {
+            audio_context
+              .create_media_stream_source(&stream.cast::<MediaStream>().unwrap())
+              .unwrap();
+          }) as Box<dyn FnMut(JsValue)>);
           let _ = self
             .window
             .navigator()
