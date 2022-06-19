@@ -23,6 +23,7 @@ const uint OPERATION_SAMPLE = 4u;
 uniform bool wrap;
 uniform float alpha;
 uniform float resolution;
+/* uniform float spl; */
 uniform mat3 color_rotation;
 uniform mat3 transform;
 uniform sampler2D audio_time_domain;

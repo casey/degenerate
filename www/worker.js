@@ -34,6 +34,8 @@ const OPERATION_INVERT = 2;
 const OPERATION_ROTATE_COLOR = 3;
 const OPERATION_SAMPLE = 4;
 
+let start = Date.now();
+
 let state;
 reset();
 
@@ -43,6 +45,9 @@ function all() {
 
 function alpha(alpha) {
   state.alpha = alpha;
+}
+
+function elapsed() {
 }
 
 async function frame() {
@@ -170,6 +175,10 @@ function* range(iterations) {
   for (let i = 0; i < iterations; i++) {
     yield i;
   }
+}
+
+function elapsed() {
+  return (Date.now() - start) / 1000;
 }
 
 const rng = new Rng();

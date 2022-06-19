@@ -2,17 +2,19 @@ use super::*;
 
 pub(crate) struct Gpu {
   analyser_node: AnalyserNode,
-  audio_time_domain_texture: WebGlTexture,
-  audio_time_domain_data: Vec<f32>,
+  audio_context: AudioContext,
+  audio_frequency_data: Vec<f32>,
   audio_time_domain_array: Float32Array,
+  audio_time_domain_data: Vec<f32>,
+  audio_time_domain_texture: WebGlTexture,
   canvas: HtmlCanvasElement,
+  destination: WebGlTexture,
   frame_buffer: WebGlFramebuffer,
   gl: WebGl2RenderingContext,
   height: u32,
   lock_resolution: bool,
   resolution: u32,
   source: WebGlTexture,
-  destination: WebGlTexture,
   uniforms: BTreeMap<String, WebGlUniformLocation>,
   width: u32,
   window: Window,
@@ -22,6 +24,7 @@ impl Gpu {
   pub(super) fn new(
     window: &Window,
     canvas: &HtmlCanvasElement,
+    audio_context: &AudioContext,
     analyser_node: &AnalyserNode,
   ) -> Result<Self> {
     let mut context_options = WebGlContextAttributes::new();
@@ -161,11 +164,13 @@ impl Gpu {
 
     Ok(Self {
       source: Self::create_texture(&gl, resolution)?,
+      audio_context: audio_context.clone(),
       destination: Self::create_texture(&gl, resolution)?,
       analyser_node: analyser_node.clone(),
       audio_time_domain_array: Float32Array::new_with_length(fft_size),
       audio_time_domain_data: vec![0.0; fft_size as usize],
       audio_time_domain_texture,
+      audio_frequency_data: vec![0.0; analyser_node.frequency_bin_count() as usize],
       canvas: canvas.clone(),
       frame_buffer,
       gl,
@@ -268,7 +273,33 @@ impl Gpu {
       )
       .map_err(JsValueError)?;
 
+    self
+      .analyser_node
+      .get_float_frequency_data(&mut self.audio_frequency_data);
+
+    let spl = self
+      .audio_frequency_data
+      .iter()
+      .enumerate()
+      .map(|(i, decibels)| {
+        let f = (i as f32 / self.audio_frequency_data.len() as f32)
+          * self.audio_context.sample_rate()
+          / 2.0;
+        let f2 = f * f;
+        let weight = 1.2588966 * 148840000.0 * f2 * f2
+          / ((f2 + 424.36) * (f2 + 11599.29) * (f2 + 544496.41)).sqrt()
+          * (f2 + 148840000.0);
+        weight * decibels
+      })
+      .sum::<f32>();
+
+    // self.gl.uniform1f(Some(self.uniform("spl")), spl);
+
     self.gl.uniform1f(Some(self.uniform("alpha")), state.alpha);
+
+    self
+      .analyser_node
+      .get_float_time_domain_data(&mut self.audio_time_domain_data);
 
     self.gl.uniform3f(
       Some(self.uniform("default_color")),

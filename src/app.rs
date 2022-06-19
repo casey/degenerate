@@ -55,7 +55,7 @@ impl App {
 
     let analyser_node = audio_context.create_analyser().map_err(JsValueError)?;
 
-    let gpu = Gpu::new(&window, &canvas, &analyser_node)?;
+    let gpu = Gpu::new(&window, &canvas, &audio_context, &analyser_node)?;
 
     let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
