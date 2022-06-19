@@ -3,6 +3,7 @@ use super::*;
 pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
   audio_context: AudioContext,
+  analyser_node: AnalyserNode,
   document: Document,
   gpu: Gpu,
   html: HtmlElement,
@@ -12,7 +13,6 @@ pub(crate) struct App {
   textarea: HtmlTextAreaElement,
   window: Window,
   worker: Worker,
-  get_user_media_callback: Closure<(dyn FnMut(JsValue))>,
   recording: bool,
 }
 
@@ -59,18 +59,9 @@ impl App {
 
     let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
-    let local = audio_context.clone();
-    let get_user_media_callback = Closure::wrap(Box::new(move |stream: JsValue| {
-      local
-        .create_media_stream_source(&stream.cast::<MediaStream>().unwrap())
-        .unwrap()
-        .connect_with_audio_node(&analyser_node)
-        .map_err(JsValueError)
-        .unwrap();
-    }) as Box<dyn FnMut(JsValue)>);
-
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
+      analyser_node,
       audio_context,
       document,
       gpu,
@@ -81,7 +72,6 @@ impl App {
       textarea: textarea.clone(),
       window,
       worker: worker.clone(),
-      get_user_media_callback,
       recording: false,
     }));
 
@@ -191,6 +181,16 @@ impl App {
       }
       WorkerMessage::Render(state) => {
         if state.operation == 4 /* OPERATION_SAMPLE */ && !self.recording {
+          let audio_context = self.audio_context.clone();
+          let analyser_node = self.analyser_node.clone();
+          let closure = Closure::wrap(Box::new(move |stream: JsValue| {
+            audio_context
+              .create_media_stream_source(&stream.cast::<MediaStream>().unwrap())
+              .unwrap()
+              .connect_with_audio_node(&analyser_node)
+              .map_err(JsValueError)
+              .unwrap();
+          }) as Box<dyn FnMut(JsValue)>);
           let _ = self
             .window
             .navigator()
@@ -202,7 +202,8 @@ impl App {
                 .video(&false.into()),
             )
             .map_err(JsValueError)?
-            .then(&self.get_user_media_callback);
+            .then(&closure);
+          closure.forget();
           self.recording = true;
         }
         self.gpu.render(&state)?;
