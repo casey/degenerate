@@ -1,3 +1,5 @@
+//Source: https://www.shadertoy.com/view/wt23Rt
+
 //Hue to RGB (red, green, blue).
 //Source: https://github.com/tobspr/GLSL-Color-Spaces/blob/master/ColorSpaces.inc.glsl
 #ifndef saturate
@@ -271,3 +273,14 @@ vec3 cmyk2rgb_pal(vec4 c){ //This might be an incorrect way of blending.
 		mix(vec3(1.),vec3(1.,.9451,.0471),c.z)*
 		mix(1.,.0784,c.w);
 }
+
+// void mainImage(out vec4 fragColor,in vec2 fragCoord){
+//     vec2 uv=fragCoord/iResolution.xy;
+//     vec3 col=hsl2rgb(vec3(uv.x,1.,uv.y));
+// 	col=cmyk2rgb_pal(rgb2cmyk(col));
+//     col=rgb2lab(col);
+//     col.g+=cos(iTime+uv.x)*.05;
+//     col.b+=sin(iTime+uv.y)*.05;
+//     col=lab2rgb(col);
+//     fragColor=vec4(col,1.0);
+// }
