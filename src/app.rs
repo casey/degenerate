@@ -168,6 +168,22 @@ impl App {
         self.html.set_class_name("done");
       }
       WorkerMessage::Render(state) => {
+        if state.mic {
+          let closure = Closure::wrap(Box::new(|stream| {}) as Box<dyn FnMut(JsValue)>);
+          let _ = self
+            .window
+            .navigator()
+            .media_devices()
+            .map_err(JsValueError)?
+            .get_user_media_with_constraints(
+              MediaStreamConstraints::new()
+                .audio(&true.into())
+                .video(&false.into()),
+            )
+            .map_err(JsValueError)?
+            .then(&closure);
+          closure.forget();
+        }
         self.gpu.render(&state)?;
         self.gpu.present()?;
       }

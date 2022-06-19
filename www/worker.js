@@ -111,6 +111,7 @@ function reset() {
     maskModRemainder: 0,
     maskRowsRows: 0,
     maskRowsStep: 0,
+    mic: false,
     operation: OPERATION_INVERT,
     operationRotateColorAxis: 'red',
     operationRotateColorTurns: 0.0,

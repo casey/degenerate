@@ -10,6 +10,7 @@ pub(crate) struct State {
   pub(crate) mask_mod_remainder: u32,
   pub(crate) mask_rows_rows: u32,
   pub(crate) mask_rows_step: u32,
+  pub(crate) mic: bool,
   pub(crate) operation: u32,
   pub(crate) operation_rotate_color_axis: String,
   pub(crate) operation_rotate_color_turns: f32,
