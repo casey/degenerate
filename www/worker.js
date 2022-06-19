@@ -48,6 +48,7 @@ function alpha(alpha) {
 }
 
 function elapsed() {
+  return (Date.now() - start) / 1000;
 }
 
 async function frame() {
@@ -56,8 +57,9 @@ async function frame() {
   });
 }
 
-function render() {
+async function render() {
   self.postMessage(JSON.stringify({ render: state }));
+  await frame();
 }
 
 function resolution(resolution) {
@@ -175,10 +177,6 @@ function* range(iterations) {
   for (let i = 0; i < iterations; i++) {
     yield i;
   }
-}
-
-function elapsed() {
-  return (Date.now() - start) / 1000;
 }
 
 const rng = new Rng();
