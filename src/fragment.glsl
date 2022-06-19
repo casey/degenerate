@@ -16,7 +16,7 @@ const uint OPERATION_DEBUG = 0u;
 const uint OPERATION_IDENTITY = 1u;
 const uint OPERATION_INVERT = 2u;
 const uint OPERATION_ROTATE_COLOR = 3u;
-const uint OPERATION_SAMPLES = 4u;
+const uint OPERATION_SAMPLE = 4u;
 
 uniform bool wrap;
 uniform float alpha;
@@ -45,8 +45,8 @@ vec3 apply(vec2 position, vec3 color) {
       return 1.0 - color;
     case OPERATION_ROTATE_COLOR:
       return (color_rotation * (color * 2.0 - 1.0) + 1.0) / 2.0;
-    case OPERATION_SAMPLES:
-      return texture(audio_time_domain, vec2((position.x + 1.0) / 2.0, 0.5)).rrr;
+    case OPERATION_SAMPLE:
+      return abs(texture(audio_time_domain, vec2((position.x + 1.0) / 2.0, 0.5)).rrr);
     default:
       return vec3(0.0, 1.0, 0.0);
   }

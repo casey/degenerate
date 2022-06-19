@@ -190,7 +190,7 @@ impl App {
         self.html.set_class_name("done");
       }
       WorkerMessage::Render(state) => {
-        if state.mic && !self.recording {
+        if state.operation == 4 /* OPERATION_SAMPLE */ && !self.recording {
           let _ = self
             .window
             .navigator()
@@ -203,6 +203,7 @@ impl App {
             )
             .map_err(JsValueError)?
             .then(&self.get_user_media_callback);
+          self.recording = true;
         }
         self.gpu.render(&state)?;
         self.gpu.present()?;

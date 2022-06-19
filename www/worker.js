@@ -93,10 +93,6 @@ function invert() {
   state.operation = OPERATION_INVERT;
 }
 
-function mic() {
-  state.mic = !state.mic;
-}
-
 function mod(divisor, remainder) {
   state.maskModDivisor = divisor;
   state.maskModRemainder = remainder;
@@ -112,7 +108,6 @@ function reset() {
     maskModRemainder: 0,
     maskRowsRows: 0,
     maskRowsStep: 0,
-    mic: false,
     operation: OPERATION_INVERT,
     operationRotateColorAxis: 'red',
     operationRotateColorTurns: 0.0,
@@ -159,7 +154,7 @@ function top() {
   state.mask = MASK_TOP;
 }
 
-function waveform() {
+function sample() {
   state.operation = OPERATION_SAMPLE;
 }
 
