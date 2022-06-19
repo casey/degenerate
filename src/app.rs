@@ -12,7 +12,8 @@ pub(crate) struct App {
   textarea: HtmlTextAreaElement,
   window: Window,
   worker: Worker,
-  analyser_node: AnalyserNode,
+  get_user_media_callback: Closure<(dyn FnMut(JsValue))>,
+  recording: bool,
 }
 
 impl App {
@@ -58,6 +59,16 @@ impl App {
 
     let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
+    let local = audio_context.clone();
+    let get_user_media_callback = Closure::wrap(Box::new(move |stream: JsValue| {
+      local
+        .create_media_stream_source(&stream.cast::<MediaStream>().unwrap())
+        .unwrap()
+        .connect_with_audio_node(&analyser_node)
+        .map_err(JsValueError)
+        .unwrap();
+    }) as Box<dyn FnMut(JsValue)>);
+
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
       audio_context,
@@ -70,7 +81,8 @@ impl App {
       textarea: textarea.clone(),
       window,
       worker: worker.clone(),
-      analyser_node,
+      get_user_media_callback,
+      recording: false,
     }));
 
     let local = app.clone();
@@ -83,7 +95,9 @@ impl App {
 
     let local = app.clone();
     textarea.add_event_listener("input", move || {
-      local.lock().unwrap().hide_nav();
+      let app = local.lock().unwrap();
+      app.hide_nav();
+      let _ = app.audio_context.resume().unwrap();
     })?;
 
     let local = app.clone();
@@ -176,17 +190,7 @@ impl App {
         self.html.set_class_name("done");
       }
       WorkerMessage::Render(state) => {
-        if state.mic {
-          let audio_context = self.audio_context.clone();
-          let analyser_node = self.analyser_node.clone();
-          let closure = Closure::wrap(Box::new(move |stream: JsValue| {
-            audio_context
-              .create_media_stream_source(&stream.cast::<MediaStream>().unwrap())
-              .unwrap()
-              .connect_with_audio_node(&analyser_node)
-              .map_err(JsValueError)
-              .unwrap();
-          }) as Box<dyn FnMut(JsValue)>);
+        if state.mic && !self.recording {
           let _ = self
             .window
             .navigator()
@@ -198,8 +202,7 @@ impl App {
                 .video(&false.into()),
             )
             .map_err(JsValueError)?
-            .then(&closure);
-          closure.forget();
+            .then(&self.get_user_media_callback);
         }
         self.gpu.render(&state)?;
         self.gpu.present()?;

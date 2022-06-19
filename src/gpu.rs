@@ -11,8 +11,8 @@ pub(crate) struct Gpu {
   height: u32,
   lock_resolution: bool,
   resolution: u32,
-  source_texture: Cell<usize>,
-  textures: [WebGlTexture; 2],
+  source: WebGlTexture,
+  destination: WebGlTexture,
   uniforms: BTreeMap<String, WebGlUniformLocation>,
   width: u32,
   window: Window,
@@ -103,11 +103,6 @@ impl Gpu {
     let height = canvas.height();
     let resolution = width.max(height);
 
-    let textures = [
-      Self::create_texture(&gl, resolution)?,
-      Self::create_texture(&gl, resolution)?,
-    ];
-
     let frame_buffer = gl
       .create_framebuffer()
       .ok_or("Failed to create framebuffer")?;
@@ -162,6 +157,8 @@ impl Gpu {
     );
 
     Ok(Self {
+      source: Self::create_texture(&gl, resolution)?,
+      destination: Self::create_texture(&gl, resolution)?,
       analyser_node: analyser_node.clone(),
       audio_time_domain_array: Float32Array::new_with_length(fft_size),
       audio_time_domain_data: vec![0.0; fft_size as usize],
@@ -172,8 +169,6 @@ impl Gpu {
       height,
       lock_resolution: false,
       resolution,
-      source_texture: Cell::new(0),
-      textures,
       uniforms,
       width,
       window: window.clone(),
@@ -194,7 +189,7 @@ impl Gpu {
       WebGl2RenderingContext::READ_FRAMEBUFFER,
       WebGl2RenderingContext::COLOR_ATTACHMENT0,
       WebGl2RenderingContext::TEXTURE_2D,
-      Some(&self.textures[self.source_texture.get()]),
+      Some(&self.source),
       0,
     );
 
@@ -235,15 +230,14 @@ impl Gpu {
       WebGl2RenderingContext::FRAMEBUFFER,
       WebGl2RenderingContext::COLOR_ATTACHMENT0,
       WebGl2RenderingContext::TEXTURE_2D,
-      Some(&self.textures[self.source_texture.get() ^ 1]),
+      Some(&self.destination),
       0,
     );
 
     self.gl.active_texture(WebGl2RenderingContext::TEXTURE0);
-    self.gl.bind_texture(
-      WebGl2RenderingContext::TEXTURE_2D,
-      Some(&self.textures[self.source_texture.get()]),
-    );
+    self
+      .gl
+      .bind_texture(WebGl2RenderingContext::TEXTURE_2D, Some(&self.source));
 
     self.gl.active_texture(WebGl2RenderingContext::TEXTURE1);
     self.gl.bind_texture(
@@ -333,7 +327,7 @@ impl Gpu {
 
     self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 3);
 
-    self.source_texture.set(self.source_texture.get() ^ 1);
+    mem::swap(&mut self.source, &mut self.destination);
 
     Ok(())
   }
@@ -450,13 +444,11 @@ impl Gpu {
   pub(crate) fn clear(&mut self) -> Result {
     self.gl.clear(WebGl2RenderingContext::COLOR_BUFFER_BIT);
 
-    self.gl.delete_texture(Some(&self.textures[0]));
-    self.gl.delete_texture(Some(&self.textures[1]));
+    self.gl.delete_texture(Some(&self.source));
+    self.gl.delete_texture(Some(&self.destination));
 
-    self.textures = [
-      Self::create_texture(&self.gl, self.resolution)?,
-      Self::create_texture(&self.gl, self.resolution)?,
-    ];
+    self.source = Self::create_texture(&self.gl, self.resolution)?;
+    self.destination = Self::create_texture(&self.gl, self.resolution)?;
 
     Ok(())
   }

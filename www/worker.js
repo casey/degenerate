@@ -32,7 +32,7 @@ const OPERATION_DEBUG = 0;
 const OPERATION_IDENTITY = 1;
 const OPERATION_INVERT = 2;
 const OPERATION_ROTATE_COLOR = 3;
-const OPERATION_WAVEFORM = 4;
+const OPERATION_SAMPLE = 4;
 
 let state;
 reset();
@@ -160,7 +160,7 @@ function top() {
 }
 
 function waveform() {
-  state.operation = OPERATION_WAVEFORM;
+  state.operation = OPERATION_SAMPLE;
 }
 
 function wrap() {
