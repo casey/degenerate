@@ -145,10 +145,10 @@ the filter will operate on, and an &quot;operation&quot;, which determines what 
 happen to those pixels.</p>
 <p>For example, to set the mask to an X, you can do <code>x()</code>, and to set the
 operation to color rotation by one half rotation about the green axis, do
-<code>rotateColor('green', 0.5)</code>. An finally, to see the results, do <code>render()</code>. The
-complete program looks like this:</p>
+<code>rotateColor('green', 0.5 * TAU)</code>. An finally, to see the results, do
+<code>render()</code>. The complete program looks like this:</p>
 <pre><code class="language-javascript">x();
-rotateColor('green', 0.5);
+rotateColor('green', 0.5 * TAU);
 render();
 </code></pre>
 <p>Go to <a href="https://degenerate.computer">degenerate.computer</a> and copy and paste the
