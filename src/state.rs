@@ -12,7 +12,7 @@ pub(crate) struct State {
   pub(crate) mask_rows_step: u32,
   pub(crate) operation: u32,
   pub(crate) operation_rotate_color_axis: String,
-  pub(crate) operation_rotate_color_turns: f32,
+  pub(crate) operation_rotate_color_radians: f32,
   pub(crate) rotation: f32,
   pub(crate) scale: f32,
   pub(crate) wrap: bool,
