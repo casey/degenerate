@@ -14,12 +14,12 @@ happen to those pixels.
 
 For example, to set the mask to an X, you can do `x()`, and to set the
 operation to color rotation by one half rotation about the green axis, do
-`rotateColor('green', 0.5)`. An finally, to see the results, do `render()`. The
-complete program looks like this:
+`rotateColor('green', 0.5 * TAU)`. An finally, to see the results, do
+`render()`. The complete program looks like this:
 
 ```javascript
 x();
-rotateColor('green', 0.5);
+rotateColor('green', 0.5 * TAU);
 render();
 ```
 
