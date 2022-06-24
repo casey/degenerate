@@ -29,7 +29,10 @@ impl App {
 
     let select = document.select("select")?.cast::<HtmlSelectElement>()?;
 
-    let examples = &[("all", include_str!("../examples/all.js"))];
+    let examples = &[
+      ("all", include_str!("../examples/all.js")),
+      ("kaleidoscope", include_str!("../examples/kaleidoscope.js")),
+    ];
 
     for (name, program) in examples {
       let option = document
