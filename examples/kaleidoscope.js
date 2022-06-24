@@ -7,15 +7,16 @@ rotateColor('green', 0.05 * TAU);
 // Set the circle mask
 circle();
 
-// Scale the canvas
-scale(3 / 4);
+// Set the scale factor to 0.75
+scale(0.75);
 
 // Wrap pixels
 wrap();
 
 // Render to the canvas 8 times
-for (_ of range(8))
+for (_ of range(8)) {
   render();
+}
 
 // Rotate the canvas
 rotate((5 / 6) * TAU);
@@ -24,7 +25,8 @@ rotate((5 / 6) * TAU);
 rotateColor('blue', 0.05 * TAU);
 
 // Render to the canvas 8 times
-for (_ of range(8))
+for (_ of range(8)) {
   render();
+}
 
 // Press `Shift + Enter` to execute
