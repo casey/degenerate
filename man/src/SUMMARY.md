@@ -1,4 +1,4 @@
 # Summary
 
 - [Introduction](./introduction.md)
-- [NFTs](./nfts.md)
+- [Degenerate NFTs](./nfts.md)
