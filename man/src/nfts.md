@@ -26,22 +26,6 @@ To find a good ordinal number to attach an NFT to, use an ord API server. A publ
 
 Ordinal NFTs can be minted and verified using the `mint` and `verify` subcommands of the [`ord` utility](https://github.com/casey/ord).
 
-## Degenerate
-
-https://degenerate.computer
-
-free to use open-source generative art engine based on iterative image filter application and scripted in javascript
-
-## Ordinals
-
-https://ordinals.com
-
-satoshi numbering and NFT scheme
-
-We are minting degenerate NFTs.
-
-- list of minted NFTs (link to instagram)
-
 ## Warnings
 
 Ordinals, the Ordinal NFT scheme, and Degenerate NFTs should be considered pre-alpha quality and subject to change at any time.
