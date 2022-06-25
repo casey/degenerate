@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Introduction - Degenerate Programmer&#x27;s Manual</title>
+        <title>Degenerate NFTs - Degenerate Programmer&#x27;s Manual</title>
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="nfts.html"><strong aria-hidden="true">2.</strong> Degenerate NFTs</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="nfts.html" class="active"><strong aria-hidden="true">2.</strong> Degenerate NFTs</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -134,70 +134,31 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="chapter-1"><a class="header" href="#chapter-1">Chapter 1</a></h1>
-<p>The Degenerate Programmers Manual is bit spare at the moment. Apologies!</p>
-<h2 id="execution-model"><a class="header" href="#execution-model">Execution Model</a></h2>
-<p>Degenerate operates as a chain of filters, with the output of each filter
-feeding into the next. Commands are issued to change the state of the current
-filter, which is then applied with <code>render()</code>.</p>
-<p>The primary components of a filter are a &quot;mask&quot;, which determines which pixels
-the filter will operate on, and an &quot;operation&quot;, which determines what will
-happen to those pixels.</p>
-<p>For example, to set the mask to an X, you can do <code>x()</code>, and to set the
-operation to color rotation by one half rotation about the green axis, do
-<code>rotateColor('green', 0.5 * TAU)</code>. An finally, to see the results, do
-<code>render()</code>. The complete program looks like this:</p>
-<pre><code class="language-javascript">x();
-rotateColor('green', 0.5 * TAU);
-render();
-</code></pre>
-<p>Go to <a href="https://degenerate.computer">degenerate.computer</a> and copy and paste the
-program into the text area.</p>
-<p>Nothing happened, because you have to hit <code>Shift + Enter</code> for the program to
-run. Try it!</p>
-<h2 id="language"><a class="header" href="#language">Language</a></h2>
-<p>Degenerate is programmed with JavaScript. An introduction to JavaScript is
-outside of the scope of this document. The reader is referred the excellent
-<a href="https://developer.mozilla.org/en-US/">Mozilla Developer Network</a>
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript">introduction to JavaScript</a>,
-<a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript">JavaScript tutorial</a>.
-and
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference">JavaScript reference</a>,</p>
-<h2 id="reference"><a class="header" href="#reference">Reference</a></h2>
-<p>Given the paucity of this manual, the current primary reference to degenerate
-is the code itself.</p>
-<p>First off, check out
-<a href="https://github.com/casey/degenerate/blob/master/www/worker.js">worker.js</a>,
-which provides the environment in which degenerate programs run. A variety of
-functions are available for manipulating the current state.</p>
-<p>Secondly, check out
-<a href="https://github.com/casey/degenerate/blob/master/src/fragment.glsl">fragment.glsl</a>,
-the fragment shader that runs on the GPU and does the hard work of rendering
-filters.</p>
-<p>And finally, check out
-<a href="https://github.com/casey/degenerate/blob/master/tests/images.spec.ts">image.spec.ts</a>,
-which contains test programs, and
-<a href="https://github.com/casey/degenerate/tree/master/images">the images directory</a>,
-which contains the corresponding images. Most test programs are simple, and
-exercise individual features, but some are more complex, like <code>smear</code>,
-<code>kaleidoscope</code>, <code>grain</code>, and <code>pattern</code>.</p>
-<h2 id="suggestions"><a class="header" href="#suggestions">Suggestions</a></h2>
-<p>Experiment, experiment, experiment! Clever combinations of commands give
-surprising results. Try changing the filter state and rendering in a loop, or
-just mash <code>Shift + Enter</code> over and over again to see what happens.</p>
-<h2 id="saving-your-creations"><a class="header" href="#saving-your-creations">Saving your creations</a></h2>
-<ol>
-<li>Make the resolution nice and large with <code>resolution(4096)</code></li>
-<li>Render something cool</li>
-<li>Save it with <code>save()</code></li>
-</ol>
+                        <h1 id="degenerate-bitcoin-nfts"><a class="header" href="#degenerate-bitcoin-nfts">Degenerate Bitcoin NFTs</a></h1>
+<p><strong><a href="#warnings">The Command Line is the Frontline: This is the bleeding edge.</a></strong></p>
+<p>Degenerate NFTs are generative art produced by <a href="#degenerate">Degenerate</a> and issued as NFTs on the Bitcoin blockchain using the <a href="#ordinals">Ordinal</a> NFT scheme.</p>
+<p>We are minting NFTs in order to gain experience with the technology, gather feedback, and build a community. Degenerate NFTs should be treated as digital baubles that glint and glimmer but may suddenly and spontaneously shatter.</p>
+<h2 id="mints"><a class="header" href="#mints">Mints</a></h2>
+<p>Mints will be announced on <a href="https://twitter.com/degencomputer">Twitter</a>. Until the underlying NFT scheme is mature, we'll be giving away NFTs or selling them for nominal amounts of sats using the Lightning Network.</p>
+<p>Minted NFTs will be posted to <a href="https://instagram.com/degencomputer">Instagram</a>.</p>
+<h2 id="discussion-and-help"><a class="header" href="#discussion-and-help">Discussion and Help</a></h2>
+<p>Visit the <a href="https://discord.gg/87cjuz4FYg">Degenerate Discord</a> to discuss the Degenerate engine, ordinals, Degenerate NFTs, or get help minting your own Ordinal NFTs of any kind.</p>
+<h2 id="minting-sending-and-receiving-ordinals"><a class="header" href="#minting-sending-and-receiving-ordinals">Minting, sending, and receiving Ordinals</a></h2>
+<p>Ordinal NFTs are bound to ordinal numbers, a numbering scheme for satoshis. Ownership of ordinals is tracked using the Bitcoin blockchain, and transferring ordinals is done using Bitcoin transactions.</p>
+<p>There are no ordinal-aware wallets, so transfers must be done manually, either by misappropriating existing wallet software, or by writing your own.</p>
+<p>To find a good ordinal number to attach an NFT to, use an ord API server. A public instance is running at api.ordinals.com:8000. To look up the ordinal numbers in a given UTXO, use the list API endpoint. <a href="http://api.ordinals.com:8000/list/c581fd4054f1663c7193c640b4d81eeb3d4fca06f1bb29937a082c9122b1a1d6:0">Example API URL for c581fd4054f1663c7193c640b4d81eeb3d4fca06f1bb29937a082c9122b1a1d6:0</a>.</p>
+<p>Ordinal NFTs can be minted and verified using the <code>mint</code> and <code>verify</code> subcommands of the <a href="https://github.com/casey/ord"><code>ord</code> utility</a>.</p>
+<h2 id="warnings"><a class="header" href="#warnings">Warnings</a></h2>
+<p>Ordinals, the Ordinal NFT scheme, and Degenerate NFTs should be considered pre-alpha quality and subject to change at any time.</p>
+<p>Ordinal numbers, defined in <a href="https://github.com/casey/ord/blob/master/bip.mediawiki">The Ordinal BIP</a>, are a mapping of ordinal numbers to satoshis, and ultimately to UTXOs. Ordinal NFTs are assigned to ordinal numbers, and thus rely on the stability and correctness of the underlying mapping. The Ordinal mapping is extremely simple and believe to be complete and bug-free, but further review and discussion is most welcome. The Ordinal spec, <code>ord</code> command line tool, and issue tracker are hosted in the <a href="https://github.com/casey/ord/">ord GitHub repository</a>.</p>
+<p>The Ordinal NFT scheme, implemented <a href="https://github.com/casey/ord/blob/master/src/nft.rs">here</a>, is a scheme for issuing NFTs and assigning them to ordinal numbers, allowing their ownership to be tracked on the Bitcoin blockchain. The NFT scheme has received minimal review, and should be considered unstable. Improvements to the NFT schema may be necessary that render previously issued NFTs invalid according to the new schema.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="next" href="nfts.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
+                            <a rel="prev" href="introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
                             </a>
                         <div style="clear: both"></div>
                     </nav>
@@ -205,8 +166,8 @@ just mash <code>Shift + Enter</code> over and over again to see what happens.</p
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="next" href="nfts.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
+                    <a rel="prev" href="introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
                     </a>
             </nav>
 
