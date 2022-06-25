@@ -1,4 +1,4 @@
-# Degenerate NFTs
+# Degenerate Bitcoin NFTs
 
 **[The Command Line is the Frontline: This is the bleeding edge.](#warnings)**
 
