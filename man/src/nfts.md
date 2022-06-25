@@ -20,7 +20,7 @@ Visit the [Degenerate Discord](https://discord.gg/87cjuz4FYg) to discuss the Deg
 
 Ordinal NFTs are bound to ordinal numbers, a numbering scheme for satoshis. Ownership of ordinals is tracked using the Bitcoin blockchain, and transferring ordinals is done using Bitcoin transactions.
 
-There are no ordinal-aware wallets, so transfers must be done manually, either by misappropraiting existing wallet software, or by writing your own.
+There are no ordinal-aware wallets, so transfers must be done manually, either by misappropriating existing wallet software, or by writing your own.
 
 To find a good ordinal number to attach an NFT to, use an ord API server. A public instance is running at api.ordinals.com:8000. To look up the ordinal numbers in a given UTXO, use the list API endpoint. [Example API URL for c581fd4054f1663c7193c640b4d81eeb3d4fca06f1bb29937a082c9122b1a1d6:0](http://api.ordinals.com:8000/list/c581fd4054f1663c7193c640b4d81eeb3d4fca06f1bb29937a082c9122b1a1d6:0).
 
@@ -30,6 +30,6 @@ Ordinal NFTs can be minted and verified using the `mint` and `verify` subcommand
 
 Ordinals, the Ordinal NFT scheme, and Degenerate NFTs should be considered pre-alpha quality and subject to change at any time.
 
-Ordinal numbers, defined in [The Ordinal BIP](https://github.com/casey/ord/blob/master/bip.mediawiki), are a mapping of numbers, to satoshis, to UTXsOs. Ordinal NFTs are assigned to ordinal numbers, and thus rely on the stability and correctness of the underlying mapping. The Ordinal mapping is extremely simple and believe to be complete and bug-free, but further review and discussion is most welcome. The Ordinal spec, `ord` command line tool, and issue tracker are hosted in the [ord GitHub repository](https://github.com/casey/ord/).
+Ordinal numbers, defined in [The Ordinal BIP](https://github.com/casey/ord/blob/master/bip.mediawiki), are a mapping of ordinal numbers to satoshis, and ultimately to UTXOs. Ordinal NFTs are assigned to ordinal numbers, and thus rely on the stability and correctness of the underlying mapping. The Ordinal mapping is extremely simple and believe to be complete and bug-free, but further review and discussion is most welcome. The Ordinal spec, `ord` command line tool, and issue tracker are hosted in the [ord GitHub repository](https://github.com/casey/ord/).
 
 The Ordinal NFT scheme, implemented [here](https://github.com/casey/ord/blob/master/src/nft.rs), is a scheme for issuing NFTs and assigning them to ordinal numbers, allowing their ownership to be tracked on the Bitcoin blockchain. The NFT scheme has received minimal review, and should be considered unstable. Improvements to the NFT schema may be necessary that render previously issued NFTs invalid according to the new schema.
