@@ -6,3 +6,4 @@ title = "Degenerate Programmer's Manual"
 
 [build]
 build-dir = "../www/man"
+create-missing = false
