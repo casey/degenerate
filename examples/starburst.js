@@ -12,7 +12,7 @@ rotate(0.1 * TAU);
 
 // Render to the canvas 20 times,
 // each time setting a random mask
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 20; i++) {
   rng.choose(masks)();
   render();
 }
