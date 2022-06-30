@@ -32,6 +32,7 @@ impl App {
     let examples = &[
       ("all", include_str!("../examples/all.js")),
       ("kaleidoscope", include_str!("../examples/kaleidoscope.js")),
+      ("pattern", include_str!("../examples/pattern.js")),
       ("starburst", include_str!("../examples/starburst.js")),
       ("target", include_str!("../examples/target.js")),
       ("x", include_str!("../examples/x.js")),
