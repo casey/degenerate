@@ -31,7 +31,10 @@ impl App {
 
     let examples = &[
       ("all", include_str!("../examples/all.js")),
-      ("default_color", include_str!("../examples/default_color.js")),
+      (
+        "default_color",
+        include_str!("../examples/default_color.js"),
+      ),
       ("kaleidoscope", include_str!("../examples/kaleidoscope.js")),
       ("pattern", include_str!("../examples/pattern.js")),
       ("starburst", include_str!("../examples/starburst.js")),
