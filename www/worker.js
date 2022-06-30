@@ -87,6 +87,10 @@ function defaultColor(defaultColor) {
   state.defaultColor = defaultColor;
 }
 
+function elapsed() {
+  return Date.now() - start;
+}
+
 function identity() {
   state.operation = OPERATION_IDENTITY;
 }
@@ -148,6 +152,10 @@ function scale(scale) {
   state.scale *= scale;
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function square() {
   state.mask = MASK_SQUARE;
 }
@@ -171,6 +179,7 @@ function* range(iterations) {
 }
 
 const rng = new Rng();
+const start = Date.now();
 
 let frameResolvers = [];
 
