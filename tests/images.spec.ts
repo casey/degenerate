@@ -506,13 +506,10 @@ test('all-example', async ({ page }) => {
   await page.selectOption('select', { label: 'all' });
 
   await expect(await page.locator('textarea'))
-    .toHaveValue(`// Reset state and clear the canvas
-reboot();
+    .toHaveValue(`reboot();
 
-// Set the all mask
 all();
 
-// Render to the canvas
 render();
 
 // Press \`Shift + Enter\` to execute
