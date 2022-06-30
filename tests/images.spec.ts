@@ -505,15 +505,13 @@ test('forbid-unused-images', async () => {
 test('all-example', async ({ page }) => {
   await page.selectOption('select', { label: 'all' });
 
-  await expect(await page.locator('textarea'))
-    .toHaveValue(`reboot();
+  await expect(await page.locator('textarea')).toHaveValue(`reboot();
 
 all();
 
 render();
 
-// Press \`Shift + Enter\` to execute`
-);
+// Press \`Shift + Enter\` to execute`);
 });
 
 test('elapsed', async ({ page }) => {
