@@ -1,7 +1,7 @@
 // Reset state and clear the canvas
 reboot();
 
-// Set the default color to green
+// Set the default color to purple
 //
 // When sampling out of bound pixels, if `wrap`
 // isn't toggled on, it will use the color set
