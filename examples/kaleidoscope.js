@@ -1,4 +1,3 @@
-// Reset state and clear the canvas
 reboot();
 
 rotateColor('green', 0.05 * TAU);
@@ -20,5 +19,3 @@ rotateColor('blue', 0.05 * TAU);
 for (_ of range(8)) {
   render();
 }
-
-// Press `Shift + Enter` to execute

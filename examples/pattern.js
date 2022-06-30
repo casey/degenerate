@@ -1,4 +1,3 @@
-// Reset state and clear the canvas
 reboot();
 
 alpha(0.75);
@@ -7,7 +6,7 @@ circle();
 
 scale(0.5);
 
-for (let i = 0; i < 8; i++) {
+for (_ of range(8)) {
   render();
   wrap();
 }

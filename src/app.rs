@@ -207,8 +207,14 @@ impl App {
 
   fn on_selection_changed(&mut self) -> Result {
     self.hide_nav();
-    self.textarea.set_value(&self.select.value());
+
+    self.textarea.set_value(&format!(
+      "{}\n// Press `Shift + Enter` to execute",
+      &self.select.value()
+    ));
+
     self.textarea.focus().map_err(JsValueError)?;
+
     Ok(())
   }
 
