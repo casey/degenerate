@@ -18,6 +18,9 @@ class Rng {
   }
 }
 
+const PI = Math.PI;
+const TAU = Math.PI * 2;
+
 const MASK_ALL = 0;
 const MASK_CHECK = 1;
 const MASK_CIRCLE = 2;
@@ -92,6 +95,10 @@ function defaultColor(defaultColor) {
   state.defaultColor = defaultColor;
 }
 
+function elapsed() {
+  return Date.now() - start;
+}
+
 function identity() {
   state.operation = OPERATION_IDENTITY;
 }
@@ -117,7 +124,7 @@ function reset() {
     maskRowsStep: 0,
     operation: OPERATION_INVERT,
     operationRotateColorAxis: 'red',
-    operationRotateColorTurns: 0.0,
+    operationRotateColorRadians: 0.0,
     rotation: 0.0,
     scale: 1.0,
     wrap: false,
@@ -133,9 +140,9 @@ function rotate(rotation) {
   state.rotation += rotation;
 }
 
-function rotateColor(axis, turns) {
+function rotateColor(axis, radians) {
   state.operationRotateColorAxis = axis;
-  state.operationRotateColorTurns = turns;
+  state.operationRotateColorRadians = radians;
   state.operation = OPERATION_ROTATE_COLOR;
 }
 
@@ -151,6 +158,10 @@ function save() {
 
 function scale(scale) {
   state.scale *= scale;
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function square() {
@@ -180,6 +191,7 @@ function* range(iterations) {
 }
 
 const rng = new Rng();
+const start = Date.now();
 
 let frameResolvers = [];
 
