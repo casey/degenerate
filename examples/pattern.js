@@ -1,3 +1,6 @@
+// Reset state and clear the canvas
+reboot();
+
 // Set the alpha value to 0.75
 alpha(0.75);
 
