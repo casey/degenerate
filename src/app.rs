@@ -32,11 +32,9 @@ impl App {
     let examples = &[
       ("all", include_str!("../examples/all.js")),
       ("kaleidoscope", include_str!("../examples/kaleidoscope.js")),
-      (
-        "scale_circle_wrap",
-        include_str!("../examples/scale_circle_wrap.js"),
-      ),
+      ("starburst", include_str!("../examples/starburst.js")),
       ("target", include_str!("../examples/target.js")),
+      ("x", include_str!("../examples/x.js")),
     ];
 
     for (name, program) in examples {

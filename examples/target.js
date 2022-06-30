@@ -1,5 +1,5 @@
 // Reset state and clear the canvas
-reboot()
+reboot();
 
 // Set the circle mask
 circle();
