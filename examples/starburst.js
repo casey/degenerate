@@ -1,3 +1,6 @@
+// Reset state and clear the canvas
+reboot();
+
 // Store all available masks
 const masks = [all, circle, cross, square, top, x];
 
