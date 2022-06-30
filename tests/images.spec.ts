@@ -4,8 +4,8 @@ import axios from 'axios';
 import { exec } from './common';
 import { test, expect, Page } from '@playwright/test';
 
-const sleep = async (msecs) => {
-  return new Promise((resolve) => setTimeout(resolve, msecs));
+const sleep = async (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 test.beforeAll(async () => {
@@ -25,12 +25,11 @@ test.beforeEach(async ({ page }) => {
   page.on('console', (message) => {
     if (process.env.VERBOSE || message.type() == 'error') console.log(message);
   });
+  await page.waitForSelector('html.ready');
 });
 
 const imageTest = (name, program) => {
   test(name, async ({ page }) => {
-    await page.waitForSelector('html.ready');
-
     await page.locator('textarea').fill(program);
 
     await page.keyboard.down('Shift');
@@ -504,8 +503,6 @@ test('forbid-unused-images', async () => {
 });
 
 test('all-example', async ({ page }) => {
-  await page.waitForSelector('html.ready');
-
   await page.selectOption('select', { label: 'all' });
 
   await expect(await page.locator('textarea'))
@@ -520,4 +517,19 @@ render();
 
 // Press \`Shift + Enter\` to execute
 `);
+});
+
+test('elapsed', async ({ page }) => {
+  await page.locator('textarea').fill(`
+    let first = elapsed();
+    await sleep(100);
+    let second = elapsed();
+
+    if (second <= first) {
+      throw "Arrow of time is broken!";
+    }
+  `);
+  await page.keyboard.down('Shift');
+  await page.keyboard.press('Enter');
+  await page.waitForSelector('html.done');
 });

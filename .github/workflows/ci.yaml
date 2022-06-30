@@ -41,7 +41,9 @@ jobs:
 
     - name: Install chromium
       working-directory: tests
-      run: npx playwright install chromium
+      run: |
+        npm install
+        npx playwright install chromium
 
     - name: Install dependencies
       working-directory: tests
