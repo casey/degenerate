@@ -152,6 +152,10 @@ function scale(scale) {
   state.scale *= scale;
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function square() {
   state.mask = MASK_SQUARE;
 }
