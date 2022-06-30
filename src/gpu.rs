@@ -2,7 +2,6 @@ use super::*;
 
 pub(crate) struct Gpu {
   analyser_node: AnalyserNode,
-  audio_context: AudioContext,
   audio_frequency_data: Vec<f32>,
   audio_time_domain_array: Float32Array,
   audio_time_domain_data: Vec<f32>,
@@ -24,7 +23,6 @@ impl Gpu {
   pub(super) fn new(
     window: &Window,
     canvas: &HtmlCanvasElement,
-    audio_context: &AudioContext,
     analyser_node: &AnalyserNode,
   ) -> Result<Self> {
     let mut context_options = WebGlContextAttributes::new();
@@ -164,7 +162,6 @@ impl Gpu {
 
     Ok(Self {
       source: Self::create_texture(&gl, resolution)?,
-      audio_context: audio_context.clone(),
       destination: Self::create_texture(&gl, resolution)?,
       analyser_node: analyser_node.clone(),
       audio_time_domain_array: Float32Array::new_with_length(fft_size),

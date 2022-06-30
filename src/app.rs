@@ -55,7 +55,7 @@ impl App {
 
     let analyser_node = audio_context.create_analyser().map_err(JsValueError)?;
 
-    let gpu = Gpu::new(&window, &canvas, &audio_context, &analyser_node)?;
+    let gpu = Gpu::new(&window, &canvas, &analyser_node)?;
 
     let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
@@ -208,16 +208,19 @@ impl App {
         }
         if state.oscillator_frequency > 0.0 && !self.recording {
           let audio_context = self.audio_context.clone();
-          let analyser_node = self.analyser_node.clone();
+          audio_context.resume().unwrap();
+          // let analyser_node = self.analyser_node.clone();
 
           let oscillator_node = OscillatorNode::new_with_options(
             &audio_context,
-            OscillatorOptions::new().frequency(state.oscillator_frequency),
+            OscillatorOptions::new().frequency(440.0),
           )
           .unwrap();
 
-          oscillator_node.connect_with_audio_node(&self.audio_context.destination());
-          oscillator_node.start();
+          oscillator_node
+            .connect_with_audio_node(&self.audio_context.destination())
+            .unwrap();
+          oscillator_node.start().unwrap();
 
           self.recording = true;
         }
