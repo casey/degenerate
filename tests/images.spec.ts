@@ -512,8 +512,8 @@ all();
 
 render();
 
-// Press \`Shift + Enter\` to execute
-`);
+// Press \`Shift + Enter\` to execute`
+);
 });
 
 test('elapsed', async ({ page }) => {
