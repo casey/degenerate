@@ -206,6 +206,21 @@ impl App {
           closure.forget();
           self.recording = true;
         }
+        if state.oscillator_frequency > 0.0 && !self.recording {
+          let audio_context = self.audio_context.clone();
+          let analyser_node = self.analyser_node.clone();
+
+          let oscillator_node = OscillatorNode::new_with_options(
+            &audio_context,
+            OscillatorOptions::new().frequency(state.oscillator_frequency),
+          )
+          .unwrap();
+
+          oscillator_node.connect_with_audio_node(&self.audio_context.destination());
+          oscillator_node.start();
+
+          self.recording = true;
+        }
         self.gpu.render(&state)?;
         self.gpu.present()?;
       }

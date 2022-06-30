@@ -15,5 +15,6 @@ pub(crate) struct State {
   pub(crate) operation_rotate_color_radians: f32,
   pub(crate) rotation: f32,
   pub(crate) scale: f32,
+  pub(crate) oscillator_frequency: f32,
   pub(crate) wrap: bool,
 }

@@ -280,6 +280,11 @@ const tests = {
       render();
     }
   `,
+  sample: `
+    soundWave(220);
+    samples();
+    render();
+  `,
   scale: `
     scale(0.5);
     circle();

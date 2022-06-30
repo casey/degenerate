@@ -37,8 +37,6 @@ const OPERATION_INVERT = 2;
 const OPERATION_ROTATE_COLOR = 3;
 const OPERATION_SAMPLE = 4;
 
-let start = Date.now();
-
 let state;
 reset();
 
@@ -125,6 +123,7 @@ function reset() {
     operation: OPERATION_INVERT,
     operationRotateColorAxis: 'red',
     operationRotateColorRadians: 0.0,
+    oscillatorFrequency: 0,
     rotation: 0.0,
     scale: 1.0,
     wrap: false,
@@ -162,6 +161,10 @@ function scale(scale) {
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function oscillatorFrequency(hz) {
+  state.oscillatorFrequency = hz;
 }
 
 function square() {

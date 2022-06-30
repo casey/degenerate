@@ -30,6 +30,7 @@ version = "0.3.57"
 features = [
   "AnalyserNode",
   "AudioContext",
+  "AudioDestinationNode",
   "CanvasRenderingContext2d",
   "Document",
   "Element",
@@ -50,6 +51,8 @@ features = [
   "MediaStreamConstraints",
   "MessageEvent",
   "Navigator",
+  "OscillatorNode",
+  "OscillatorOptions",
   "WebGl2RenderingContext",
   "WebGlActiveInfo",
   "WebGlBuffer",
