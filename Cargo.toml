@@ -30,6 +30,7 @@ version = "0.3.57"
 features = [
   "CanvasRenderingContext2d",
   "Document",
+  "DomTokenList",
   "Element",
   "HtmlAnchorElement",
   "HtmlCanvasElement",

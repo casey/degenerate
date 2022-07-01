@@ -82,7 +82,9 @@ impl App {
 
     let local = app.clone();
     textarea.add_event_listener("input", move || {
-      local.lock().unwrap().on_input();
+      let app = local.lock().unwrap();
+      let result = app.on_input();
+      app.stderr.update(result);
     })?;
 
     let local = app.clone();
@@ -169,11 +171,8 @@ impl App {
 
     match event {
       WorkerMessage::Checkbox(name) => {
-        if self
-          .document
-          .select_optional(&format!("aside > #{name}"))?
-          .is_none()
-        {
+        let id = format!("widget-{name}");
+        if self.document.select_optional(&format!("#{id}"))?.is_none() {
           let aside = self.document.select("aside")?;
 
           let div = self
@@ -181,7 +180,6 @@ impl App {
             .create_element("div")
             .map_err(JsValueError)?
             .cast::<HtmlDivElement>()?;
-          div.set_id(&name);
           aside.append_child(&div).map_err(JsValueError)?;
 
           let label = self
@@ -189,7 +187,7 @@ impl App {
             .create_element("label")
             .map_err(JsValueError)?
             .cast::<HtmlLabelElement>()?;
-          label.set_html_for(&name);
+          label.set_html_for(&id);
           label.set_inner_text(&name);
           div.append_child(&label).map_err(JsValueError)?;
 
@@ -199,7 +197,7 @@ impl App {
             .map_err(JsValueError)?
             .cast::<HtmlInputElement>()?;
           checkbox.set_type("checkbox");
-          checkbox.set_id(&name);
+          checkbox.set_id(&id);
           div.append_child(&checkbox).map_err(JsValueError)?;
 
           let local = checkbox.clone();
@@ -254,7 +252,7 @@ impl App {
   }
 
   fn on_selection_changed(&mut self) -> Result {
-    self.on_input();
+    self.on_input()?;
 
     self.textarea.set_value(&format!(
       "{}\n// Press `Shift + Enter` to execute",
@@ -266,8 +264,17 @@ impl App {
     Ok(())
   }
 
-  fn on_input(&self) {
-    self.html.set_class_name("");
-    self.nav.set_class_name("fade-out");
+  fn on_input(&self) -> Result {
+    self
+      .html
+      .class_list()
+      .remove_1("done")
+      .map_err(JsValueError)?;
+    self
+      .nav
+      .class_list()
+      .add_1("fade-out")
+      .map_err(JsValueError)?;
+    Ok(())
   }
 }

@@ -524,14 +524,14 @@ test('elapsed', async ({ page }) => {
   await run(
     page,
     `
-    let first = elapsed();
-    await sleep(100);
-    let second = elapsed();
+      let first = elapsed();
+      await sleep(100);
+      let second = elapsed();
 
-    if (second <= first) {
-      throw "Arrow of time is broken!";
-    }
-  `
+      if (second <= first) {
+        throw "Arrow of time is broken!";
+      }
+    `
   );
 });
 
@@ -539,8 +539,8 @@ test('checkbox', async ({ page }) => {
   await run(
     page,
     `
-    checkbox('x');
-  `
+      checkbox('x');
+    `
   );
 
   await expect(await page.isChecked('aside > div#x > input')).toBeFalsy();
@@ -548,10 +548,10 @@ test('checkbox', async ({ page }) => {
   await run(
     page,
     `
-    if (checkbox('x')) {
-      render();
-    }
-  `
+      if (checkbox('x')) {
+        render();
+      }
+    `
   );
 
   let off = await imageData(page);
@@ -562,10 +562,10 @@ test('checkbox', async ({ page }) => {
   await run(
     page,
     `
-    if (checkbox('x')) {
-      render();
-    }
-  `
+      if (checkbox('x')) {
+        render();
+      }
+    `
   );
 
   let on = await imageData(page);
