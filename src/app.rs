@@ -32,6 +32,8 @@ impl App {
     let examples = &[
       ("All", include_str!("../examples/all.js")),
       ("Kaleidoscope", include_str!("../examples/kaleidoscope.js")),
+      ("Orb Zoom", include_str!("../examples/orb_zoom.js")),
+      ("Orbs", include_str!("../examples/orbs.js")),
       ("Pattern", include_str!("../examples/pattern.js")),
       (
         "Spinning Kaleidoscope",
