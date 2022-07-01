@@ -543,7 +543,7 @@ test('checkbox', async ({ page }) => {
     `
   );
 
-  await expect(await page.isChecked('aside > div#x > input')).toBeFalsy();
+  await expect(await page.isChecked('#widget-x')).toBeFalsy();
 
   await run(
     page,
@@ -557,7 +557,7 @@ test('checkbox', async ({ page }) => {
   let off = await imageData(page);
   await expect(off[0]).toEqual(0);
 
-  await page.check('aside > div#x > input');
+  await page.check('#widget-x');
 
   await run(
     page,
@@ -570,4 +570,6 @@ test('checkbox', async ({ page }) => {
 
   let on = await imageData(page);
   await expect(on[0]).toEqual(255);
+
+  await expect(await page.locator('#widget-x').count()).toBe(1);
 });
