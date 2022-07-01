@@ -8,14 +8,15 @@ async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function imageData(page) {
-  const encoded = (
-    await page.evaluate(() =>
-      document.getElementsByTagName('canvas')[0].toDataURL()
-    )
-  ).slice('data:image/png;base64,'.length);
-
-  return png.decode(Buffer.from(encoded, 'base64')).data;
+async function imageBuffer(page) {
+  return Buffer.from(
+    (
+      await page.evaluate(() =>
+        document.getElementsByTagName('canvas')[0].toDataURL()
+      )
+    ).slice('data:image/png;base64,'.length),
+    'base64'
+  );
 }
 
 async function run(page, program) {
@@ -52,7 +53,9 @@ const imageTest = (name, program) => {
   test(name, async ({ page }) => {
     await run(page, program);
 
-    const have = await imageData(page);
+    const encoded = await imageBuffer(page);
+
+    const have = png.decode(encoded).data;
 
     const wantPath = `../images/${name}.png`;
 
@@ -67,7 +70,7 @@ const imageTest = (name, program) => {
     ) {
       const destination = `../images/${name}.actual-memory.png`;
 
-      await fs.promises.writeFile(destination, encoded, 'base64');
+      await fs.promises.writeFile(destination, encoded);
 
       if (process.platform === 'darwin') {
         await exec(`
@@ -557,7 +560,7 @@ test('checkbox', async ({ page }) => {
     `
   );
 
-  let off = await imageData(page);
+  let off = png.decode(await imageBuffer(page)).data;
   await expect(off[0]).toEqual(0);
 
   await page.check('#widget-x');
@@ -571,7 +574,7 @@ test('checkbox', async ({ page }) => {
     `
   );
 
-  let on = await imageData(page);
+  let on = png.decode(await imageBuffer(page)).data;
   await expect(on[0]).toEqual(255);
 
   await expect(await page.locator('#widget-x').count()).toBe(1);
