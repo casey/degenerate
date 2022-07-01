@@ -49,7 +49,7 @@ function alpha(alpha) {
 
 async function frame() {
   await new Promise((resolve, reject) => {
-    frameResolvers.push(resolve);
+    frameCallbacks.push({resolve, reject});
   });
 }
 
@@ -190,7 +190,7 @@ function* range(iterations) {
 const rng = new Rng();
 const start = Date.now();
 
-let frameResolvers = [];
+let frameCallbacks = [];
 let lastDelta = 0;
 let lastFrame = 0;
 let widgets = {};
@@ -203,14 +203,18 @@ self.addEventListener('message', async function (event) {
       widgets[message.content.name] = message.content.value;
       break;
     case 'script':
+      for (var callbacks of frameCallbacks) {
+        callbacks.reject();
+      }
+      frameCallbacks = [];
       await new AsyncFunction(message.content)();
       self.postMessage(JSON.stringify('done'));
       break;
     case 'frame':
-      for (var resolve of frameResolvers) {
-        resolve();
+      for (var callbacks of frameCallbacks) {
+        callbacks.resolve();
       }
-      frameResolvers = [];
+      frameCallbacks = [];
       let now = Date.now();
       if (lastFrame > 0) {
         lastDelta = now - lastFrame;
