@@ -188,16 +188,16 @@ self.addEventListener('message', async function (event) {
   const message = JSON.parse(event.data);
   switch (message.tag) {
     case 'script':
-      for (var callback of frameCallbacks) {
-        callback.reject();
+      for (var callbacks of frameCallbacks) {
+        callbacks.reject();
       }
       frameCallbacks = [];
       await new AsyncFunction(message.content)();
       self.postMessage(JSON.stringify('done'));
       break;
     case 'frame':
-      for (var callback of frameCallbacks) {
-        callback.resolve();
+      for (var callbacks of frameCallbacks) {
+        callbacks.resolve();
       }
       frameCallbacks = [];
       break;
