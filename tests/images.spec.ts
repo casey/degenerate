@@ -521,7 +521,9 @@ render();
 });
 
 test('elapsed', async ({ page }) => {
-  await run(page, `
+  await run(
+    page,
+    `
     let first = elapsed();
     await sleep(100);
     let second = elapsed();
@@ -529,32 +531,42 @@ test('elapsed', async ({ page }) => {
     if (second <= first) {
       throw "Arrow of time is broken!";
     }
-  `);
+  `
+  );
 });
 
 test('checkbox', async ({ page }) => {
-  await run(page, `
+  await run(
+    page,
+    `
     checkbox('x');
-  `);
+  `
+  );
 
   await expect(await page.isChecked('aside > div#x > input')).toBeFalsy();
 
-  await run(page, `
+  await run(
+    page,
+    `
     if (checkbox('x')) {
       render();
     }
-  `);
+  `
+  );
 
   let off = await imageData(page);
   await expect(off[0]).toEqual(0);
 
   await page.check('aside > div#x > input');
 
-  await run(page, `
+  await run(
+    page,
+    `
     if (checkbox('x')) {
       render();
     }
-  `);
+  `
+  );
 
   let on = await imageData(page);
   await expect(on[0]).toEqual(255);
