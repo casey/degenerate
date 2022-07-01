@@ -239,7 +239,9 @@ impl Gpu {
 
     let mut similarity = Similarity2::<f32>::identity();
     similarity.append_rotation_mut(&UnitComplex::from_angle(-state.rotation));
-    similarity.append_scaling_mut(state.scale);
+    if state.scale != 0.0 {
+      similarity.append_scaling_mut(state.scale);
+    }
 
     self.gl.uniform_matrix3fv_with_f32_array(
       Some(self.uniform("transform")),
