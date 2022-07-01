@@ -503,7 +503,7 @@ test('forbid-unused-images', async () => {
 });
 
 test('all-example', async ({ page }) => {
-  await page.selectOption('select', { label: 'all' });
+  await page.selectOption('select', { label: 'All' });
 
   await expect(await page.locator('textarea')).toHaveValue(`reboot();
 
