@@ -82,7 +82,7 @@ impl App {
 
     let local = app.clone();
     textarea.add_event_listener("input", move || {
-      local.lock().unwrap().hide_nav();
+      local.lock().unwrap().on_input();
     })?;
 
     let local = app.clone();
@@ -254,7 +254,7 @@ impl App {
   }
 
   fn on_selection_changed(&mut self) -> Result {
-    self.hide_nav();
+    self.on_input();
 
     self.textarea.set_value(&format!(
       "{}\n// Press `Shift + Enter` to execute",
@@ -266,7 +266,8 @@ impl App {
     Ok(())
   }
 
-  fn hide_nav(&self) {
+  fn on_input(&self) {
+    self.html.set_class_name("");
     self.nav.set_class_name("fade-out");
   }
 }
