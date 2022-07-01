@@ -168,6 +168,51 @@ impl App {
     )?;
 
     match event {
+      WorkerMessage::Checkbox(name) => {
+        if self
+          .document
+          .select_optional(&format!("aside > #{name}"))?
+          .is_none()
+        {
+          let aside = self.document.select("aside")?;
+
+          let label = self
+            .document
+            .create_element("label")
+            .map_err(JsValueError)?
+            .cast::<HtmlLabelElement>()?;
+          label.set_html_for(&name);
+          label.set_inner_text(&name);
+          aside.append_child(&label).map_err(JsValueError)?;
+
+          // todo:
+          // - put multiple inputs on different lines
+
+          let checkbox = self
+            .document
+            .create_element("input")
+            .map_err(JsValueError)?
+            .cast::<HtmlInputElement>()?;
+          checkbox.set_type("checkbox");
+          checkbox.set_id(&name);
+          aside.append_child(&checkbox).map_err(JsValueError)?;
+
+          let local = checkbox.clone();
+          let worker = self.worker.clone();
+          checkbox.add_event_listener("input", move || {
+            worker
+              .post_message(&JsValue::from_str(
+                &serde_json::to_string(&AppMessage::Checkbox {
+                  name: &name,
+                  value: local.checked(),
+                })
+                .unwrap(),
+              ))
+              .map_err(JsValueError)
+              .unwrap()
+          })?;
+        }
+      }
       WorkerMessage::Clear => {
         self.gpu.clear()?;
       }

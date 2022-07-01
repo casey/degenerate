@@ -35,6 +35,8 @@ features = [
   "HtmlCanvasElement",
   "HtmlCollection",
   "HtmlElement",
+  "HtmlInputElement",
+  "HtmlLabelElement",
   "HtmlOptionElement",
   "HtmlSelectElement",
   "HtmlTextAreaElement",

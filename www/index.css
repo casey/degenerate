@@ -45,7 +45,7 @@ nav {
   mix-blend-mode: difference;
   position: absolute;
   top: var(--padding-vertical);
-  z-index: 3;
+  z-index: 4;
 }
 
 nav > * {
@@ -82,7 +82,7 @@ samp {
   padding: 1em;
   position: absolute;
   width: 100%;
-  z-index: 2;
+  z-index: 1;
 }
 
 select {
@@ -91,6 +91,17 @@ select {
   right: 0;
   top: 0;
   z-index: 3;
+}
+
+aside {
+  z-index: 3;
+  margin: 0.5rem;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
 }
 
 textarea {
