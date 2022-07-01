@@ -94,11 +94,15 @@ select {
 }
 
 aside {
-  z-index: 3;
+  -webkit-text-stroke-color: black;
+  -webkit-text-stroke-width: 1px;
+  bottom: 0;
+  font-size: 1.5em;
+  font-weight: 900;
   margin: 0.5rem;
   position: absolute;
   right: 0;
-  bottom: 0;
+  z-index: 3;
   z-index: 3;
 }
 
