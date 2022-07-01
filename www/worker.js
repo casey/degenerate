@@ -67,6 +67,11 @@ function check() {
   state.mask = MASK_CHECK;
 }
 
+function checkbox(name) {
+  self.postMessage(JSON.stringify({ checkbox: name }));
+  return !!widgets[name];
+}
+
 function circle() {
   state.mask = MASK_CIRCLE;
 }
@@ -182,11 +187,15 @@ const rng = new Rng();
 const start = Date.now();
 
 let frameResolvers = [];
+let widgets = {};
 
 self.addEventListener('message', async function (event) {
   const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
   const message = JSON.parse(event.data);
   switch (message.tag) {
+    case 'checkbox':
+      widgets[message.content.name] = message.content.value;
+      break;
     case 'script':
       await new AsyncFunction(message.content)();
       self.postMessage(JSON.stringify('done'));
