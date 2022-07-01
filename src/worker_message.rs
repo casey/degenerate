@@ -5,6 +5,8 @@ use super::*;
 pub(crate) enum WorkerMessage {
   Clear,
   Done,
+  OscillatorFrequency(f32),
+  Record,
   Render(State),
   Resolution(u32),
   Save,

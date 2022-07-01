@@ -1,19 +1,20 @@
 use super::*;
 
 pub(crate) struct App {
+  analyser_node: AnalyserNode,
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
   audio_context: AudioContext,
-  analyser_node: AnalyserNode,
   document: Document,
   gpu: Gpu,
   html: HtmlElement,
   nav: HtmlElement,
+  oscillator_node: OscillatorNode,
+  recording: bool,
   select: HtmlSelectElement,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
   window: Window,
   worker: Worker,
-  recording: bool,
 }
 
 impl App {
@@ -59,20 +60,41 @@ impl App {
 
     let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
+    let oscillator_node = audio_context.create_oscillator().unwrap();
+
+    let gain_node = audio_context.create_gain().map_err(JsValueError)?;
+    gain_node.gain().set_value(0.25);
+
+    oscillator_node.frequency().set_value(0.0);
+
+    oscillator_node
+      .connect_with_audio_node(&gain_node)
+      .map_err(JsValueError)?;
+    oscillator_node.start().map_err(JsValueError)?;
+
+    gain_node
+      .connect_with_audio_node(&audio_context.destination())
+      .map_err(JsValueError)?;
+
+    gain_node
+      .connect_with_audio_node(&analyser_node)
+      .map_err(JsValueError)?;
+
     let app = Arc::new(Mutex::new(Self {
-      animation_frame_callback: None,
       analyser_node,
+      animation_frame_callback: None,
       audio_context,
       document,
       gpu,
       html,
       nav,
+      oscillator_node,
+      recording: false,
       select: select.clone(),
       stderr,
       textarea: textarea.clone(),
       window,
       worker: worker.clone(),
-      recording: false,
     }));
 
     let local = app.clone();
@@ -179,8 +201,15 @@ impl App {
       WorkerMessage::Done => {
         self.html.set_class_name("done");
       }
+      WorkerMessage::OscillatorFrequency(frequency) => {
+        self.oscillator_node.frequency().set_value(frequency);
+      }
       WorkerMessage::Render(state) => {
-        if state.operation == 4 /* OPERATION_SAMPLE */ && !self.recording {
+        self.gpu.render(&state)?;
+        self.gpu.present()?;
+      }
+      WorkerMessage::Record => {
+        if !self.recording {
           let audio_context = self.audio_context.clone();
           let analyser_node = self.analyser_node.clone();
           let closure = Closure::wrap(Box::new(move |stream: JsValue| {
@@ -206,26 +235,6 @@ impl App {
           closure.forget();
           self.recording = true;
         }
-        if state.oscillator_frequency > 0.0 && !self.recording {
-          let audio_context = self.audio_context.clone();
-          audio_context.resume().unwrap();
-          // let analyser_node = self.analyser_node.clone();
-
-          let oscillator_node = OscillatorNode::new_with_options(
-            &audio_context,
-            OscillatorOptions::new().frequency(440.0),
-          )
-          .unwrap();
-
-          oscillator_node
-            .connect_with_audio_node(&self.audio_context.destination())
-            .unwrap();
-          oscillator_node.start().unwrap();
-
-          self.recording = true;
-        }
-        self.gpu.render(&state)?;
-        self.gpu.present()?;
       }
       WorkerMessage::Resolution(resolution) => {
         self.gpu.lock_resolution(resolution);

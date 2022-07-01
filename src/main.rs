@@ -23,8 +23,8 @@ use {
     AnalyserNode, AudioContext, Document, Element, EventTarget, HtmlAnchorElement,
     HtmlCanvasElement, HtmlElement, HtmlOptionElement, HtmlSelectElement, HtmlTextAreaElement,
     KeyboardEvent, MediaStream, MediaStreamConstraints, MessageEvent, OscillatorNode,
-    OscillatorOptions, WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer,
-    WebGlTexture, WebGlUniformLocation, Window, Worker,
+    WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
+    WebGlUniformLocation, Window, Worker,
   },
 };
 

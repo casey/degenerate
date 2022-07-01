@@ -281,8 +281,9 @@ const tests = {
     }
   `,
   sample: `
-    soundWave(220);
-    samples();
+    oscillatorFrequency(440);
+    await sleep(100);
+    sample();
     render();
   `,
   scale: `

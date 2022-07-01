@@ -111,6 +111,10 @@ function mod(divisor, remainder) {
   state.mask = MASK_MOD;
 }
 
+function record() {
+  self.postMessage(JSON.stringify('record'));
+}
+
 function reset() {
   state = {
     alpha: 1.0,
@@ -123,7 +127,6 @@ function reset() {
     operation: OPERATION_INVERT,
     operationRotateColorAxis: 'red',
     operationRotateColorRadians: 0.0,
-    oscillatorFrequency: 0,
     rotation: 0.0,
     scale: 1.0,
     wrap: false,
@@ -164,7 +167,7 @@ function sleep(ms) {
 }
 
 function oscillatorFrequency(hz) {
-  state.oscillatorFrequency = hz;
+  self.postMessage(JSON.stringify({'oscillatorFrequency': hz}));
 }
 
 function square() {
