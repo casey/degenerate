@@ -18,6 +18,9 @@ pub(crate) struct App {
   this: Option<Arc<Mutex<Self>>>,
 }
 
+// what to do?
+// - can attach media stream to gain node
+
 impl App {
   pub(super) fn init() -> Result {
     let window = window();
@@ -282,6 +285,7 @@ impl App {
           let app = self.this();
           let closure = Closure::wrap(Box::new(move |stream: JsValue| {
             let media_stream = stream.cast::<MediaStream>().unwrap();
+
             let media_stream_audio_source_node = audio_context
               .create_media_stream_source(&media_stream)
               .unwrap();
@@ -292,6 +296,10 @@ impl App {
               .unwrap();
             app.lock().unwrap().media_stream_audio_source_node =
               Some(media_stream_audio_source_node);
+
+            for stream in media_stream.get_tracks().iter() {
+              stream.cast::<MediaStreamTrack>().unwrap().stop();
+            }
           }) as Box<dyn FnMut(JsValue)>);
           let _ = self
             .window
