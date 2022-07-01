@@ -204,10 +204,6 @@ impl App {
       WorkerMessage::OscillatorFrequency(frequency) => {
         self.oscillator_node.frequency().set_value(frequency);
       }
-      WorkerMessage::Render(state) => {
-        self.gpu.render(&state)?;
-        self.gpu.present()?;
-      }
       WorkerMessage::Record => {
         if !self.recording {
           let audio_context = self.audio_context.clone();
@@ -235,6 +231,10 @@ impl App {
           closure.forget();
           self.recording = true;
         }
+      }
+      WorkerMessage::Render(state) => {
+        self.gpu.render(&state)?;
+        self.gpu.present()?;
       }
       WorkerMessage::Resolution(resolution) => {
         self.gpu.lock_resolution(resolution);
