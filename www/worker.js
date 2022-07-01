@@ -49,7 +49,7 @@ function alpha(alpha) {
 
 async function frame() {
   await new Promise((resolve, reject) => {
-    frameResolvers.push(resolve);
+    frameResolvers.push({resolve: resolve, reject: reject});
   });
 }
 
@@ -188,12 +188,15 @@ self.addEventListener('message', async function (event) {
   const message = JSON.parse(event.data);
   switch (message.tag) {
     case 'script':
+      for (var promise of frameResolvers) {
+        promise.reject();
+      }
       await new AsyncFunction(message.content)();
       self.postMessage(JSON.stringify('done'));
       break;
     case 'frame':
-      for (var resolve of frameResolvers) {
-        resolve();
+      for (var promise of frameResolvers) {
+        promise.resolve();
       }
       frameResolvers = [];
       break;
