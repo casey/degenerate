@@ -4,9 +4,26 @@ import axios from 'axios';
 import { exec } from './common';
 import { test, expect, Page } from '@playwright/test';
 
-const sleep = async (ms) => {
+async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
-};
+}
+
+async function imageData(page) {
+  const encoded = (
+    await page.evaluate(() =>
+      document.getElementsByTagName('canvas')[0].toDataURL()
+    )
+  ).slice('data:image/png;base64,'.length);
+
+  return png.decode(Buffer.from(encoded, 'base64')).data;
+}
+
+async function run(page, program) {
+  await page.locator('textarea').fill(program);
+  await page.keyboard.down('Shift');
+  await page.keyboard.press('Enter');
+  await page.waitForSelector('html.done');
+}
 
 test.beforeAll(async () => {
   let done = false;
@@ -30,20 +47,9 @@ test.beforeEach(async ({ page }) => {
 
 const imageTest = (name, program) => {
   test(name, async ({ page }) => {
-    await page.locator('textarea').fill(program);
+    await run(page, program);
 
-    await page.keyboard.down('Shift');
-    await page.keyboard.press('Enter');
-
-    await page.waitForSelector('html.done');
-
-    const encoded = (
-      await page.evaluate(() =>
-        document.getElementsByTagName('canvas')[0].toDataURL()
-      )
-    ).slice('data:image/png;base64,'.length);
-
-    const have = png.decode(Buffer.from(encoded, 'base64')).data;
+    const have = await imageData(page);
 
     const wantPath = `../images/${name}.png`;
 
@@ -515,16 +521,55 @@ render();
 });
 
 test('elapsed', async ({ page }) => {
-  await page.locator('textarea').fill(`
-    let first = elapsed();
-    await sleep(100);
-    let second = elapsed();
+  await run(
+    page,
+    `
+      let first = elapsed();
+      await sleep(100);
+      let second = elapsed();
 
-    if (second <= first) {
-      throw "Arrow of time is broken!";
-    }
-  `);
-  await page.keyboard.down('Shift');
-  await page.keyboard.press('Enter');
-  await page.waitForSelector('html.done');
+      if (second <= first) {
+        throw "Arrow of time is broken!";
+      }
+    `
+  );
+});
+
+test('checkbox', async ({ page }) => {
+  await run(
+    page,
+    `
+      checkbox('x');
+    `
+  );
+
+  await expect(await page.isChecked('#widget-x')).toBeFalsy();
+
+  await run(
+    page,
+    `
+      if (checkbox('x')) {
+        render();
+      }
+    `
+  );
+
+  let off = await imageData(page);
+  await expect(off[0]).toEqual(0);
+
+  await page.check('#widget-x');
+
+  await run(
+    page,
+    `
+      if (checkbox('x')) {
+        render();
+      }
+    `
+  );
+
+  let on = await imageData(page);
+  await expect(on[0]).toEqual(255);
+
+  await expect(await page.locator('#widget-x').count()).toBe(1);
 });
