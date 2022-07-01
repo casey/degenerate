@@ -13,7 +13,7 @@ while(true) {
     render();
   }
 
-  if checkbox('rotate') {
+  if (checkbox('rotate')) {
     rotate((5 / 6) * TAU * elapsed() / 20000);
   } else {
     rotate((5 / 6) * TAU);

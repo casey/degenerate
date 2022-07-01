@@ -35,10 +35,6 @@ impl App {
       ("Orb Zoom", include_str!("../examples/orb_zoom.js")),
       ("Orbs", include_str!("../examples/orbs.js")),
       ("Pattern", include_str!("../examples/pattern.js")),
-      (
-        "Spinning Kaleidoscope",
-        include_str!("../examples/spinning_kaleidoscope.js"),
-      ),
       ("Starburst", include_str!("../examples/starburst.js")),
       ("Target", include_str!("../examples/target.js")),
       ("X", include_str!("../examples/x.js")),
