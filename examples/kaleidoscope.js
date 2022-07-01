@@ -1,3 +1,5 @@
+let rotation = 5 / 6 * TAU;
+
 while(true) {
   reboot();
 
@@ -14,10 +16,10 @@ while(true) {
   }
 
   if (checkbox('rotate')) {
-    rotate((5 / 6) * TAU * elapsed() / 20000);
-  } else {
-    rotate((5 / 6) * TAU);
+    rotation += delta() / 30000 * TAU;
   }
+
+  rotate(rotation);
 
   rotateColor('blue', 0.05 * TAU);
 

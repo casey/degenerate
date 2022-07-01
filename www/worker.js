@@ -92,6 +92,10 @@ function defaultColor(defaultColor) {
   state.defaultColor = defaultColor;
 }
 
+function delta() {
+  return lastDelta;
+}
+
 function elapsed() {
   return Date.now() - start;
 }
@@ -187,6 +191,8 @@ const rng = new Rng();
 const start = Date.now();
 
 let frameResolvers = [];
+let lastDelta = 0;
+let lastFrame = 0;
 let widgets = {};
 
 self.addEventListener('message', async function (event) {
@@ -205,6 +211,11 @@ self.addEventListener('message', async function (event) {
         resolve();
       }
       frameResolvers = [];
+      let now = Date.now();
+      if (lastFrame > 0) {
+        lastDelta = now - lastFrame;
+      }
+      lastFrame = now;
       break;
   }
 });

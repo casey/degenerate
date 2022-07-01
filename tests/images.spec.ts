@@ -573,3 +573,15 @@ test('checkbox', async ({ page }) => {
 
   await expect(await page.locator('#widget-x').count()).toBe(1);
 });
+
+test('delta', async ({ page }) => {
+  await run(
+    page,
+    `
+      let x = delta();
+      if (x === 0) {
+        throw "Frame delta was zero: " + x;
+      }
+    `
+  );
+});
