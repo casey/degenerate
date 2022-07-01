@@ -38,7 +38,10 @@ test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 256, height: 256 });
   await page.goto(`http://localhost:${process.env.PORT}`);
   await page.evaluate('window.preserveDrawingBuffer = true');
-  page.on('pageerror', (error) => console.log(error.message));
+  page.on('pageerror', (error) => {
+    console.log(error.message);
+    throw error;
+  });
   page.on('console', (message) => {
     if (process.env.VERBOSE || message.type() == 'error') console.log(message);
   });
