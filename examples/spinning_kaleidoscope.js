@@ -23,5 +23,3 @@ while(true) {
 
   await frame();
 }
-
-// Press `Shift + Enter` to execute
