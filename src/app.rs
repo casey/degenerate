@@ -29,7 +29,14 @@ impl App {
 
     let select = document.select("select")?.cast::<HtmlSelectElement>()?;
 
-    let examples = &[("all", include_str!("../examples/all.js"))];
+    let examples = &[
+      ("all", include_str!("../examples/all.js")),
+      ("kaleidoscope", include_str!("../examples/kaleidoscope.js")),
+      ("pattern", include_str!("../examples/pattern.js")),
+      ("starburst", include_str!("../examples/starburst.js")),
+      ("target", include_str!("../examples/target.js")),
+      ("x", include_str!("../examples/x.js")),
+    ];
 
     for (name, program) in examples {
       let option = document
@@ -196,8 +203,14 @@ impl App {
 
   fn on_selection_changed(&mut self) -> Result {
     self.hide_nav();
-    self.textarea.set_value(&self.select.value());
+
+    self.textarea.set_value(&format!(
+      "{}\n// Press `Shift + Enter` to execute",
+      &self.select.value()
+    ));
+
     self.textarea.focus().map_err(JsValueError)?;
+
     Ok(())
   }
 
