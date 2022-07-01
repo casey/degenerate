@@ -100,8 +100,6 @@ aside {
   right: 0;
   bottom: 0;
   z-index: 3;
-  display: flex;
-  justify-content: space-between;
 }
 
 textarea {
