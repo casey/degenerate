@@ -30,12 +30,14 @@ impl App {
     let select = document.select("select")?.cast::<HtmlSelectElement>()?;
 
     let examples = &[
-      ("all", include_str!("../examples/all.js")),
-      ("kaleidoscope", include_str!("../examples/kaleidoscope.js")),
-      ("pattern", include_str!("../examples/pattern.js")),
-      ("starburst", include_str!("../examples/starburst.js")),
-      ("target", include_str!("../examples/target.js")),
-      ("x", include_str!("../examples/x.js")),
+      ("All", include_str!("../examples/all.js")),
+      ("Kaleidoscope", include_str!("../examples/kaleidoscope.js")),
+      ("Orb Zoom", include_str!("../examples/orb_zoom.js")),
+      ("Orbs", include_str!("../examples/orbs.js")),
+      ("Pattern", include_str!("../examples/pattern.js")),
+      ("Starburst", include_str!("../examples/starburst.js")),
+      ("Target", include_str!("../examples/target.js")),
+      ("X", include_str!("../examples/x.js")),
     ];
 
     for (name, program) in examples {

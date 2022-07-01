@@ -509,7 +509,7 @@ test('forbid-unused-images', async () => {
 });
 
 test('all-example', async ({ page }) => {
-  await page.selectOption('select', { label: 'all' });
+  await page.selectOption('select', { label: 'All' });
 
   await expect(await page.locator('textarea')).toHaveValue(`reboot();
 
@@ -572,4 +572,16 @@ test('checkbox', async ({ page }) => {
   await expect(on[0]).toEqual(255);
 
   await expect(await page.locator('#widget-x').count()).toBe(1);
+});
+
+test('delta', async ({ page }) => {
+  await run(
+    page,
+    `
+      let x = delta();
+      if (x === 0) {
+        throw "Frame delta was zero: " + x;
+      }
+    `
+  );
 });

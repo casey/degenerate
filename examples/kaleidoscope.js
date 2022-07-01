@@ -1,21 +1,31 @@
-reboot();
+let rotation = 5 / 6 * TAU;
 
-rotateColor('green', 0.05 * TAU);
+while(true) {
+  reboot();
 
-circle();
+  rotateColor('green', 0.05 * TAU);
 
-scale(0.75);
+  circle();
 
-wrap();
+  scale(0.75);
 
-for (_ of range(8)) {
-  render();
-}
+  wrap();
 
-rotate((5 / 6) * TAU);
+  for (_ of range(8)) {
+    render();
+  }
 
-rotateColor('blue', 0.05 * TAU);
+  if (checkbox('rotate')) {
+    rotation += delta() / 30000 * TAU;
+  }
 
-for (_ of range(8)) {
-  render();
+  rotate(rotation);
+
+  rotateColor('blue', 0.05 * TAU);
+
+  for (_ of range(8)) {
+    render();
+  }
+
+  await frame();
 }
