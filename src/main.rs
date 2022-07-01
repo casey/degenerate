@@ -5,7 +5,7 @@ use {
     state::State, stderr::Stderr, window::window, worker_message::WorkerMessage,
   },
   image::{ImageBuffer, ImageOutputFormat},
-  js_sys::Float32Array,
+  js_sys::{Float32Array, Promise},
   nalgebra::{Rotation3, Similarity2, UnitComplex, Vector3},
   serde::{Deserialize, Serialize},
   std::{
@@ -21,9 +21,10 @@ use {
   wasm_bindgen::{closure::Closure, convert::FromWasmAbi, JsCast, JsValue},
   web_sys::{
     AnalyserNode, AudioContext, Document, Element, EventTarget, HtmlAnchorElement,
-    HtmlCanvasElement, HtmlElement, HtmlOptionElement, HtmlSelectElement, HtmlTextAreaElement,
-    KeyboardEvent, MediaStream, MediaStreamConstraints, MessageEvent, OscillatorNode,
-    WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
+    HtmlCanvasElement, HtmlDivElement, HtmlElement, HtmlInputElement, HtmlLabelElement,
+    HtmlOptionElement, HtmlSelectElement, HtmlTextAreaElement, KeyboardEvent, MediaStream,
+    MediaStreamAudioSourceNode, MediaStreamConstraints, MediaStreamTrack, MessageEvent,
+    OscillatorNode, WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
     WebGlUniformLocation, Window, Worker,
   },
 };

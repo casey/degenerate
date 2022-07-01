@@ -54,7 +54,7 @@ function elapsed() {
 
 async function frame() {
   await new Promise((resolve, reject) => {
-    frameResolvers.push(resolve);
+    frameCallbacks.push({resolve, reject});
   });
 }
 
@@ -71,6 +71,11 @@ function resolution(resolution) {
 
 function check() {
   state.mask = MASK_CHECK;
+}
+
+function checkbox(name) {
+  self.postMessage(JSON.stringify({ checkbox: name }));
+  return !!widgets[name];
 }
 
 function circle() {
@@ -93,6 +98,10 @@ function defaultColor(defaultColor) {
   state.defaultColor = defaultColor;
 }
 
+function delta() {
+  return lastDelta;
+}
+
 function elapsed() {
   return Date.now() - start;
 }
@@ -111,8 +120,8 @@ function mod(divisor, remainder) {
   state.mask = MASK_MOD;
 }
 
-function record() {
-  self.postMessage(JSON.stringify('record'));
+function record(record) {
+  self.postMessage(JSON.stringify({record}));
 }
 
 function reset() {
@@ -199,21 +208,36 @@ function* range(iterations) {
 const rng = new Rng();
 const start = Date.now();
 
-let frameResolvers = [];
+let frameCallbacks = [];
+let lastDelta = 0;
+let lastFrame = 0;
+let widgets = {};
 
 self.addEventListener('message', async function (event) {
   const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
   const message = JSON.parse(event.data);
   switch (message.tag) {
+    case 'checkbox':
+      widgets[message.content.name] = message.content.value;
+      break;
     case 'script':
+      for (var callbacks of frameCallbacks) {
+        callbacks.reject();
+      }
+      frameCallbacks = [];
       await new AsyncFunction(message.content)();
       self.postMessage(JSON.stringify('done'));
       break;
     case 'frame':
-      for (var resolve of frameResolvers) {
-        resolve();
+      for (var callbacks of frameCallbacks) {
+        callbacks.resolve();
       }
-      frameResolvers = [];
+      frameCallbacks = [];
+      let now = Date.now();
+      if (lastFrame > 0) {
+        lastDelta = now - lastFrame;
+      }
+      lastFrame = now;
       break;
   }
 });

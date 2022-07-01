@@ -45,7 +45,7 @@ nav {
   mix-blend-mode: difference;
   position: absolute;
   top: var(--padding-vertical);
-  z-index: 3;
+  z-index: 5;
 }
 
 nav > * {
@@ -82,7 +82,7 @@ samp {
   padding: 1em;
   position: absolute;
   width: 100%;
-  z-index: 2;
+  z-index: 1;
 }
 
 select {
@@ -90,6 +90,18 @@ select {
   position: absolute;
   right: 0;
   top: 0;
+  z-index: 4;
+}
+
+aside {
+  -webkit-text-stroke-color: black;
+  -webkit-text-stroke-width: 1px;
+  bottom: 0;
+  font-size: 1.5em;
+  font-weight: 900;
+  margin: 0.5rem;
+  position: absolute;
+  right: 0;
   z-index: 3;
 }
 

@@ -6,4 +6,5 @@ use super::*;
 pub(crate) enum AppMessage<'a> {
   Script(&'a str),
   Frame,
+  Checkbox { name: &'a str, value: bool },
 }

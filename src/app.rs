@@ -9,12 +9,13 @@ pub(crate) struct App {
   html: HtmlElement,
   nav: HtmlElement,
   oscillator_node: OscillatorNode,
-  recording: bool,
+  media_stream_audio_source_node: Option<MediaStreamAudioSourceNode>,
   select: HtmlSelectElement,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
   window: Window,
   worker: Worker,
+  this: Option<Arc<Mutex<Self>>>,
 }
 
 impl App {
@@ -33,7 +34,17 @@ impl App {
 
     let select = document.select("select")?.cast::<HtmlSelectElement>()?;
 
-    let examples = &[("all", include_str!("../examples/all.js"))];
+    let examples = &[
+      ("All", include_str!("../examples/all.js")),
+      ("Kaleidoscope", include_str!("../examples/kaleidoscope.js")),
+      ("Orb Zoom", include_str!("../examples/orb_zoom.js")),
+      ("Orbs", include_str!("../examples/orbs.js")),
+      ("Pattern", include_str!("../examples/pattern.js")),
+      ("Sample", include_str!("../examples/sample.js")),
+      ("Starburst", include_str!("../examples/starburst.js")),
+      ("Target", include_str!("../examples/target.js")),
+      ("X", include_str!("../examples/x.js")),
+    ];
 
     for (name, program) in examples {
       let option = document
@@ -89,27 +100,31 @@ impl App {
       html,
       nav,
       oscillator_node,
-      recording: false,
+      media_stream_audio_source_node: None,
       select: select.clone(),
       stderr,
       textarea: textarea.clone(),
       window,
       worker: worker.clone(),
+      this: None,
     }));
 
-    let local = app.clone();
-    app.lock().unwrap().animation_frame_callback = Some(Closure::wrap(Box::new(move |timestamp| {
-      let mut app = local.lock().unwrap();
-      let result = app.on_animation_frame(timestamp);
-      app.stderr.update(result);
-    })
-      as Box<dyn FnMut(f64)>));
+    {
+      let local = app.clone();
+      let mut this = app.lock().unwrap();
+      this.animation_frame_callback = Some(Closure::wrap(Box::new(move |timestamp| {
+        let mut app = local.lock().unwrap();
+        let result = app.on_animation_frame(timestamp);
+        app.stderr.update(result);
+      }) as Box<dyn FnMut(f64)>));
+      this.this = Some(app.clone());
+    }
 
     let local = app.clone();
     textarea.add_event_listener("input", move || {
       let app = local.lock().unwrap();
-      app.hide_nav();
-      let _ = app.audio_context.resume().unwrap();
+      let result = app.on_input();
+      app.stderr.update(result);
     })?;
 
     let local = app.clone();
@@ -195,6 +210,54 @@ impl App {
     )?;
 
     match event {
+      WorkerMessage::Checkbox(name) => {
+        let id = format!("widget-{name}");
+        if self.document.select_optional(&format!("#{id}"))?.is_none() {
+          let aside = self.document.select("aside")?;
+
+          let div = self
+            .document
+            .create_element("div")
+            .map_err(JsValueError)?
+            .cast::<HtmlDivElement>()?;
+          aside.append_child(&div).map_err(JsValueError)?;
+
+          let label = self
+            .document
+            .create_element("label")
+            .map_err(JsValueError)?
+            .cast::<HtmlLabelElement>()?;
+          label.set_html_for(&id);
+          label.set_inner_text(&name);
+          div.append_child(&label).map_err(JsValueError)?;
+
+          let checkbox = self
+            .document
+            .create_element("input")
+            .map_err(JsValueError)?
+            .cast::<HtmlInputElement>()?;
+          checkbox.set_type("checkbox");
+          checkbox.set_id(&id);
+          div.append_child(&checkbox).map_err(JsValueError)?;
+
+          let local = checkbox.clone();
+          let worker = self.worker.clone();
+          let stderr = self.stderr.clone();
+          checkbox.add_event_listener("input", move || {
+            stderr.update(|| -> Result {
+              worker
+                .post_message(&JsValue::from_str(&serde_json::to_string(
+                  &AppMessage::Checkbox {
+                    name: &name,
+                    value: local.checked(),
+                  },
+                )?))
+                .map_err(JsValueError)?;
+              Ok(())
+            }())
+          })?;
+        }
+      }
       WorkerMessage::Clear => {
         self.gpu.clear()?;
       }
@@ -204,17 +267,31 @@ impl App {
       WorkerMessage::OscillatorFrequency(frequency) => {
         self.oscillator_node.frequency().set_value(frequency);
       }
-      WorkerMessage::Record => {
-        if !self.recording {
+      WorkerMessage::Record(record) => {
+        if let Some(media_stream_audio_source_node) = &self.media_stream_audio_source_node {
+          if record {
+            media_stream_audio_source_node
+              .connect_with_audio_node(&self.analyser_node)
+              .unwrap();
+          } else {
+            media_stream_audio_source_node.disconnect().unwrap();
+          }
+        } else if record {
           let audio_context = self.audio_context.clone();
           let analyser_node = self.analyser_node.clone();
+          let app = self.this();
           let closure = Closure::wrap(Box::new(move |stream: JsValue| {
-            audio_context
-              .create_media_stream_source(&stream.cast::<MediaStream>().unwrap())
-              .unwrap()
+            let media_stream = stream.cast::<MediaStream>().unwrap();
+            let media_stream_audio_source_node = audio_context
+              .create_media_stream_source(&media_stream)
+              .unwrap();
+
+            media_stream_audio_source_node
               .connect_with_audio_node(&analyser_node)
               .map_err(JsValueError)
               .unwrap();
+            app.lock().unwrap().media_stream_audio_source_node =
+              Some(media_stream_audio_source_node);
           }) as Box<dyn FnMut(JsValue)>);
           let _ = self
             .window
@@ -229,7 +306,6 @@ impl App {
             .map_err(JsValueError)?
             .then(&closure);
           closure.forget();
-          self.recording = true;
         }
       }
       WorkerMessage::Render(state) => {
@@ -260,13 +336,34 @@ impl App {
   }
 
   fn on_selection_changed(&mut self) -> Result {
-    self.hide_nav();
-    self.textarea.set_value(&self.select.value());
+    self.on_input()?;
+
+    self.textarea.set_value(&format!(
+      "{}\n// Press `Shift + Enter` to execute",
+      &self.select.value()
+    ));
+
     self.textarea.focus().map_err(JsValueError)?;
+
     Ok(())
   }
 
-  fn hide_nav(&self) {
-    self.nav.set_class_name("fade-out");
+  fn on_input(&self) -> Result {
+    self
+      .html
+      .class_list()
+      .remove_1("done")
+      .map_err(JsValueError)?;
+    self
+      .nav
+      .class_list()
+      .add_1("fade-out")
+      .map_err(JsValueError)?;
+    let _promise: Promise = self.audio_context.resume().map_err(JsValueError)?;
+    Ok(())
+  }
+
+  fn this(&self) -> Arc<Mutex<Self>> {
+    self.this.as_ref().unwrap().clone()
   }
 }
