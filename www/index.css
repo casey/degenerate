@@ -45,7 +45,7 @@ nav {
   mix-blend-mode: difference;
   position: absolute;
   top: var(--padding-vertical);
-  z-index: 4;
+  z-index: 5;
 }
 
 nav > * {
@@ -90,7 +90,7 @@ select {
   position: absolute;
   right: 0;
   top: 0;
-  z-index: 3;
+  z-index: 4;
 }
 
 aside {
@@ -102,7 +102,6 @@ aside {
   margin: 0.5rem;
   position: absolute;
   right: 0;
-  z-index: 3;
   z-index: 3;
 }
 
