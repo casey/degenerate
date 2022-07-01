@@ -2,6 +2,446 @@
 
 importScripts('randchacha_browser.min.js');
 
+// Mask all pixels.
+//
+// ```
+// all();
+// render();
+// ```
+//
+// `MASK_ALL` is the default mask, so the above example could have been written
+// as:
+//
+// ```
+// render();
+// ```
+function all() {
+  state.mask = MASK_ALL;
+}
+
+// Set the alpha blending factor. `alpha` will be used to blend the output of
+// the current operation with the original color. See `www/fragment.glsl` for
+// the blend equation.
+//
+// ```
+// alpha(0.5);
+// render();
+// ```
+function alpha(alpha) {
+  state.alpha = alpha;
+}
+
+// Mask pixels in a checkerboard pattern.
+//
+// ```
+// check;
+// render();
+// ```
+function check() {
+  state.mask = MASK_CHECK;
+}
+
+// Create a new checkbox widget with the label `name`, and return true if it is
+// checked. Calls with same `name` will all refer to the same checkbox, making
+// it safe to call repeatedly.
+//
+// ```
+// while(true) {
+//  reboot();
+//  if (checkbox('x')) {
+//    x();
+//  } else {
+//    circle();
+//  }
+//  await render();
+// }
+// ```
+function checkbox(name) {
+  self.postMessage(JSON.stringify({ checkbox: name }));
+  return !!widgets[name];
+}
+
+// Mask pixels within a circle.
+//
+// ```
+// circle();
+// render();
+// ```
+function circle() {
+  state.mask = MASK_CIRCLE;
+}
+
+// Clear the canvas.
+//
+// ```
+// check();
+// render();
+// clear();
+// ```
+function clear() {
+  self.postMessage(JSON.stringify('clear'));
+}
+
+// Mask pixels within a cross shape.
+//
+// ```
+// cross();
+// render();
+// ```
+function cross() {
+  state.mask = MASK_CROSS;
+}
+
+// Set the operation to the debug operation.The debug operation is permanently
+// unstable, and may change at any time.
+//
+// ```
+// debug();
+// render();
+// ```
+function debug() {
+  state.operation = OPERATION_DEBUG;
+}
+
+// Set the default color. The default color is returned whenever a pixel is sampled
+// out of bounds due a rotation, scale, or other sample coordinate transformation.
+//
+// ```
+// defaultColor([255, 0, 255]);
+// rotate(0.01 * TAU);
+// render();
+// ```
+function defaultColor(defaultColor) {
+  state.defaultColor = defaultColor;
+}
+
+// Return the number of milliseconds that have elapsed between this frame and the last.
+// Returns 0 for the first frame.
+//
+// ```
+// let rotation = 0;
+//
+// while(true) {
+//   reboot();
+//   x();
+//   rotation += delta() / 30000 * TAU;
+//   rotate(rotation);
+//   await render();
+// }
+// ```
+function delta() {
+  return lastDelta;
+}
+
+// Return the number of milliseconds that have elapsed since the page was loaded.
+//
+// ```
+// while(true) {
+//   reboot()
+//   circle();
+//   scale(0.75 * elapsed() / 20000);
+//   await render();
+// }
+// ```
+function elapsed() {
+  return Date.now() - start;
+}
+
+// Returns a promise that resolves when the browser is ready to display a new
+// frame. Call `await frame()` in your rendering loop to only render when
+// necessary and make sure each frame is displayed after rendering.
+//
+// ```
+// scale(0.99);
+// while (true) {
+//   circle();
+//   render();
+//   x()
+//   render();
+//   await frame();
+// }
+// ```
+async function frame() {
+  await new Promise((resolve, reject) => {
+    frameCallbacks.push(resolve);
+  });
+}
+
+// Set the operation to the identity operation. The identity operation returns the
+// sampled pixel unchanged. Useful for applying transformations, such as scales or
+// rotation, without changing the sampled pixels.
+//
+// ```
+// identity();
+// render();
+// ```
+function identity() {
+  state.operation = OPERATION_IDENTITY;
+}
+
+// Set the operation to the invert operation. The invert operation inverts the sample
+// pixels RGB components.
+//
+// ```
+// x();
+// invert();
+// render();
+// ```
+//
+// The invert operation is the default operation, so the above example could have been
+// written as:
+//
+// ```
+// x();
+// render();
+// ```
+function invert() {
+  state.operation = OPERATION_INVERT;
+}
+
+// Mask pixels where the pixel's index mod `divisor` is equal to `remainder`.
+//
+// ```
+// mod(7,0);
+// render();
+// ```
+function mod(divisor, remainder) {
+  state.maskModDivisor = divisor;
+  state.maskModRemainder = remainder;
+  state.mask = MASK_MOD;
+}
+
+// Yield values in the half-open range `[0,iterations)`.
+//
+// ```
+// x();
+// scale(0.9);
+// for(_ of range(10)) {
+//   render();
+//   await sleep(1000);
+// }
+// ```
+function* range(iterations) {
+  for (let i = 0; i < iterations; i++) {
+    yield i;
+  }
+}
+
+// Reset the image filter state and clear the canvas.
+// ```
+// x();
+// render();
+// reboot();
+// ```
+function reboot() {
+  reset();
+  clear();
+}
+
+// Send the current state to the main thread to be rendered. Like `frame()`,
+// returns a promise that will resolve when the browser is ready to display a
+// new frame. Use `await frame();` when you want to render multiple times before
+// presenting a new frame, and `await render();` when you want to render once
+// per frame.
+//
+// ```
+// scale(0.99);
+// circle();
+// while (true) {
+//   await render();
+// }
+// ```
+async function render() {
+  self.postMessage(JSON.stringify({ render: state }));
+  await frame();
+}
+
+// Reset the image filter state.
+//
+// ```
+// x();
+// render();
+// reset();
+// ```
+function reset() {
+  state = new State();
+}
+
+// Set resolution to a fixed value. Normally, the resolution increases and
+// decreases automatically as the window is resized. This is usually what you
+// want, but it is convenient to override it if you want to render at a fixed
+// size, for example for saving high-resolution images:
+//
+// ```
+// resolution(4096);
+// x();
+// render();
+// save();
+// ```
+function resolution(resolution) {
+  if (Number.isInteger(resolution)) {
+    self.postMessage(JSON.stringify({ resolution }));
+  }
+}
+
+// Add `rotation` to the current rotation.
+//
+// ```
+// rotate(0.1);
+// x();
+// render();
+// ```
+function rotate(rotation) {
+  state.rotation += rotation;
+}
+
+// Set the roate color operation. The rotate color operation interpets the sample pixel
+// as a vector in three dimensional space and rotates it about the `axis` by `radians`.
+//
+// Valid values for `axis` are `red`, `green`, and `blue`. Applying `rotateColor` multiple
+// times around different axes is a good way to get a variety of colors. Since `rotateColor`
+// rotates the vector around the provided color axis, it will not change the amount of the
+// axis's color. So if you want red, e.g., rotate about the `green` or `blue` axes.
+//
+// ```
+// rotateColor('red', 0.5 * TAU);
+// all();
+// render();
+// ```
+function rotateColor(axis, radians) {
+  state.operationRotateColorAxis = axis;
+  state.operationRotateColorRadians = radians;
+  state.operation = OPERATION_ROTATE_COLOR;
+}
+
+// Mask pixels where `pixel.y % (nrows + step) < nrows`. Will mask `nrows` pixels and then
+// skip `step` pixels.
+//
+// ```
+// rows(1, 9);
+// render();
+// ```
+function rows(nrows, step) {
+  state.maskRowsRows = nrows;
+  state.maskRowsStep = step;
+  state.mask = MASK_ROWS;
+}
+
+// Save the current canvas as a PNG.
+//
+// ```
+// resolution(4096);
+// x();
+// render();
+// save();
+// ```
+function save() {
+  self.postMessage(JSON.stringify('save'));
+}
+
+// Multiply the current scale factor by `scale`.
+//
+// ```
+// circle();
+// render();
+// scale(0.5);
+// render();
+// ```
+function scale(scale) {
+  state.scale *= scale;
+}
+
+// Return a promise that resolves after `ms` milliseconds.
+//
+// ```
+// circle();
+// render();
+// await sleep(1000);
+// scale(0.5);
+// render();
+// ```
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Mask pixels within a square.
+//
+// ```
+// square();
+// render();
+// ```
+function square() {
+  state.mask = MASK_SQUARE;
+}
+
+// Mask the pixels in the upper half of the canvas.
+//
+// ```
+// top();
+// render();
+// ```
+function top() {
+  state.mask = MASK_TOP;
+}
+
+// Toggle wrapping. When `wrap` is `true`, out of bounds samples will be wrapped back within bounds.
+//
+// ```
+// x();
+// wrap();
+// scale(0.1);
+// render();
+// ```
+function wrap() {
+  state.wrap = !state.wrap;
+}
+
+// Mask pixels in an X shape.
+//
+// ```
+// x();
+// render();
+// ```
+function x() {
+  state.mask = MASK_X;
+}
+
+// The ratio of a circle's circumference to its diameter. Useful for expressing
+// rotations in radians, where a full 360° turn is equal to `2 * PI`. For
+// example, to rotate 1/4 turn, use `rotate(1/4 * 2 * PI)`.
+const PI = Math.PI;
+
+// The ratio of a circle's circumference to its radius. Useful for expressing
+// rotations in radians, where a full 360° turn is equal to `TAU` For example,
+// to rotate 1/4 turn, use `rotate(1/4 * TAU)`.
+const TAU = Math.PI * 2;
+
+// Mask constants. The mask determines which pixels the current operation will
+// be applied to. These values should be kept in sync with those in
+// `www/fragment.glsl`. See the corresponding functions and case statements,
+// e.g., `all()` in this file and `case MASK_ALL:` in `www/fragment.glsl`, for
+// more details and the mask definition, respectively.
+const MASK_ALL = 0;
+const MASK_CHECK = 1;
+const MASK_CIRCLE = 2;
+const MASK_CROSS = 3;
+const MASK_MOD = 4;
+const MASK_ROWS = 5;
+const MASK_SQUARE = 6;
+const MASK_TOP = 7;
+const MASK_X = 8;
+
+// Operation constants. The operation determines how pixels selected by the mask
+// will be modified. These values should be kept in sync with those in
+// `www/fragment.glsl`. See the corresponding functions and case statements,
+// e.g., `invert()` in this file and `case OPERATION_INVERT:` in
+// `www/fragment.glsl`, for more details and the operation definitions,
+// respectively.
+const OPERATION_DEBUG = 0;
+const OPERATION_IDENTITY = 1;
+const OPERATION_INVERT = 2;
+const OPERATION_ROTATE_COLOR = 3;
+
 class Rng {
   constructor(seed) {
     this.seed(0);
@@ -18,181 +458,31 @@ class Rng {
   }
 }
 
-const PI = Math.PI;
-const TAU = Math.PI * 2;
-
-const MASK_ALL = 0;
-const MASK_CHECK = 1;
-const MASK_CIRCLE = 2;
-const MASK_CROSS = 3;
-const MASK_MOD = 4;
-const MASK_ROWS = 5;
-const MASK_SQUARE = 6;
-const MASK_TOP = 7;
-const MASK_X = 8;
-
-const OPERATION_DEBUG = 0;
-const OPERATION_IDENTITY = 1;
-const OPERATION_INVERT = 2;
-const OPERATION_ROTATE_COLOR = 3;
-
-let state;
-reset();
-
-function all() {
-  state.mask = MASK_ALL;
-}
-
-function alpha(alpha) {
-  state.alpha = alpha;
-}
-
-async function frame() {
-  await new Promise((resolve, reject) => {
-    frameCallbacks.push(resolve);
-  });
-}
-
-function render() {
-  self.postMessage(JSON.stringify({ render: state }));
-}
-
-function resolution(resolution) {
-  if (Number.isInteger(resolution)) {
-    self.postMessage(JSON.stringify({ resolution }));
+// State objects encapsulate the current image filter state.
+class State {
+  constructor() {
+    this.alpha = 1.0;
+    this.defaultColor = [0.0, 0.0, 0.0];
+    this.mask = MASK_ALL;
+    this.maskModDivisor = 0;
+    this.maskModRemainder = 0;
+    this.maskRowsRows = 0;
+    this.maskRowsStep = 0;
+    this.operation = OPERATION_INVERT;
+    this.operationRotateColorAxis = 'red';
+    this.operationRotateColorRadians = 0.0;
+    this.rotation = 0.0;
+    this.scale = 1.0;
+    this.wrap = false;
   }
 }
-
-function check() {
-  state.mask = MASK_CHECK;
-}
-
-function checkbox(name) {
-  self.postMessage(JSON.stringify({ checkbox: name }));
-  return !!widgets[name];
-}
-
-function circle() {
-  state.mask = MASK_CIRCLE;
-}
-
-function clear() {
-  self.postMessage(JSON.stringify('clear'));
-}
-
-function cross() {
-  state.mask = MASK_CROSS;
-}
-
-function debug() {
-  state.operation = OPERATION_DEBUG;
-}
-
-function defaultColor(defaultColor) {
-  state.defaultColor = defaultColor;
-}
-
-function delta() {
-  return lastDelta;
-}
-
-function elapsed() {
-  return Date.now() - start;
-}
-
-function identity() {
-  state.operation = OPERATION_IDENTITY;
-}
-
-function invert() {
-  state.operation = OPERATION_INVERT;
-}
-
-function mod(divisor, remainder) {
-  state.maskModDivisor = divisor;
-  state.maskModRemainder = remainder;
-  state.mask = MASK_MOD;
-}
-
-function reset() {
-  state = {
-    alpha: 1.0,
-    defaultColor: [0.0, 0.0, 0.0],
-    mask: MASK_ALL,
-    maskModDivisor: 0,
-    maskModRemainder: 0,
-    maskRowsRows: 0,
-    maskRowsStep: 0,
-    operation: OPERATION_INVERT,
-    operationRotateColorAxis: 'red',
-    operationRotateColorRadians: 0.0,
-    rotation: 0.0,
-    scale: 1.0,
-    wrap: false,
-  };
-}
-
-function reboot() {
-  reset();
-  clear();
-}
-
-function rotate(rotation) {
-  state.rotation += rotation;
-}
-
-function rotateColor(axis, radians) {
-  state.operationRotateColorAxis = axis;
-  state.operationRotateColorRadians = radians;
-  state.operation = OPERATION_ROTATE_COLOR;
-}
-
-function rows(nrows, step) {
-  state.maskRowsRows = nrows;
-  state.maskRowsStep = step;
-  state.mask = MASK_ROWS;
-}
-
-function save() {
-  self.postMessage(JSON.stringify('save'));
-}
-
-function scale(scale) {
-  state.scale *= scale;
-}
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function square() {
-  state.mask = MASK_SQUARE;
-}
-
-function top() {
-  state.mask = MASK_TOP;
-}
-
-function wrap() {
-  state.wrap = !state.wrap;
-}
-
-function x() {
-  state.mask = MASK_X;
-}
-
-function* range(iterations) {
-  for (let i = 0; i < iterations; i++) {
-    yield i;
-  }
-}
-
-const rng = new Rng();
-const start = Date.now();
 
 let frameCallbacks = [];
 let lastDelta = 0;
 let lastFrame = 0;
+let rng = new Rng();
+let start = Date.now();
+let state = new State();
 let widgets = {};
 
 self.addEventListener('message', async function (event) {
