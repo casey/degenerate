@@ -198,14 +198,14 @@ test('radio', async ({ page }) => {
     `
   );
 
-  await expect(await page.isChecked('text=a')).toBeFalsy();
+  await expect(await page.isChecked('text=a')).toBeTruthy();
   await expect(await page.isChecked('text=b')).toBeFalsy();
   await expect(await page.isChecked('text=c')).toBeFalsy();
 
   await run(
     page,
     `
-      if (radio('foo', ['a', 'b', 'c']) == 'a') {
+      if (radio('foo', ['a', 'b', 'c']) == 'b') {
         render();
       }
     `
@@ -214,12 +214,12 @@ test('radio', async ({ page }) => {
   let off = png.decode(await imageBuffer(page)).data;
   await expect(off[0]).toEqual(0);
 
-  await page.check('text=a');
+  await page.check('text=b');
 
   await run(
     page,
     `
-      if (radio('foo', ['a', 'b', 'c']) == 'a') {
+      if (radio('foo', ['a', 'b', 'c']) == 'b') {
         render();
       }
     `

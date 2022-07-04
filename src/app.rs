@@ -259,7 +259,7 @@ impl App {
 
           div.append_child(&label).map_err(JsValueError)?;
 
-          for option in options {
+          for (i, option) in options.iter().enumerate() {
             let label = self
               .document
               .create_element("label")
@@ -283,6 +283,7 @@ impl App {
             div.append_child(&radio).map_err(JsValueError)?;
 
             let name = name.clone();
+            let option = option.clone();
             let worker = self.worker.clone();
             let stderr = self.stderr.clone();
             radio.add_event_listener("input", move || {
@@ -298,6 +299,10 @@ impl App {
                 Ok(())
               }())
             })?;
+
+            if i == 0 {
+              radio.set_checked(true);
+            }
           }
         }
       }
