@@ -209,7 +209,7 @@ test('run', async ({ page }) => {
     `
   );
 
-  await page.locator('#run').click();
+  await page.locator('text=run').click();
 
   await page.waitForSelector('html.done');
 
