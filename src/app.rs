@@ -297,9 +297,9 @@ impl App {
             app.lock().unwrap().media_stream_audio_source_node =
               Some(media_stream_audio_source_node);
 
-            for stream in media_stream.get_tracks().iter() {
-              stream.cast::<MediaStreamTrack>().unwrap().stop();
-            }
+            // for stream in media_stream.get_tracks().iter() {
+            //   stream.cast::<MediaStreamTrack>().unwrap().stop();
+            // }
           }) as Box<dyn FnMut(JsValue)>);
           let _ = self
             .window
