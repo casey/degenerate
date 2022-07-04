@@ -278,7 +278,7 @@ impl App {
     self.on_input()?;
 
     self.textarea.set_value(&format!(
-      "{}\n// Press `Shift + Enter` to execute",
+      "{}\n// Press the `Run` button or `Shift + Enter` to execute",
       &self.select.value()
     ));
 
