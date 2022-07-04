@@ -190,6 +190,47 @@ test('checkbox', async ({ page }) => {
   await expect(await page.locator('#widget-x').count()).toBe(1);
 });
 
+test('radio', async ({ page }) => {
+  await run(
+    page,
+    `
+      radio('foo', ['a', 'b', 'c']);
+    `
+  );
+
+  await expect(await page.isChecked('text=a')).toBeFalsy();
+  await expect(await page.isChecked('text=b')).toBeFalsy();
+  await expect(await page.isChecked('text=c')).toBeFalsy();
+
+  await run(
+    page,
+    `
+      if (radio('foo', ['a', 'b', 'c']) == 'a') {
+        render();
+      }
+    `
+  );
+
+  let off = png.decode(await imageBuffer(page)).data;
+  await expect(off[0]).toEqual(0);
+
+  await page.check('text=a');
+
+  await run(
+    page,
+    `
+      if (radio('foo', ['a', 'b', 'c']) == 'a') {
+        render();
+      }
+    `
+  );
+
+  let on = png.decode(await imageBuffer(page)).data;
+  await expect(on[0]).toEqual(255);
+
+  await expect(await page.locator('#widget-foo').count()).toBe(1);
+});
+
 test('delta', async ({ page }) => {
   await run(
     page,

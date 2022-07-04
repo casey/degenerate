@@ -33,6 +33,7 @@ features = [
   "DomTokenList",
   "Element",
   "HtmlAnchorElement",
+  "HtmlBrElement",
   "HtmlCanvasElement",
   "HtmlCollection",
   "HtmlDivElement",

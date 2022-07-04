@@ -114,6 +114,11 @@ function mod(divisor, remainder) {
   state.mask = MASK_MOD;
 }
 
+function radio(name, options) {
+  self.postMessage(JSON.stringify({ radio: [name, options] }))
+  return widgets[name];
+}
+
 function reset() {
   state = {
     alpha: 1.0,
@@ -200,6 +205,9 @@ self.addEventListener('message', async function (event) {
   const message = JSON.parse(event.data);
   switch (message.tag) {
     case 'checkbox':
+      widgets[message.content.name] = message.content.value;
+      break;
+    case 'radio':
       widgets[message.content.name] = message.content.value;
       break;
     case 'script':
