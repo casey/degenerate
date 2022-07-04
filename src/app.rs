@@ -13,6 +13,8 @@ pub(crate) struct App {
   worker: Worker,
 }
 
+const EXAMPLES: include_dir::Dir = include_dir!("examples");
+
 impl App {
   pub(super) fn init() -> Result {
     let window = window();
@@ -29,30 +31,37 @@ impl App {
 
     let select = document.select("select")?.cast::<HtmlSelectElement>()?;
 
-    let examples = &[
-      ("All", include_str!("../examples/all.js")),
-      ("Kaleidoscope", include_str!("../examples/kaleidoscope.js")),
-      ("Orb Zoom", include_str!("../examples/orb_zoom.js")),
-      ("Orbs", include_str!("../examples/orbs.js")),
-      ("Pattern", include_str!("../examples/pattern.js")),
-      ("Starburst", include_str!("../examples/starburst.js")),
-      ("Target", include_str!("../examples/target.js")),
-      ("X", include_str!("../examples/x.js")),
-    ];
+    for entry in EXAMPLES.entries() {
+      match entry {
+        include_dir::DirEntry::File(file) => {
+          let path = file.path();
 
-    for (name, program) in examples {
-      let option = document
-        .create_element("option")
-        .map_err(JsValueError)?
-        .cast::<HtmlOptionElement>()?;
+          let option = document
+            .create_element("option")
+            .map_err(JsValueError)?
+            .cast::<HtmlOptionElement>()?;
 
-      option.set_text(name);
+          option.set_text(
+            &path
+              .file_stem()
+              .ok_or("Failed to extract file stem")?
+              .to_str()
+              .ok_or("Failed to convert OsStr to str")?
+              .split('_')
+              .into_iter()
+              .map(|s| s[0..1].to_uppercase() + &s[1..])
+              .collect::<Vec<String>>()
+              .join(" "),
+          );
 
-      option.set_value(program);
+          option.set_value(path.to_str().ok_or("Failed to convert path to str")?);
 
-      select
-        .add_with_html_option_element(&option)
-        .map_err(JsValueError)?;
+          select
+            .add_with_html_option_element(&option)
+            .map_err(JsValueError)?
+        }
+        _ => continue,
+      }
     }
 
     let stderr = Stderr::get();
@@ -338,7 +347,11 @@ impl App {
 
     self.textarea.set_value(&format!(
       "{}\n// Press `Shift + Enter` to execute",
-      &self.select.value()
+      EXAMPLES
+        .get_file(Path::new(&self.select.value()))
+        .ok_or("Failed to get file")?
+        .contents_utf8()
+        .ok_or("Failed to get file contents")?
     ));
 
     self.textarea.focus().map_err(JsValueError)?;
