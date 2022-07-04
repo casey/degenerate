@@ -2,6 +2,7 @@ use super::*;
 
 pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
+  button: HtmlButtonElement,
   document: Document,
   gpu: Gpu,
   html: HtmlElement,
@@ -28,6 +29,8 @@ impl App {
     let nav = document.select("nav")?.cast::<HtmlElement>()?;
 
     let select = document.select("select")?.cast::<HtmlSelectElement>()?;
+
+    let button = document.select("button")?.cast::<HtmlButtonElement>()?;
 
     let examples = &[
       ("All", include_str!("../examples/all.js")),
@@ -63,6 +66,7 @@ impl App {
 
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
+      button: button.clone(),
       document,
       gpu,
       html,
@@ -110,6 +114,13 @@ impl App {
       app.stderr.update(result);
     })?;
 
+    let local = app.clone();
+    button.add_event_listener("click", move || {
+      let mut app = local.lock().unwrap();
+      let result = app.on_run();
+      app.stderr.update(result);
+    })?;
+
     let mut app = app.lock().unwrap();
     app.request_animation_frame()?;
     app.html.set_class_name("ready");
@@ -127,6 +138,16 @@ impl App {
         )?))
         .map_err(JsValueError)?;
     }
+    Ok(())
+  }
+
+  pub(super) fn on_run(&mut self) -> Result {
+    self
+      .worker
+      .post_message(&JsValue::from_str(&serde_json::to_string(
+        &AppMessage::Script(&self.textarea.value()),
+      )?))
+      .map_err(JsValueError)?;
     Ok(())
   }
 
@@ -279,41 +300,7 @@ impl App {
       .add_1("fade-out")
       .map_err(JsValueError)?;
 
-    if self.document.select_optional("#run")?.is_none() {
-      let aside = self.document.select("aside")?;
-
-      let div = self
-        .document
-        .create_element("div")
-        .map_err(JsValueError)?
-        .cast::<HtmlDivElement>()?;
-
-      aside.append_child(&div).map_err(JsValueError)?;
-
-      let button = self
-        .document
-        .create_element("button")
-        .map_err(JsValueError)?;
-
-      button.set_id("run");
-      button.set_text_content(Some("Run"));
-
-      let textarea = self.textarea.clone();
-      let worker = self.worker.clone();
-      let stderr = self.stderr.clone();
-      button.add_event_listener("click", move || {
-        stderr.update(|| -> Result {
-          worker
-            .post_message(&JsValue::from_str(&serde_json::to_string(
-              &AppMessage::Script(&textarea.value()),
-            )?))
-            .map_err(JsValueError)?;
-          Ok(())
-        }());
-      })?;
-
-      div.append_child(&button).map_err(JsValueError)?;
-    }
+    self.button.set_disabled(false);
 
     Ok(())
   }
