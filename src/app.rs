@@ -13,6 +13,12 @@ pub(crate) struct App {
   worker: Worker,
 }
 
+use {rust_embed::RustEmbed, std::str};
+
+#[derive(RustEmbed)]
+#[folder = "examples"]
+struct Examples;
+
 impl App {
   pub(super) fn init() -> Result {
     let window = window();
@@ -29,30 +35,30 @@ impl App {
 
     let select = document.select("select")?.cast::<HtmlSelectElement>()?;
 
-    let examples = &[
-      ("All", include_str!("../examples/all.js")),
-      ("Kaleidoscope", include_str!("../examples/kaleidoscope.js")),
-      ("Orb Zoom", include_str!("../examples/orb_zoom.js")),
-      ("Orbs", include_str!("../examples/orbs.js")),
-      ("Pattern", include_str!("../examples/pattern.js")),
-      ("Starburst", include_str!("../examples/starburst.js")),
-      ("Target", include_str!("../examples/target.js")),
-      ("X", include_str!("../examples/x.js")),
-    ];
+    for filename in Examples::iter() {
+      let file = Examples::get(&filename).ok_or("Failed to get file from examples directory")?;
 
-    for (name, program) in examples {
       let option = document
         .create_element("option")
         .map_err(JsValueError)?
         .cast::<HtmlOptionElement>()?;
 
-      option.set_text(name);
+      option.set_text(
+        &filename[..filename
+          .rfind('.')
+          .ok_or("Failed to find `.` in filename")?]
+          .split('_')
+          .into_iter()
+          .map(|s| s[0..1].to_uppercase() + &s[1..])
+          .collect::<Vec<String>>()
+          .join(" "),
+      );
 
-      option.set_value(program);
+      option.set_value(str::from_utf8(&file.data)?);
 
       select
         .add_with_html_option_element(&option)
-        .map_err(JsValueError)?;
+        .map_err(JsValueError)?
     }
 
     let stderr = Stderr::get();
