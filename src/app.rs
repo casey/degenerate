@@ -13,12 +13,6 @@ pub(crate) struct App {
   worker: Worker,
 }
 
-use {rust_embed::RustEmbed, std::str};
-
-#[derive(RustEmbed)]
-#[folder = "examples"]
-struct Examples;
-
 impl App {
   pub(super) fn init() -> Result {
     let window = window();
@@ -35,30 +29,38 @@ impl App {
 
     let select = document.select("select")?.cast::<HtmlSelectElement>()?;
 
-    for filename in Examples::iter() {
-      let file = Examples::get(&filename).ok_or("Failed to get file from examples directory")?;
+    for entry in include_dir!("examples").entries() {
+      match entry {
+        DirEntry::File(file) => {
+          let name = file
+            .path()
+            .file_stem()
+            .ok_or("Failed to extract file stem")?
+            .to_str()
+            .ok_or("Failed to convert OsStr to str")?;
 
-      let option = document
-        .create_element("option")
-        .map_err(JsValueError)?
-        .cast::<HtmlOptionElement>()?;
+          let option = document
+            .create_element("option")
+            .map_err(JsValueError)?
+            .cast::<HtmlOptionElement>()?;
 
-      option.set_text(
-        &filename[..filename
-          .rfind('.')
-          .ok_or("Failed to find `.` in filename")?]
-          .split('_')
-          .into_iter()
-          .map(|s| s[0..1].to_uppercase() + &s[1..])
-          .collect::<Vec<String>>()
-          .join(" "),
-      );
+          option.set_text(
+            &name
+              .split('_')
+              .into_iter()
+              .map(|s| s[0..1].to_uppercase() + &s[1..])
+              .collect::<Vec<String>>()
+              .join(" "),
+          );
 
-      option.set_value(str::from_utf8(&file.data)?);
+          option.set_value(file.contents_utf8().ok_or("Failed to get file contents")?);
 
-      select
-        .add_with_html_option_element(&option)
-        .map_err(JsValueError)?
+          select
+            .add_with_html_option_element(&option)
+            .map_err(JsValueError)?
+        }
+        _ => continue,
+      }
     }
 
     let stderr = Stderr::get();
