@@ -13,7 +13,7 @@ pub(crate) struct App {
   worker: Worker,
 }
 
-const EXAMPLES: Dir = include_dir!("examples");
+const EXAMPLES: include_dir::Dir = include_dir!("examples");
 
 impl App {
   pub(super) fn init() -> Result {
@@ -33,7 +33,7 @@ impl App {
 
     for entry in EXAMPLES.entries() {
       match entry {
-        DirEntry::File(file) => {
+        include_dir::DirEntry::File(file) => {
           let path = file.path();
 
           let option = document
