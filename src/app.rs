@@ -272,11 +272,46 @@ impl App {
       .class_list()
       .remove_1("done")
       .map_err(JsValueError)?;
+
     self
       .nav
       .class_list()
       .add_1("fade-out")
       .map_err(JsValueError)?;
+
+    let aside = self.document.select("aside")?;
+
+    let div = self
+      .document
+      .create_element("div")
+      .map_err(JsValueError)?
+      .cast::<HtmlDivElement>()?;
+
+    aside.append_child(&div).map_err(JsValueError)?;
+
+    let button = self
+      .document
+      .create_element("button")
+      .map_err(JsValueError)?;
+
+    button.set_text_content(Some("Run"));
+
+    let textarea = self.textarea.clone();
+    let worker = self.worker.clone();
+    let stderr = self.stderr.clone();
+    button.add_event_listener("click", move || {
+      stderr.update(|| -> Result {
+        worker
+          .post_message(&JsValue::from_str(&serde_json::to_string(
+            &AppMessage::Script(&textarea.value()),
+          )?))
+          .map_err(JsValueError)?;
+        Ok(())
+      }());
+    })?;
+
+    div.append_child(&button).map_err(JsValueError)?;
+
     Ok(())
   }
 }
