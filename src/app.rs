@@ -266,8 +266,8 @@ impl App {
               .map_err(JsValueError)?
               .cast::<HtmlLabelElement>()?;
 
-            label.set_html_for(&option);
-            label.set_inner_text(&option);
+            label.set_html_for(option);
+            label.set_inner_text(option);
 
             let radio = self
               .document
@@ -275,7 +275,7 @@ impl App {
               .map_err(JsValueError)?
               .cast::<HtmlInputElement>()?;
 
-            radio.set_id(&option);
+            radio.set_id(option);
             radio.set_name(&id);
             radio.set_type("radio");
 
