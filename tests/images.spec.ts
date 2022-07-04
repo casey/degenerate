@@ -159,7 +159,7 @@ test('checkbox', async ({ page }) => {
     `
   );
 
-  await expect(await page.isChecked('#widget-x')).toBeFalsy();
+  await expect(await page.isChecked('#checkbox-widget-x')).toBeFalsy();
 
   await run(
     page,
@@ -173,7 +173,7 @@ test('checkbox', async ({ page }) => {
   let off = png.decode(await imageBuffer(page)).data;
   await expect(off[0]).toEqual(0);
 
-  await page.check('#widget-x');
+  await page.check('#checkbox-widget-x');
 
   await run(
     page,
@@ -187,7 +187,7 @@ test('checkbox', async ({ page }) => {
   let on = png.decode(await imageBuffer(page)).data;
   await expect(on[0]).toEqual(255);
 
-  await expect(await page.locator('#widget-x').count()).toBe(1);
+  await expect(await page.locator('#checkbox-widget-x').count()).toBe(1);
 });
 
 test('radio', async ({ page }) => {
@@ -228,8 +228,21 @@ test('radio', async ({ page }) => {
   let on = png.decode(await imageBuffer(page)).data;
   await expect(on[0]).toEqual(255);
 
-  await expect(await page.locator('#widget-foo').count()).toBe(1);
+  await expect(await page.locator('#radio-widget-foo').count()).toBe(1);
 });
+
+test('radio-checkbox', async ({ page }) => {
+  await run(
+    page,
+    `
+      radio('foo', ['a', 'b', 'c']);
+      checkbox('foo');
+    `
+  );
+
+  await expect(await page.locator('#checkbox-widget-foo').count()).toBe(1);
+  await expect(await page.locator('#radio-widget-foo').count()).toBe(1);
+})
 
 test('delta', async ({ page }) => {
   await run(

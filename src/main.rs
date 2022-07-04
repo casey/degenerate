@@ -21,7 +21,7 @@ use {
   web_sys::{
     Document, Element, EventTarget, HtmlAnchorElement, HtmlCanvasElement, HtmlDivElement,
     HtmlElement, HtmlInputElement, HtmlLabelElement, HtmlOptionElement, HtmlSelectElement,
-    HtmlSpanElement, HtmlTextAreaElement, KeyboardEvent, MessageEvent, WebGl2RenderingContext,
+    HtmlTextAreaElement, KeyboardEvent, MessageEvent, WebGl2RenderingContext,
     WebGlContextAttributes, WebGlFramebuffer, WebGlTexture, WebGlUniformLocation, Window, Worker,
   },
 };
