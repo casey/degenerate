@@ -242,7 +242,7 @@ test('radio-checkbox', async ({ page }) => {
 
   await expect(await page.locator('#checkbox-widget-foo').count()).toBe(1);
   await expect(await page.locator('#radio-widget-foo').count()).toBe(1);
-})
+});
 
 test('delta', async ({ page }) => {
   await run(
