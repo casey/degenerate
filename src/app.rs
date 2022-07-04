@@ -13,6 +13,8 @@ pub(crate) struct App {
   worker: Worker,
 }
 
+const EXAMPLES: Dir = include_dir!("examples");
+
 impl App {
   pub(super) fn init() -> Result {
     let window = window();
@@ -29,15 +31,10 @@ impl App {
 
     let select = document.select("select")?.cast::<HtmlSelectElement>()?;
 
-    for entry in include_dir!("examples").entries() {
+    for entry in EXAMPLES.entries() {
       match entry {
         DirEntry::File(file) => {
-          let name = file
-            .path()
-            .file_stem()
-            .ok_or("Failed to extract file stem")?
-            .to_str()
-            .ok_or("Failed to convert OsStr to str")?;
+          let path = file.path();
 
           let option = document
             .create_element("option")
@@ -45,7 +42,11 @@ impl App {
             .cast::<HtmlOptionElement>()?;
 
           option.set_text(
-            &name
+            &path
+              .file_stem()
+              .ok_or("Failed to extract file stem")?
+              .to_str()
+              .ok_or("Failed to convert OsStr to str")?
               .split('_')
               .into_iter()
               .map(|s| s[0..1].to_uppercase() + &s[1..])
@@ -53,7 +54,7 @@ impl App {
               .join(" "),
           );
 
-          option.set_value(file.contents_utf8().ok_or("Failed to get file contents")?);
+          option.set_value(path.to_str().ok_or("Failed to convert path to str")?);
 
           select
             .add_with_html_option_element(&option)
@@ -266,7 +267,11 @@ impl App {
 
     self.textarea.set_value(&format!(
       "{}\n// Press `Shift + Enter` to execute",
-      &self.select.value()
+      EXAMPLES
+        .get_file(Path::new(&self.select.value()))
+        .ok_or("Failed to get file")?
+        .contents_utf8()
+        .ok_or("Failed to get file contents")?
     ));
 
     self.textarea.focus().map_err(JsValueError)?;
