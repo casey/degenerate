@@ -159,7 +159,7 @@ test('checkbox', async ({ page }) => {
     `
   );
 
-  await expect(await page.isChecked('#widget-x')).toBeFalsy();
+  await expect(await page.isChecked('#widget-checkbox-x')).toBeFalsy();
 
   await run(
     page,
@@ -173,7 +173,7 @@ test('checkbox', async ({ page }) => {
   let off = png.decode(await imageBuffer(page)).data;
   await expect(off[0]).toEqual(0);
 
-  await page.check('#widget-x');
+  await page.check('#widget-checkbox-x');
 
   await run(
     page,
@@ -187,7 +187,72 @@ test('checkbox', async ({ page }) => {
   let on = png.decode(await imageBuffer(page)).data;
   await expect(on[0]).toEqual(255);
 
-  await expect(await page.locator('#widget-x').count()).toBe(1);
+  await expect(await page.locator('#widget-checkbox-x').count()).toBe(1);
+});
+
+test('radio', async ({ page }) => {
+  await run(
+    page,
+    `
+      radio('foo', ['a', 'b', 'c']);
+    `
+  );
+
+  await expect(await page.isChecked('text=a')).toBeTruthy();
+  await expect(await page.isChecked('text=b')).toBeFalsy();
+  await expect(await page.isChecked('text=c')).toBeFalsy();
+
+  await run(
+    page,
+    `
+      if (radio('foo', ['a', 'b', 'c']) == 'b') {
+        render();
+      }
+    `
+  );
+
+  let off = png.decode(await imageBuffer(page)).data;
+  await expect(off[0]).toEqual(0);
+
+  await page.check('text=b');
+
+  await run(
+    page,
+    `
+      if (radio('foo', ['a', 'b', 'c']) == 'b') {
+        render();
+      }
+    `
+  );
+
+  let on = png.decode(await imageBuffer(page)).data;
+  await expect(on[0]).toEqual(255);
+
+  await expect(await page.locator('#widget-radio-foo').count()).toBe(1);
+});
+
+test('radio-checkbox', async ({ page }) => {
+  await run(
+    page,
+    `
+      radio('foo', ['a', 'b', 'c']);
+      checkbox('foo');
+    `
+  );
+
+  await expect(await page.locator('#widget-radio-foo').count()).toBe(1);
+  await expect(await page.locator('#widget-checkbox-foo').count()).toBe(1);
+});
+
+test('radio-initial', async ({ page }) => {
+  await run(
+    page,
+    `
+      if (radio('foo', ['a', 'b', 'c']) != 'a') {
+        throw 'Incorrect return value';
+      }
+    `
+  );
 });
 
 test('delta', async ({ page }) => {
