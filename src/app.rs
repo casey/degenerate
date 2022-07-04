@@ -173,7 +173,7 @@ impl App {
 
     match event {
       WorkerMessage::Checkbox(name) => {
-        let id = format!("widget-{name}");
+        let id = format!("checkbox-widget-{name}");
 
         if self.document.select_optional(&format!("#{id}"))?.is_none() {
           let aside = self.document.select("aside")?;
@@ -233,7 +233,7 @@ impl App {
         self.html.set_class_name("done");
       }
       WorkerMessage::Radio(name, options) => {
-        let id = format!("widget-{name}");
+        let id = format!("radio-widget-{name}");
 
         if self.document.select_optional(&format!("#{id}"))?.is_none() {
           let aside = self.document.select("aside")?;
@@ -248,12 +248,6 @@ impl App {
 
           aside.append_child(&div).map_err(JsValueError)?;
 
-          let linebreak = self
-            .document
-            .create_element("br")
-            .map_err(JsValueError)?
-            .cast::<HtmlBrElement>()?;
-
           let label = self
             .document
             .create_element("label")
@@ -261,18 +255,11 @@ impl App {
             .cast::<HtmlLabelElement>()?;
 
           label.set_html_for(&id);
-          label.set_inner_text(&name);
+          label.set_inner_text(&format!("{} ", name));
 
           div.append_child(&label).map_err(JsValueError)?;
-          div.append_child(&linebreak).map_err(JsValueError)?;
 
           for option in options {
-            let linebreak = self
-              .document
-              .create_element("br")
-              .map_err(JsValueError)?
-              .cast::<HtmlBrElement>()?;
-
             let label = self
               .document
               .create_element("label")
@@ -294,7 +281,6 @@ impl App {
 
             div.append_child(&label).map_err(JsValueError)?;
             div.append_child(&radio).map_err(JsValueError)?;
-            div.append_child(&linebreak).map_err(JsValueError)?;
 
             let name = name.clone();
             let worker = self.worker.clone();
