@@ -244,6 +244,17 @@ test('radio-checkbox', async ({ page }) => {
   await expect(await page.locator('#widget-checkbox-foo').count()).toBe(1);
 });
 
+test('radio-initial', async ({ page }) => {
+  await run(
+    page,
+    `
+      if (radio('foo', ['a', 'b', 'c']) != 'a') {
+        throw 'Incorrect return value';
+      }
+    `
+  );
+});
+
 test('delta', async ({ page }) => {
   await run(
     page,

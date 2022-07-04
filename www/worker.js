@@ -116,7 +116,7 @@ function mod(divisor, remainder) {
 
 function radio(name, options) {
   self.postMessage(JSON.stringify({ radio: [name, options] }))
-  return widgets['widget-radio-' + name];
+  return widgets['widget-radio-' + name] ?? options[0];
 }
 
 function reset() {
