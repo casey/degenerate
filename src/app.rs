@@ -173,7 +173,7 @@ impl App {
 
     match event {
       WorkerMessage::Checkbox(name) => {
-        let id = format!("checkbox-widget-{name}");
+        let id = format!("widget-checkbox-{name}");
 
         if self.document.select_optional(&format!("#{id}"))?.is_none() {
           let aside = self.document.select("aside")?;
@@ -233,7 +233,7 @@ impl App {
         self.html.set_class_name("done");
       }
       WorkerMessage::Radio(name, options) => {
-        let id = format!("radio-widget-{name}");
+        let id = format!("widget-radio-{name}");
 
         if self.document.select_optional(&format!("#{id}"))?.is_none() {
           let aside = self.document.select("aside")?;

@@ -69,7 +69,7 @@ function check() {
 
 function checkbox(name) {
   self.postMessage(JSON.stringify({ checkbox: name }));
-  return !!widgets[name];
+  return !!widgets['widget-checkbox-' + name];
 }
 
 function circle() {
@@ -116,7 +116,7 @@ function mod(divisor, remainder) {
 
 function radio(name, options) {
   self.postMessage(JSON.stringify({ radio: [name, options] }))
-  return widgets[name];
+  return widgets['widget-radio-' + name];
 }
 
 function reset() {
@@ -205,10 +205,10 @@ self.addEventListener('message', async function (event) {
   const message = JSON.parse(event.data);
   switch (message.tag) {
     case 'checkbox':
-      widgets[message.content.name] = message.content.value;
+      widgets['widget-checkbox-' + message.content.name] = message.content.value;
       break;
     case 'radio':
-      widgets[message.content.name] = message.content.value;
+      widgets['widget-radio-' + message.content.name] = message.content.value;
       break;
     case 'script':
       frameCallbacks = [];
