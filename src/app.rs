@@ -2,6 +2,7 @@ use super::*;
 
 pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
+  button: HtmlButtonElement,
   document: Document,
   gpu: Gpu,
   html: HtmlElement,
@@ -30,6 +31,8 @@ impl App {
     let nav = document.select("nav")?.cast::<HtmlElement>()?;
 
     let select = document.select("select")?.cast::<HtmlSelectElement>()?;
+
+    let button = document.select("button")?.cast::<HtmlButtonElement>()?;
 
     for entry in EXAMPLES.entries() {
       match entry {
@@ -72,6 +75,7 @@ impl App {
 
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
+      button: button.clone(),
       document,
       gpu,
       html,
@@ -119,6 +123,13 @@ impl App {
       app.stderr.update(result);
     })?;
 
+    let local = app.clone();
+    button.add_event_listener("click", move || {
+      let mut app = local.lock().unwrap();
+      let result = app.on_run();
+      app.stderr.update(result);
+    })?;
+
     let mut app = app.lock().unwrap();
     app.request_animation_frame()?;
     app.html.set_class_name("ready");
@@ -136,6 +147,16 @@ impl App {
         )?))
         .map_err(JsValueError)?;
     }
+    Ok(())
+  }
+
+  pub(super) fn on_run(&mut self) -> Result {
+    self
+      .worker
+      .post_message(&JsValue::from_str(&serde_json::to_string(
+        &AppMessage::Script(&self.textarea.value()),
+      )?))
+      .map_err(JsValueError)?;
     Ok(())
   }
 
@@ -346,7 +367,7 @@ impl App {
     self.on_input()?;
 
     self.textarea.set_value(&format!(
-      "{}\n// Press `Shift + Enter` to execute",
+      "{}\n// Press the `Run` button or `Shift + Enter` to execute",
       EXAMPLES
         .get_file(Path::new(&self.select.value()))
         .ok_or("Failed to get file")?
@@ -365,11 +386,15 @@ impl App {
       .class_list()
       .remove_1("done")
       .map_err(JsValueError)?;
+
     self
       .nav
       .class_list()
       .add_1("fade-out")
       .map_err(JsValueError)?;
+
+    self.button.set_disabled(false);
+
     Ok(())
   }
 }

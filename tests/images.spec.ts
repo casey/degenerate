@@ -133,7 +133,7 @@ all();
 
 render();
 
-// Press \`Shift + Enter\` to execute`);
+// Press the \`Run\` button or \`Shift + Enter\` to execute`);
 });
 
 test('elapsed', async ({ page }) => {
@@ -265,4 +265,19 @@ test('delta', async ({ page }) => {
       }
     `
   );
+});
+
+test('run', async ({ page }) => {
+  await page.locator('textarea').fill(
+    `
+      render();
+    `
+  );
+
+  await page.locator('text=run').click();
+
+  await page.waitForSelector('html.done');
+
+  let on = png.decode(await imageBuffer(page)).data;
+  await expect(on[0]).toEqual(255);
 });
