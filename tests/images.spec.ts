@@ -133,7 +133,7 @@ all();
 
 render();
 
-// Press \`Shift + Enter\` to execute`);
+// Press the \`Run\` button or \`Shift + Enter\` to execute`);
 });
 
 test('elapsed', async ({ page }) => {
