@@ -8,7 +8,7 @@ build:
   cargo build
 
 test *args:
-  cd tests && npx playwright test {{args}}
+  cd tests && npx playwright test --project=chromium --retries=0 {{args}}
 
 clippy:
   cargo clippy --target wasm32-unknown-unknown
