@@ -2,9 +2,6 @@
 
 importScripts('randchacha_browser.min.js');
 
-// TODO:
-// - fix radio button example
-
 // Mask all pixels.
 //
 // ```
@@ -215,18 +212,25 @@ function mod(divisor, remainder) {
 }
 
 // Create a new radio button widget with the label `name` and options `options`,
-// and return the selected option. Calls with same `name` will all refer to the
-// same radio button widget, making it safe to call repeatedly.
+// and return the selected option. `options` must be a list of strings. Calls with
+// same `name` will all refer to the same radio button widget, making it safe to
+// call repeatedly.
 //
 // ```
 // while(true) {
-//  reboot();
-//  if (radio('x', [a', 'b', 'c'] === 'a')) {
-//    x();
-//  } else {
-//    circle();
-//  }
-//  await render();
+//   reboot();
+//   switch (radio('shape', ['x', 'circle', 'cross'])) {
+//     case 'x':
+//       x();
+//       break;
+//     case 'circle':
+//       circle();
+//       break;
+//     case 'cross':
+//       cross();
+//       break;
+//   }
+//   await render();
 // }
 // ```
 function radio(name, options) {
