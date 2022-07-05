@@ -291,5 +291,7 @@ test('error', async ({ page }) => {
     `
   );
 
-  await expect(await page.locator('samp')).toHaveText('Invalid color rotation axis');
+  await expect(await page.locator('samp')).toHaveText(
+    'Invalid color rotation axis'
+  );
 });
