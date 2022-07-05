@@ -9,7 +9,7 @@ while(true) {
 
   scale(state.scale * 0.75);
 
-  wrap(true);
+  wrap(!state.wrap);
 
   for (_ of range(8)) {
     render();
