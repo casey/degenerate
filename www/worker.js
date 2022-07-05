@@ -54,7 +54,7 @@ function elapsed() {
 
 async function frame() {
   await new Promise((resolve, reject) => {
-    frameCallbacks.push({resolve, reject});
+    frameCallbacks.push(resolve);
   });
 }
 
@@ -75,7 +75,7 @@ function check() {
 
 function checkbox(name) {
   self.postMessage(JSON.stringify({ checkbox: name }));
-  return !!widgets[name];
+  return !!widgets['widget-checkbox-' + name];
 }
 
 function circle() {
@@ -122,6 +122,11 @@ function mod(divisor, remainder) {
 
 function record(record) {
   self.postMessage(JSON.stringify({record}));
+}
+
+function radio(name, options) {
+  self.postMessage(JSON.stringify({ radio: [name, options] }))
+  return widgets['widget-radio-' + name] ?? options[0];
 }
 
 function reset() {
@@ -218,19 +223,19 @@ self.addEventListener('message', async function (event) {
   const message = JSON.parse(event.data);
   switch (message.tag) {
     case 'checkbox':
-      widgets[message.content.name] = message.content.value;
+      widgets['widget-checkbox-' + message.content.name] = message.content.value;
+      break;
+    case 'radio':
+      widgets['widget-radio-' + message.content.name] = message.content.value;
       break;
     case 'script':
-      for (var callbacks of frameCallbacks) {
-        callbacks.reject();
-      }
       frameCallbacks = [];
       await new AsyncFunction(message.content)();
       self.postMessage(JSON.stringify('done'));
       break;
     case 'frame':
-      for (var callbacks of frameCallbacks) {
-        callbacks.resolve();
+      for (let callback of frameCallbacks) {
+        callback();
       }
       frameCallbacks = [];
       let now = Date.now();

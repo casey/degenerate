@@ -22,6 +22,15 @@ body {
   top: 0;
 }
 
+button {
+  bottom: 0;
+  color: black;
+  margin: 1em;
+  padding: 0.5em;
+  position: absolute;
+  z-index: 5;
+}
+
 canvas {
   height: 100%;
   left: 0;

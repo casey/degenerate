@@ -6,7 +6,10 @@ const config: PlaywrightTestConfig = {
   forbidOnly: !!process.env.CI,
   fullyParallel: false,
   globalSetup: require.resolve('./global-setup'),
-  projects: [{ name: 'chromium', use: devices['Desktop Chrome'] }],
+  projects: [
+    { name: 'chromium', use: devices['Desktop Chrome'] },
+    { name: 'webkit', use: devices['Desktop Webkit'] },
+  ],
   reporter: [['html', { open: 'never' }]],
   retries: 3,
   testDir: '.',
