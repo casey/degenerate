@@ -29,6 +29,6 @@ impl Stderr {
   }
 
   pub(crate) fn clear(&self) {
-    self.0.set_text_content(None);
+    // self.0.set_text_content(None);
   }
 }

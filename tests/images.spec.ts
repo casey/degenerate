@@ -281,3 +281,15 @@ test('run', async ({ page }) => {
   let on = png.decode(await imageBuffer(page)).data;
   await expect(on[0]).toEqual(255);
 });
+
+test('error', async ({ page }) => {
+  await run(
+    page,
+    `
+      rotateColor('purple', 0.05 * TAU);
+      render();
+    `
+  );
+
+  await expect(await page.locator('samp')).toHaveText('Invalid color rotation axis');
+});
