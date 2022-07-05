@@ -1,7 +1,7 @@
 x();
 render();
 scale(0.5);
-wrap();
+wrap(true);
 identity();
 all();
 render();

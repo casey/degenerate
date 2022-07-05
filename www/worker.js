@@ -143,7 +143,7 @@ function reboot() {
 }
 
 function rotate(rotation) {
-  state.rotation += rotation;
+  state.rotation = rotation;
 }
 
 function rotateColor(axis, radians) {
@@ -163,7 +163,7 @@ function save() {
 }
 
 function scale(scale) {
-  state.scale *= scale;
+  state.scale = scale;
 }
 
 function sleep(ms) {
@@ -178,8 +178,8 @@ function top() {
   state.mask = MASK_TOP;
 }
 
-function wrap() {
-  state.wrap = !state.wrap;
+function wrap(wrap) {
+  state.wrap = wrap;
 }
 
 function x() {

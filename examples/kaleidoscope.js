@@ -7,9 +7,9 @@ while(true) {
 
   circle();
 
-  scale(0.75);
+  scale(state.scale * 0.75);
 
-  wrap();
+  wrap(true);
 
   for (_ of range(8)) {
     render();
@@ -19,7 +19,7 @@ while(true) {
     rotation += delta() / 30000 * TAU;
   }
 
-  rotate(rotation);
+  rotate(state.rotation + rotation);
 
   rotateColor('blue', 0.05 * TAU);
 
