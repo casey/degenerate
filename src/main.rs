@@ -5,6 +5,7 @@ use {
     state::State, stderr::Stderr, window::window, worker_message::WorkerMessage,
   },
   image::{ImageBuffer, ImageOutputFormat},
+  include_dir::include_dir,
   nalgebra::{Rotation3, Similarity2, UnitComplex, Vector3},
   serde::{Deserialize, Serialize},
   std::{
@@ -14,14 +15,15 @@ use {
     fmt::{self, Formatter},
     io::Cursor,
     ops::Deref,
+    path::Path,
     string::ToString,
     sync::{Arc, Mutex},
   },
   wasm_bindgen::{closure::Closure, convert::FromWasmAbi, JsCast, JsValue},
   web_sys::{
-    Document, Element, EventTarget, HtmlAnchorElement, HtmlCanvasElement, HtmlDivElement,
-    HtmlElement, HtmlInputElement, HtmlLabelElement, HtmlOptionElement, HtmlSelectElement,
-    HtmlTextAreaElement, KeyboardEvent, MessageEvent, WebGl2RenderingContext,
+    Document, Element, EventTarget, HtmlAnchorElement, HtmlButtonElement, HtmlCanvasElement,
+    HtmlDivElement, HtmlElement, HtmlInputElement, HtmlLabelElement, HtmlOptionElement,
+    HtmlSelectElement, HtmlTextAreaElement, KeyboardEvent, MessageEvent, WebGl2RenderingContext,
     WebGlContextAttributes, WebGlFramebuffer, WebGlTexture, WebGlUniformLocation, Window, Worker,
   },
 };

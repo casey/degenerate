@@ -2,6 +2,9 @@
 
 importScripts('randchacha_browser.min.js');
 
+// TODO:
+// - fix radio button example
+
 // Mask all pixels.
 //
 // ```
@@ -58,7 +61,7 @@ function check() {
 // ```
 function checkbox(name) {
   self.postMessage(JSON.stringify({ checkbox: name }));
-  return !!widgets[name];
+  return !!widgets['widget-checkbox-' + name];
 }
 
 // Mask pixels within a circle.
@@ -210,6 +213,27 @@ function mod(divisor, remainder) {
   state.maskModRemainder = remainder;
   state.mask = MASK_MOD;
 }
+
+// Create a new radio button widget with the label `name` and options `options`,
+// and return the selected option. Calls with same `name` will all refer to the
+// same radio button widget, making it safe to call repeatedly.
+//
+// ```
+// while(true) {
+//  reboot();
+//  if (radio('x', [a', 'b', 'c'] === 'a')) {
+//    x();
+//  } else {
+//    circle();
+//  }
+//  await render();
+// }
+// ```
+function radio(name, options) {
+  self.postMessage(JSON.stringify({ radio: [name, options] }))
+  return widgets['widget-radio-' + name] ?? options[0];
+}
+
 
 // Yield values in the half-open range `[0,iterations)`.
 //
@@ -490,7 +514,10 @@ self.addEventListener('message', async function (event) {
   const message = JSON.parse(event.data);
   switch (message.tag) {
     case 'checkbox':
-      widgets[message.content.name] = message.content.value;
+      widgets['widget-checkbox-' + message.content.name] = message.content.value;
+      break;
+    case 'radio':
+      widgets['widget-radio-' + message.content.name] = message.content.value;
       break;
     case 'script':
       frameCallbacks = [];

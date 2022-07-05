@@ -2,6 +2,7 @@ use super::*;
 
 pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
+  button: HtmlButtonElement,
   document: Document,
   gpu: Gpu,
   html: HtmlElement,
@@ -12,6 +13,8 @@ pub(crate) struct App {
   window: Window,
   worker: Worker,
 }
+
+const EXAMPLES: include_dir::Dir = include_dir!("examples");
 
 impl App {
   pub(super) fn init() -> Result {
@@ -29,30 +32,39 @@ impl App {
 
     let select = document.select("select")?.cast::<HtmlSelectElement>()?;
 
-    let examples = &[
-      ("All", include_str!("../examples/all.js")),
-      ("Kaleidoscope", include_str!("../examples/kaleidoscope.js")),
-      ("Orb Zoom", include_str!("../examples/orb_zoom.js")),
-      ("Orbs", include_str!("../examples/orbs.js")),
-      ("Pattern", include_str!("../examples/pattern.js")),
-      ("Starburst", include_str!("../examples/starburst.js")),
-      ("Target", include_str!("../examples/target.js")),
-      ("X", include_str!("../examples/x.js")),
-    ];
+    let button = document.select("button")?.cast::<HtmlButtonElement>()?;
 
-    for (name, program) in examples {
-      let option = document
-        .create_element("option")
-        .map_err(JsValueError)?
-        .cast::<HtmlOptionElement>()?;
+    for entry in EXAMPLES.entries() {
+      match entry {
+        include_dir::DirEntry::File(file) => {
+          let path = file.path();
 
-      option.set_text(name);
+          let option = document
+            .create_element("option")
+            .map_err(JsValueError)?
+            .cast::<HtmlOptionElement>()?;
 
-      option.set_value(program);
+          option.set_text(
+            &path
+              .file_stem()
+              .ok_or("Failed to extract file stem")?
+              .to_str()
+              .ok_or("Failed to convert OsStr to str")?
+              .split('_')
+              .into_iter()
+              .map(|s| s[0..1].to_uppercase() + &s[1..])
+              .collect::<Vec<String>>()
+              .join(" "),
+          );
 
-      select
-        .add_with_html_option_element(&option)
-        .map_err(JsValueError)?;
+          option.set_value(path.to_str().ok_or("Failed to convert path to str")?);
+
+          select
+            .add_with_html_option_element(&option)
+            .map_err(JsValueError)?
+        }
+        _ => continue,
+      }
     }
 
     let stderr = Stderr::get();
@@ -63,6 +75,7 @@ impl App {
 
     let app = Arc::new(Mutex::new(Self {
       animation_frame_callback: None,
+      button: button.clone(),
       document,
       gpu,
       html,
@@ -110,6 +123,13 @@ impl App {
       app.stderr.update(result);
     })?;
 
+    let local = app.clone();
+    button.add_event_listener("click", move || {
+      let mut app = local.lock().unwrap();
+      let result = app.on_run();
+      app.stderr.update(result);
+    })?;
+
     let mut app = app.lock().unwrap();
     app.request_animation_frame()?;
     app.html.set_class_name("ready");
@@ -127,6 +147,16 @@ impl App {
         )?))
         .map_err(JsValueError)?;
     }
+    Ok(())
+  }
+
+  pub(super) fn on_run(&mut self) -> Result {
+    self
+      .worker
+      .post_message(&JsValue::from_str(&serde_json::to_string(
+        &AppMessage::Script(&self.textarea.value()),
+      )?))
+      .map_err(JsValueError)?;
     Ok(())
   }
 
@@ -173,7 +203,8 @@ impl App {
 
     match event {
       WorkerMessage::Checkbox(name) => {
-        let id = format!("widget-{name}");
+        let id = format!("widget-checkbox-{name}");
+
         if self.document.select_optional(&format!("#{id}"))?.is_none() {
           let aside = self.document.select("aside")?;
 
@@ -182,6 +213,7 @@ impl App {
             .create_element("div")
             .map_err(JsValueError)?
             .cast::<HtmlDivElement>()?;
+
           aside.append_child(&div).map_err(JsValueError)?;
 
           let label = self
@@ -189,8 +221,10 @@ impl App {
             .create_element("label")
             .map_err(JsValueError)?
             .cast::<HtmlLabelElement>()?;
+
           label.set_html_for(&id);
           label.set_inner_text(&name);
+
           div.append_child(&label).map_err(JsValueError)?;
 
           let checkbox = self
@@ -198,8 +232,10 @@ impl App {
             .create_element("input")
             .map_err(JsValueError)?
             .cast::<HtmlInputElement>()?;
+
           checkbox.set_type("checkbox");
           checkbox.set_id(&id);
+
           div.append_child(&checkbox).map_err(JsValueError)?;
 
           let local = checkbox.clone();
@@ -225,6 +261,80 @@ impl App {
       }
       WorkerMessage::Done => {
         self.html.set_class_name("done");
+      }
+      WorkerMessage::Radio(name, options) => {
+        let id = format!("widget-radio-{name}");
+
+        if self.document.select_optional(&format!("#{id}"))?.is_none() {
+          let aside = self.document.select("aside")?;
+
+          let div = self
+            .document
+            .create_element("div")
+            .map_err(JsValueError)?
+            .cast::<HtmlDivElement>()?;
+
+          div.set_id(&id);
+
+          aside.append_child(&div).map_err(JsValueError)?;
+
+          let label = self
+            .document
+            .create_element("label")
+            .map_err(JsValueError)?
+            .cast::<HtmlLabelElement>()?;
+
+          label.set_html_for(&id);
+          label.set_inner_text(&format!("{} ", name));
+
+          div.append_child(&label).map_err(JsValueError)?;
+
+          for (i, option) in options.iter().enumerate() {
+            let label = self
+              .document
+              .create_element("label")
+              .map_err(JsValueError)?
+              .cast::<HtmlLabelElement>()?;
+
+            label.set_html_for(option);
+            label.set_inner_text(option);
+
+            let radio = self
+              .document
+              .create_element("input")
+              .map_err(JsValueError)?
+              .cast::<HtmlInputElement>()?;
+
+            radio.set_id(option);
+            radio.set_name(&id);
+            radio.set_type("radio");
+
+            div.append_child(&label).map_err(JsValueError)?;
+            div.append_child(&radio).map_err(JsValueError)?;
+
+            let name = name.clone();
+            let option = option.clone();
+            let worker = self.worker.clone();
+            let stderr = self.stderr.clone();
+            radio.add_event_listener("input", move || {
+              stderr.update(|| -> Result {
+                worker
+                  .post_message(&JsValue::from_str(&serde_json::to_string(
+                    &AppMessage::Radio {
+                      name: &name,
+                      value: &option,
+                    },
+                  )?))
+                  .map_err(JsValueError)?;
+                Ok(())
+              }())
+            })?;
+
+            if i == 0 {
+              radio.set_checked(true);
+            }
+          }
+        }
       }
       WorkerMessage::Render(state) => {
         self.gpu.render(&state)?;
@@ -257,8 +367,12 @@ impl App {
     self.on_input()?;
 
     self.textarea.set_value(&format!(
-      "{}\n// Press `Shift + Enter` to execute",
-      &self.select.value()
+      "{}\n// Press the `Run` button or `Shift + Enter` to execute",
+      EXAMPLES
+        .get_file(Path::new(&self.select.value()))
+        .ok_or("Failed to get file")?
+        .contents_utf8()
+        .ok_or("Failed to get file contents")?
     ));
 
     self.textarea.focus().map_err(JsValueError)?;
@@ -272,11 +386,15 @@ impl App {
       .class_list()
       .remove_1("done")
       .map_err(JsValueError)?;
+
     self
       .nav
       .class_list()
       .add_1("fade-out")
       .map_err(JsValueError)?;
+
+    self.button.set_disabled(false);
+
     Ok(())
   }
 }

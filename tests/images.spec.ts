@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import * as png from 'fast-png';
 import axios from 'axios';
 import { exec } from './common';
@@ -49,7 +50,7 @@ test.beforeEach(async ({ page }) => {
   await page.waitForSelector('html.ready');
 });
 
-const imageTest = (name, program) => {
+function imageTest(name, program) {
   test(name, async ({ page }) => {
     await run(page, program);
 
@@ -89,414 +90,23 @@ const imageTest = (name, program) => {
       }
     }
   });
-};
+}
 
-const tests = {
-  all: `
-    all();
-    render();
-  `,
-  alpha: `
-    alpha(0.5);
-    x();
-    render();
-  `,
-  render: `
-    render();
-  `,
-  brilliance: `
-    x();
-    rotateColor('green', 0.07 * TAU);
-    rotate(0.07 * TAU);
-    for (let i = 0; i < 10; i++) {
-      render();
-    }
-    rotateColor('blue', 0.09 * TAU);
-    rotate(0.09 * TAU);
-    for (let i = 0; i < 10; i++) {
-      render();
-    }
-  `,
-  carpet: `
-    circle();
-    scale(0.5);
-    for (let i = 0; i < 8; i++) {
-      render();
-      wrap();
-    }
-  `,
-  circle: `
-    circle();
-    render();
-  `,
-  circle_scale: `
-    scale(0.5);
-    circle();
-    render();
-    all();
-    scale(0.9);
-    wrap();
-    render();
-  `,
-  concentric_circles: `
-    scale(0.99);
-    circle();
-    for (let i = 0; i < 100; i++) {
-      render();
-    }
-  `,
-  cross: `
-    cross();
-    render();
-  `,
-  default_program: ` `,
-  diamonds: `
-    rotate(0.3333 * TAU);
-    rotateColor('green', 0.05 * TAU);
-    circle();
-    scale(0.5);
-    wrap();
-    for (let i = 0; i < 8; i++) {
-      render();
-    }
-    rotate(0.8333 * TAU);
-    rotateColor('blue', 0.05 * TAU);
-    for (let i = 0; i < 8; i++) {
-      render();
-    }
-  `,
-  grain: `
-    rotate(0.111 * TAU);
-    for (let i = 0; i < 16; i++) {
-      square();
-      render();
-      circle();
-      render();
-    }
-  `,
-  kaleidoscope: `
-    rotateColor('green', 0.05 * TAU);
-    circle();
-    scale(0.75);
-    wrap();
-    for (let i = 0; i < 8; i++) {
-      render();
-    }
-    rotate(0.8333 * TAU);
-    rotateColor('blue', 0.05 * TAU);
-    for (let i = 0; i < 8; i++) {
-      render();
-    }
-  `,
-  mod_3: `
-    mod(3, 0);
-    render();
-  `,
-  orbs: `
-    rotateColor('green', 0.05 * TAU);
-    circle();
-    scale(0.75);
-    wrap();
-    for (let i = 0; i < 8; i++) {
-      render();
-    }
-    rotateColor('blue', 0.05 * TAU);
-    for (let i = 0; i < 8; i++) {
-      render();
-    }
-  `,
-  pattern: `
-    alpha(0.75);
-    circle();
-    scale(0.5);
-    for (let i = 0; i < 8; i++) {
-      render();
-      wrap();
-    }
-  `,
-  check: `
-    check();
-    render();
-  `,
-  choose_default_seed: `
-    rng.choose([all, circle, cross, square, top, x])();
-    render();
-  `,
-  choose_zero_seed: `
-    rng.seed(0);
-    rng.choose([all, circle, cross, square, top, x])();
-    render();
-  `,
-  choose_nonzero_seed: `
-    rng.seed(3);
-    rng.choose([all, circle, cross, square, top, x])();
-    render();
-  `,
-  rotate: `
-    rotate(0.05 * TAU);
-    x();
-    render();
-  `,
-  rotate_0125_square: `
-    rotate(0.125 * TAU);
-    square();
-    render();
-  `,
-  rotate_1_square: `
-    rotate(1.0 * TAU);
-    square();
-    render();
-  `,
-  rotate_scale_x: `
-    rotate(0.05 * TAU);
-    scale(2);
-    x();
-    render();
-  `,
-  rotate_square: `
-    rotate(0.05 * TAU);
-    square();
-    for (let i = 0; i < 2; i++) {
-      render();
-    }
-  `,
-  rotate_square_for_x: `
-    rotate(0.05 * TAU);
-    square();
-    for (let i = 0; i < 2; i++) {
-      render();
-    }
-    x();
-    for (let i = 0; i < 1; i++) {
-      render();
-    }
-  `,
-  rows: `
-    rows(1, 1);
-    render();
-  `,
-  rows_overflow: `
-    rows(4294967295, 4294967295);
-    render();
-  `,
-  rug: `
-    rotateColor('green', 0.05 * TAU);
-    circle();
-    scale(0.5);
-    wrap();
-    for (let i = 0; i < 8; i++) {
-      render();
-    }
-    rotateColor('blue', 0.05 * TAU);
-    for (let i = 0; i < 8; i++) {
-      render();
-    }
-  `,
-  scale: `
-    scale(0.5);
-    circle();
-    render();
-  `,
-  scale_circle_for: `
-    circle();
-    scale(0.5);
-    for (let i = 0; i < 8; i++) {
-      render();
-    }
-  `,
-  scale_circle_wrap: `
-    scale(0.5);
-    circle();
-    wrap();
-    render();
-  `,
-  scale_rotate: `
-    scale(2);
-    rotate(0.05 * TAU);
-    x();
-    render();
-  `,
-  scale_x: `
-    scale(2);
-    x();
-    render();
-  `,
-  smear: `
-    const masks = [all, circle, cross, square, top, x];
-    rng.seed(9);
-    rotateColor('green', 0.01 * TAU);
-    rotate(0.01 * TAU);
-    for (let i = 0; i < 100; i++) {
-      rng.choose(masks)();
-      render();
-    }
-    rotateColor('blue', 0.01 * TAU);
-    rotate(0.01 * TAU);
-    for (let i = 0; i < 100; i++) {
-      rng.choose(masks)();
-      render();
-    }
-  `,
-  square: `
-    square();
-    render();
-  `,
-  square_top: `
-    square();
-    render();
-    top();
-    render();
-  `,
-  starburst: `
-    const masks = [all, circle, cross, square, top, x];
-    rng.seed(3);
-    rotateColor('green', 0.1 * TAU);
-    rotate(0.1 * TAU);
-    for (let i = 0; i < 20; i++) {
-      rng.choose(masks)();
-      render();
-    }
-    rotateColor('blue', 0.1 * TAU);
-    rotate(0.1 * TAU);
-    for (let i = 0; i < 10; i++) {
-      rng.choose(masks)();
-      render();
-    }
-  `,
-  top: `
-    top();
-    render();
-  `,
-  x: `
-    x();
-    render();
-  `,
-  x_loop: `
-    x();
-    scale(0.5);
-    for (let i = 0; i < 8; i++) {
-      render();
-      wrap();
-    }
-  `,
-  x_scale: `
-    x();
-    scale(0.5);
-    for (let i = 0; i < 8; i++) {
-      render();
-    }
-  `,
-  x_wrap: `
-    x();
-    render();
-    scale(0.5);
-    wrap();
-    identity();
-    all();
-    render();
-  `,
-  debug_operation: `
-    debug();
-    render();
-  `,
-  mod_zero_is_always_false: `
-    mod(0, 1);
-    render();
-  `,
-  square_colors: `
-    rotate(0.01 * TAU);
-    rotateColor('green', 0.1 * TAU);
-    square();
-    for (let i = 0; i < 10; i++) {
-      render();
-    }
-  `,
-  nested_for_loops: `
-    circle();
-    scale(0.9);
-    for (let i = 0; i < 2; i++) {
-      for (let j = 0; j < 2; j++) {
-        render();
-      }
-    }
-  `,
-  for_zero: `
-    circle();
-    for (let i = 0; i < 0; i++) {
-      render();
-    }
-  `,
-  gpu_extra_pixels: `
-    rotate(0.01 * TAU);
-    render();
-    render();
-  `,
-  default_color: `
-    defaultColor([255, 0, 255]);
-    rotate(0.01 * TAU);
-    render();
-  `,
-  rotate_color_05_red: `
-    rotateColor('red', 0.5 * TAU);
-    all();
-    render();
-  `,
-  rotate_color_blue_05_all: `
-    rotateColor('blue', 0.5 * TAU);
-    all();
-    render();
-  `,
-  rotate_color_green: `
-    rotateColor('green', 0.5 * TAU);
-    all();
-    render();
-  `,
-  rotate_color_blue_1_all: `
-    rotateColor('blue', 1.0 * TAU);
-    all();
-    render();
-  `,
-  rotate_color_green_all: `
-    rotateColor('green', 1.0 * TAU);
-    all();
-    render();
-  `,
-  rotate_color_red_all: `
-    rotateColor('red', 1.0 * TAU);
-    all();
-    render();
-  `,
-  range_loop: `
-    scale(0.5);
-    circle();
-    for (_ of range(10)) {
-      render();
-    }
-  `,
-  clear: `
-    render();
-    clear();
-  `,
-  reset: `
-    x();
-    render();
-    reset();
-    render();
-  `,
-  reboot: `
-    x();
-    render();
-    reboot();
-    render();
-  `,
-};
+const tests = fs
+  .readdirSync('../features')
+  .map((filename) => path.parse(filename))
+  .reduce((tests, path) => {
+    tests[path.name] = fs.readFileSync(`../features/${path.base}`).toString();
+    return tests;
+  }, {});
 
-for (const name in tests) {
-  imageTest(name, tests[name]);
+for (const test in tests) {
+  imageTest(test, tests[test]);
 }
 
 test('forbid-unused-images', async () => {
   let testNames = new Set(Object.getOwnPropertyNames(tests));
+
   let unused = [];
 
   for (const filename of await fs.promises.readdir('../images')) {
@@ -523,7 +133,7 @@ all();
 
 render();
 
-// Press \`Shift + Enter\` to execute`);
+// Press the \`Run\` button or \`Shift + Enter\` to execute`);
 });
 
 test('elapsed', async ({ page }) => {
@@ -549,7 +159,7 @@ test('checkbox', async ({ page }) => {
     `
   );
 
-  await expect(await page.isChecked('#widget-x')).toBeFalsy();
+  await expect(await page.isChecked('#widget-checkbox-x')).toBeFalsy();
 
   await run(
     page,
@@ -563,7 +173,7 @@ test('checkbox', async ({ page }) => {
   let off = png.decode(await imageBuffer(page)).data;
   await expect(off[0]).toEqual(0);
 
-  await page.check('#widget-x');
+  await page.check('#widget-checkbox-x');
 
   await run(
     page,
@@ -577,7 +187,72 @@ test('checkbox', async ({ page }) => {
   let on = png.decode(await imageBuffer(page)).data;
   await expect(on[0]).toEqual(255);
 
-  await expect(await page.locator('#widget-x').count()).toBe(1);
+  await expect(await page.locator('#widget-checkbox-x').count()).toBe(1);
+});
+
+test('radio', async ({ page }) => {
+  await run(
+    page,
+    `
+      radio('foo', ['a', 'b', 'c']);
+    `
+  );
+
+  await expect(await page.isChecked('text=a')).toBeTruthy();
+  await expect(await page.isChecked('text=b')).toBeFalsy();
+  await expect(await page.isChecked('text=c')).toBeFalsy();
+
+  await run(
+    page,
+    `
+      if (radio('foo', ['a', 'b', 'c']) == 'b') {
+        render();
+      }
+    `
+  );
+
+  let off = png.decode(await imageBuffer(page)).data;
+  await expect(off[0]).toEqual(0);
+
+  await page.check('text=b');
+
+  await run(
+    page,
+    `
+      if (radio('foo', ['a', 'b', 'c']) == 'b') {
+        render();
+      }
+    `
+  );
+
+  let on = png.decode(await imageBuffer(page)).data;
+  await expect(on[0]).toEqual(255);
+
+  await expect(await page.locator('#widget-radio-foo').count()).toBe(1);
+});
+
+test('radio-checkbox', async ({ page }) => {
+  await run(
+    page,
+    `
+      radio('foo', ['a', 'b', 'c']);
+      checkbox('foo');
+    `
+  );
+
+  await expect(await page.locator('#widget-radio-foo').count()).toBe(1);
+  await expect(await page.locator('#widget-checkbox-foo').count()).toBe(1);
+});
+
+test('radio-initial', async ({ page }) => {
+  await run(
+    page,
+    `
+      if (radio('foo', ['a', 'b', 'c']) != 'a') {
+        throw 'Incorrect return value';
+      }
+    `
+  );
 });
 
 test('delta', async ({ page }) => {
@@ -590,4 +265,19 @@ test('delta', async ({ page }) => {
       }
     `
   );
+});
+
+test('run', async ({ page }) => {
+  await page.locator('textarea').fill(
+    `
+      render();
+    `
+  );
+
+  await page.locator('text=run').click();
+
+  await page.waitForSelector('html.done');
+
+  let on = png.decode(await imageBuffer(page)).data;
+  await expect(on[0]).toEqual(255);
 });

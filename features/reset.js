@@ -1,0 +1,4 @@
+x();
+render();
+reset();
+render();
