@@ -7,6 +7,7 @@ pub(crate) enum WorkerMessage {
   Error(String),
   Clear,
   Done,
+  Error(String),
   Radio(String, Vec<String>),
   Render(State),
   Resolution(u32),

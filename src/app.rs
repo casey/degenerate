@@ -262,8 +262,8 @@ impl App {
       WorkerMessage::Done => {
         self.html.set_class_name("done");
       }
-      WorkerMessage::Error(err) => {
-        self.stderr.update(Err(err)?);
+      WorkerMessage::Error(error) => {
+        self.stderr.update(Err(error.into()));
       }
       WorkerMessage::Radio(name, options) => {
         let id = format!("widget-radio-{name}");
@@ -308,7 +308,7 @@ impl App {
               .map_err(JsValueError)?
               .cast::<HtmlInputElement>()?;
 
-            radio.set_id(option);
+            radio.set_id(&format!("{}-{}", id, option));
             radio.set_name(&id);
             radio.set_type("radio");
 
