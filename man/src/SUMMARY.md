@@ -6,6 +6,6 @@
 - Document the programming model
 
 - [Introduction](./introduction.md)
-- [Programming API](./api.md)
-- [Fragment Shader](./shader.md)
+- [Programming](./programming.md)
+- [Rendering](./rendering.md)
 - [Degenerate NFTs](./nfts.md)
