@@ -287,12 +287,9 @@ test('error', async ({ page }) => {
   await run(
     page,
     `
-      rotateColor('purple', 0.05 * TAU);
-      render();
+      error('foo');
     `
   );
 
-  await expect(await page.locator('samp > *')).toHaveText(
-    'Invalid color rotation axis'
-  );
+  await expect(await page.locator('samp > *')).toHaveText('foo');
 });
