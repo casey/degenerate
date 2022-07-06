@@ -259,6 +259,7 @@ test('delta', async ({ page }) => {
   await run(
     page,
     `
+      await frame();
       let x = delta();
       if (x === 0) {
         throw "Frame delta was zero: " + x;
