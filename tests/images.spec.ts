@@ -302,5 +302,7 @@ test('worker-error', async ({ page }) => {
     `
   );
 
-  await expect(await page.locator('samp > *')).toHaveText('ReferenceError: foo is not defined');
+  await expect(await page.locator('samp > *')).toHaveText(
+    'ReferenceError: foo is not defined'
+  );
 });
