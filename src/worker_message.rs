@@ -4,7 +4,6 @@ use super::*;
 #[serde(rename_all = "camelCase")]
 pub(crate) enum WorkerMessage {
   Checkbox(String),
-  Error(String),
   Clear,
   Done,
   Error(String),
