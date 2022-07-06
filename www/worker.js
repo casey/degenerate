@@ -538,7 +538,6 @@ self.addEventListener('message', async function (event) {
       try {
         await new AsyncFunction(message.content)();
       } catch (error) {
-        console.log('foobar');
         self.postMessage(JSON.stringify({error}));
       }
       self.postMessage(JSON.stringify('done'));
