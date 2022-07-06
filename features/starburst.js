@@ -7,7 +7,7 @@ for (let i = 0; i < 20; i++) {
   render();
 }
 rotateColor('blue', 0.1 * TAU);
-rotate(0.1 * TAU);
+rotate(state.rotation + 0.1 * TAU);
 for (let i = 0; i < 10; i++) {
   rng.choose(masks)();
   render();

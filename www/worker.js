@@ -320,7 +320,7 @@ function resolution(resolution) {
 // render();
 // ```
 function rotate(rotation) {
-  state.rotation += rotation;
+  state.rotation = rotation;
 }
 
 // Set the roate color operation. The rotate color operation interpets the sample pixel
@@ -376,7 +376,7 @@ function save() {
 // render();
 // ```
 function scale(scale) {
-  state.scale *= scale;
+  state.scale = scale;
 }
 
 // Return a promise that resolves after `ms` milliseconds.
@@ -420,8 +420,8 @@ function top() {
 // scale(0.1);
 // render();
 // ```
-function wrap() {
-  state.wrap = !state.wrap;
+function wrap(wrap) {
+  state.wrap = warp;
 }
 
 // Mask pixels in an X shape.

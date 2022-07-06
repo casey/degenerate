@@ -1,4 +1,4 @@
 scale(0.5);
 circle();
-wrap();
+wrap(true);
 render();
