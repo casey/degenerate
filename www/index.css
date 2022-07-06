@@ -28,7 +28,7 @@ button {
   margin: 1em;
   padding: 0.5em;
   position: absolute;
-  z-index: 5;
+  z-index: 6;
 }
 
 canvas {
@@ -88,6 +88,7 @@ samp {
   box-sizing: border-box;
   color: red;
   mix-blend-mode: difference;
+  overflow-y: auto;
   padding: 1em;
   position: absolute;
   width: 100%;

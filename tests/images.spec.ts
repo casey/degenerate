@@ -274,7 +274,7 @@ test('run', async ({ page }) => {
     `
   );
 
-  await page.locator('text=run').click();
+  await page.locator('button', { hasText: 'run' }).click();
 
   await page.waitForSelector('html.done');
 
@@ -291,7 +291,7 @@ test('error', async ({ page }) => {
     `
   );
 
-  await expect(await page.locator('samp')).toHaveText(
+  await expect(await page.locator('.error')).toHaveText(
     'Invalid color rotation axis'
   );
 });
