@@ -14,6 +14,21 @@ pub(crate) struct App {
   worker: Worker,
 }
 
+lazy_static! {
+  static ref EXAMPLES: HashMap<&'static str, &'static str> = {
+    let mut m = HashMap::new();
+    m.insert("All", include_str!("../examples/all.js"));
+    m.insert("Kaleidoscope", include_str!("../examples/kaleidoscope.js"));
+    m.insert("Orb Zoom", include_str!("../examples/orb_zoom.js"));
+    m.insert("Orbs", include_str!("../examples/orbs.js"));
+    m.insert("Pattern", include_str!("../examples/pattern.js"));
+    m.insert("Starburst", include_str!("../examples/starburst.js"));
+    m.insert("Target", include_str!("../examples/target.js"));
+    m.insert("X", include_str!("../examples/x.js"));
+    m
+  };
+}
+
 impl App {
   pub(super) fn init() -> Result {
     let window = window();
@@ -32,18 +47,7 @@ impl App {
 
     let button = document.select("button")?.cast::<HtmlButtonElement>()?;
 
-    let examples = &[
-      ("All", include_str!("../examples/all.js")),
-      ("Kaleidoscope", include_str!("../examples/kaleidoscope.js")),
-      ("Orb Zoom", include_str!("../examples/orb_zoom.js")),
-      ("Orbs", include_str!("../examples/orbs.js")),
-      ("Pattern", include_str!("../examples/pattern.js")),
-      ("Starburst", include_str!("../examples/starburst.js")),
-      ("Target", include_str!("../examples/target.js")),
-      ("X", include_str!("../examples/x.js")),
-    ];
-
-    for (name, program) in examples {
+    for name in EXAMPLES.keys() {
       let option = document
         .create_element("option")
         .map_err(JsValueError)?
@@ -51,7 +55,7 @@ impl App {
 
       option.set_text(name);
 
-      option.set_value(program);
+      option.set_value(name);
 
       select
         .add_with_html_option_element(&option)
@@ -362,7 +366,9 @@ impl App {
 
     self.textarea.set_value(&format!(
       "{}\n// Press the `Run` button or `Shift + Enter` to execute",
-      &self.select.value()
+      EXAMPLES
+        .get(&*self.select.value())
+        .ok_or("Failed to get example")?
     ));
 
     self.textarea.focus().map_err(JsValueError)?;
