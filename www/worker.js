@@ -150,7 +150,7 @@ function elapsed() {
 // Display an error message in the console at the bottom of the page.
 //
 // ```
-// error('foo')
+// error('foo');
 // ```
 function error(error) {
   self.postMessage(JSON.stringify({error}));
