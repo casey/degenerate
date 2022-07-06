@@ -35,7 +35,7 @@ impl Stderr {
     div.set_class_name("error");
     div.set_inner_text(&message);
 
-    self.0.append_child(&div).map_err(JsValueError)?;
+    self.0.prepend_with_node_1(&div).map_err(JsValueError)?;
 
     Ok(())
   }

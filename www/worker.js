@@ -192,6 +192,10 @@ function* range(iterations) {
   }
 }
 
+function error(error) {
+  self.postMessage(JSON.stringify({error}));
+}
+
 const rng = new Rng();
 const start = Date.now();
 

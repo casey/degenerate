@@ -19,16 +19,23 @@ body {
   height: 100%;
   margin: 0;
   position: relative;
+  overflow: hidden;
   top: 0;
 }
 
 button {
-  bottom: 0;
   color: black;
   margin: 1em;
   padding: 0.5em;
-  position: absolute;
   z-index: 6;
+}
+
+#controls {
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 0;
 }
 
 canvas {
@@ -84,14 +91,18 @@ nav > div:hover {
 }
 
 samp {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
   bottom: 0;
-  box-sizing: border-box;
   color: red;
+  display: -webkit-box;
+  margin: 1em;
   mix-blend-mode: difference;
-  overflow-y: auto;
-  padding: 1em;
+  overflow: hidden;
   position: absolute;
-  width: 100%;
+  visibility: visible;
+  width: calc(100% - 2rem);
+  word-wrap: break-word;
   z-index: 1;
 }
 
@@ -106,12 +117,9 @@ select {
 aside {
   -webkit-text-stroke-color: black;
   -webkit-text-stroke-width: 1px;
-  bottom: 0;
   font-size: 1.5em;
   font-weight: 900;
   margin: 0.5rem;
-  position: absolute;
-  right: 0;
   z-index: 3;
 }
 
