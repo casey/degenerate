@@ -1,17 +1,32 @@
 # Introduction
 
-Degenerate is a programmable generative art engine engine. It is developed on
+Degenerate is a programmable generative art engine. It is developed on
 [GitHub](https://github.com/casey/degenerate/) and deployed at
 [degenerate.computer](https://degenerate.computer).
 
-## Execution Model
+## Image Filters
 
-Degenerate operates as a chain of filters, with the output of each filter
-feeding into the next. Commands are issued to change the state of the current
-filter, which is then applied with `render()`.
+Degenerate operates as a chain of image filters. The output of each filter is
+used as the input of the next filter. Degenerate programs change the state of
+the the current image filter, and call `render()` to apply it.
 
-The primary components of a filter are a "mask", which determines which pixels
-the filter will operate on, and an "operation", which determines what will
+Image filters have a number of properties that determine what they do. The
+chapter on [rendering](rendering.md) has more .
+
+#### Mask
+
+#### Operation
+
+#### Transformation
+
+#### Alpha
+
+#### Wrap
+
+The primary components of a filter are a mask, which determines which pixels
+the filter will operate on, a transformation, which determines which
+
+and an "operation", which determines what will
 happen to those pixels.
 
 For example, to set the mask to an X, you can do `x()`, and to set the
