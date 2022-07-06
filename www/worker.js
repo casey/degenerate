@@ -104,7 +104,7 @@ function debug() {
 }
 
 // Set the default color. The default color is returned whenever a pixel is sampled
-// out of bounds due a rotation, scale, or other sample coordinate transformation.
+// out of bounds due to a rotation, scale, or other sample coordinate transformation.
 //
 // ```
 // defaultColor([255, 0, 255]);
@@ -312,7 +312,7 @@ function resolution(resolution) {
   }
 }
 
-// Add `rotation` to the current rotation.
+// Set `rotation` to the current rotation.
 //
 // ```
 // rotate(0.1);
@@ -367,7 +367,8 @@ function save() {
   self.postMessage(JSON.stringify('save'));
 }
 
-// Multiply the current scale factor by `scale`.
+// Set the current scale to `scale`. The scale factor is applied to sample coordinates before
+// looking up the pixel under those coordinates.
 //
 // ```
 // circle();
@@ -412,7 +413,7 @@ function top() {
   state.mask = MASK_TOP;
 }
 
-// Toggle wrapping. When `wrap` is `true`, out of bounds samples will be wrapped back within bounds.
+// Set wrap. When `wrap` is `true`, out of bounds samples will be wrapped back within bounds.
 //
 // ```
 // x();
@@ -420,7 +421,7 @@ function top() {
 // scale(0.1);
 // render();
 // ```
-function wrap(wrap) {
+function wrap(warp) {
   state.wrap = warp;
 }
 
