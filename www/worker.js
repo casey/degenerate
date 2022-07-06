@@ -537,9 +537,9 @@ self.addEventListener('message', async function (event) {
       frameCallbacks = [];
       try {
         await new AsyncFunction(message.content)();
-      } catch(err) {
+      } catch (error) {
         console.log('foobar');
-        self.postMessage(JSON.stringify({'error': err}));
+        self.postMessage(JSON.stringify({error}));
       }
       self.postMessage(JSON.stringify('done'));
       break;

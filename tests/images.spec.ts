@@ -293,3 +293,14 @@ test('error', async ({ page }) => {
 
   await expect(await page.locator('samp > *')).toHaveText('foo');
 });
+
+test('worker-error', async ({ page }) => {
+  await run(
+    page,
+    `
+      foo
+    `
+  );
+
+  await expect(await page.locator('samp > *')).toHaveText('invalid type: map, expected a string at line 1 column 9');
+});
