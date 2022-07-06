@@ -16,9 +16,8 @@ impl Stderr {
   }
 
   pub(crate) fn update(&self, result: Result) {
-    match result {
-      Err(err) => self.add(err.as_ref()).unwrap(),
-      _ => {}
+    if let Err(err) = result {
+      self.add(err.as_ref()).unwrap();
     }
   }
 
