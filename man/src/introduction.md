@@ -1,8 +1,6 @@
-# Introduction
+# Chapter 1
 
-Degenerate is a programmable generative art engine engine. It is developed on
-[GitHub](https://github.com/casey/degenerate/) and deployed at
-[degenerate.computer](https://degenerate.computer).
+The Degenerate Programmers Manual is bit spare at the moment. Apologies!
 
 ## Execution Model
 
@@ -25,18 +23,13 @@ rotateColor('green', 0.5 * TAU);
 render();
 ```
 
-TODO explain:
-transformations
-wrapping
-default color
-
 Go to [degenerate.computer](https://degenerate.computer) and copy and paste the
 program into the text area.
 
 Nothing happened, because you have to hit `Shift + Enter` for the program to
 run. Try it!
 
-## Learning JavaScript
+## Language
 
 Degenerate is programmed with JavaScript. An introduction to JavaScript is
 outside of the scope of this document. The reader is referred the excellent
@@ -46,20 +39,7 @@ outside of the scope of this document. The reader is referred the excellent
 and
 [JavaScript reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference),
 
-## Writing Degenerate Programs
-
-Degenerate Programs are written in JavaScript and executed in a WebWorker.
-Programs send messages back to the main browser thread, which renders the output
-in a WebGL context.
-
-TODO link:
-1. Examples
-2. worker.js
-3. fragment.glsl
-4. app.rs
-5. gpu.rs
-
-[mdBook](mdBook.md)
+## Reference
 
 Given the paucity of this manual, the current primary reference to degenerate
 is the code itself.
