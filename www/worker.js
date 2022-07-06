@@ -147,6 +147,15 @@ function elapsed() {
   return Date.now() - start;
 }
 
+// Display an error message in the console at the bottom of the page.
+//
+// ```
+// error('foo')
+// ```
+function error(error) {
+  self.postMessage(JSON.stringify({error}));
+}
+
 // Returns a promise that resolves when the browser is ready to display a new
 // frame. Call `await frame()` in your rendering loop to only render when
 // necessary and make sure each frame is displayed after rendering.
