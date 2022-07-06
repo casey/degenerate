@@ -302,5 +302,5 @@ test('worker-error', async ({ page }) => {
     `
   );
 
-  await expect(await page.locator('samp > *')).toHaveText('invalid type: map, expected a string at line 1 column 9');
+  await expect(await page.locator('samp > *')).toHaveText('ReferenceError: foo is not defined');
 });

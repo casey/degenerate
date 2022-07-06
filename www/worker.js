@@ -538,7 +538,7 @@ self.addEventListener('message', async function (event) {
       try {
         await new AsyncFunction(message.content)();
       } catch (error) {
-        self.postMessage(JSON.stringify({error}));
+        self.postMessage(JSON.stringify({'error': error.toString()}));
       }
       self.postMessage(JSON.stringify('done'));
       break;
