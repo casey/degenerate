@@ -308,7 +308,7 @@ impl App {
               .map_err(JsValueError)?
               .cast::<HtmlInputElement>()?;
 
-            radio.set_id(option);
+            radio.set_id(&format!("{}-{}", id, option));
             radio.set_name(&id);
             radio.set_type("radio");
 
