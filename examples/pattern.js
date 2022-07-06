@@ -6,10 +6,10 @@ while (true) {
     alpha(1);
   }
   circle();
-  scale(0.5);
+  scale(state.scale * 0.5);
   for (_ of range(8)) {
     render();
-    wrap();
+    wrap(!state.wrap);
   }
   await frame();
 }
