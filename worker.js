@@ -535,7 +535,11 @@ self.addEventListener('message', async function (event) {
       break;
     case 'script':
       frameCallbacks = [];
-      await new AsyncFunction(message.content)();
+      try {
+        await new AsyncFunction(message.content)();
+      } catch (error) {
+        self.postMessage(JSON.stringify({'error': error.toString()}));
+      }
       self.postMessage(JSON.stringify('done'));
       break;
     case 'frame':
