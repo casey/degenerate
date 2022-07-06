@@ -198,9 +198,9 @@ test('radio', async ({ page }) => {
     `
   );
 
-  await expect(await page.isChecked('text=a')).toBeTruthy();
-  await expect(await page.isChecked('text=b')).toBeFalsy();
-  await expect(await page.isChecked('text=c')).toBeFalsy();
+  await expect(await page.isChecked('#widget-radio-foo-a')).toBeTruthy();
+  await expect(await page.isChecked('#widget-radio-foo-b')).toBeFalsy();
+  await expect(await page.isChecked('#widget-radio-foo-c')).toBeFalsy();
 
   await run(
     page,
@@ -214,7 +214,7 @@ test('radio', async ({ page }) => {
   let off = png.decode(await imageBuffer(page)).data;
   await expect(off[0]).toEqual(0);
 
-  await page.check('text=b');
+  await page.check('#widget-radio-foo-b');
 
   await run(
     page,
@@ -259,6 +259,7 @@ test('delta', async ({ page }) => {
   await run(
     page,
     `
+      await frame();
       let x = delta();
       if (x === 0) {
         throw "Frame delta was zero: " + x;
@@ -274,10 +275,21 @@ test('run', async ({ page }) => {
     `
   );
 
-  await page.locator('text=run').click();
+  await page.locator('button', { hasText: 'run' }).click();
 
   await page.waitForSelector('html.done');
 
   let on = png.decode(await imageBuffer(page)).data;
   await expect(on[0]).toEqual(255);
+});
+
+test('error', async ({ page }) => {
+  await run(
+    page,
+    `
+      error('foo');
+    `
+  );
+
+  await expect(await page.locator('samp > *')).toHaveText('foo');
 });
