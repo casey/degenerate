@@ -27,10 +27,9 @@ button {
   color: black;
   margin: 1em;
   padding: 0.5em;
-  z-index: 6;
 }
 
-#controls {
+footer {
   bottom: 0;
   display: flex;
   flex-direction: column;
@@ -44,7 +43,6 @@ canvas {
   position: absolute;
   top: 0;
   width: 100%;
-  z-index: 0;
 }
 
 html {
@@ -61,7 +59,6 @@ nav {
   mix-blend-mode: difference;
   position: absolute;
   top: var(--padding-vertical);
-  z-index: 5;
 }
 
 nav > * {
@@ -103,7 +100,6 @@ samp {
   visibility: visible;
   width: calc(100% - 2rem);
   word-wrap: break-word;
-  z-index: 1;
 }
 
 select {
@@ -111,7 +107,6 @@ select {
   position: absolute;
   right: 0;
   top: 0;
-  z-index: 4;
 }
 
 aside {
@@ -120,7 +115,6 @@ aside {
   font-size: 1.5em;
   font-weight: 900;
   margin: 0.5rem;
-  z-index: 3;
 }
 
 textarea {
@@ -140,7 +134,6 @@ textarea {
   resize: none;
   top: 0;
   width: 100%;
-  z-index: 2;
 }
 
 .fade-out {
@@ -148,3 +141,10 @@ textarea {
   transition: visibility 0s 1s, opacity 1s linear;
   visibility: hidden;
 }
+
+canvas { z-index: 0; }
+samp { z-index: 1; }
+textarea { z-index: 2; }
+select { z-index: 3; }
+footer { z-index: 4;}
+nav { z-index: 5; }

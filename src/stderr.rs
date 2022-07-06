@@ -32,7 +32,6 @@ impl Stderr {
       .map_err(JsValueError)?
       .cast::<HtmlDivElement>()?;
 
-    div.set_class_name("error");
     div.set_inner_text(&message);
 
     self.0.prepend_with_node_1(&div).map_err(JsValueError)?;
