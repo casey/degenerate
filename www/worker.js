@@ -212,7 +212,12 @@ self.addEventListener('message', async function (event) {
       break;
     case 'script':
       frameCallbacks = [];
-      await new AsyncFunction(message.content)();
+      try {
+        await new AsyncFunction(message.content)();
+      } catch(err) {
+        console.log('foobar');
+        self.postMessage(JSON.stringify({'error': err}));
+      }
       self.postMessage(JSON.stringify('done'));
       break;
     case 'frame':

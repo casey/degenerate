@@ -262,6 +262,9 @@ impl App {
       WorkerMessage::Done => {
         self.html.set_class_name("done");
       }
+      WorkerMessage::Error(err) => {
+        self.stderr.update(Err(err)?);
+      }
       WorkerMessage::Radio(name, options) => {
         let id = format!("widget-radio-{name}");
 
