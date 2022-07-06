@@ -5,8 +5,8 @@ use super::*;
 pub(crate) enum WorkerMessage {
   Checkbox(String),
   Clear,
-  Error(String),
   Done,
+  Error(String),
   Radio(String, Vec<String>),
   Render(State),
   Resolution(u32),
