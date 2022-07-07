@@ -287,9 +287,9 @@ function reboot() {
   clear();
 }
 
-// Enable or disable audio recording.
-function record(record) {
-  self.postMessage(JSON.stringify({record}));
+// Enable audio recording.
+function record() {
+  self.postMessage(JSON.stringify('record'));
 }
 
 // Send the current state to the main thread to be rendered. Like `frame()`,

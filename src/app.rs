@@ -2,7 +2,8 @@ use super::*;
 
 // TODO:
 // - turn on and off media stream
-// - tests?
+// - deal with warning
+// - test
 // - review
 
 pub(crate) struct App {
@@ -13,7 +14,6 @@ pub(crate) struct App {
   document: Document,
   gpu: Gpu,
   html: HtmlElement,
-  media_stream_audio_source_node: Option<MediaStreamAudioSourceNode>,
   nav: HtmlElement,
   oscillator_node: OscillatorNode,
   oscillator_gain_node: GainNode,
@@ -23,6 +23,7 @@ pub(crate) struct App {
   this: Option<Arc<Mutex<Self>>>,
   window: Window,
   worker: Worker,
+  recording: bool,
 }
 
 lazy_static! {
@@ -31,8 +32,9 @@ lazy_static! {
     ("Kaleidoscope", include_str!("../examples/kaleidoscope.js")),
     ("Orb Zoom", include_str!("../examples/orb_zoom.js")),
     ("Orbs", include_str!("../examples/orbs.js")),
+    ("Oscillator", include_str!("../examples/oscillator.js")),
     ("Pattern", include_str!("../examples/pattern.js")),
-    ("Sample", include_str!("../examples/sample.js")),
+    ("Record", include_str!("../examples/record.js")),
     ("Starburst", include_str!("../examples/starburst.js")),
     ("Target", include_str!("../examples/target.js")),
     ("X", include_str!("../examples/x.js")),
@@ -77,7 +79,9 @@ impl App {
 
     let stderr = Stderr::get();
 
-    let audio_context = AudioContext::new().map_err(JsValueError)?;
+    let audio_context =
+      AudioContext::new_with_context_options(AudioContextOptions::new().sample_rate(96000.0))
+        .map_err(JsValueError)?;
 
     let analyser_node = audio_context.create_analyser().map_err(JsValueError)?;
 
@@ -113,10 +117,10 @@ impl App {
       document,
       gpu,
       html,
-      media_stream_audio_source_node: None,
       nav,
       oscillator_gain_node,
       oscillator_node,
+      recording: false,
       select: select.clone(),
       stderr,
       textarea: textarea.clone(),
@@ -386,16 +390,8 @@ impl App {
           }
         }
       }
-      WorkerMessage::Record(record) => {
-        if let Some(media_stream_audio_source_node) = &self.media_stream_audio_source_node {
-          if record {
-            media_stream_audio_source_node
-              .connect_with_audio_node(&self.analyser_node)
-              .unwrap();
-          } else {
-            media_stream_audio_source_node.disconnect().unwrap();
-          }
-        } else if record {
+      WorkerMessage::Record => {
+        if !self.recording {
           let audio_context = self.audio_context.clone();
           let analyser_node = self.analyser_node.clone();
           let app = self.this();
@@ -410,12 +406,8 @@ impl App {
               .connect_with_audio_node(&analyser_node)
               .map_err(JsValueError)
               .unwrap();
-            app.lock().unwrap().media_stream_audio_source_node =
-              Some(media_stream_audio_source_node);
 
-            // for stream in media_stream.get_tracks().iter() {
-            //   stream.cast::<MediaStreamTrack>().unwrap().stop();
-            // }
+            app.lock().unwrap().recording = true;
           }) as Box<dyn FnMut(JsValue)>);
           let _ = self
             .window
