@@ -11,7 +11,6 @@ use {
   std::{
     cell::Cell,
     collections::BTreeMap,
-    collections::HashMap,
     f32,
     fmt::{self, Formatter},
     io::Cursor,
