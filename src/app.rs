@@ -123,6 +123,11 @@ impl App {
     }));
 
     {
+      let mut this = app.lock().unwrap();
+      this.this = Some(app.clone());
+    }
+
+    {
       let local = app.clone();
       let mut this = app.lock().unwrap();
       this.animation_frame_callback = Some(Closure::wrap(Box::new(move |timestamp| {
@@ -130,7 +135,6 @@ impl App {
         let result = app.on_animation_frame(timestamp);
         app.stderr.update(result);
       }) as Box<dyn FnMut(f64)>));
-      this.this = Some(app.clone());
     }
 
     let local = app.clone();
