@@ -1,17 +1,23 @@
 use super::*;
 
 pub(crate) struct App {
+  analyser_node: AnalyserNode,
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
+  audio_context: AudioContext,
   button: HtmlButtonElement,
   document: Document,
   gpu: Gpu,
   html: HtmlElement,
   nav: HtmlElement,
+  oscillator_node: OscillatorNode,
+  oscillator_gain_node: GainNode,
   select: HtmlSelectElement,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
+  this: Option<Arc<Mutex<Self>>>,
   window: Window,
   worker: Worker,
+  recording: bool,
 }
 
 lazy_static! {
@@ -20,7 +26,9 @@ lazy_static! {
     ("Kaleidoscope", include_str!("../examples/kaleidoscope.js")),
     ("Orb Zoom", include_str!("../examples/orb_zoom.js")),
     ("Orbs", include_str!("../examples/orbs.js")),
+    ("Oscillator", include_str!("../examples/oscillator.js")),
     ("Pattern", include_str!("../examples/pattern.js")),
+    ("Record", include_str!("../examples/record.js")),
     ("Starburst", include_str!("../examples/starburst.js")),
     ("Target", include_str!("../examples/target.js")),
     ("X", include_str!("../examples/x.js")),
@@ -65,31 +73,69 @@ impl App {
 
     let stderr = Stderr::get();
 
-    let gpu = Gpu::new(&canvas, &window)?;
+    let audio_context =
+      AudioContext::new_with_context_options(AudioContextOptions::new().sample_rate(96000.0))
+        .map_err(JsValueError)?;
+
+    let analyser_node = audio_context.create_analyser().map_err(JsValueError)?;
+
+    let gpu = Gpu::new(&window, &canvas, &analyser_node)?;
 
     let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
+    let oscillator_gain_node = audio_context.create_gain().map_err(JsValueError)?;
+    oscillator_gain_node.gain().set_value(0.0);
+
+    let oscillator_node = audio_context.create_oscillator().map_err(JsValueError)?;
+    oscillator_node.frequency().set_value(60.0);
+
+    oscillator_node
+      .connect_with_audio_node(&oscillator_gain_node)
+      .map_err(JsValueError)?;
+    oscillator_node.start().map_err(JsValueError)?;
+
+    oscillator_gain_node
+      .connect_with_audio_node(&audio_context.destination())
+      .map_err(JsValueError)?;
+
+    oscillator_gain_node
+      .connect_with_audio_node(&analyser_node)
+      .map_err(JsValueError)?;
+
     let app = Arc::new(Mutex::new(Self {
+      analyser_node,
       animation_frame_callback: None,
+      audio_context,
       button: button.clone(),
       document,
       gpu,
       html,
       nav,
+      oscillator_gain_node,
+      oscillator_node,
+      recording: false,
       select: select.clone(),
       stderr,
       textarea: textarea.clone(),
+      this: None,
       window,
       worker: worker.clone(),
     }));
 
-    let local = app.clone();
-    app.lock().unwrap().animation_frame_callback = Some(Closure::wrap(Box::new(move |timestamp| {
-      let mut app = local.lock().unwrap();
-      let result = app.on_animation_frame(timestamp);
-      app.stderr.update(result);
-    })
-      as Box<dyn FnMut(f64)>));
+    {
+      let mut this = app.lock().unwrap();
+      this.this = Some(app.clone());
+    }
+
+    {
+      let local = app.clone();
+      let mut this = app.lock().unwrap();
+      this.animation_frame_callback = Some(Closure::wrap(Box::new(move |timestamp| {
+        let mut app = local.lock().unwrap();
+        let result = app.on_animation_frame(timestamp);
+        app.stderr.update(result);
+      }) as Box<dyn FnMut(f64)>));
+    }
 
     let local = app.clone();
     textarea.add_event_listener("input", move || {
@@ -261,6 +307,12 @@ impl App {
       WorkerMessage::Error(error) => {
         self.stderr.update(Err(error.into()));
       }
+      WorkerMessage::OscillatorFrequency(frequency) => {
+        self.oscillator_node.frequency().set_value(frequency);
+      }
+      WorkerMessage::OscillatorGain(gain) => {
+        self.oscillator_gain_node.gain().set_value(gain);
+      }
       WorkerMessage::Radio(name, options) => {
         let id = format!("widget-radio-{name}");
 
@@ -335,6 +387,29 @@ impl App {
           }
         }
       }
+      WorkerMessage::Record => {
+        if !self.recording {
+          let local = self.this();
+          let closure = Closure::wrap(Box::new(move |stream: JsValue| {
+            let mut app = local.lock().unwrap();
+            let result = app.on_get_user_media(stream);
+            app.stderr.update(result);
+          }) as Box<dyn FnMut(JsValue)>);
+          let _ = self
+            .window
+            .navigator()
+            .media_devices()
+            .map_err(JsValueError)?
+            .get_user_media_with_constraints(
+              MediaStreamConstraints::new()
+                .audio(&true.into())
+                .video(&false.into()),
+            )
+            .map_err(JsValueError)?
+            .then(&closure);
+          closure.forget();
+        }
+      }
       WorkerMessage::Render(state) => {
         self.gpu.render(&state)?;
         self.gpu.present()?;
@@ -358,6 +433,23 @@ impl App {
         a.click();
       }
     }
+
+    Ok(())
+  }
+
+  fn on_get_user_media(&mut self, media_stream: JsValue) -> Result {
+    let media_stream = media_stream.cast::<MediaStream>()?;
+
+    let media_stream_audio_source_node = self
+      .audio_context
+      .create_media_stream_source(&media_stream)
+      .map_err(JsValueError)?;
+
+    media_stream_audio_source_node
+      .connect_with_audio_node(&self.analyser_node)
+      .map_err(JsValueError)?;
+
+    self.recording = true;
 
     Ok(())
   }
@@ -392,6 +484,12 @@ impl App {
 
     self.button.set_disabled(false);
 
+    let _promise: Promise = self.audio_context.resume().map_err(JsValueError)?;
+
     Ok(())
+  }
+
+  fn this(&self) -> Arc<Mutex<Self>> {
+    self.this.as_ref().unwrap().clone()
   }
 }
