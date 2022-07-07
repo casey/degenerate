@@ -1,8 +1,6 @@
 use super::*;
 
 // TODO:
-// - turn on and off media stream
-// - deal with warning
 // - test
 // - review
 
