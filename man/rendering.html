@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Introduction - Degenerate Programmer&#x27;s Manual</title>
+        <title>Rendering - Degenerate Programmer&#x27;s Manual</title>
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html" class="active"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="programming.html"><strong aria-hidden="true">2.</strong> Programming</a></li><li class="chapter-item expanded "><a href="rendering.html"><strong aria-hidden="true">3.</strong> Rendering</a></li><li class="chapter-item expanded "><a href="nfts.html"><strong aria-hidden="true">4.</strong> Degenerate NFTs</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="programming.html"><strong aria-hidden="true">2.</strong> Programming</a></li><li class="chapter-item expanded "><a href="rendering.html" class="active"><strong aria-hidden="true">3.</strong> Rendering</a></li><li class="chapter-item expanded "><a href="nfts.html"><strong aria-hidden="true">4.</strong> Degenerate NFTs</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -134,67 +134,42 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
-<p>Degenerate is a programmable generative art engine. It is developed on
-<a href="https://github.com/casey/degenerate/">GitHub</a> and deployed on the web at
-<a href="https://degenerate.computer">degenerate.computer</a>.</p>
-<p>Degenerate operates as a chain of image filters. The output of each filter is
-used as the input of the next filter. Degenerate programs change the state of
-the current image filter and call <code>render()</code> to apply it.</p>
-<p>Image filters have a number of properties, including a transformation, which
-determines where in the input image pixels will be sampled from; a mask, which
-determines which of those pixels will be modified; and an operation, which
-determines how those pixels will be modified.</p>
-<p>Try copying this example program into the text input field at
-<a href="https://degenerate.computer">degenerate.computer</a>:</p>
-<pre><code class="language-javascript">// Set the scale component of the current transformation
-scale(0.75);
-// Use an x-shaped mask
-x();
-// Use a tenth-turn about the green color axis as the operation
-rotateColor('green', 0.1 * TAU);
-// Apply the current image filter
-render();
-</code></pre>
-<p>Press the <code>Run</code> button or <code>Shift + Enter</code> to run it. Try running it repeatedly
-to see the effects of iterated rendering.</p>
-<p>For more information about the JavaScript programming API, see
-<a href="programming.html">Programming</a>. For more details about how the rendering engine
-works, see <a href="rendering.html">Rendering</a>.</p>
-<h2 id="development"><a class="header" href="#development">Development</a></h2>
-<p>Degenerate is developed on <a href="https://github.com/casey/degenerate/">GitHub</a>. If
-you're interested in contributing, take a look at the codebase, and pop into
-<a href="https://discord.gg/87cjuz4FYg">the Discord</a> for some suggestions for a good
-first issue.</p>
-<h2 id="suggestions"><a class="header" href="#suggestions">Suggestions</a></h2>
-<p>Experiment, experiment, experiment! Clever combinations of commands craft
-charming consequences. Check out and modify some examples by using the
-drop-down menu in the upper right corner of the page. Try changing the filter
-state and rendering in a loop, or just mash <code>Shift + Enter</code> over and over again
-to see what happens.</p>
-<h2 id="saving-your-creations"><a class="header" href="#saving-your-creations">Saving your creations</a></h2>
-<pre><code class="language-javascript">// Make the resolution nice and big
-resolution(4096);
-// Render something cool
-x();
-render();
-// Save it
-save();
-</code></pre>
-<h2 id="learning-javascript"><a class="header" href="#learning-javascript">Learning JavaScript</a></h2>
-<p>Degenerate is programmed with JavaScript. An introduction to JavaScript is
-outside of the scope of this document. The reader is referred the excellent
-<a href="https://developer.mozilla.org/en-US/">Mozilla Developer Network</a>
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript">introduction to JavaScript</a>,
-<a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript">JavaScript tutorial</a>.
-and
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference">JavaScript reference</a>,</p>
+                        <h1 id="rendering"><a class="header" href="#rendering">Rendering</a></h1>
+<p>Degenerate programs are written in JavaScript and sent to a Web Worker for
+execution. The program then sends back a series of <code>State</code> objects from the
+worker, which are used to configure the renderer that runs in the main thread.
+The renderer renders to a full-page <code>&lt;canvas&gt;</code> element using WebGL.</p>
+<p>Rendering is performed by applying a series of image filters, with the output
+of each filter being fed as input to the next.</p>
+<p>The various parts of the renderer are described below. You may want to skip
+ahead to the description of the fragment shader, which ties everything and
+serves as a good jumping off point for the rest of the codebase.</p>
+<h2 id="app"><a class="header" href="#app"><code>App</code></a></h2>
+<p><code>App</code>, in <a href="https://github.com/casey/degenerate/blob/master/src/app.rs">app.rs</a>,
+is the top-level struct which contains logic for configuring the application
+responding to user-input.</p>
+<h2 id="gpu"><a class="header" href="#gpu"><code>Gpu</code></a></h2>
+<p><code>Gpu</code>, in <a href="https://github.com/casey/degenerate/blob/master/src/gpu.rs">gpu.rs</a>,
+is responsible for setting up the WebGL context, updating the fragment shader
+with values from <code>State</code> objects, and executing the rendering pipeline.</p>
+<h2 id="vertex-shader"><a class="header" href="#vertex-shader">Vertex Shader</a></h2>
+<p>The vertex shader, in
+<a href="https://github.com/casey/degenerate/blob/master/src/vertex.glsl">vertex.glsl</a>,
+emits a full-screen triangle.</p>
+<h2 id="fragment-shader"><a class="header" href="#fragment-shader">Fragment Shader</a></h2>
+<p>The fragment shader, in
+<a href="https://github.com/casey/degenerate/blob/master/src/fragment.glsl">fragment.glsl</a>,
+performs the bulk of the rendering by determining the color of each pixel of
+the triangle produced by the vertex shader,</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="next" href="programming.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="prev" href="programming.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a rel="next" href="nfts.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
@@ -203,7 +178,10 @@ and
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="next" href="programming.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="prev" href="programming.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a rel="next" href="nfts.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

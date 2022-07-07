@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html" class="active"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="nfts.html"><strong aria-hidden="true">2.</strong> Degenerate NFTs</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html" class="active"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="programming.html"><strong aria-hidden="true">2.</strong> Programming</a></li><li class="chapter-item expanded "><a href="rendering.html"><strong aria-hidden="true">3.</strong> Rendering</a></li><li class="chapter-item expanded "><a href="nfts.html"><strong aria-hidden="true">4.</strong> Degenerate NFTs</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -134,28 +134,54 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="chapter-1"><a class="header" href="#chapter-1">Chapter 1</a></h1>
-<p>The Degenerate Programmers Manual is bit spare at the moment. Apologies!</p>
-<h2 id="execution-model"><a class="header" href="#execution-model">Execution Model</a></h2>
-<p>Degenerate operates as a chain of filters, with the output of each filter
-feeding into the next. Commands are issued to change the state of the current
-filter, which is then applied with <code>render()</code>.</p>
-<p>The primary components of a filter are a &quot;mask&quot;, which determines which pixels
-the filter will operate on, and an &quot;operation&quot;, which determines what will
-happen to those pixels.</p>
-<p>For example, to set the mask to an X, you can do <code>x()</code>, and to set the
-operation to color rotation by one half rotation about the green axis, do
-<code>rotateColor('green', 0.5 * TAU)</code>. An finally, to see the results, do
-<code>render()</code>. The complete program looks like this:</p>
-<pre><code class="language-javascript">x();
-rotateColor('green', 0.5 * TAU);
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>Degenerate is a programmable generative art engine. It is developed on
+<a href="https://github.com/casey/degenerate/">GitHub</a> and deployed on the web at
+<a href="https://degenerate.computer">degenerate.computer</a>.</p>
+<p>Degenerate operates as a chain of image filters. The output of each filter is
+used as the input of the next filter. Degenerate programs change the state of
+the current image filter and call <code>render()</code> to apply it.</p>
+<p>Image filters have a number of properties, including a transformation, which
+determines where in the input image pixels will be sampled from; a mask, which
+determines which of those pixels will be modified; and an operation, which
+determines how those pixels will be modified.</p>
+<p>Try copying this example program into the text input field at
+<a href="https://degenerate.computer">degenerate.computer</a>:</p>
+<pre><code class="language-javascript">// Set the scale component of the current transformation
+scale(0.75);
+// Use an x-shaped mask
+x();
+// Use a tenth-turn about the green color axis as the operation
+rotateColor('green', 0.1 * TAU);
+// Apply the current image filter
 render();
 </code></pre>
-<p>Go to <a href="https://degenerate.computer">degenerate.computer</a> and copy and paste the
-program into the text area.</p>
-<p>Nothing happened, because you have to hit <code>Shift + Enter</code> for the program to
-run. Try it!</p>
-<h2 id="language"><a class="header" href="#language">Language</a></h2>
+<p>Press the <code>Run</code> button or <code>Shift + Enter</code> to run it. Try running it repeatedly
+to see the effects of iterated rendering.</p>
+<p>For more information about the JavaScript programming API, see
+<a href="programming.html">Programming</a>. For more details about how the rendering engine
+works, see <a href="rendering.html">Rendering</a>.</p>
+<h2 id="development"><a class="header" href="#development">Development</a></h2>
+<p>Degenerate is developed on <a href="https://github.com/casey/degenerate/">GitHub</a>. If
+you're interested in contributing, take a look at the codebase, and pop into
+<a href="https://discord.gg/87cjuz4FYg">the Discord</a> for some suggestions for a good
+first issue.</p>
+<h2 id="suggestions"><a class="header" href="#suggestions">Suggestions</a></h2>
+<p>Experiment, experiment, experiment! Clever combinations of commands craft
+charming consequences. Check out and modify some examples by using the
+drop-down menu in the upper right corner of the page. Try changing the filter
+state and rendering in a loop, or just mash <code>Shift + Enter</code> over and over again
+to see what happens.</p>
+<h2 id="saving-your-creations"><a class="header" href="#saving-your-creations">Saving your creations</a></h2>
+<pre><code class="language-javascript">// Make the resolution nice and big
+resolution(4096);
+// Render something cool
+x();
+render();
+// Save it
+save();
+</code></pre>
+<h2 id="learning-javascript"><a class="header" href="#learning-javascript">Learning JavaScript</a></h2>
 <p>Degenerate is programmed with JavaScript. An introduction to JavaScript is
 outside of the scope of this document. The reader is referred the excellent
 <a href="https://developer.mozilla.org/en-US/">Mozilla Developer Network</a>
@@ -163,40 +189,12 @@ outside of the scope of this document. The reader is referred the excellent
 <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript">JavaScript tutorial</a>.
 and
 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference">JavaScript reference</a>,</p>
-<h2 id="reference"><a class="header" href="#reference">Reference</a></h2>
-<p>Given the paucity of this manual, the current primary reference to degenerate
-is the code itself.</p>
-<p>First off, check out
-<a href="https://github.com/casey/degenerate/blob/master/www/worker.js">worker.js</a>,
-which provides the environment in which degenerate programs run. A variety of
-functions are available for manipulating the current state.</p>
-<p>Secondly, check out
-<a href="https://github.com/casey/degenerate/blob/master/src/fragment.glsl">fragment.glsl</a>,
-the fragment shader that runs on the GPU and does the hard work of rendering
-filters.</p>
-<p>And finally, check out
-<a href="https://github.com/casey/degenerate/blob/master/tests/images.spec.ts">image.spec.ts</a>,
-which contains test programs, and
-<a href="https://github.com/casey/degenerate/tree/master/images">the images directory</a>,
-which contains the corresponding images. Most test programs are simple, and
-exercise individual features, but some are more complex, like <code>smear</code>,
-<code>kaleidoscope</code>, <code>grain</code>, and <code>pattern</code>.</p>
-<h2 id="suggestions"><a class="header" href="#suggestions">Suggestions</a></h2>
-<p>Experiment, experiment, experiment! Clever combinations of commands give
-surprising results. Try changing the filter state and rendering in a loop, or
-just mash <code>Shift + Enter</code> over and over again to see what happens.</p>
-<h2 id="saving-your-creations"><a class="header" href="#saving-your-creations">Saving your creations</a></h2>
-<ol>
-<li>Make the resolution nice and large with <code>resolution(4096)</code></li>
-<li>Render something cool</li>
-<li>Save it with <code>save()</code></li>
-</ol>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="next" href="nfts.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="programming.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
@@ -205,7 +203,7 @@ just mash <code>Shift + Enter</code> over and over again to see what happens.</p
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="next" href="nfts.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="programming.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
