@@ -147,6 +147,15 @@ function elapsed() {
   return Date.now() - start;
 }
 
+// Display an error message in the console at the bottom of the page.
+//
+// ```
+// error('foo');
+// ```
+function error(error) {
+  self.postMessage(JSON.stringify({error}));
+}
+
 // Returns a promise that resolves when the browser is ready to display a new
 // frame. Call `await frame()` in your rendering loop to only render when
 // necessary and make sure each frame is displayed after rendering.
@@ -526,7 +535,11 @@ self.addEventListener('message', async function (event) {
       break;
     case 'script':
       frameCallbacks = [];
-      await new AsyncFunction(message.content)();
+      try {
+        await new AsyncFunction(message.content)();
+      } catch (error) {
+        self.postMessage(JSON.stringify({'error': error.toString()}));
+      }
       self.postMessage(JSON.stringify('done'));
       break;
     case 'frame':

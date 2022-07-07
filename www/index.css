@@ -23,12 +23,17 @@ body {
 }
 
 button {
-  bottom: 0;
   color: black;
   margin: 1em;
   padding: 0.5em;
+}
+
+footer {
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
   position: absolute;
-  z-index: 5;
+  right: 0;
 }
 
 canvas {
@@ -37,7 +42,6 @@ canvas {
   position: absolute;
   top: 0;
   width: 100%;
-  z-index: 0;
 }
 
 html {
@@ -54,7 +58,6 @@ nav {
   mix-blend-mode: difference;
   position: absolute;
   top: var(--padding-vertical);
-  z-index: 5;
 }
 
 nav > * {
@@ -84,14 +87,18 @@ nav > div:hover {
 }
 
 samp {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
   bottom: 0;
-  box-sizing: border-box;
   color: red;
+  display: -webkit-box;
+  margin: 1em;
   mix-blend-mode: difference;
-  padding: 1em;
+  overflow: hidden;
   position: absolute;
-  width: 100%;
-  z-index: 1;
+  visibility: visible;
+  width: calc(100% - 2rem);
+  word-wrap: break-word;
 }
 
 select {
@@ -99,19 +106,14 @@ select {
   position: absolute;
   right: 0;
   top: 0;
-  z-index: 4;
 }
 
 aside {
   -webkit-text-stroke-color: black;
   -webkit-text-stroke-width: 1px;
-  bottom: 0;
   font-size: 1.5em;
   font-weight: 900;
   margin: 0.5rem;
-  position: absolute;
-  right: 0;
-  z-index: 3;
 }
 
 textarea {
@@ -131,7 +133,6 @@ textarea {
   resize: none;
   top: 0;
   width: 100%;
-  z-index: 2;
 }
 
 .fade-out {
@@ -139,3 +140,10 @@ textarea {
   transition: visibility 0s 1s, opacity 1s linear;
   visibility: hidden;
 }
+
+canvas { z-index: 0; }
+samp { z-index: 1; }
+textarea { z-index: 2; }
+select { z-index: 3; }
+footer { z-index: 4;}
+nav { z-index: 5; }
