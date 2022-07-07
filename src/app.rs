@@ -87,7 +87,7 @@ impl App {
 
     let worker = Worker::new("/worker.js").map_err(JsValueError)?;
 
-    let oscillator_node = audio_context.create_oscillator().unwrap();
+    let oscillator_node = audio_context.create_oscillator().map_err(JsValueError)?;
 
     let oscillator_gain_node = audio_context.create_gain().map_err(JsValueError)?;
     oscillator_gain_node.gain().set_value(0.0);
