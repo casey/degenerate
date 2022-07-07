@@ -1,12 +1,12 @@
 # Introduction
 
 Degenerate is a programmable generative art engine. It is developed on
-[GitHub](https://github.com/casey/degenerate/) and online at
+[GitHub](https://github.com/casey/degenerate/) and deployed on the web at
 [degenerate.computer](https://degenerate.computer).
 
 Degenerate operates as a chain of image filters. The output of each filter is
 used as the input of the next filter. Degenerate programs change the state of
-the the current image filter, and call `render()` to apply it.
+the the current image filter and call `render()` to apply it.
 
 Image filters have a number of properties, including a transformation, which
 determines where in the input image pixels will be sampled from; a mask, which
@@ -21,7 +21,7 @@ Try copying this example program into the text input field at
 scale(0.75);
 // Use an x-shaped mask
 x();
-// Use a half-turn about the green color axis as the operation
+// Use a tenth-turn about the green color axis as the operation
 rotateColor('green', 0.1 * TAU);
 // Apply the current image filter
 render();
@@ -43,17 +43,23 @@ first issue.
 
 ## Suggestions
 
-Experiment, experiment, experiment! Clever combinations of commands give
-surprising results. Check out and modify some examples by using the drop-down
-menu in the upper right corner of the page. Try changing the filter state and
-rendering in a loop, or just mash `Shift + Enter` over and over again to see
-what happens.
+Experiment, experiment, experiment! Clever combinations of commands craft
+charming consequences. Check out and modify some examples by using the
+drop-down menu in the upper right corner of the page. Try changing the filter
+state and rendering in a loop, or just mash `Shift + Enter` over and over again
+to see what happens.
 
 ## Saving your creations
 
-1. Make the resolution nice and large with `resolution(4096)`
-2. Render something cool
-3. Save it with `save()`
+```javascript
+// Make the resolution nice and big
+resolution(4096);
+// Render something cool
+x();
+render();
+// Save it
+save();
+```
 
 ## Learning JavaScript
 
