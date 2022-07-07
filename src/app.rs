@@ -15,7 +15,7 @@ pub(crate) struct App {
 }
 
 lazy_static! {
-  static ref EXAMPLES: HashMap<&'static str, &'static str> = [
+  static ref EXAMPLES: BTreeMap<&'static str, &'static str> = [
     ("All", include_str!("../examples/all.js")),
     ("Kaleidoscope", include_str!("../examples/kaleidoscope.js")),
     ("Orb Zoom", include_str!("../examples/orb_zoom.js")),
