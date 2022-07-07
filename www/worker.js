@@ -281,6 +281,11 @@ function reboot() {
   clear();
 }
 
+// Enable or disable audio recording.
+function record(record) {
+  self.postMessage(JSON.stringify({record}));
+}
+
 // Send the current state to the main thread to be rendered. Like `frame()`,
 // returns a promise that will resolve when the browser is ready to display a
 // new frame. Use `await frame();` when you want to render multiple times before
