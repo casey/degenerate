@@ -16,19 +16,26 @@ impl Stderr {
   }
 
   pub(crate) fn update(&self, result: Result) {
-    match result {
-      Err(err) => self.set(err.as_ref()),
-      Ok(()) => self.clear(),
+    if let Err(err) = result {
+      self.add(err.as_ref()).unwrap();
     }
   }
 
-  pub(crate) fn set(&self, err: &dyn std::error::Error) {
+  pub(crate) fn add(&self, err: &dyn std::error::Error) -> Result {
     let message = err.to_string();
-    log::error!("{}", message);
-    self.0.set_text_content(Some(&message));
-  }
 
-  pub(crate) fn clear(&self) {
-    self.0.set_text_content(None);
+    log::error!("{}", message);
+
+    let div = window()
+      .get_document()
+      .create_element("div")
+      .map_err(JsValueError)?
+      .cast::<HtmlDivElement>()?;
+
+    div.set_inner_text(&message);
+
+    self.0.prepend_with_node_1(&div).map_err(JsValueError)?;
+
+    Ok(())
   }
 }

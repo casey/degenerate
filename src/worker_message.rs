@@ -6,6 +6,7 @@ pub(crate) enum WorkerMessage {
   Checkbox(String),
   Clear,
   Done,
+  Error(String),
   OscillatorFrequency(f32),
   Radio(String, Vec<String>),
   Record(bool),

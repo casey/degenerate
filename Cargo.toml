@@ -15,8 +15,8 @@ console_error_panic_hook = "0.1.7"
 console_log = "0.2.0"
 getrandom = { version = "0.2.6", features = ["js"] }
 image = "0.24.2"
-include_dir = "0.7.2"
 js-sys = "0.3.57"
+lazy_static = "1.4.0"
 log = "0.4.17"
 nalgebra = "0.31.0"
 rand = { version = "0.8.4" }
