@@ -14,7 +14,21 @@ pub(crate) struct App {
   worker: Worker,
 }
 
-const EXAMPLES: include_dir::Dir = include_dir!("examples");
+lazy_static! {
+  static ref EXAMPLES: HashMap<&'static str, &'static str> = [
+    ("All", include_str!("../examples/all.js")),
+    ("Kaleidoscope", include_str!("../examples/kaleidoscope.js")),
+    ("Orb Zoom", include_str!("../examples/orb_zoom.js")),
+    ("Orbs", include_str!("../examples/orbs.js")),
+    ("Pattern", include_str!("../examples/pattern.js")),
+    ("Starburst", include_str!("../examples/starburst.js")),
+    ("Target", include_str!("../examples/target.js")),
+    ("X", include_str!("../examples/x.js")),
+  ]
+  .iter()
+  .cloned()
+  .collect();
+}
 
 impl App {
   pub(super) fn init() -> Result {
@@ -34,37 +48,19 @@ impl App {
 
     let button = document.select("button")?.cast::<HtmlButtonElement>()?;
 
-    for entry in EXAMPLES.entries() {
-      match entry {
-        include_dir::DirEntry::File(file) => {
-          let path = file.path();
+    for name in EXAMPLES.keys() {
+      let option = document
+        .create_element("option")
+        .map_err(JsValueError)?
+        .cast::<HtmlOptionElement>()?;
 
-          let option = document
-            .create_element("option")
-            .map_err(JsValueError)?
-            .cast::<HtmlOptionElement>()?;
+      option.set_text(name);
 
-          option.set_text(
-            &path
-              .file_stem()
-              .ok_or("Failed to extract file stem")?
-              .to_str()
-              .ok_or("Failed to convert OsStr to str")?
-              .split('_')
-              .into_iter()
-              .map(|s| s[0..1].to_uppercase() + &s[1..])
-              .collect::<Vec<String>>()
-              .join(" "),
-          );
+      option.set_value(name);
 
-          option.set_value(path.to_str().ok_or("Failed to convert path to str")?);
-
-          select
-            .add_with_html_option_element(&option)
-            .map_err(JsValueError)?
-        }
-        _ => continue,
-      }
+      select
+        .add_with_html_option_element(&option)
+        .map_err(JsValueError)?;
     }
 
     let stderr = Stderr::get();
@@ -372,10 +368,8 @@ impl App {
     self.textarea.set_value(&format!(
       "{}\n// Press the `Run` button or `Shift + Enter` to execute",
       EXAMPLES
-        .get_file(Path::new(&self.select.value()))
-        .ok_or("Failed to get file")?
-        .contents_utf8()
-        .ok_or("Failed to get file contents")?
+        .get(&*self.select.value())
+        .ok_or("Failed to get example")?
     ));
 
     self.textarea.focus().map_err(JsValueError)?;
