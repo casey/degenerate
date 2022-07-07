@@ -2,7 +2,6 @@ use super::*;
 
 pub(crate) struct Gpu {
   analyser_node: AnalyserNode,
-  audio_frequency_data: Vec<f32>,
   audio_time_domain_array: Float32Array,
   audio_time_domain_data: Vec<f32>,
   audio_time_domain_texture: WebGlTexture,
@@ -167,7 +166,6 @@ impl Gpu {
       audio_time_domain_array: Float32Array::new_with_length(fft_size),
       audio_time_domain_data: vec![0.0; fft_size as usize],
       audio_time_domain_texture,
-      audio_frequency_data: vec![0.0; analyser_node.frequency_bin_count() as usize],
       canvas: canvas.clone(),
       frame_buffer,
       gl,
@@ -269,10 +267,6 @@ impl Gpu {
         Some(&self.audio_time_domain_array),
       )
       .map_err(JsValueError)?;
-
-    self
-      .analyser_node
-      .get_float_frequency_data(&mut self.audio_frequency_data);
 
     self.gl.uniform1f(Some(self.uniform("alpha")), state.alpha);
 
