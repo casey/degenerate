@@ -389,6 +389,18 @@ function mod(divisor, remainder) {
   state.mask = MASK_MOD;
 }
 
+// Set the oscillator gain. The oscillator produces a sine wave tone, useful
+// for debugging audio-reactive programs.
+function oscillatorGain(gain) {
+  self.postMessage(JSON.stringify({'oscillatorGain': gain}));
+}
+
+// Set the oscillator frequency to `hz` hertz. The oscillator produces a sine wave tone,
+// useful for debugging audio-reactive programs.
+function oscillatorFrequency(hz) {
+  self.postMessage(JSON.stringify({'oscillatorFrequency': hz}));
+}
+
 // Create a new radio button widget with the label `name` and options `options`,
 // and return the selected option. `options` must be a list of strings. Calls with
 // same `name` will all refer to the same radio button widget, making it safe to
@@ -442,6 +454,11 @@ function* range(iterations) {
 function reboot() {
   reset();
   clear();
+}
+
+// Enable audio recording.
+function record() {
+  self.postMessage(JSON.stringify('record'));
 }
 
 // Send the current state to the main thread to be rendered. Like `frame()`,
@@ -531,6 +548,14 @@ function rows(nrows, step) {
   state.maskRowsRows = nrows;
   state.maskRowsStep = step;
   state.mask = MASK_ROWS;
+}
+
+// Set the sample operation. The sample operation samples the currently playing
+// audio's time domain data using the x coordinate of the current pixel
+// position, and rotates the current pixel in HSL color space by the intensity
+// of the audio at that position.
+function sample() {
+  state.operation = OPERATION_SAMPLE;
 }
 
 // Save the current canvas as a PNG.
@@ -648,6 +673,7 @@ const OPERATION_DEBUG = 0;
 const OPERATION_IDENTITY = 1;
 const OPERATION_INVERT = 2;
 const OPERATION_ROTATE_COLOR = 3;
+const OPERATION_SAMPLE = 4;
 
 class Rng {
   constructor(seed) {
