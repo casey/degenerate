@@ -270,10 +270,6 @@ impl Gpu {
 
     self.gl.uniform1f(Some(self.uniform("alpha")), state.alpha);
 
-    self
-      .analyser_node
-      .get_float_time_domain_data(&mut self.audio_time_domain_data);
-
     self.gl.uniform3f(
       Some(self.uniform("default_color")),
       state.default_color[0],
