@@ -6,7 +6,7 @@ Degenerate is a programmable generative art engine. It is developed on
 
 Degenerate operates as a chain of image filters. The output of each filter is
 used as the input of the next filter. Degenerate programs change the state of
-the the current image filter and call `render()` to apply it.
+the current image filter and call `render()` to apply it.
 
 Image filters have a number of properties, including a transformation, which
 determines where in the input image pixels will be sampled from; a mask, which

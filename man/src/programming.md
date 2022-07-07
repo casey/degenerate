@@ -28,7 +28,7 @@ For each pixel in the image, an filter operates with roughly the following
 steps:
 
 1. Generate the coordinates of the current pixel
-2. Transform those coordiantes by the current transform
+2. Transform those coordinates by the current transform
 3. If wrapping is enabled and the transformed pixel coordinates are out of
    bounds, wrap them back in bounds
 4. Sample the source image at those coordinates if they are in bounds,
