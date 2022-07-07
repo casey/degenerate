@@ -390,22 +390,11 @@ impl App {
       }
       WorkerMessage::Record => {
         if !self.recording {
-          let audio_context = self.audio_context.clone();
-          let analyser_node = self.analyser_node.clone();
-          let app = self.this();
+          let local = self.this();
           let closure = Closure::wrap(Box::new(move |stream: JsValue| {
-            let media_stream = stream.cast::<MediaStream>().unwrap();
-
-            let media_stream_audio_source_node = audio_context
-              .create_media_stream_source(&media_stream)
-              .unwrap();
-
-            media_stream_audio_source_node
-              .connect_with_audio_node(&analyser_node)
-              .map_err(JsValueError)
-              .unwrap();
-
-            app.lock().unwrap().recording = true;
+            let mut app = local.lock().unwrap();
+            let result = app.on_get_user_media(stream);
+            app.stderr.update(result);
           }) as Box<dyn FnMut(JsValue)>);
           let _ = self
             .window
@@ -445,6 +434,23 @@ impl App {
         a.click();
       }
     }
+
+    Ok(())
+  }
+
+  fn on_get_user_media(&mut self, media_stream: JsValue) -> Result {
+    let media_stream = media_stream.cast::<MediaStream>()?;
+
+    let media_stream_audio_source_node = self
+      .audio_context
+      .create_media_stream_source(&media_stream)
+      .map_err(JsValueError)?;
+
+    media_stream_audio_source_node
+      .connect_with_audio_node(&self.analyser_node)
+      .map_err(JsValueError)?;
+
+    self.recording = true;
 
     Ok(())
   }
