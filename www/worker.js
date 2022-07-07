@@ -511,6 +511,25 @@ class Rng {
   }
 }
 
+// State objects encapsulate the current image filter state.
+class State {
+  constructor() {
+    this.alpha = 1.0;
+    this.defaultColor = [0.0, 0.0, 0.0];
+    this.mask = MASK_ALL;
+    this.maskModDivisor = 0;
+    this.maskModRemainder = 0;
+    this.maskRowsRows = 0;
+    this.maskRowsStep = 0;
+    this.operation = OPERATION_INVERT;
+    this.operationRotateColorAxis = 'red';
+    this.operationRotateColorRadians = 0.0;
+    this.rotation = 0.0;
+    this.scale = 1.0;
+    this.wrap = false;
+  }
+}
+
 let frameCallbacks = [];
 let lastDelta = 0;
 let lastFrame = 0;
