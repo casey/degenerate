@@ -1,9 +1,5 @@
 use super::*;
 
-// TODO:
-// - test
-// - review
-
 pub(crate) struct App {
   analyser_node: AnalyserNode,
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
