@@ -2,6 +2,8 @@ use super::*;
 
 // TODO:
 // - turn on and off media stream
+// - tests?
+// - review
 
 pub(crate) struct App {
   analyser_node: AnalyserNode,
@@ -14,6 +16,7 @@ pub(crate) struct App {
   media_stream_audio_source_node: Option<MediaStreamAudioSourceNode>,
   nav: HtmlElement,
   oscillator_node: OscillatorNode,
+  oscillator_gain_node: GainNode,
   select: HtmlSelectElement,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
@@ -84,21 +87,21 @@ impl App {
 
     let oscillator_node = audio_context.create_oscillator().unwrap();
 
-    let gain_node = audio_context.create_gain().map_err(JsValueError)?;
-    gain_node.gain().set_value(0.25);
+    let oscillator_gain_node = audio_context.create_gain().map_err(JsValueError)?;
+    oscillator_gain_node.gain().set_value(0.0);
 
-    oscillator_node.frequency().set_value(0.0);
+    oscillator_node.frequency().set_value(60.0);
 
     oscillator_node
-      .connect_with_audio_node(&gain_node)
+      .connect_with_audio_node(&oscillator_gain_node)
       .map_err(JsValueError)?;
     oscillator_node.start().map_err(JsValueError)?;
 
-    gain_node
+    oscillator_gain_node
       .connect_with_audio_node(&audio_context.destination())
       .map_err(JsValueError)?;
 
-    gain_node
+    oscillator_gain_node
       .connect_with_audio_node(&analyser_node)
       .map_err(JsValueError)?;
 
@@ -112,6 +115,7 @@ impl App {
       html,
       media_stream_audio_source_node: None,
       nav,
+      oscillator_gain_node,
       oscillator_node,
       select: select.clone(),
       stderr,
@@ -304,6 +308,9 @@ impl App {
       }
       WorkerMessage::OscillatorFrequency(frequency) => {
         self.oscillator_node.frequency().set_value(frequency);
+      }
+      WorkerMessage::OscillatorGain(gain) => {
+        self.oscillator_gain_node.gain().set_value(gain);
       }
       WorkerMessage::Radio(name, options) => {
         let id = format!("widget-radio-{name}");

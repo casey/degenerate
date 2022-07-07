@@ -8,6 +8,7 @@ pub(crate) enum WorkerMessage {
   Done,
   Error(String),
   OscillatorFrequency(f32),
+  OscillatorGain(f32),
   Radio(String, Vec<String>),
   Record(bool),
   Render(State),

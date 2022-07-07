@@ -21,7 +21,7 @@ use {
   },
   wasm_bindgen::{closure::Closure, convert::FromWasmAbi, JsCast, JsValue},
   web_sys::{
-    AnalyserNode, AudioContext, Document, Element, EventTarget, HtmlAnchorElement,
+    AnalyserNode, AudioContext, Document, Element, EventTarget, GainNode, HtmlAnchorElement,
     HtmlButtonElement, HtmlCanvasElement, HtmlDivElement, HtmlElement, HtmlInputElement,
     HtmlLabelElement, HtmlOptionElement, HtmlSelectElement, HtmlTextAreaElement, KeyboardEvent,
     MediaStream, MediaStreamAudioSourceNode, MediaStreamConstraints, MessageEvent, OscillatorNode,

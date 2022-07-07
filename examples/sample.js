@@ -3,10 +3,10 @@ sample();
 while (true) {
   if (checkbox('record')) {
     record(true);
-    oscillatorFrequency(0);
+    oscillatorGain(0.0);
   } else {
     record(false);
-    oscillatorFrequency(60);
+    oscillatorGain(0.25);
   }
 
   await render();

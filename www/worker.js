@@ -220,6 +220,12 @@ function mod(divisor, remainder) {
   state.mask = MASK_MOD;
 }
 
+// Set the oscillator gain. The oscillator produces a sine wave tone, useful
+// for debugging audio-reactive programs.
+function oscillatorGain(gain) {
+  self.postMessage(JSON.stringify({'oscillatorGain': gain}));
+}
+
 // Set the oscillator frequency to `hz` hertz. The oscillator produces a sine wave tone,
 // useful for debugging audio-reactive programs.
 function oscillatorFrequency(hz) {
