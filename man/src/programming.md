@@ -11,20 +11,21 @@ with interactive widgets.
 
 Individual image filters are relatively simple, but iterated application of one
 or more filters can produce surprising and beautiful results, and varying image
-filters over time or applying the same image filter in a loop can produce
+filters over time or applying the same image filter in a loop can yield
 striking animations.
 
 ## Image Filter Properties
 
-Image filters have a number of properties, including a transformation, which
-determines where in the input image pixels will be sampled from; a mask, which
-determines which of those pixels will be modified; and an operation, which
-determines how those pixels will be modified.
-
 Image filters read from a source image and write to a destination image. Every
 time an image filter is applied, those images are swapped.
 
-For each pixel, an image filter operates with roughly the following steps:
+Image filters have a number of properties, including a transformation, which
+determines whence input image pixels will be sampled; a mask, which determines
+which of those pixels will be modified; and an operation, which determines how
+those pixels will be modified.
+
+For each pixel in the image, an filter operates with roughly the following
+steps:
 
 1. Generate the coordinates of the current pixel
 2. Transform those coordiantes by the current transform
