@@ -29,6 +29,7 @@ lazy_static! {
     ("Orb Zoom", include_str!("../examples/orb_zoom.js")),
     ("Orbs", include_str!("../examples/orbs.js")),
     ("Pattern", include_str!("../examples/pattern.js")),
+    ("Sample", include_str!("../examples/sample.js")),
     ("Starburst", include_str!("../examples/starburst.js")),
     ("Target", include_str!("../examples/target.js")),
     ("X", include_str!("../examples/x.js")),
