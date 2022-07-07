@@ -1,15 +1,16 @@
 # Rendering
 
 Degenerate programs are written in JavaScript and sent to a Web Worker for
-executation. The program then sends back a series of `State` objects, which are
-used to configure the renderer. The renderer renders to a full-page `<canvas>`
-element using WebGL.
+execution. The program then sends back a series of `State` objects from the
+worker, which are used to configure the renderer that runs in the main thread.
+The renderer renders to a full-page `<canvas>` element using WebGL.
 
 Rendering is performed by applying a series of image filters, with the output
 of each filter being fed as input to the next.
 
 The various parts of the renderer are described below. You may want to skip
-ahead to the description of the fragment shader, which neatly
+ahead to the description of the fragment shader, which ties everything and
+serves as a good jumping off point for the rest of the codebase.
 
 ## `App`
 
@@ -33,9 +34,5 @@ emits a full-screen triangle.
 
 The fragment shader, in
 [fragment.glsl](https://github.com/casey/degenerate/blob/master/src/fragment.glsl),
-determines the color of each pixel of the triangle produced by the vertex shader,
-thus performing the bulk of the rendering.
-
-See the
-[source file](https://github.com/casey/degenerate/blob/master/src/fragment.glsl),
-which is well commented, for details.
+performs the bulk of the rendering by determining the color of each pixel of
+the triangle produced by the vertex shader,

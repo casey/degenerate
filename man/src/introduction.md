@@ -1,7 +1,7 @@
 # Introduction
 
 Degenerate is a programmable generative art engine. It is developed on
-[GitHub](https://github.com/casey/degenerate/) and deployed at
+[GitHub](https://github.com/casey/degenerate/) and online at
 [degenerate.computer](https://degenerate.computer).
 
 ## Image Filters
