@@ -5,8 +5,8 @@ Degenerate is a programmable generative art engine. It is developed on
 [degenerate.computer](https://degenerate.computer).
 
 Degenerate operates as a chain of image filters. The output of each filter is
-used as the input of the next filter. Degenerate programs change the state of
-the current image filter and call `render()` to apply it.
+used as the input of the next filter. Degenerate programs configure the state
+of the current image filter and call `render()` to apply it.
 
 Image filters have a number of properties, including a transformation, which
 determines where in the input image pixels will be sampled from; a mask, which
@@ -46,8 +46,8 @@ first issue.
 Experiment, experiment, experiment! Clever combinations of commands craft
 charming consequences. Check out and modify some examples by using the
 drop-down menu in the upper right corner of the page. Try changing the filter
-state and rendering in a loop, or just mash `Shift + Enter` over and over again
-to see what happens.
+and rendering in a loop, or just mash `Shift + Enter` over and over again to
+see what happens.
 
 ## Saving your creations
 

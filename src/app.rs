@@ -410,8 +410,8 @@ impl App {
           closure.forget();
         }
       }
-      WorkerMessage::Render(state) => {
-        self.gpu.render(&state)?;
+      WorkerMessage::Render(filter) => {
+        self.gpu.render(&filter)?;
         self.gpu.present()?;
       }
       WorkerMessage::Resolution(resolution) => {
