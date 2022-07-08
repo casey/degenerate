@@ -219,7 +219,7 @@ impl Gpu {
     Ok(())
   }
 
-  pub(crate) fn render(&mut self, state: &State) -> Result {
+  pub(crate) fn render(&mut self, state: &Filter) -> Result {
     log::trace!("Applying state {:?}", state);
 
     self.resize()?;

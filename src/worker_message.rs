@@ -11,7 +11,7 @@ pub(crate) enum WorkerMessage {
   OscillatorGain(f32),
   Radio(String, Vec<String>),
   Record,
-  Render(State),
+  Render(Filter),
   Resolution(u32),
   Save,
 }
