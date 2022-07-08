@@ -68,7 +68,6 @@ vec3 apply(vec2 position, vec3 color) {
     case OPERATION_DEBUG:
       return floor(vec3((position.x + 1.0) / 2.0, 0.0, 1.0 - (position.y + 1.0) / 2.0) * 16.0) / 16.0;
     case OPERATION_IDENTITY:
-      return color;
     case OPERATION_INVERT:
     case OPERATION_ROTATE_COLOR:
       vec3 v = color * 2.0 - 1.0;

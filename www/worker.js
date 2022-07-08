@@ -191,6 +191,7 @@ async function frame() {
 // ```
 function identity() {
   filter.operation = OPERATION_IDENTITY;
+  mat4.identity(filter.colorTransform);
 }
 
 // Set the operation to the invert operation. The invert operation inverts the sample
