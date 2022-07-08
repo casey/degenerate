@@ -372,6 +372,20 @@ function rotateColor(axis, radians) {
   filter.operation = OPERATION_ROTATE_COLOR;
   filter.operationRotateColorAxis = axis;
   filter.operationRotateColorRadians = radians;
+
+  filter.operation = OPERATION_INVERT;
+
+  switch (axis) {
+    case 'red':
+      filter.colorTransform = mat4.fromXRotation(mat4.create(), radians);
+      break;
+    case 'green':
+      filter.colorTransform = mat4.fromYRotation(mat4.create(), radians);
+      break;
+    case 'blue':
+      filter.colorTransform = mat4.fromZRotation(mat4.create(), radians);
+      break;
+  }
 }
 
 // Mask pixels where `pixel.y % (nrows + step) < nrows`. Will mask `nrows` pixels and then
