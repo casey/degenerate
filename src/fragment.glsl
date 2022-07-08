@@ -25,7 +25,7 @@ uniform float alpha;
 uniform float resolution;
 uniform mat3 color_rotation;
 uniform mat3 transform;
-uniform mat3 color_transform;
+uniform mat4 color_transform;
 uniform sampler2D audio_time_domain;
 uniform sampler2D source;
 uniform uint divisor;
@@ -71,7 +71,9 @@ vec3 apply(vec2 position, vec3 color) {
     case OPERATION_IDENTITY:
       return color;
     case OPERATION_INVERT:
-      return (color_transform * (color * 2.0 - 1.0) + 1.0) / 2.0;
+      vec3 v = color * 2.0 - 1.0;
+      vec4 t = color_transform * vec4(v, 1.0);
+      return (t.xyz + 1.0) / 2.0;
     case OPERATION_ROTATE_COLOR:
       return (color_rotation * (color * 2.0 - 1.0) + 1.0) / 2.0;
     case OPERATION_SAMPLE:

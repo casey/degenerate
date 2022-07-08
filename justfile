@@ -60,6 +60,9 @@ update-test-images:
     mv $image ${image%.actual-memory.png}.png
   done
 
+update-glmatrix:
+  curl https://raw.githubusercontent.com/toji/gl-matrix/master/dist/gl-matrix-min.js > www/gl-matrix-min.js
+
 diff name:
   -compare images/{{name}}.png images/{{name}}.actual-memory.png diff.png
   open diff.png

@@ -314,10 +314,10 @@ impl Gpu {
       similarity.append_scaling_mut(filter.scale);
     }
 
-    self.gl.uniform_matrix3fv_with_f32_array(
+    self.gl.uniform_matrix4fv_with_f32_array(
       Some(self.uniform("color_transform")),
       false,
-      &state.color_transform,
+      &filter.color_transform,
     );
 
     self.gl.uniform_matrix3fv_with_f32_array(

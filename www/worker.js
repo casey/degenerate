@@ -2,6 +2,11 @@
 
 importScripts('gl-matrix-min.js', 'randchacha_browser.min.js');
 
+glMatrix.glMatrix.setMatrixArrayType(Array)
+
+let mat4 = glMatrix.mat4;
+let vec3 = glMatrix.vec3;
+
 // Mask all pixels.
 //
 // ```
@@ -206,11 +211,7 @@ function identity() {
 // ```
 function invert() {
   filter.operation = OPERATION_INVERT;
-  filter.colorTransform = [
-    -1, 0, 0,
-    0, -1, 0,
-    0, 0, -1,
-  ];
+  filter.colorTransform = mat4.fromScaling(mat4.create(), vec3.fromValues(-1, -1, -1));
 }
 
 // Mask pixels where the pixel's index mod `divisor` is equal to `remainder`.
@@ -368,19 +369,9 @@ function rotate(rotation) {
 // render();
 // ```
 function rotateColor(axis, radians) {
+  filter.operation = OPERATION_ROTATE_COLOR;
   filter.operationRotateColorAxis = axis;
   filter.operationRotateColorRadians = radians;
-  filter.operation = OPERATION_ROTATE_COLOR;
-  switch (axis) {
-    case 'red':
-      state.colorRotation = [
-      ];
-      break;
-    case 'blue':
-      break;
-    case 'green':
-      break;
-  }
 }
 
 // Mask pixels where `pixel.y % (nrows + step) < nrows`. Will mask `nrows` pixels and then
@@ -540,11 +531,7 @@ class Rng {
 class Filter {
   constructor() {
     this.alpha = 1.0;
-    this.colorTransform = [
-      -1, 0, 0,
-      0, -1, 0,
-      0, 0, -1,
-    ],
+    this.colorTransform = mat4.fromScaling(mat4.create(), vec3.fromValues(-1, -1, -1));
     this.defaultColor = [0.0, 0.0, 0.0];
     this.mask = MASK_ALL;
     this.maskModDivisor = 0;
