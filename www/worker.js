@@ -1,6 +1,6 @@
 'use strict';
 
-importScripts('randchacha_browser.min.js');
+importScripts('gl-matrix-min.js', 'randchacha_browser.min.js');
 
 // Mask all pixels.
 //
