@@ -25,6 +25,7 @@ uniform float alpha;
 uniform float resolution;
 uniform mat3 color_rotation;
 uniform mat3 transform;
+uniform mat3 color_transform;
 uniform sampler2D audio_time_domain;
 uniform sampler2D source;
 uniform uint divisor;
@@ -37,6 +38,32 @@ uniform vec3 default_color;
 
 out vec4 output_color;
 
+// all operations are
+//
+// transform * color
+//
+// mask returns sample alpha instead of bool using sdf
+//
+// rotate: rotation
+// sample: rotation axis
+// invert: reflection
+// debug: rotate by amount and axis that differs depending on square
+//
+// loudness, time domain sample, frequency domain sample, x position, y position:
+// size, sharpness, operation rotation amount, operation rotation axis:
+//
+// function that generates widgets for everything
+// - x * amount of rotation
+//
+// position transform
+// color transform
+// lots of values between 0 and 1
+// flip single axis
+//
+// rename mask: shape
+//
+// render to temporary buffer and use as mask to combine shapes
+
 vec3 apply(vec2 position, vec3 color) {
   switch (operation) {
     case OPERATION_DEBUG:
@@ -44,7 +71,7 @@ vec3 apply(vec2 position, vec3 color) {
     case OPERATION_IDENTITY:
       return color;
     case OPERATION_INVERT:
-      return 1.0 - color;
+      return (color_transform * (color * 2.0 - 1.0) + 1.0) / 2.0;
     case OPERATION_ROTATE_COLOR:
       return (color_rotation * (color * 2.0 - 1.0) + 1.0) / 2.0;
     case OPERATION_SAMPLE:

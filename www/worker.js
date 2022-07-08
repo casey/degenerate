@@ -206,6 +206,11 @@ function identity() {
 // ```
 function invert() {
   state.operation = OPERATION_INVERT;
+  state.colorTransform = [
+    -1, 0, 0,
+    0, -1, 0,
+    0, 0, -1,
+  ];
 }
 
 // Mask pixels where the pixel's index mod `divisor` is equal to `remainder`.
@@ -366,6 +371,16 @@ function rotateColor(axis, radians) {
   state.operationRotateColorAxis = axis;
   state.operationRotateColorRadians = radians;
   state.operation = OPERATION_ROTATE_COLOR;
+  switch (axis) {
+    case 'red':
+      state.colorRotation = [
+      ];
+      break;
+    case 'blue':
+      break;
+    case 'green':
+      break;
+  }
 }
 
 // Mask pixels where `pixel.y % (nrows + step) < nrows`. Will mask `nrows` pixels and then
@@ -526,6 +541,11 @@ class Rng {
 class State {
   constructor() {
     this.alpha = 1.0;
+    this.colorTransform = [
+      -1, 0, 0,
+      0, -1, 0,
+      0, 0, -1,
+    ],
     this.defaultColor = [0.0, 0.0, 0.0];
     this.mask = MASK_ALL;
     this.maskModDivisor = 0;

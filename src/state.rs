@@ -5,6 +5,7 @@ use super::*;
 pub(crate) struct State {
   pub(crate) alpha: f32,
   pub(crate) default_color: [f32; 3],
+  pub(crate) color_transform: [f32; 9],
   pub(crate) mask: u32,
   pub(crate) mask_mod_divisor: u32,
   pub(crate) mask_mod_remainder: u32,
