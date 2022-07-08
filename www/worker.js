@@ -211,7 +211,7 @@ function identity() {
 // ```
 function invert() {
   filter.operation = OPERATION_INVERT;
-  filter.colorTransform = mat4.fromScaling(mat4.create(), vec3.fromValues(-1, -1, -1));
+  mat4.fromScaling(filter.colorTransform, vec3.fromValues(-1, -1, -1));
 }
 
 // Mask pixels where the pixel's index mod `divisor` is equal to `remainder`.
@@ -369,21 +369,17 @@ function rotate(rotation) {
 // render();
 // ```
 function rotateColor(axis, radians) {
-  filter.operation = OPERATION_ROTATE_COLOR;
-  filter.operationRotateColorAxis = axis;
-  filter.operationRotateColorRadians = radians;
-
   filter.operation = OPERATION_INVERT;
 
   switch (axis) {
     case 'red':
-      filter.colorTransform = mat4.fromXRotation(mat4.create(), radians);
+      mat4.fromXRotation(filter.colorTransform, radians);
       break;
     case 'green':
-      filter.colorTransform = mat4.fromYRotation(mat4.create(), radians);
+      mat4.fromYRotation(filter.colorTransform, radians);
       break;
     case 'blue':
-      filter.colorTransform = mat4.fromZRotation(mat4.create(), radians);
+      mat4.fromZRotation(filter.colorTransform, radians);
       break;
   }
 }
@@ -553,8 +549,6 @@ class Filter {
     this.maskRowsRows = 0;
     this.maskRowsStep = 0;
     this.operation = OPERATION_INVERT;
-    this.operationRotateColorAxis = 'red';
-    this.operationRotateColorRadians = 0.0;
     this.rotation = 0.0;
     this.scale = 1.0;
     this.wrap = false;

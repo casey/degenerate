@@ -293,21 +293,6 @@ impl Gpu {
       .gl
       .uniform1ui(Some(self.uniform("step")), filter.mask_rows_step);
 
-    let axis_vector = match filter.operation_rotate_color_axis.as_ref() {
-      "red" => Ok(Vector3::x()),
-      "green" => Ok(Vector3::y()),
-      "blue" => Ok(Vector3::z()),
-      _ => Err("Invalid color rotation axis"),
-    }?;
-
-    self.gl.uniform_matrix3fv_with_f32_array(
-      Some(self.uniform("color_rotation")),
-      false,
-      Rotation3::new(axis_vector * filter.operation_rotate_color_radians)
-        .matrix()
-        .as_slice(),
-    );
-
     let mut similarity = Similarity2::<f32>::identity();
     similarity.append_rotation_mut(&UnitComplex::from_angle(-filter.rotation));
     if filter.scale != 0.0 {
