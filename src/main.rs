@@ -1,8 +1,8 @@
 use {
   crate::{
     add_event_listener::AddEventListener, app::App, app_message::AppMessage, cast::Cast,
-    get_document::GetDocument, gpu::Gpu, js_value_error::JsValueError, select::Select,
-    state::State, stderr::Stderr, window::window, worker_message::WorkerMessage,
+    filter::Filter, get_document::GetDocument, gpu::Gpu, js_value_error::JsValueError,
+    select::Select, stderr::Stderr, window::window, worker_message::WorkerMessage,
   },
   image::{ImageBuffer, ImageOutputFormat},
   js_sys::{Float32Array, Promise},
@@ -37,11 +37,11 @@ mod add_event_listener;
 mod app;
 mod app_message;
 mod cast;
+mod filter;
 mod get_document;
 mod gpu;
 mod js_value_error;
 mod select;
-mod state;
 mod stderr;
 mod window;
 mod worker_message;

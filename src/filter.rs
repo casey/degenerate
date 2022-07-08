@@ -2,7 +2,7 @@ use super::*;
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct State {
+pub(crate) struct Filter {
   pub(crate) alpha: f32,
   pub(crate) default_color: [f32; 3],
   pub(crate) mask: u32,

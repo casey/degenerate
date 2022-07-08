@@ -219,8 +219,8 @@ impl Gpu {
     Ok(())
   }
 
-  pub(crate) fn render(&mut self, state: &State) -> Result {
-    log::trace!("Applying state {:?}", state);
+  pub(crate) fn render(&mut self, filter: &Filter) -> Result {
+    log::trace!("Applying filter {:?}", filter);
 
     self.resize()?;
 
@@ -268,32 +268,32 @@ impl Gpu {
       )
       .map_err(JsValueError)?;
 
-    self.gl.uniform1f(Some(self.uniform("alpha")), state.alpha);
+    self.gl.uniform1f(Some(self.uniform("alpha")), filter.alpha);
 
     self.gl.uniform3f(
       Some(self.uniform("default_color")),
-      state.default_color[0],
-      state.default_color[1],
-      state.default_color[2],
+      filter.default_color[0],
+      filter.default_color[1],
+      filter.default_color[2],
     );
 
     self
       .gl
-      .uniform1ui(Some(self.uniform("divisor")), state.mask_mod_divisor);
+      .uniform1ui(Some(self.uniform("divisor")), filter.mask_mod_divisor);
 
     self
       .gl
-      .uniform1ui(Some(self.uniform("remainder")), state.mask_mod_remainder);
+      .uniform1ui(Some(self.uniform("remainder")), filter.mask_mod_remainder);
 
     self
       .gl
-      .uniform1ui(Some(self.uniform("nrows")), state.mask_rows_rows);
+      .uniform1ui(Some(self.uniform("nrows")), filter.mask_rows_rows);
 
     self
       .gl
-      .uniform1ui(Some(self.uniform("step")), state.mask_rows_step);
+      .uniform1ui(Some(self.uniform("step")), filter.mask_rows_step);
 
-    let axis_vector = match state.operation_rotate_color_axis.as_ref() {
+    let axis_vector = match filter.operation_rotate_color_axis.as_ref() {
       "red" => Ok(Vector3::x()),
       "green" => Ok(Vector3::y()),
       "blue" => Ok(Vector3::z()),
@@ -303,15 +303,15 @@ impl Gpu {
     self.gl.uniform_matrix3fv_with_f32_array(
       Some(self.uniform("color_rotation")),
       false,
-      Rotation3::new(axis_vector * state.operation_rotate_color_radians)
+      Rotation3::new(axis_vector * filter.operation_rotate_color_radians)
         .matrix()
         .as_slice(),
     );
 
     let mut similarity = Similarity2::<f32>::identity();
-    similarity.append_rotation_mut(&UnitComplex::from_angle(-state.rotation));
-    if state.scale != 0.0 {
-      similarity.append_scaling_mut(state.scale);
+    similarity.append_rotation_mut(&UnitComplex::from_angle(-filter.rotation));
+    if filter.scale != 0.0 {
+      similarity.append_scaling_mut(filter.scale);
     }
 
     self.gl.uniform_matrix3fv_with_f32_array(
@@ -322,13 +322,13 @@ impl Gpu {
 
     self
       .gl
-      .uniform1ui(Some(self.uniform("wrap")), state.wrap as u32);
+      .uniform1ui(Some(self.uniform("wrap")), filter.wrap as u32);
 
-    self.gl.uniform1ui(Some(self.uniform("mask")), state.mask);
+    self.gl.uniform1ui(Some(self.uniform("mask")), filter.mask);
 
     self
       .gl
-      .uniform1ui(Some(self.uniform("operation")), state.operation);
+      .uniform1ui(Some(self.uniform("operation")), filter.operation);
 
     self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 3);
 
