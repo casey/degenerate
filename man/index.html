@@ -139,8 +139,8 @@
 <a href="https://github.com/casey/degenerate/">GitHub</a> and deployed on the web at
 <a href="https://degenerate.computer">degenerate.computer</a>.</p>
 <p>Degenerate operates as a chain of image filters. The output of each filter is
-used as the input of the next filter. Degenerate programs change the state of
-the current image filter and call <code>render()</code> to apply it.</p>
+used as the input of the next filter. Degenerate programs configure the state
+of the current image filter and call <code>render()</code> to apply it.</p>
 <p>Image filters have a number of properties, including a transformation, which
 determines where in the input image pixels will be sampled from; a mask, which
 determines which of those pixels will be modified; and an operation, which
@@ -170,8 +170,8 @@ first issue.</p>
 <p>Experiment, experiment, experiment! Clever combinations of commands craft
 charming consequences. Check out and modify some examples by using the
 drop-down menu in the upper right corner of the page. Try changing the filter
-state and rendering in a loop, or just mash <code>Shift + Enter</code> over and over again
-to see what happens.</p>
+and rendering in a loop, or just mash <code>Shift + Enter</code> over and over again to
+see what happens.</p>
 <h2 id="saving-your-creations"><a class="header" href="#saving-your-creations">Saving your creations</a></h2>
 <pre><code class="language-javascript">// Make the resolution nice and big
 resolution(4096);
