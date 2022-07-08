@@ -16,7 +16,7 @@ importScripts('randchacha_browser.min.js');
 // render();
 // ```
 function all() {
-  state.mask = MASK_ALL;
+  filter.mask = MASK_ALL;
 }
 
 // Set the alpha blending factor. `alpha` will be used to blend the output of
@@ -28,7 +28,7 @@ function all() {
 // render();
 // ```
 function alpha(alpha) {
-  state.alpha = alpha;
+  filter.alpha = alpha;
 }
 
 // Mask pixels in a checkerboard pattern.
@@ -38,7 +38,7 @@ function alpha(alpha) {
 // render();
 // ```
 function check() {
-  state.mask = MASK_CHECK;
+  filter.mask = MASK_CHECK;
 }
 
 // Create a new checkbox widget with the label `name`, and return true if it is
@@ -68,7 +68,7 @@ function checkbox(name) {
 // render();
 // ```
 function circle() {
-  state.mask = MASK_CIRCLE;
+  filter.mask = MASK_CIRCLE;
 }
 
 // Clear the canvas.
@@ -89,7 +89,7 @@ function clear() {
 // render();
 // ```
 function cross() {
-  state.mask = MASK_CROSS;
+  filter.mask = MASK_CROSS;
 }
 
 // Set the operation to the debug operation.The debug operation is permanently
@@ -100,7 +100,7 @@ function cross() {
 // render();
 // ```
 function debug() {
-  state.operation = OPERATION_DEBUG;
+  filter.operation = OPERATION_DEBUG;
 }
 
 // Set the default color. The default color is returned whenever a pixel is sampled
@@ -112,7 +112,7 @@ function debug() {
 // render();
 // ```
 function defaultColor(defaultColor) {
-  state.defaultColor = defaultColor;
+  filter.defaultColor = defaultColor;
 }
 
 // Return the number of milliseconds that have elapsed between this frame and the last.
@@ -185,7 +185,7 @@ async function frame() {
 // render();
 // ```
 function identity() {
-  state.operation = OPERATION_IDENTITY;
+  filter.operation = OPERATION_IDENTITY;
 }
 
 // Set the operation to the invert operation. The invert operation inverts the sample
@@ -205,8 +205,8 @@ function identity() {
 // render();
 // ```
 function invert() {
-  state.operation = OPERATION_INVERT;
-  state.colorTransform = [
+  filter.operation = OPERATION_INVERT;
+  filter.colorTransform = [
     -1, 0, 0,
     0, -1, 0,
     0, 0, -1,
@@ -220,9 +220,9 @@ function invert() {
 // render();
 // ```
 function mod(divisor, remainder) {
-  state.maskModDivisor = divisor;
-  state.maskModRemainder = remainder;
-  state.mask = MASK_MOD;
+  filter.maskModDivisor = divisor;
+  filter.maskModRemainder = remainder;
+  filter.mask = MASK_MOD;
 }
 
 // Set the oscillator gain. The oscillator produces a sine wave tone, useful
@@ -281,7 +281,7 @@ function* range(iterations) {
   }
 }
 
-// Reset the image filter state and clear the canvas.
+// Reset the image filter and clear the canvas.
 // ```
 // x();
 // render();
@@ -297,7 +297,7 @@ function record() {
   self.postMessage(JSON.stringify('record'));
 }
 
-// Send the current state to the main thread to be rendered. Like `frame()`,
+// Send the current filter to the main thread to be rendered. Like `frame()`,
 // returns a promise that will resolve when the browser is ready to display a
 // new frame. Use `await frame();` when you want to render multiple times before
 // presenting a new frame, and `await render();` when you want to render once
@@ -311,11 +311,11 @@ function record() {
 // }
 // ```
 async function render() {
-  self.postMessage(JSON.stringify({ render: state }));
+  self.postMessage(JSON.stringify({ render: filter }));
   await frame();
 }
 
-// Reset the image filter state.
+// Reset the image filter.
 //
 // ```
 // x();
@@ -323,7 +323,7 @@ async function render() {
 // reset();
 // ```
 function reset() {
-  state = new State();
+  filter = new Filter();
 }
 
 // Set resolution to a fixed value. Normally, the resolution increases and
@@ -351,7 +351,7 @@ function resolution(resolution) {
 // render();
 // ```
 function rotate(rotation) {
-  state.rotation = rotation;
+  filter.rotation = rotation;
 }
 
 // Set the roate color operation. The rotate color operation interpets the sample pixel
@@ -368,9 +368,9 @@ function rotate(rotation) {
 // render();
 // ```
 function rotateColor(axis, radians) {
-  state.operationRotateColorAxis = axis;
-  state.operationRotateColorRadians = radians;
-  state.operation = OPERATION_ROTATE_COLOR;
+  filter.operationRotateColorAxis = axis;
+  filter.operationRotateColorRadians = radians;
+  filter.operation = OPERATION_ROTATE_COLOR;
   switch (axis) {
     case 'red':
       state.colorRotation = [
@@ -391,9 +391,9 @@ function rotateColor(axis, radians) {
 // render();
 // ```
 function rows(nrows, step) {
-  state.maskRowsRows = nrows;
-  state.maskRowsStep = step;
-  state.mask = MASK_ROWS;
+  filter.maskRowsRows = nrows;
+  filter.maskRowsStep = step;
+  filter.mask = MASK_ROWS;
 }
 
 // Set the sample operation. The sample operation samples the currently playing
@@ -401,7 +401,7 @@ function rows(nrows, step) {
 // position, and rotates the current pixel in HSL color space by the intensity
 // of the audio at that position.
 function sample() {
-  state.operation = OPERATION_SAMPLE;
+  filter.operation = OPERATION_SAMPLE;
 }
 
 // Save the current canvas as a PNG.
@@ -426,7 +426,7 @@ function save() {
 // render();
 // ```
 function scale(scale) {
-  state.scale = scale;
+  filter.scale = scale;
 }
 
 // Return a promise that resolves after `ms` milliseconds.
@@ -449,7 +449,7 @@ function sleep(ms) {
 // render();
 // ```
 function square() {
-  state.mask = MASK_SQUARE;
+  filter.mask = MASK_SQUARE;
 }
 
 // Mask the pixels in the upper half of the canvas.
@@ -459,7 +459,7 @@ function square() {
 // render();
 // ```
 function top() {
-  state.mask = MASK_TOP;
+  filter.mask = MASK_TOP;
 }
 
 // Set wrap. When `wrap` is `true`, out of bounds samples will be wrapped back within bounds.
@@ -471,7 +471,7 @@ function top() {
 // render();
 // ```
 function wrap(warp) {
-  state.wrap = warp;
+  filter.wrap = warp;
 }
 
 // Mask pixels in an X shape.
@@ -481,7 +481,7 @@ function wrap(warp) {
 // render();
 // ```
 function x() {
-  state.mask = MASK_X;
+  filter.mask = MASK_X;
 }
 
 // The ratio of a circle's circumference to its diameter. Useful for expressing
@@ -537,8 +537,7 @@ class Rng {
   }
 }
 
-// State objects encapsulate the current image filter state.
-class State {
+class Filter {
   constructor() {
     this.alpha = 1.0;
     this.colorTransform = [
@@ -566,7 +565,7 @@ let lastDelta = 0;
 let lastFrame = 0;
 let rng = new Rng();
 let start = Date.now();
-let state = new State();
+let filter = new Filter();
 let widgets = {};
 
 self.addEventListener('message', async function (event) {

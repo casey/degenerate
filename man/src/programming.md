@@ -1,12 +1,12 @@
 # Programming
 
 Degenerate programs are written in JavaScript and sent to a Web Worker for
-execution. The program then sends back a series of `State` objects from the
+execution. The program then sends back a series of `Filter` objects from the
 worker thread, which are used to configure image filters that the renderer
 applies in the main thread.
 
-The JavaScript API is concerned with setting properties of the current `State`
-object, sending `State` objects to the main thread, and populating the sidebar
+The JavaScript API is concerned with setting properties of the current `Filter`
+object, sending `Filter` objects to the main thread, and populating the sidebar
 with interactive widgets.
 
 Individual image filters are relatively simple, but iterated application of one
