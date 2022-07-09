@@ -1,5 +1,10 @@
 #version 300 es
 
+// TODO:
+// - Fix docs
+// - finalize wave mask
+// - finalize sample mask
+
 precision highp float;
 
 const uint MASK_ALL = 0u;
@@ -100,12 +105,11 @@ void main() {
   // Convert color back from [-1,-1] to [0,1]
   vec3 transformed_color = (transformed_color_vector.xyz + 1.0) / 2.0;
 
-  // If within mask…
-  vec3 output_color_rgb = masked(wrapped, pixel_position)
-    // …set output color to alpha blended transformed color…
-    ? transformed_color * alpha + original_color * (1.0 - alpha)
-    // …otherwise use original color
-    : original_color;
+  // Set alpha to 0.0 if outside the mask
+  float alpha = masked(wrapped, pixel_position) ? alpha : 0.0;
+
+  // Perform alpha blending
+  vec3 output_color_rgb = transformed_color * alpha + original_color * (1.0 - alpha);
 
   // Extend output color with opaque alpha channel
   output_color = vec4(output_color_rgb, 1.0);
