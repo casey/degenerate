@@ -306,7 +306,7 @@ impl Gpu {
     );
 
     self.gl.uniform_matrix3fv_with_f32_array(
-      Some(self.uniform("transform")),
+      Some(self.uniform("coordinate_transform")),
       false,
       similarity.inverse().to_homogeneous().as_slice(),
     );
