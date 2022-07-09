@@ -74,15 +74,26 @@ vec3 apply(vec2 position, vec3 color) {
       vec4 t = color_transform * vec4(v, 1.0);
       return (t.xyz + 1.0) / 2.0;
     case OPERATION_SAMPLE:
-      float lightness = abs(texture(audio_time_domain, vec2((position.x + 1.0) / 2.0, 0.5)).r);
-      vec3 hsl = rgb2hsl(color);
-      hsl.z = lightness;
-      vec3 rgb = hsl2rgb(hsl);
-      return rgb;
+      // float lightness = abs(texture(audio_time_domain, vec2((position.x + 1.0) / 2.0, 0.5)).r);
+      // vec3 hsl = rgb2hsl(color);
+      // hsl.z = clamp(lightness, .1, 0.9);
+      // vec3 rgb = hsl2rgb(hsl);
+      // return rgb;
+      float x = abs(texture(audio_time_domain, vec2((position.x + 1.0) / 2.0, 0.5)).r) - 0.5;
+      return vec3(v.r +x, v.g + x,  v.b + x);
     default:
       return vec3(0.0, 1.0, 0.0);
   }
 }
+
+// FILTER(wve) {
+//   float f = texture(win_waveform, uv.yx).r - 0.5;
+//   return vec4(I.r + f, I.g + f, I.b + f, 1.0);
+// }
+
+// FILTER(waveform) {
+//   return abs(uv.y - texture(win_waveform, uv).r) < 0.5 ? invert_f() : I;
+// }
 
 bool masked(vec2 position, uvec2 pixel_position) {
   switch (mask) {
