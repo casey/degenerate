@@ -70,10 +70,7 @@ impl Gpu {
         .create_shader(WebGl2RenderingContext::FRAGMENT_SHADER)
         .ok_or("Failed to create shader")?;
 
-      let fragment_source =
-        include_str!("fragment.glsl").replace("#include <hsl.glsl>", include_str!("hsl.glsl"));
-
-      gl.shader_source(&fragment, &fragment_source);
+      gl.shader_source(&fragment, &include_str!("fragment.glsl"));
       gl.compile_shader(&fragment);
 
       if !gl.get_shader_parameter(&fragment, WebGl2RenderingContext::COMPILE_STATUS) {
@@ -316,10 +313,6 @@ impl Gpu {
       .uniform1ui(Some(self.uniform("wrap")), filter.wrap as u32);
 
     self.gl.uniform1ui(Some(self.uniform("mask")), filter.mask);
-
-    self
-      .gl
-      .uniform1ui(Some(self.uniform("operation")), filter.operation);
 
     self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 3);
 

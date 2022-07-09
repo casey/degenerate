@@ -11,7 +11,6 @@ pub(crate) struct Filter {
   pub(crate) mask_mod_remainder: u32,
   pub(crate) mask_rows_rows: u32,
   pub(crate) mask_rows_step: u32,
-  pub(crate) operation: u32,
   pub(crate) rotation: f32,
   pub(crate) scale: f32,
   pub(crate) wrap: bool,

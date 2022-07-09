@@ -4,8 +4,15 @@ importScripts('gl-matrix-min.js', 'randchacha_browser.min.js');
 
 glMatrix.glMatrix.setMatrixArrayType(Array)
 
+let mat2 = glMatrix.mat2;
+let mat2d = glMatrix.mat2d;
+let mat3 = glMatrix.mat3;
 let mat4 = glMatrix.mat4;
+let quat = glMatrix.quat;
+let quat2 = glMatrix.quat2;
+let vec2 = glMatrix.vec2;
 let vec3 = glMatrix.vec3;
+let vec4 = glMatrix.vec4;
 
 // Mask all pixels.
 //
@@ -97,17 +104,6 @@ function cross() {
   filter.mask = MASK_CROSS;
 }
 
-// Set the operation to the debug operation.The debug operation is permanently
-// unstable, and may change at any time.
-//
-// ```
-// debug();
-// render();
-// ```
-function debug() {
-  filter.operation = OPERATION_DEBUG;
-}
-
 // Set the default color. The default color is returned whenever a pixel is sampled
 // out of bounds due to a rotation, scale, or other sample coordinate transformation.
 //
@@ -190,7 +186,6 @@ async function frame() {
 // render();
 // ```
 function identity() {
-  filter.operation = OPERATION_TRANSFORM;
   mat4.identity(filter.colorTransform);
 }
 
@@ -211,7 +206,6 @@ function identity() {
 // render();
 // ```
 function invert() {
-  filter.operation = OPERATION_TRANSFORM;
   mat4.fromScaling(filter.colorTransform, vec3.fromValues(-1, -1, -1));
 }
 
@@ -370,7 +364,6 @@ function rotate(rotation) {
 // render();
 // ```
 function rotateColor(axis, radians) {
-  filter.operation = OPERATION_TRANSFORM;
   switch (axis) {
     case 'red':
       mat4.fromXRotation(filter.colorTransform, radians);
@@ -397,12 +390,9 @@ function rows(nrows, step) {
   filter.mask = MASK_ROWS;
 }
 
-// Set the sample operation. The sample operation samples the currently playing
-// audio's time domain data using the x coordinate of the current pixel
-// position, and rotates the current pixel in HSL color space by the intensity
-// of the audio at that position.
+// Mask pixels where the audio time domain data is large.
 function sample() {
-  filter.operation = OPERATION_SAMPLE;
+  filter.mask = MASK_SAMPLE;
 }
 
 // Save the current canvas as a PNG.
@@ -463,6 +453,20 @@ function top() {
   filter.mask = MASK_TOP;
 }
 
+// Mask pixels within the audio waveform.
+//
+// ```
+// record();
+// wave();
+// while(true) {
+//   clear();
+//   await render();
+// }
+// ```
+function wave() {
+  filter.mask = MASK_WAVE;
+}
+
 // Set wrap. When `wrap` is `true`, out of bounds samples will be wrapped back within bounds.
 //
 // ```
@@ -495,8 +499,8 @@ const PI = Math.PI;
 // to rotate 1/4 turn, use `rotate(1/4 * TAU)`.
 const TAU = Math.PI * 2;
 
-// Mask constants. The mask determines which pixels the current operation will
-// be applied to. These values should be kept in sync with those in
+// Mask constants. The mask determines which pixels the current color transform
+// will be applied to. These values should be kept in sync with those in
 // `www/fragment.glsl`. See the corresponding functions and case statements,
 // e.g., `all()` in this file and `case MASK_ALL:` in `www/fragment.glsl`, for
 // more details and the mask definition, respectively.
@@ -506,19 +510,11 @@ const MASK_CIRCLE = 2;
 const MASK_CROSS = 3;
 const MASK_MOD = 4;
 const MASK_ROWS = 5;
-const MASK_SQUARE = 6;
-const MASK_TOP = 7;
-const MASK_X = 8;
-
-// Operation constants. The operation determines how pixels selected by the mask
-// will be modified. These values should be kept in sync with those in
-// `www/fragment.glsl`. See the corresponding functions and case statements,
-// e.g., `invert()` in this file and `case OPERATION_INVERT:` in
-// `www/fragment.glsl`, for more details and the operation definitions,
-// respectively.
-const OPERATION_DEBUG = 0;
-const OPERATION_SAMPLE = 1;
-const OPERATION_TRANSFORM = 2;
+const MASK_SAMPLE = 6;
+const MASK_SQUARE = 7;
+const MASK_TOP = 8;
+const MASK_WAVE = 9;
+const MASK_X = 10;
 
 class Rng {
   constructor(seed) {
@@ -546,7 +542,6 @@ class Filter {
     this.maskModRemainder = 0;
     this.maskRowsRows = 0;
     this.maskRowsStep = 0;
-    this.operation = OPERATION_TRANSFORM;
     this.rotation = 0.0;
     this.scale = 1.0;
     this.wrap = false;
