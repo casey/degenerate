@@ -70,7 +70,7 @@ impl Gpu {
         .create_shader(WebGl2RenderingContext::FRAGMENT_SHADER)
         .ok_or("Failed to create shader")?;
 
-      gl.shader_source(&fragment, &include_str!("fragment.glsl"));
+      gl.shader_source(&fragment, include_str!("fragment.glsl"));
       gl.compile_shader(&fragment);
 
       if !gl.get_shader_parameter(&fragment, WebGl2RenderingContext::COMPILE_STATUS) {
