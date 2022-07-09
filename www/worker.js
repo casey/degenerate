@@ -190,7 +190,7 @@ async function frame() {
 // render();
 // ```
 function identity() {
-  filter.operation = OPERATION_IDENTITY;
+  filter.operation = OPERATION_TRANSFORM;
   mat4.identity(filter.colorTransform);
 }
 
@@ -211,7 +211,7 @@ function identity() {
 // render();
 // ```
 function invert() {
-  filter.operation = OPERATION_INVERT;
+  filter.operation = OPERATION_TRANSFORM;
   mat4.fromScaling(filter.colorTransform, vec3.fromValues(-1, -1, -1));
 }
 
@@ -370,8 +370,7 @@ function rotate(rotation) {
 // render();
 // ```
 function rotateColor(axis, radians) {
-  filter.operation = OPERATION_INVERT;
-
+  filter.operation = OPERATION_TRANSFORM;
   switch (axis) {
     case 'red':
       mat4.fromXRotation(filter.colorTransform, radians);
@@ -518,10 +517,8 @@ const MASK_X = 8;
 // `www/fragment.glsl`, for more details and the operation definitions,
 // respectively.
 const OPERATION_DEBUG = 0;
-const OPERATION_IDENTITY = 1;
-const OPERATION_INVERT = 2;
-const OPERATION_ROTATE_COLOR = 3;
-const OPERATION_SAMPLE = 4;
+const OPERATION_SAMPLE = 1;
+const OPERATION_TRANSFORM = 2;
 
 class Rng {
   constructor(seed) {
@@ -549,7 +546,7 @@ class Filter {
     this.maskModRemainder = 0;
     this.maskRowsRows = 0;
     this.maskRowsStep = 0;
-    this.operation = OPERATION_INVERT;
+    this.operation = OPERATION_TRANSFORM;
     this.rotation = 0.0;
     this.scale = 1.0;
     this.wrap = false;

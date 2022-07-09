@@ -15,10 +15,8 @@ const uint MASK_TOP = 7u;
 const uint MASK_X = 8u;
 
 const uint OPERATION_DEBUG = 0u;
-const uint OPERATION_IDENTITY = 1u;
-const uint OPERATION_INVERT = 2u;
-const uint OPERATION_ROTATE_COLOR = 3u;
-const uint OPERATION_SAMPLE = 4u;
+const uint OPERATION_SAMPLE = 1u;
+const uint OPERATION_TRANSFORM = 2u;
 
 uniform bool wrap;
 uniform float alpha;
@@ -37,63 +35,31 @@ uniform vec3 default_color;
 
 out vec4 output_color;
 
-// all operations are
-//
-// transform * color
-//
-// mask returns sample alpha instead of bool using sdf
-//
-// rotate: rotation
-// sample: rotation axis
-// invert: reflection
-// debug: rotate by amount and axis that differs depending on square
-//
-// loudness, time domain sample, frequency domain sample, x position, y position:
-// size, sharpness, operation rotation amount, operation rotation axis:
-//
-// function that generates widgets for everything
-// - x * amount of rotation
-//
-// position transform
-// color transform
-// lots of values between 0 and 1
-// flip single axis
-//
-// rename mask: shape
-//
-// render to temporary buffer and use as mask to combine shapes
-
 vec3 apply(vec2 position, vec3 color) {
   switch (operation) {
     case OPERATION_DEBUG:
       return floor(vec3((position.x + 1.0) / 2.0, 0.0, 1.0 - (position.y + 1.0) / 2.0) * 16.0) / 16.0;
-    case OPERATION_IDENTITY:
-    case OPERATION_INVERT:
-    case OPERATION_ROTATE_COLOR:
-      vec3 v = color * 2.0 - 1.0;
-      vec4 t = color_transform * vec4(v, 1.0);
-      return (t.xyz + 1.0) / 2.0;
     case OPERATION_SAMPLE:
-      // float lightness = abs(texture(audio_time_domain, vec2((position.x + 1.0) / 2.0, 0.5)).r);
-      // vec3 hsl = rgb2hsl(color);
-      // hsl.z = clamp(lightness, .1, 0.9);
-      // vec3 rgb = hsl2rgb(hsl);
-      // return rgb;
-      float x = abs(texture(audio_time_domain, vec2((position.x + 1.0) / 2.0, 0.5)).r) - 0.5;
-      return vec3(v.r +x, v.g + x,  v.b + x);
+      float lightness = abs(texture(audio_time_domain, vec2((position.x + 1.0) / 2.0, 0.5)).r);
+      vec3 hsl = rgb2hsl(color);
+      hsl.z = clamp(lightness, .1, 0.9);
+      vec3 rgb = hsl2rgb(hsl);
+      return rgb;
+    case OPERATION_TRANSFORM:
+      // Convert color from [0,1] to [-1,-1]
+      vec3 color_vector = color * 2.0 - 1.0;
+
+      // Transform color vector using color transform
+      vec4 transformed_color_vector = color_transform * vec4(color_vector, 1.0);
+
+      // Convert color back from [-1,-1] to [0,1]
+      vec3 transformed_color = (transformed_color_vector.xyz + 1.0) / 2.0;
+
+      return transformed_color;
     default:
       return vec3(0.0, 1.0, 0.0);
   }
 }
-
-// FILTER(wve) {
-//   float f = texture(win_waveform, uv.yx).r - 0.5;
-//   return vec4(I.r + f, I.g + f, I.b + f, 1.0);
-// }
-
-// FILTER(waveform) {
-//   return abs(uv.y - texture(win_waveform, uv).r) < 0.5 ? invert_f() : I;
-// }
 
 bool masked(vec2 position, uvec2 pixel_position) {
   switch (mask) {
