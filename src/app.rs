@@ -223,8 +223,6 @@ impl App {
 
     self.gpu.resize()?;
 
-    log::trace!("Animation frame timestamp {}s", timestamp);
-
     self
       .worker
       .post_message(&JsValue::from_str(&serde_json::to_string(
