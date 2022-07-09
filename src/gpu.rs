@@ -217,8 +217,6 @@ impl Gpu {
   }
 
   pub(crate) fn render(&mut self, filter: &Filter) -> Result {
-    log::trace!("Applying filter {:?}", filter);
-
     self.resize()?;
 
     self.gl.bind_framebuffer(

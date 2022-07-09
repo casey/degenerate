@@ -218,12 +218,10 @@ impl App {
     Ok(())
   }
 
-  fn on_animation_frame(&mut self, timestamp: f64) -> Result {
+  fn on_animation_frame(&mut self, _timestamp: f64) -> Result {
     self.request_animation_frame()?;
 
     self.gpu.resize()?;
-
-    log::trace!("Animation frame timestamp {}s", timestamp);
 
     self
       .worker
