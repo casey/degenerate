@@ -81,6 +81,10 @@ bool masked(vec2 position, uvec2 pixel_position) {
       return length(position) < 1.0;
     case MASK_CROSS:
       return abs(position.x) < 0.25 || abs(position.y) < 0.25;
+    case MASK_EQUALIZER:
+      return position.y < audio_frequency_sample(position) / 1000.0;
+    case MASK_FREQUENCY:
+      return abs(audio_frequency_sample(position)) < 100.0;
     case MASK_MOD:
       if (divisor == 0u) {
         return false;
@@ -99,10 +103,6 @@ bool masked(vec2 position, uvec2 pixel_position) {
       return abs(abs(position.x) - abs(position.y)) < 0.25;
     case MASK_WAVE:
       return abs(position.y - audio_time_domain_sample(position)) < 0.1;
-    case MASK_FREQUENCY:
-      return abs(audio_frequency_sample(position)) < 100.0;
-    case MASK_EQUALIZER:
-      return position.y < audio_frequency_sample(position) / 1000.0;
     default:
       return false;
   }
