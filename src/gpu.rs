@@ -1,5 +1,33 @@
 use super::*;
 
+// TODO:
+// - should frequency texture be a-weighted?
+// - make all masks audio reactive
+// - make alpha audio reactive
+// - make color transform and coordinate transform audio reactive
+// - make default color audio reactive
+// - add equalizer mask - bar up or down (from bottom or middle?) depending on frequency bucket intensity
+// - add frequency mask - bars on or off depending on frequency bucket intensity
+// - add slider for overriding audio level
+
+// let db = self
+//   .audio_frequency_data
+//   .iter()
+//   .enumerate()
+//   .map(|(i, decibels)| {
+//     let f = (i as f32 / self.audio_frequency_data.len() as f32)
+//       * self.audio_context.sample_rate()
+//       / 2.0;
+//     let f2 = f * f;
+//     let weight = 1.2588966 * 148840000.0 * f2 * f2
+//       / ((f2 + 424.36) * (f2 + 11599.29) * (f2 + 544496.41)).sqrt()
+//       * (f2 + 148840000.0);
+//     weight * decibels
+//   })
+//   .sum::<f32>();
+
+// self.gl.uniform1f(Some(self.uniform("db")), db);
+
 pub(crate) struct Gpu {
   analyser_node: AnalyserNode,
   audio_time_domain_array: Float32Array,
