@@ -89,7 +89,9 @@ bool masked(vec2 position, uvec2 pixel_position) {
   }
 }
 
-// Write function that goes from -1 1 to 0 1 and vice versa
+vec2 uv(vec2 position) {
+  return (position + 1.0) / 2.0;
+}
 
 void main() {
   // Get fragment coordinates and transform to [-1, 1]
@@ -104,15 +106,15 @@ void main() {
     : transformed;
 
   // Sample color if in-bounds, otherwise use default color
-  vec3 input_color = coordinates ? vec3(wrapped / 2.0 + 0.5, 0.0)
-    : abs(wrapped.x) <= 1.0 && abs(wrapped.y) <= 1.0 ? texture(source, (wrapped + 1.0) / 2.0).rgb
+  vec3 input_color = coordinates ? vec3(uv(wrapped), 0.0)
+    : abs(wrapped.x) <= 1.0 && abs(wrapped.y) <= 1.0 ? texture(source, uv(wrapped)).rgb
     : default_color;
 
   // Sample original color
   vec3 original_color = texture(source, gl_FragCoord.xy / resolution).rgb;
 
   // Calculate position in pixel coordinates, [0, resolution)
-  uvec2 pixel_position = uvec2((wrapped + 1.0) / 2.0 * resolution);
+  uvec2 pixel_position = uvec2(uv(wrapped) * resolution);
 
   // If within mask…
   vec3 output_color_rgb = masked(wrapped, pixel_position)

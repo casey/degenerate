@@ -1,0 +1,2 @@
+coordinates(true);
+render();
