@@ -178,7 +178,7 @@ async function frame() {
 }
 
 // Set the color transformation to the identity transformation. The identity
-// trnasformation returns the sampled pixel unchanged. Useful for applying
+// transformation returns the sampled pixel unchanged. Useful for applying
 // transformations, such as scales or rotation, without changing the sampled
 // pixels.
 //
