@@ -148,6 +148,20 @@ function elapsed() {
   return Date.now() - start;
 }
 
+// Mask pixels in an equalizer pattern;
+//
+// ```
+// record();
+// equalizer();
+// while(true) {
+//   clear();
+//   await render();
+// }
+// ```
+function equalizer() {
+  filter.mask = MASK_EQUALIZER;
+}
+
 // Display an error message in the console at the bottom of the page.
 //
 // ```
@@ -175,6 +189,11 @@ async function frame() {
   await new Promise((resolve, reject) => {
     frameCallbacks.push(resolve);
   });
+}
+
+// Mask pixels where the audio frequency data is large.
+function frequency() {
+  filter.mask = MASK_FREQUENCY;
 }
 
 // Set the color transformation to the identity transformation. The identity
@@ -507,13 +526,15 @@ const MASK_ALL = 0;
 const MASK_CHECK = 1;
 const MASK_CIRCLE = 2;
 const MASK_CROSS = 3;
-const MASK_MOD = 4;
-const MASK_ROWS = 5;
-const MASK_SAMPLE = 6;
-const MASK_SQUARE = 7;
-const MASK_TOP = 8;
-const MASK_WAVE = 9;
-const MASK_X = 10;
+const MASK_EQUALIZER = 4;
+const MASK_FREQUENCY = 5;
+const MASK_MOD = 6;
+const MASK_ROWS = 7;
+const MASK_SAMPLE = 8;
+const MASK_SQUARE = 9;
+const MASK_TOP = 10;
+const MASK_WAVE = 11;
+const MASK_X = 12;
 
 class Rng {
   constructor(seed) {

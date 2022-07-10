@@ -1,28 +1,60 @@
 #version 300 es
 
+// TODO:
+// - add equalizer mask - bar up or down (from bottom or middle?) depending on frequency bucket intensity
+// - add frequency mask - bars on or off depending on frequency bucket intensity
+// - should frequency texture be a-weighted?
+// - make all masks audio reactive
+// - make alpha audio reactive
+// - make color transform and coordinate transform audio reactive
+// - make default color audio reactive
+// - add slider for overriding audio level
+
+// let db = self
+//   .audio_frequency_data
+//   .iter()
+//   .enumerate()
+//   .map(|(i, decibels)| {
+//     let f = (i as f32 / self.audio_frequency_data.len() as f32)
+//       * self.audio_context.sample_rate()
+//       / 2.0;
+//     let f2 = f * f;
+//     let weight = 1.2588966 * 148840000.0 * f2 * f2
+//       / ((f2 + 424.36) * (f2 + 11599.29) * (f2 + 544496.41)).sqrt()
+//       * (f2 + 148840000.0);
+//     weight * decibels
+//   })
+//   .sum::<f32>();
+
+// self.gl.uniform1f(Some(self.uniform("db")), db);
+
+
 precision highp float;
 
-const uint MASK_ALL = 0u;
-const uint MASK_CHECK = 1u;
-const uint MASK_CIRCLE = 2u;
-const uint MASK_CROSS = 3u;
-const uint MASK_MOD = 4u;
-const uint MASK_ROWS = 5u;
-const uint MASK_SAMPLE = 6u;
-const uint MASK_SQUARE = 7u;
-const uint MASK_TOP = 8u;
-const uint MASK_WAVE = 9u;
-const uint MASK_X = 10u;
+const int MASK_ALL = 0;
+const int MASK_CHECK = 1;
+const int MASK_CIRCLE = 2;
+const int MASK_CROSS = 3;
+const int MASK_EQUALIZER = 4;
+const int MASK_FREQUENCY = 5;
+const int MASK_MOD = 6;
+const int MASK_ROWS = 7;
+const int MASK_SAMPLE = 8;
+const int MASK_SQUARE = 9;
+const int MASK_TOP = 10;
+const int MASK_WAVE = 11;
+const int MASK_X = 12;
 
 uniform bool wrap;
 uniform float alpha;
 uniform float resolution;
+uniform int mask;
 uniform mat3 coordinate_transform;
 uniform mat4 color_transform;
+uniform sampler2D audio_frequency;
 uniform sampler2D audio_time_domain;
 uniform sampler2D source;
 uniform uint divisor;
-uniform uint mask;
 uniform uint nrows;
 uniform uint remainder;
 uniform uint step;
@@ -32,6 +64,10 @@ out vec4 output_color;
 
 float audio_time_domain_sample(vec2 position) {
   return texture(audio_time_domain, vec2((position.x + 1.0) / 2.0, 0.5)).r;
+}
+
+float audio_frequency_sample(vec2 position) {
+  return texture(audio_frequency, vec2((position.x + 1.0) / 2.0, 0.5)).r;
 }
 
 bool masked(vec2 position, uvec2 pixel_position) {
@@ -63,6 +99,10 @@ bool masked(vec2 position, uvec2 pixel_position) {
       return abs(abs(position.x) - abs(position.y)) < 0.25;
     case MASK_WAVE:
       return abs(position.y - audio_time_domain_sample(position)) < 0.1;
+    case MASK_FREQUENCY:
+      return abs(audio_frequency_sample(position)) < 100.0;
+    case MASK_EQUALIZER:
+      return position.y < audio_frequency_sample(position) / 1000.0;
     default:
       return false;
   }

@@ -1,35 +1,10 @@
 use super::*;
 
-// TODO:
-// - should frequency texture be a-weighted?
-// - make all masks audio reactive
-// - make alpha audio reactive
-// - make color transform and coordinate transform audio reactive
-// - make default color audio reactive
-// - add equalizer mask - bar up or down (from bottom or middle?) depending on frequency bucket intensity
-// - add frequency mask - bars on or off depending on frequency bucket intensity
-// - add slider for overriding audio level
-
-// let db = self
-//   .audio_frequency_data
-//   .iter()
-//   .enumerate()
-//   .map(|(i, decibels)| {
-//     let f = (i as f32 / self.audio_frequency_data.len() as f32)
-//       * self.audio_context.sample_rate()
-//       / 2.0;
-//     let f2 = f * f;
-//     let weight = 1.2588966 * 148840000.0 * f2 * f2
-//       / ((f2 + 424.36) * (f2 + 11599.29) * (f2 + 544496.41)).sqrt()
-//       * (f2 + 148840000.0);
-//     weight * decibels
-//   })
-//   .sum::<f32>();
-
-// self.gl.uniform1f(Some(self.uniform("db")), db);
-
 pub(crate) struct Gpu {
   analyser_node: AnalyserNode,
+  audio_frequency_array: Float32Array,
+  audio_frequency_data: Vec<f32>,
+  audio_frequency_texture: WebGlTexture,
   audio_time_domain_array: Float32Array,
   audio_time_domain_data: Vec<f32>,
   audio_time_domain_texture: WebGlTexture,
@@ -151,6 +126,7 @@ impl Gpu {
 
     gl.uniform1i(Some(uniforms.get("source").unwrap()), 0);
     gl.uniform1i(Some(uniforms.get("audio_time_domain").unwrap()), 1);
+    gl.uniform1i(Some(uniforms.get("audio_frequency").unwrap()), 2);
 
     let audio_time_domain_texture = gl
       .create_texture()
@@ -184,6 +160,38 @@ impl Gpu {
       1,
     );
 
+    let audio_frequency_texture = gl
+      .create_texture()
+      .ok_or("Failed to create audio_frequency texture")?;
+
+    gl.active_texture(WebGl2RenderingContext::TEXTURE2);
+    gl.bind_texture(
+      WebGl2RenderingContext::TEXTURE_2D,
+      Some(&audio_frequency_texture),
+    );
+
+    gl.tex_parameteri(
+      WebGl2RenderingContext::TEXTURE_2D,
+      WebGl2RenderingContext::TEXTURE_MIN_FILTER,
+      WebGl2RenderingContext::NEAREST.try_into()?,
+    );
+
+    gl.tex_parameteri(
+      WebGl2RenderingContext::TEXTURE_2D,
+      WebGl2RenderingContext::TEXTURE_MAG_FILTER,
+      WebGl2RenderingContext::NEAREST.try_into()?,
+    );
+
+    let frequency_bin_count = analyser_node.frequency_bin_count();
+
+    gl.tex_storage_2d(
+      WebGl2RenderingContext::TEXTURE_2D,
+      1,
+      WebGl2RenderingContext::R32F,
+      frequency_bin_count as i32,
+      1,
+    );
+
     Ok(Self {
       source: Self::create_texture(&gl, resolution)?,
       destination: Self::create_texture(&gl, resolution)?,
@@ -191,6 +199,9 @@ impl Gpu {
       audio_time_domain_array: Float32Array::new_with_length(fft_size),
       audio_time_domain_data: vec![0.0; fft_size as usize],
       audio_time_domain_texture,
+      audio_frequency_array: Float32Array::new_with_length(frequency_bin_count),
+      audio_frequency_data: vec![0.0; frequency_bin_count as usize],
+      audio_frequency_texture,
       canvas: canvas.clone(),
       frame_buffer,
       gl,
@@ -291,6 +302,32 @@ impl Gpu {
       )
       .map_err(JsValueError)?;
 
+    self.gl.active_texture(WebGl2RenderingContext::TEXTURE2);
+    self.gl.bind_texture(
+      WebGl2RenderingContext::TEXTURE_2D,
+      Some(&self.audio_frequency_texture),
+    );
+    self
+      .analyser_node
+      .get_float_frequency_data(&mut self.audio_frequency_data);
+    self
+      .audio_frequency_array
+      .copy_from(&self.audio_frequency_data);
+    self
+      .gl
+      .tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_array_buffer_view(
+        WebGl2RenderingContext::TEXTURE_2D,
+        0,
+        0,
+        0,
+        self.audio_frequency_data.len() as i32,
+        1,
+        WebGl2RenderingContext::RED,
+        WebGl2RenderingContext::FLOAT,
+        Some(&self.audio_frequency_array),
+      )
+      .map_err(JsValueError)?;
+
     self.gl.uniform1f(Some(self.uniform("alpha")), filter.alpha);
 
     self.gl.uniform3f(
@@ -338,7 +375,9 @@ impl Gpu {
       .gl
       .uniform1ui(Some(self.uniform("wrap")), filter.wrap as u32);
 
-    self.gl.uniform1ui(Some(self.uniform("mask")), filter.mask);
+    self
+      .gl
+      .uniform1i(Some(self.uniform("mask")), filter.mask as i32);
 
     self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 3);
 
