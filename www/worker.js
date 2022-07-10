@@ -31,8 +31,8 @@ function all() {
   filter.mask = MASK_ALL;
 }
 
-// Set the alpha blending factor. `alpha` will be used to blend the output of
-// the current operation with the original color. See `www/fragment.glsl` for
+// Set the alpha blending factor. `alpha` will be used to blend the
+// transformed color with the original color. See `www/fragment.glsl` for
 // the blend equation.
 //
 // ```
@@ -177,9 +177,10 @@ async function frame() {
   });
 }
 
-// Set the operation to the identity operation. The identity operation returns the
-// sampled pixel unchanged. Useful for applying transformations, such as scales or
-// rotation, without changing the sampled pixels.
+// Set the color transformation to the identity transformation. The identity
+// trnasformation returns the sampled pixel unchanged. Useful for applying
+// transformations, such as scales or rotation, without changing the sampled
+// pixels.
 //
 // ```
 // identity();
@@ -189,8 +190,7 @@ function identity() {
   mat4.identity(filter.colorTransform);
 }
 
-// Set the operation to the invert operation. The invert operation inverts the sample
-// pixels RGB components.
+// Set the color transformation to inversion.
 //
 // ```
 // x();
@@ -198,8 +198,8 @@ function identity() {
 // render();
 // ```
 //
-// The invert operation is the default operation, so the above example could have been
-// written as:
+// The inversion is the default color transformation, so the above example
+// could have been written as:
 //
 // ```
 // x();
@@ -350,8 +350,7 @@ function rotate(rotation) {
   filter.rotation = rotation;
 }
 
-// Set the roate color operation. The rotate color operation interpets the sample pixel
-// as a vector in three dimensional space and rotates it about the `axis` by `radians`.
+// Use rotation as the color transformation.
 //
 // Valid values for `axis` are `red`, `green`, and `blue`. Applying `rotateColor` multiple
 // times around different axes is a good way to get a variety of colors. Since `rotateColor`
