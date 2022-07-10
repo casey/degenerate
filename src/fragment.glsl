@@ -101,7 +101,7 @@ void main() {
     : transformed;
 
   // Sample color if in-bounds, otherwise use default color
-  vec3 input_color = wrapped.x >= -1.0 && wrapped.x <= 1.0 && wrapped.y >= -1.0 && wrapped.y <= 1.0
+  vec3 input_color = abs(wrapped.x) <= 1.0 && abs(wrapped.y) <= 1.0
     ? texture(source, (wrapped + 1.0) / 2.0).rgb
     : default_color;
 
