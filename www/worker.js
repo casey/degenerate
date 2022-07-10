@@ -188,6 +188,20 @@ function identity() {
   filter.operation = OPERATION_IDENTITY;
 }
 
+// If `position` is true, use the coordinate of the sample as the input color,
+// instead of the color of the pixel in the source image. Defaults to false.
+// Useful for creating gradiants or debugging coordinate transfoms.
+//
+// When true, rgb will be set to (x, y, 0)
+//
+// ```
+// coordinates(true);
+// render();
+// ```
+function coordinates(coordinates) {
+  filter.coordinates = coordinates;
+}
+
 // Set the operation to the invert operation. The invert operation inverts the sample
 // pixels RGB components.
 //
@@ -526,6 +540,7 @@ class Filter {
   constructor() {
     this.alpha = 1.0;
     this.defaultColor = [0.0, 0.0, 0.0];
+    this.coordinates = false;
     this.mask = MASK_ALL;
     this.maskModDivisor = 0;
     this.maskModRemainder = 0;

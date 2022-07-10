@@ -20,6 +20,7 @@ const uint OPERATION_INVERT = 2u;
 const uint OPERATION_ROTATE_COLOR = 3u;
 const uint OPERATION_SAMPLE = 4u;
 
+uniform bool coordinates;
 uniform bool wrap;
 uniform float alpha;
 uniform float resolution;
@@ -88,6 +89,8 @@ bool masked(vec2 position, uvec2 pixel_position) {
   }
 }
 
+// Write function that goes from -1 1 to 0 1 and vice versa
+
 void main() {
   // Get fragment coordinates and transform to [-1, 1]
   vec2 position = gl_FragCoord.xy / resolution * 2.0 - 1.0;
@@ -101,8 +104,8 @@ void main() {
     : transformed;
 
   // Sample color if in-bounds, otherwise use default color
-  vec3 input_color = abs(wrapped.x) <= 1.0 && abs(wrapped.y) <= 1.0
-    ? texture(source, (wrapped + 1.0) / 2.0).rgb
+  vec3 input_color = coordinates ? vec3(wrapped / 2.0 + 0.5, 0.0)
+    : abs(wrapped.x) <= 1.0 && abs(wrapped.y) <= 1.0 ? texture(source, (wrapped + 1.0) / 2.0).rgb
     : default_color;
 
   // Sample original color
