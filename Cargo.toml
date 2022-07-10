@@ -31,7 +31,6 @@ version = "0.3.57"
 features = [
   "AnalyserNode",
   "AudioContext",
-  "AudioContextOptions",
   "AudioDestinationNode",
   "AudioParam",
   "CanvasRenderingContext2d",
