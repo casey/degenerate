@@ -1,34 +1,5 @@
 #version 300 es
 
-// TODO:
-// - add equalizer mask - bar up or down (from bottom or middle?) depending on frequency bucket intensity
-// - add frequency mask - bars on or off depending on frequency bucket intensity
-// - should frequency texture be a-weighted?
-// - make all masks audio reactive
-// - make alpha audio reactive
-// - make color transform and coordinate transform audio reactive
-// - make default color audio reactive
-// - add slider for overriding audio level
-
-// let db = self
-//   .audio_frequency_data
-//   .iter()
-//   .enumerate()
-//   .map(|(i, decibels)| {
-//     let f = (i as f32 / self.audio_frequency_data.len() as f32)
-//       * self.audio_context.sample_rate()
-//       / 2.0;
-//     let f2 = f * f;
-//     let weight = 1.2588966 * 148840000.0 * f2 * f2
-//       / ((f2 + 424.36) * (f2 + 11599.29) * (f2 + 544496.41)).sqrt()
-//       * (f2 + 148840000.0);
-//     weight * decibels
-//   })
-//   .sum::<f32>();
-
-// self.gl.uniform1f(Some(self.uniform("db")), db);
-
-
 precision highp float;
 
 const int MASK_ALL = 0;
@@ -82,9 +53,9 @@ bool masked(vec2 position, uvec2 pixel_position) {
     case MASK_CROSS:
       return abs(position.x) < 0.25 || abs(position.y) < 0.25;
     case MASK_EQUALIZER:
-      return position.y < audio_frequency_sample(position) / 1000.0;
+      return position.y / 2.0 + 0.5 < audio_frequency_sample(position);
     case MASK_FREQUENCY:
-      return abs(audio_frequency_sample(position)) < 100.0;
+      return abs(audio_frequency_sample(position)) > 0.125;
     case MASK_MOD:
       if (divisor == 0u) {
         return false;

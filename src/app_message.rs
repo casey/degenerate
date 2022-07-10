@@ -8,4 +8,5 @@ pub(crate) enum AppMessage<'a> {
   Frame,
   Radio { name: &'a str, value: &'a str },
   Script(&'a str),
+  Slider { name: &'a str, value: f64 },
 }

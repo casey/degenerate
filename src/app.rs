@@ -73,11 +73,11 @@ impl App {
 
     let stderr = Stderr::get();
 
-    let audio_context =
-      AudioContext::new_with_context_options(AudioContextOptions::new().sample_rate(96000.0))
-        .map_err(JsValueError)?;
+    let audio_context = AudioContext::new().map_err(JsValueError)?;
 
     let analyser_node = audio_context.create_analyser().map_err(JsValueError)?;
+
+    analyser_node.set_smoothing_time_constant(0.5);
 
     let gpu = Gpu::new(&window, &canvas, &analyser_node)?;
 
@@ -299,6 +299,9 @@ impl App {
       WorkerMessage::Clear => {
         self.gpu.clear()?;
       }
+      WorkerMessage::DecibelRange { min, max } => {
+        self.gpu.set_decibel_range(min, max);
+      }
       WorkerMessage::Done => {
         self.html.set_class_name("done");
       }
@@ -429,6 +432,80 @@ impl App {
         base64::encode_config_buf(png.get_ref(), base64::STANDARD, &mut href);
         a.set_href(&href);
         a.click();
+      }
+      WorkerMessage::Slider {
+        name,
+        min,
+        max,
+        initial,
+        step,
+      } => {
+        let id = format!("widget-slider-{name}");
+
+        if self.document.select_optional(&format!("#{id}"))?.is_none() {
+          let aside = self.document.select("aside")?;
+
+          let div = self
+            .document
+            .create_element("div")
+            .map_err(JsValueError)?
+            .cast::<HtmlDivElement>()?;
+
+          aside.append_child(&div).map_err(JsValueError)?;
+
+          let label = self
+            .document
+            .create_element("label")
+            .map_err(JsValueError)?
+            .cast::<HtmlLabelElement>()?;
+
+          label.set_html_for(&id);
+          label.set_inner_text(&name);
+
+          div.append_child(&label).map_err(JsValueError)?;
+
+          let range = self
+            .document
+            .create_element("input")
+            .map_err(JsValueError)?
+            .cast::<HtmlInputElement>()?;
+
+          range.set_type("range");
+          range.set_id(&id);
+          range.set_min(&min.to_string());
+          range.set_max(&max.to_string());
+          range.set_value(&initial.to_string());
+          range.set_step(&step.to_string());
+
+          div.append_child(&range).map_err(JsValueError)?;
+
+          let current = self
+            .document
+            .create_element("span")
+            .map_err(JsValueError)?
+            .cast::<HtmlSpanElement>()?;
+          div.append_child(&current).map_err(JsValueError)?;
+          current.set_inner_text(&initial.to_string());
+
+          let local = range.clone();
+          let worker = self.worker.clone();
+          let stderr = self.stderr.clone();
+          range.add_event_listener("input", move || {
+            stderr.update(|| -> Result {
+              let value = local.value();
+              current.set_inner_text(&value);
+              worker
+                .post_message(&JsValue::from_str(&serde_json::to_string(
+                  &AppMessage::Slider {
+                    name: &name,
+                    value: value.parse()?,
+                  },
+                )?))
+                .map_err(JsValueError)?;
+              Ok(())
+            }())
+          })?;
+        }
       }
     }
 

@@ -9,6 +9,8 @@ pub(crate) struct Gpu {
   audio_time_domain_data: Vec<f32>,
   audio_time_domain_texture: WebGlTexture,
   canvas: HtmlCanvasElement,
+  decibels_max: f32,
+  decibels_min: f32,
   destination: WebGlTexture,
   frame_buffer: WebGlFramebuffer,
   gl: WebGl2RenderingContext,
@@ -203,6 +205,8 @@ impl Gpu {
       audio_frequency_data: vec![0.0; frequency_bin_count as usize],
       audio_frequency_texture,
       canvas: canvas.clone(),
+      decibels_min: -100.0,
+      decibels_max: -30.0,
       frame_buffer,
       gl,
       height,
@@ -276,17 +280,17 @@ impl Gpu {
       .gl
       .bind_texture(WebGl2RenderingContext::TEXTURE_2D, Some(&self.source));
 
-    self.gl.active_texture(WebGl2RenderingContext::TEXTURE1);
-    self.gl.bind_texture(
-      WebGl2RenderingContext::TEXTURE_2D,
-      Some(&self.audio_time_domain_texture),
-    );
     self
       .analyser_node
       .get_float_time_domain_data(&mut self.audio_time_domain_data);
     self
       .audio_time_domain_array
       .copy_from(&self.audio_time_domain_data);
+    self.gl.active_texture(WebGl2RenderingContext::TEXTURE1);
+    self.gl.bind_texture(
+      WebGl2RenderingContext::TEXTURE_2D,
+      Some(&self.audio_time_domain_texture),
+    );
     self
       .gl
       .tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_array_buffer_view(
@@ -302,17 +306,24 @@ impl Gpu {
       )
       .map_err(JsValueError)?;
 
+    self
+      .analyser_node
+      .get_float_frequency_data(&mut self.audio_frequency_data);
+
+    let scale_factor = 1.0 / (self.decibels_max - self.decibels_min);
+
+    for bucket in &mut self.audio_frequency_data {
+      *bucket = ((*bucket - self.decibels_min) * scale_factor).clamp(0.0, 1.0);
+    }
+
+    self
+      .audio_frequency_array
+      .copy_from(&self.audio_frequency_data);
     self.gl.active_texture(WebGl2RenderingContext::TEXTURE2);
     self.gl.bind_texture(
       WebGl2RenderingContext::TEXTURE_2D,
       Some(&self.audio_frequency_texture),
     );
-    self
-      .analyser_node
-      .get_float_frequency_data(&mut self.audio_frequency_data);
-    self
-      .audio_frequency_array
-      .copy_from(&self.audio_frequency_data);
     self
       .gl
       .tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_array_buffer_view(
@@ -485,6 +496,11 @@ impl Gpu {
       .ok_or("Failed to create ImageBuffer")?;
 
     Ok(image)
+  }
+
+  pub(crate) fn set_decibel_range(&mut self, min: f32, max: f32) {
+    self.decibels_min = min;
+    self.decibels_max = max;
   }
 
   fn uniform(&self, name: &str) -> &WebGlUniformLocation {

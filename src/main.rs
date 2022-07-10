@@ -23,9 +23,9 @@ use {
   web_sys::{
     AnalyserNode, AudioContext, AudioContextOptions, Document, Element, EventTarget, GainNode,
     HtmlAnchorElement, HtmlButtonElement, HtmlCanvasElement, HtmlDivElement, HtmlElement,
-    HtmlInputElement, HtmlLabelElement, HtmlOptionElement, HtmlSelectElement, HtmlTextAreaElement,
-    KeyboardEvent, MediaStream, MediaStreamConstraints, MessageEvent, OscillatorNode,
-    WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
+    HtmlInputElement, HtmlLabelElement, HtmlOptionElement, HtmlSelectElement, HtmlSpanElement,
+    HtmlTextAreaElement, KeyboardEvent, MediaStream, MediaStreamConstraints, MessageEvent,
+    OscillatorNode, WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
     WebGlUniformLocation, Window, Worker,
   },
 };

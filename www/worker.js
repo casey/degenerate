@@ -104,6 +104,23 @@ function cross() {
   filter.mask = MASK_CROSS;
 }
 
+// ```
+// equalizer()
+// record();
+// wrap(true);
+// while(true) {
+//   let min = slider('min', -300, 0, 1, -100);
+//   let max = slider('max', -300, 0, 1, -30);
+//   decibelRange(min, max);
+//
+//   clear();
+//   await render();
+// }
+// ```
+function decibelRange(min, max) {
+  self.postMessage(JSON.stringify({'decibelRange': {min, max}}));
+}
+
 // Set the default color. The default color is returned whenever a pixel is sampled
 // out of bounds due to a rotation, scale, or other sample coordinate transformation.
 //
@@ -242,6 +259,17 @@ function mod(divisor, remainder) {
 
 // Set the oscillator gain. The oscillator produces a sine wave tone, useful
 // for debugging audio-reactive programs.
+//
+// ```
+// equalizer()
+// while(true) {
+//   oscillatorFrequency(slider('frequency', 0, 20000, 1, 0));
+//   oscillatorGain(slider('gain', 0, 1, 0.01, 0.25));
+//   clear();
+//   await render();
+// }
+// ```
+
 function oscillatorGain(gain) {
   self.postMessage(JSON.stringify({'oscillatorGain': gain}));
 }
@@ -278,7 +306,6 @@ function radio(name, options) {
   self.postMessage(JSON.stringify({ radio: [name, options] }))
   return widgets['widget-radio-' + name] ?? options[0];
 }
-
 
 // Yield values in the half-open range `[0,iterations)`.
 //
@@ -451,6 +478,19 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function slider(name, min, max, step, initial) {
+  self.postMessage(JSON.stringify({
+    slider: {
+      name,
+      min: min ?? 0,
+      max: max ?? 1,
+      step: step ?? 0.001,
+      initial: initial ?? min ?? 0,
+  }
+  }))
+  return widgets['widget-slider-' + name] ?? initial;
+}
+
 // Mask pixels within a square.
 //
 // ```
@@ -594,6 +634,9 @@ self.addEventListener('message', async function (event) {
         self.postMessage(JSON.stringify({'error': error.toString()}));
       }
       self.postMessage(JSON.stringify('done'));
+      break;
+    case 'slider':
+      widgets['widget-slider-' + message.content.name] = message.content.value;
       break;
     case 'frame':
       for (let callback of frameCallbacks) {

@@ -49,6 +49,7 @@ features = [
   "HtmlLabelElement",
   "HtmlOptionElement",
   "HtmlSelectElement",
+  "HtmlSpanElement",
   "HtmlTextAreaElement",
   "ImageData",
   "KeyboardEvent",
