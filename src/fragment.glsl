@@ -1,10 +1,5 @@
 #version 300 es
 
-// TODO:
-// - Fix docs
-// - finalize wave mask
-// - finalize sample mask
-
 precision highp float;
 
 const uint MASK_ALL = 0u;
@@ -59,7 +54,7 @@ bool masked(vec2 position, uvec2 pixel_position) {
     case MASK_ROWS:
       return pixel_position.y % (nrows + step) < nrows;
     case MASK_SAMPLE:
-      return abs(audio_time_domain_sample(position)) > 0.1;
+      return abs(audio_time_domain_sample(position)) > 0.01;
     case MASK_SQUARE:
       return abs(position.x) < 0.5 && abs(position.y) < 0.5;
     case MASK_TOP:
