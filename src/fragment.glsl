@@ -14,6 +14,7 @@ const uint MASK_TOP = 8u;
 const uint MASK_WAVE = 9u;
 const uint MASK_X = 10u;
 
+uniform bool coordinates;
 uniform bool wrap;
 uniform float alpha;
 uniform float resolution;
@@ -68,6 +69,10 @@ bool masked(vec2 position, uvec2 pixel_position) {
   }
 }
 
+vec2 uv(vec2 position) {
+  return (position + 1.0) / 2.0;
+}
+
 void main() {
   // Get fragment coordinates and transform to [-1, 1]
   vec2 position = gl_FragCoord.xy / resolution * 2.0 - 1.0;
@@ -81,15 +86,15 @@ void main() {
     : transformed;
 
   // Sample color if in-bounds, otherwise use default color
-  vec3 input_color = wrapped.x >= -1.0 && wrapped.x <= 1.0 && wrapped.y >= -1.0 && wrapped.y <= 1.0
-    ? texture(source, (wrapped + 1.0) / 2.0).rgb
+  vec3 input_color = coordinates ? vec3(uv(wrapped), 0.0)
+    : abs(wrapped.x) <= 1.0 && abs(wrapped.y) <= 1.0 ? texture(source, uv(wrapped)).rgb
     : default_color;
 
   // Sample original color
   vec3 original_color = texture(source, gl_FragCoord.xy / resolution).rgb;
 
   // Calculate position in pixel coordinates, [0, resolution)
-  uvec2 pixel_position = uvec2((wrapped + 1.0) / 2.0 * resolution);
+  uvec2 pixel_position = uvec2(uv(wrapped) * resolution);
 
   // Convert color from [0,1] to [-1,-1]
   vec3 color_vector = input_color * 2.0 - 1.0;

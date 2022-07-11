@@ -27,7 +27,7 @@ impl Gpu {
     let mut context_options = WebGlContextAttributes::new();
 
     context_options
-      .alpha(false)
+      .alpha(true)
       .antialias(false)
       .depth(false)
       .stencil(false);
@@ -310,6 +310,10 @@ impl Gpu {
       .gl
       .uniform1ui(Some(self.uniform("wrap")), filter.wrap as u32);
 
+    self
+      .gl
+      .uniform1ui(Some(self.uniform("coordinates")), filter.coordinates as u32);
+
     self.gl.uniform1ui(Some(self.uniform("mask")), filter.mask);
 
     self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 3);
@@ -429,7 +433,9 @@ impl Gpu {
   }
 
   pub(crate) fn clear(&mut self) -> Result {
-    self.gl.clear(WebGl2RenderingContext::COLOR_BUFFER_BIT);
+    self
+      .gl
+      .clear_bufferfv_with_f32_array(WebGl2RenderingContext::COLOR, 0, &[0.0, 0.0, 0.0, 1.0]);
 
     self.gl.delete_texture(Some(&self.source));
     self.gl.delete_texture(Some(&self.destination));

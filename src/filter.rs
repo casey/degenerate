@@ -4,6 +4,7 @@ use super::*;
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Filter {
   pub(crate) alpha: f32,
+  pub(crate) coordinates: bool,
   pub(crate) default_color: [f32; 3],
   pub(crate) color_transform: [f32; 16],
   pub(crate) mask: u32,

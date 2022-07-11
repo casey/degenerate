@@ -190,6 +190,20 @@ function identity() {
   mat4.identity(filter.colorTransform);
 }
 
+// If `coordinates` is true, use the coordinate of the sample as the input color,
+// instead of the color of the pixel in the source image. Defaults to false.
+// Useful for creating gradiants or debugging coordinate transfoms.
+//
+// When true, rgb will be set to (x, y, 0)
+//
+// ```
+// coordinates(true);
+// render();
+// ```
+function coordinates(coordinates) {
+  filter.coordinates = coordinates;
+}
+
 // Set the color transformation to inversion.
 //
 // ```
@@ -536,6 +550,7 @@ class Filter {
     this.alpha = 1.0;
     this.colorTransform = mat4.fromScaling(mat4.create(), vec3.fromValues(-1, -1, -1));
     this.defaultColor = [0.0, 0.0, 0.0];
+    this.coordinates = false;
     this.mask = MASK_ALL;
     this.maskModDivisor = 0;
     this.maskModRemainder = 0;
