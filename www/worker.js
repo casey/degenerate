@@ -297,13 +297,22 @@ function mod(divisor, remainder) {
 //   await render();
 // }
 // ```
-
 function oscillatorGain(gain) {
   self.postMessage(JSON.stringify({'oscillatorGain': gain}));
 }
 
 // Set the oscillator frequency to `hz` hertz. The oscillator produces a sine wave tone,
 // useful for debugging audio-reactive programs.
+//
+// ```
+// equalizer()
+// while(true) {
+//   oscillatorFrequency(slider('frequency', 0, 20000, 1, 0));
+//   oscillatorGain(slider('gain', 0, 1, 0.01, 0.25));
+//   clear();
+//   await render();
+// }
+// ```
 function oscillatorFrequency(hz) {
   self.postMessage(JSON.stringify({'oscillatorFrequency': hz}));
 }
