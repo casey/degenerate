@@ -7,7 +7,7 @@ use {
   image::{ImageBuffer, ImageOutputFormat},
   js_sys::{Float32Array, Promise},
   lazy_static::lazy_static,
-  nalgebra::{Rotation3, Similarity2, UnitComplex, Vector3},
+  nalgebra::{Similarity2, UnitComplex},
   serde::{Deserialize, Serialize},
   std::{
     collections::BTreeMap,
