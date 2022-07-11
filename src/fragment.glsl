@@ -42,12 +42,12 @@ vec3 octant(vec3 position) {
   return (position + 1.0) / 2.0;
 }
 
-float audio_time_domain_sample(vec2 position) {
-  return texture(audio_time_domain, octant(position)).r;
-}
-
 float audio_frequency_sample(vec2 position) {
   return texture(audio_frequency, octant(position)).r;
+}
+
+float audio_time_domain_sample(vec2 position) {
+  return texture(audio_time_domain, octant(position)).r;
 }
 
 bool masked(vec2 position, uvec2 pixel_position) {
