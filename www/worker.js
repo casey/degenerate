@@ -188,7 +188,7 @@ function identity() {
   filter.operation = OPERATION_IDENTITY;
 }
 
-// If `position` is true, use the coordinate of the sample as the input color,
+// If `coordinates` is true, use the coordinate of the sample as the input color,
 // instead of the color of the pixel in the source image. Defaults to false.
 // Useful for creating gradiants or debugging coordinate transfoms.
 //
