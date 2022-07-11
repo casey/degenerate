@@ -34,12 +34,20 @@ uniform vec3 default_color;
 
 out vec4 output_color;
 
+vec2 octant(vec2 position) {
+  return (position + 1.0) / 2.0;
+}
+
+vec3 octant(vec3 position) {
+  return (position + 1.0) / 2.0;
+}
+
 float audio_time_domain_sample(vec2 position) {
-  return texture(audio_time_domain, vec2((position.x + 1.0) / 2.0, 0.5)).r;
+  return texture(audio_time_domain, octant(position)).r;
 }
 
 float audio_frequency_sample(vec2 position) {
-  return texture(audio_frequency, vec2((position.x + 1.0) / 2.0, 0.5)).r;
+  return texture(audio_frequency, octant(position)).r;
 }
 
 bool masked(vec2 position, uvec2 pixel_position) {
@@ -54,7 +62,7 @@ bool masked(vec2 position, uvec2 pixel_position) {
     case MASK_CROSS:
       return abs(position.x) < 0.25 || abs(position.y) < 0.25;
     case MASK_EQUALIZER:
-      return position.y / 2.0 + 0.5 < audio_frequency_sample(position);
+      return octant(position).y < audio_frequency_sample(position);
     case MASK_FREQUENCY:
       return abs(audio_frequency_sample(position)) > 0.125;
     case MASK_MOD:
@@ -80,10 +88,6 @@ bool masked(vec2 position, uvec2 pixel_position) {
   }
 }
 
-vec2 uv(vec2 position) {
-  return (position + 1.0) / 2.0;
-}
-
 void main() {
   // Get fragment coordinates and transform to [-1, 1]
   vec2 position = gl_FragCoord.xy / resolution * 2.0 - 1.0;
@@ -97,15 +101,15 @@ void main() {
     : transformed;
 
   // Sample color if in-bounds, otherwise use default color
-  vec3 input_color = coordinates ? vec3(uv(wrapped), 0.0)
-    : abs(wrapped.x) <= 1.0 && abs(wrapped.y) <= 1.0 ? texture(source, uv(wrapped)).rgb
+  vec3 input_color = coordinates ? vec3(octant(wrapped), 0.0)
+    : abs(wrapped.x) <= 1.0 && abs(wrapped.y) <= 1.0 ? texture(source, octant(wrapped)).rgb
     : default_color;
 
   // Sample original color
   vec3 original_color = texture(source, gl_FragCoord.xy / resolution).rgb;
 
   // Calculate position in pixel coordinates, [0, resolution)
-  uvec2 pixel_position = uvec2(uv(wrapped) * resolution);
+  uvec2 pixel_position = uvec2(octant(wrapped) * resolution);
 
   // Convert color from [0,1] to [-1,-1]
   vec3 color_vector = input_color * 2.0 - 1.0;
@@ -114,7 +118,7 @@ void main() {
   vec4 transformed_color_vector = color_transform * vec4(color_vector, 1.0);
 
   // Convert color back from [-1,-1] to [0,1]
-  vec3 transformed_color = (transformed_color_vector.xyz + 1.0) / 2.0;
+  vec3 transformed_color = octant(transformed_color_vector.xyz);
 
   // Set alpha to 0.0 if outside the mask
   float alpha = masked(wrapped, pixel_position) ? alpha : 0.0;
