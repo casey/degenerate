@@ -212,7 +212,7 @@ function coordinates(coordinates) {
 // render();
 // ```
 //
-// The inversion is the default color transformation, so the above example
+// Inversion is the default color transformation, so the above example
 // could have been written as:
 //
 // ```
