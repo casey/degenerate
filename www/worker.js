@@ -104,7 +104,6 @@ function cross() {
   filter.mask = MASK_CROSS;
 }
 
-<<<<<<< HEAD
 // ```
 // equalizer()
 // record();
@@ -122,20 +121,6 @@ function decibelRange(min, max) {
   self.postMessage(JSON.stringify({'decibelRange': {min, max}}));
 }
 
-||||||| 338febd
-// Set the operation to the debug operation.The debug operation is permanently
-// unstable, and may change at any time.
-//
-// ```
-// debug();
-// render();
-// ```
-function debug() {
-  filter.operation = OPERATION_DEBUG;
-}
-
-=======
->>>>>>> origin/master
 // Set the default color. The default color is returned whenever a pixel is sampled
 // out of bounds due to a rotation, scale, or other sample coordinate transformation.
 //
