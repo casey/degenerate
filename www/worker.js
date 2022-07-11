@@ -106,18 +106,18 @@ function cross() {
 
 // Set the decibel range for normalization of raw frequency data into values
 // usable in the fragment shader. Frequency data, by default, is expressed in
-// decibels. Decibels are logarithmic, with 0 representing for the loudest
-// possible sound, and -∞ representing the quietest possible sound. This is
-// inconvenient and unintuitive to work with, so frequency data decibel values
-// are normalized to values between 0 and 1, where 0 is the silence and 1 is
-// loud. This normalization requires selecting cut-off min and max decibel
-// values. Values below `min` are clamped to 0, and values above `max` are
-// clamped to 1. Setting the min value too low will cause noise to appear in
-// the normalized frequency data. Setting the min value too high will remove
-// quiet sounds from the frequency data. Setting the max value too high will
-// reduce the dynamic range of the normalized values, and setting the max value
-// too low will clip loud sounds, causing them to all map to 1. The default
-// range is [-100, -30], which is reasonable for most applications.
+// decibels. Decibels are logarithmic, with 0 representing the loudest possible
+// sound, and -∞ representing the quietest possible sound. This is inconvenient
+// and unintuitive to work with, so frequency data decibel values are
+// normalized to values between 0 and 1, where 0 is the silence and 1 is loud.
+// This normalization requires selecting cut-off min and max decibel values.
+// Values below `min` are clamped to 0, and values above `max` are clamped to
+// 1. Setting the min value too low will cause noise to appear in the
+// normalized frequency data. Setting the min value too high will remove quiet
+// sounds from the frequency data. Setting the max value too high will reduce
+// the dynamic range of the normalized values, and setting the max value too
+// low will clip loud sounds, causing them to all map to 1. The default range
+// is [-100, -30], which is reasonable for most applications.
 //
 // ```
 // equalizer()

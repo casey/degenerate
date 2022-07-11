@@ -20,6 +20,7 @@ uniform bool coordinates;
 uniform bool wrap;
 uniform float alpha;
 uniform float resolution;
+uniform int mask;
 uniform mat3 coordinate_transform;
 uniform mat4 color_transform;
 uniform sampler2D audio_frequency;
