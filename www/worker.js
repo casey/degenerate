@@ -104,6 +104,21 @@ function cross() {
   filter.mask = MASK_CROSS;
 }
 
+// Set the decibel range for normalization of raw frequency data into values
+// usable in the fragment shader. Frequency data, by default, is expressed in
+// decibels. Decibels are logarithmic, with 0 representing for the loudest
+// possible sound, and -∞ representing the quietest possible sound. This is
+// inconvenient and unintuitive to work with, so frequency data decibel values
+// are normalized to values between 0 and 1, where 0 is the silence and 1 is
+// loud. This normalization requires selecting cut-off min and max decibel
+// values. Values below `min` are clamped to 0, and values above `max` are
+// clamped to 1. Setting the min value too low will cause noise to appear in
+// the normalized frequency data. Setting the min value too high will remove
+// quiet sounds from the frequency data. Setting the max value too high will
+// reduce the dynamic range of the normalized values, and setting the max value
+// too low will clip loud sounds, causing them to all map to 1. The default
+// range is [-100, -30], which is reasonable for most applications.
+//
 // ```
 // equalizer()
 // record();
@@ -165,7 +180,7 @@ function elapsed() {
   return Date.now() - start;
 }
 
-// Mask pixels in an equalizer pattern;
+// Mask pixels in an equalizer pattern.
 //
 // ```
 // record();
@@ -228,9 +243,9 @@ function identity() {
 
 // If `coordinates` is true, use the coordinate of the sample as the input color,
 // instead of the color of the pixel in the source image. Defaults to false.
-// Useful for creating gradiants or debugging coordinate transfoms.
+// Useful for creating gradients or debugging coordinate transforms.
 //
-// When true, rgb will be set to (x, y, 0)
+// When true, RGB will be set to (x, y, 0)
 //
 // ```
 // coordinates(true);
@@ -492,6 +507,9 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// Create a new slider widget with the given `name`, `min`, `max`, `step`, and
+// `initial` values. Calls with same `name` will all refer to the same slider,
+// making it safe to call repeatedly.
 function slider(name, min, max, step, initial) {
   self.postMessage(JSON.stringify({
     slider: {
