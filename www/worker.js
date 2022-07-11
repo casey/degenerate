@@ -104,6 +104,7 @@ function cross() {
   filter.mask = MASK_CROSS;
 }
 
+<<<<<<< HEAD
 // ```
 // equalizer()
 // record();
@@ -121,6 +122,20 @@ function decibelRange(min, max) {
   self.postMessage(JSON.stringify({'decibelRange': {min, max}}));
 }
 
+||||||| 338febd
+// Set the operation to the debug operation.The debug operation is permanently
+// unstable, and may change at any time.
+//
+// ```
+// debug();
+// render();
+// ```
+function debug() {
+  filter.operation = OPERATION_DEBUG;
+}
+
+=======
+>>>>>>> origin/master
 // Set the default color. The default color is returned whenever a pixel is sampled
 // out of bounds due to a rotation, scale, or other sample coordinate transformation.
 //
@@ -226,6 +241,20 @@ function identity() {
   mat4.identity(filter.colorTransform);
 }
 
+// If `coordinates` is true, use the coordinate of the sample as the input color,
+// instead of the color of the pixel in the source image. Defaults to false.
+// Useful for creating gradiants or debugging coordinate transfoms.
+//
+// When true, rgb will be set to (x, y, 0)
+//
+// ```
+// coordinates(true);
+// render();
+// ```
+function coordinates(coordinates) {
+  filter.coordinates = coordinates;
+}
+
 // Set the color transformation to inversion.
 //
 // ```
@@ -234,7 +263,7 @@ function identity() {
 // render();
 // ```
 //
-// The inversion is the default color transformation, so the above example
+// Inversion is the default color transformation, so the above example
 // could have been written as:
 //
 // ```
@@ -597,6 +626,7 @@ class Filter {
     this.alpha = 1.0;
     this.colorTransform = mat4.fromScaling(mat4.create(), vec3.fromValues(-1, -1, -1));
     this.defaultColor = [0.0, 0.0, 0.0];
+    this.coordinates = false;
     this.mask = MASK_ALL;
     this.maskModDivisor = 0;
     this.maskModRemainder = 0;
