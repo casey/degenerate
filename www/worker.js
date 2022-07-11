@@ -518,6 +518,15 @@ function sleep(ms) {
 // Create a new slider widget with the given `name`, `min`, `max`, `step`, and
 // `initial` values. Calls with same `name` will all refer to the same slider,
 // making it safe to call repeatedly.
+//
+// ```
+// x()
+// while(true) {
+//   rotateColor('green', slider('color rotation', 0, TAU, 0.001, 0));
+//   clear();
+//   await render();
+// }
+// ```
 function slider(name, min, max, step, initial) {
   self.postMessage(JSON.stringify({
     slider: {

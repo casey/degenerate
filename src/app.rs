@@ -243,7 +243,7 @@ impl App {
 
     match event {
       WorkerMessage::Checkbox(name) => {
-        let id = format!("widget-checkbox-{name}");
+        let id = Self::widget_id("checkbox", &name);
 
         if self.document.select_optional(&format!("#{id}"))?.is_none() {
           let aside = self.document.select("aside")?;
@@ -315,7 +315,7 @@ impl App {
         self.oscillator_gain_node.gain().set_value(gain);
       }
       WorkerMessage::Radio(name, options) => {
-        let id = format!("widget-radio-{name}");
+        let id = Self::widget_id("radio", &name);
 
         if self.document.select_optional(&format!("#{id}"))?.is_none() {
           let aside = self.document.select("aside")?;
@@ -440,7 +440,7 @@ impl App {
         initial,
         step,
       } => {
-        let id = format!("widget-slider-{name}");
+        let id = Self::widget_id("slider", &name);
 
         if self.document.select_optional(&format!("#{id}"))?.is_none() {
           let aside = self.document.select("aside")?;
@@ -566,5 +566,9 @@ impl App {
 
   fn this(&self) -> Arc<Mutex<Self>> {
     self.this.as_ref().unwrap().clone()
+  }
+
+  fn widget_id(kind: &str, name: &str) -> String {
+    format!("widget-{}-{}", kind, name.replace(' ', "-"))
   }
 }
