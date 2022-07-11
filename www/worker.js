@@ -127,7 +127,6 @@ function cross() {
 //   let min = slider('min', -300, 0, 1, -100);
 //   let max = slider('max', -300, 0, 1, -30);
 //   decibelRange(min, max);
-//
 //   clear();
 //   await render();
 // }
