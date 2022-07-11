@@ -231,18 +231,6 @@ function __wbg_adapter_42(arg0, arg1) {
     wasm._dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hf0b930a88c678282(arg0, arg1);
 }
 
-function getArrayU8FromWasm0(ptr, len) {
-    return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
-}
-
-function handleError(f, args) {
-    try {
-        return f.apply(this, args);
-    } catch (e) {
-        wasm.__wbindgen_exn_store(addHeapObject(e));
-    }
-}
-
 let cachegetFloat32Memory0 = null;
 function getFloat32Memory0() {
     if (cachegetFloat32Memory0 === null || cachegetFloat32Memory0.buffer !== wasm.memory.buffer) {
@@ -253,6 +241,18 @@ function getFloat32Memory0() {
 
 function getArrayF32FromWasm0(ptr, len) {
     return getFloat32Memory0().subarray(ptr / 4, ptr / 4 + len);
+}
+
+function getArrayU8FromWasm0(ptr, len) {
+    return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
+}
+
+function handleError(f, args) {
+    try {
+        return f.apply(this, args);
+    } catch (e) {
+        wasm.__wbindgen_exn_store(addHeapObject(e));
+    }
 }
 
 async function load(module, imports) {
@@ -364,6 +364,9 @@ async function init(input) {
     imports.wbg.__wbg_blitFramebuffer_c72c74d695ed2ece = function(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10) {
         getObject(arg0).blitFramebuffer(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 >>> 0, arg10 >>> 0);
     };
+    imports.wbg.__wbg_clearBufferfv_23a50f05d21aad3f = function(arg0, arg1, arg2, arg3, arg4) {
+        getObject(arg0).clearBufferfv(arg1 >>> 0, arg2, getArrayF32FromWasm0(arg3, arg4));
+    };
     imports.wbg.__wbg_readPixels_9c8bebac43c776db = function() { return handleError(function (arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) {
         getObject(arg0).readPixels(arg1, arg2, arg3, arg4, arg5 >>> 0, arg6 >>> 0, arg7 === 0 ? undefined : getArrayU8FromWasm0(arg7, arg8));
     }, arguments) };
@@ -390,9 +393,6 @@ async function init(input) {
     };
     imports.wbg.__wbg_bindTexture_dbddb0b0c3efa1b9 = function(arg0, arg1, arg2) {
         getObject(arg0).bindTexture(arg1 >>> 0, getObject(arg2));
-    };
-    imports.wbg.__wbg_clear_a9fbec6b33c4e095 = function(arg0, arg1) {
-        getObject(arg0).clear(arg1 >>> 0);
     };
     imports.wbg.__wbg_compileShader_4940032085b41ed2 = function(arg0, arg1) {
         getObject(arg0).compileShader(getObject(arg1));
