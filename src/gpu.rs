@@ -322,6 +322,10 @@ impl Gpu {
       .gl
       .uniform1ui(Some(self.uniform("wrap")), filter.wrap as u32);
 
+    self
+      .gl
+      .uniform1ui(Some(self.uniform("coordinates")), filter.coordinates as u32);
+
     self.gl.uniform1ui(Some(self.uniform("mask")), filter.mask);
 
     self
