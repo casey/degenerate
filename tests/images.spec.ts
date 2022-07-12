@@ -6,12 +6,6 @@ import { exec } from './common';
 import { test, expect, Page } from '@playwright/test';
 
 // TODO:
-// later:
-// - set_decibel_range changes audio levels
-// - insert dummy time data and check output
-// - check all audio-reactive masks
-// - fix line numbers in WebGL shader errors
-//
 // - widgets:
 //   - calling widget function adds widget to page with correct values
 //     (check whole widget against html string)
@@ -19,6 +13,8 @@ import { test, expect, Page } from '@playwright/test';
 //   - worker gets updated widget value
 //
 // - use strongly typed widgets
+// - don't look up widgets in page
+// - refactor widget tests
 
 async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -164,6 +160,19 @@ test('elapsed', async ({ page }) => {
       }
     `
   );
+});
+
+test('slider', async ({ page }) => {
+  await run(
+    page,
+    `
+      slider('x', 0, 1, 0.1, 0.5);
+    `
+  );
+
+  let html = await page.$$eval('#widget-slider-x', element => element[0].outerHTML);
+
+  await expect(html).toBe('<label id="widget-slider-x">x<input type="range" min="0" max="1" step="0.1"><span>0.5</span></label>');
 });
 
 test('checkbox', async ({ page }) => {

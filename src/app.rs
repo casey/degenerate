@@ -445,24 +445,16 @@ impl App {
         if self.document.select_optional(&format!("#{id}"))?.is_none() {
           let aside = self.document.select("aside")?;
 
-          let div = self
-            .document
-            .create_element("div")
-            .map_err(JsValueError)?
-            .cast::<HtmlDivElement>()?;
-
-          aside.append_child(&div).map_err(JsValueError)?;
-
           let label = self
             .document
             .create_element("label")
             .map_err(JsValueError)?
             .cast::<HtmlLabelElement>()?;
 
-          label.set_html_for(&id);
+          label.set_id(&id);
           label.set_inner_text(&name);
 
-          div.append_child(&label).map_err(JsValueError)?;
+          aside.append_child(&label).map_err(JsValueError)?;
 
           let range = self
             .document
@@ -471,20 +463,19 @@ impl App {
             .cast::<HtmlInputElement>()?;
 
           range.set_type("range");
-          range.set_id(&id);
           range.set_min(&min.to_string());
           range.set_max(&max.to_string());
           range.set_value(&initial.to_string());
           range.set_step(&step.to_string());
 
-          div.append_child(&range).map_err(JsValueError)?;
+          label.append_child(&range).map_err(JsValueError)?;
 
           let current = self
             .document
             .create_element("span")
             .map_err(JsValueError)?
             .cast::<HtmlSpanElement>()?;
-          div.append_child(&current).map_err(JsValueError)?;
+          label.append_child(&current).map_err(JsValueError)?;
           current.set_inner_text(&initial.to_string());
 
           let local = range.clone();

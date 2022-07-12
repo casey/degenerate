@@ -26,3 +26,22 @@ pub(crate) enum WorkerMessage {
     step: f64,
   },
 }
+
+// enum WidgetNew {
+//   Checkbox,
+//   Slider {
+//     initial: f64,
+//     max: f64,
+//     min: f64,
+//     step: f64,
+//   },
+//   Radio {
+//     options: Vec<String>,
+//   },
+// }
+
+// enum WidgetInput {
+//   Checkbox(bool),
+//   Slider(f64),
+//   Radio(String),
+// }
