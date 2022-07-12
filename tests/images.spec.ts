@@ -7,10 +7,6 @@ const util = require('node:util');
 const execFile = util.promisify(require('node:child_process').execFile);
 
 // TODO:
-// - widgets:
-//   - calling widget twice doesn't add another widget
-//   - worker gets updated widget value
-//
 // - break tests into multiple .spec files
 // - use strongly typed widgets
 // - don't look up widgets in page
@@ -324,20 +320,17 @@ test('error', async ({ page }) => {
   await run(
     page,
     `
-      error('foo');
+      error('foobar');
     `
   );
 
-  await expect(await page.locator('samp > *')).toHaveText('foo');
+  await expect(await page.locator('samp > *')).toHaveText('foobar');
+
+  test.fail();
 });
 
 test('worker-error', async ({ page }) => {
-  await run(
-    page,
-    `
-      foo
-    `
-  );
+  await run(page, 'foo');
 
   await expect(await page.locator('samp > *')).toHaveText(
     'ReferenceError: foo is not defined'
