@@ -34,7 +34,7 @@ uniform vec3 default_color;
 
 out vec4 output_color;
 
-vec2 octant(vec2 position) {
+vec2 quadrant(vec2 position) {
   return (position + 1.0) / 2.0;
 }
 
@@ -43,11 +43,11 @@ vec3 octant(vec3 position) {
 }
 
 float audio_frequency_sample(vec2 position) {
-  return texture(audio_frequency, octant(position)).r;
+  return texture(audio_frequency, quadrant(position)).r;
 }
 
 float audio_time_domain_sample(vec2 position) {
-  return texture(audio_time_domain, octant(position)).r;
+  return texture(audio_time_domain, quadrant(position)).r;
 }
 
 bool masked(vec2 position, uvec2 pixel_position) {
@@ -62,7 +62,7 @@ bool masked(vec2 position, uvec2 pixel_position) {
     case MASK_CROSS:
       return abs(position.x) < 0.25 || abs(position.y) < 0.25;
     case MASK_EQUALIZER:
-      return octant(position).y < audio_frequency_sample(position);
+      return quadrant(position).y < audio_frequency_sample(position);
     case MASK_FREQUENCY:
       return abs(audio_frequency_sample(position)) > 0.125;
     case MASK_MOD:
@@ -101,15 +101,15 @@ void main() {
     : transformed;
 
   // Sample color if in-bounds, otherwise use default color
-  vec3 input_color = coordinates ? vec3(octant(wrapped), 0.0)
-    : abs(wrapped.x) <= 1.0 && abs(wrapped.y) <= 1.0 ? texture(source, octant(wrapped)).rgb
+  vec3 input_color = coordinates ? vec3(quadrant(wrapped), 0.0)
+    : abs(wrapped.x) <= 1.0 && abs(wrapped.y) <= 1.0 ? texture(source, quadrant(wrapped)).rgb
     : default_color;
 
   // Sample original color
   vec3 original_color = texture(source, gl_FragCoord.xy / resolution).rgb;
 
   // Calculate position in pixel coordinates, [0, resolution)
-  uvec2 pixel_position = uvec2(octant(wrapped) * resolution);
+  uvec2 pixel_position = uvec2(quadrant(wrapped) * resolution);
 
   // Convert color from [0,1] to [-1,-1]
   vec3 color_vector = input_color * 2.0 - 1.0;

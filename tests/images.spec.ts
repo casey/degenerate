@@ -6,7 +6,19 @@ import { exec } from './common';
 import { test, expect, Page } from '@playwright/test';
 
 // TODO:
-// - add tests
+// later:
+// - set_decibel_range changes audio levels
+// - insert dummy time data and check output
+// - check all audio-reactive masks
+// - fix line numbers in WebGL shader errors
+//
+// - widgets:
+//   - calling widget function adds widget to page with correct values
+//     (check whole widget against html string)
+//   - calling widget twice doesn't add another widget
+//   - worker gets updated widget value
+//
+// - use strongly typed widgets
 
 async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
