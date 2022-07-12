@@ -2,16 +2,16 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as png from 'fast-png';
 import axios from 'axios';
-import { exec } from './common';
 import { test, expect, Page } from '@playwright/test';
+const util = require('node:util');
+const execFile = util.promisify(require('node:child_process').execFile);
 
 // TODO:
 // - widgets:
-//   - calling widget function adds widget to page with correct values
-//     (check whole widget against html string)
 //   - calling widget twice doesn't add another widget
 //   - worker gets updated widget value
 //
+// - break tests into multiple .spec files
 // - use strongly typed widgets
 // - don't look up widgets in page
 // - refactor widget tests
@@ -36,6 +36,11 @@ async function run(page, program) {
   await page.keyboard.down('Shift');
   await page.keyboard.press('Enter');
   await page.waitForSelector('html.done');
+
+  let messages = await page.locator('samp > *');
+  let count = await messages.count();
+
+  await expect(count).toBe(0);
 }
 
 test.beforeAll(async () => {
@@ -85,13 +90,11 @@ function imageTest(name, program) {
       await fs.promises.writeFile(destination, encoded);
 
       if (process.platform === 'darwin') {
-        await exec(`
-          xattr \
-          -wx \
-          com.apple.FinderInfo \
-          0000000000000000000C00000000000000000000000000000000000000000000 \
-          ${destination}
-        `);
+        await execFile('xattr', [
+          '-wx', 'com.apple.FinderInfo',
+          '0000000000000000000C00000000000000000000000000000000000000000000',
+          destination,
+        ]);
       }
 
       if (missing) {
@@ -162,17 +165,27 @@ test('elapsed', async ({ page }) => {
   );
 });
 
+async function outerHTML(page, selector) {
+  return await page.$$eval(selector, elements => elements[0].outerHTML);
+}
+
 test('slider', async ({ page }) => {
-  await run(
-    page,
-    `
-      slider('x', 0, 1, 0.1, 0.5);
-    `
-  );
+  let id = '#widget-slider-x';
 
-  let html = await page.$$eval('#widget-slider-x', element => element[0].outerHTML);
+  await run(page, `slider('x', 0, 1, 0.1, 0.5);`);
 
-  await expect(html).toBe('<label id="widget-slider-x">x<input type="range" min="0" max="1" step="0.1"><span>0.5</span></label>');
+  await expect(await outerHTML(page, id))
+    .toBe('<label id="widget-slider-x">x<input type="range" min="0" max="1" step="0.1" value="0.5"><span>0.5</span></label>');
+
+  await run(page, `slider('x', 0, 1, 0.1, 0.5);`);
+
+  await expect(await page.locator(id).count()).toBe(1);
+
+  await run(page, 'if (slider("x", 0, 1, 0.1, 0.5) !== 0.5) { error("expected 0.5"); }');
+
+  await page.fill(id, '0.2')
+
+  await run(page, 'if (slider("x", 0, 1, 0.1, 0.5) !== 0.2) { error("expected 0.2"); }');
 });
 
 test('checkbox', async ({ page }) => {

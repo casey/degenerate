@@ -465,8 +465,8 @@ impl App {
           range.set_type("range");
           range.set_min(&min.to_string());
           range.set_max(&max.to_string());
-          range.set_value(&initial.to_string());
           range.set_step(&step.to_string());
+          range.set_default_value(&initial.to_string());
 
           label.append_child(&range).map_err(JsValueError)?;
 
