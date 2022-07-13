@@ -51,7 +51,7 @@ test.beforeEach(async ({ page }) => {
     throw error;
   });
   page.on('console', (message) => {
-    if (process.env.VERBOSE) {
+    if (process.env.VERBOSE || message.type() == 'error') {
       console.log(message);
     }
   });
