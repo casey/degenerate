@@ -3,21 +3,22 @@ use super::*;
 pub(crate) struct App {
   analyser_node: AnalyserNode,
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
+  aside: HtmlElement,
   audio_context: AudioContext,
   button: HtmlButtonElement,
   document: Document,
   gpu: Gpu,
   html: HtmlElement,
   nav: HtmlElement,
-  oscillator_node: OscillatorNode,
   oscillator_gain_node: GainNode,
+  oscillator_node: OscillatorNode,
+  recording: bool,
   select: HtmlSelectElement,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
   this: Option<Arc<Mutex<Self>>>,
   window: Window,
   worker: Worker,
-  recording: bool,
 }
 
 lazy_static! {
@@ -105,6 +106,7 @@ impl App {
     let app = Arc::new(Mutex::new(Self {
       analyser_node,
       animation_frame_callback: None,
+      aside: document.select("aside")?.cast::<HtmlElement>()?,
       audio_context,
       button: button.clone(),
       document,
@@ -242,60 +244,6 @@ impl App {
     )?;
 
     match event {
-      WorkerMessage::Checkbox(name) => {
-        let id = Self::widget_id("checkbox", &name);
-
-        if self.document.select_optional(&format!("#{id}"))?.is_none() {
-          let aside = self.document.select("aside")?;
-
-          let div = self
-            .document
-            .create_element("div")
-            .map_err(JsValueError)?
-            .cast::<HtmlDivElement>()?;
-
-          aside.append_child(&div).map_err(JsValueError)?;
-
-          let label = self
-            .document
-            .create_element("label")
-            .map_err(JsValueError)?
-            .cast::<HtmlLabelElement>()?;
-
-          label.set_html_for(&id);
-          label.set_inner_text(&name);
-
-          div.append_child(&label).map_err(JsValueError)?;
-
-          let checkbox = self
-            .document
-            .create_element("input")
-            .map_err(JsValueError)?
-            .cast::<HtmlInputElement>()?;
-
-          checkbox.set_type("checkbox");
-          checkbox.set_id(&id);
-
-          div.append_child(&checkbox).map_err(JsValueError)?;
-
-          let local = checkbox.clone();
-          let worker = self.worker.clone();
-          let stderr = self.stderr.clone();
-          checkbox.add_event_listener("input", move || {
-            stderr.update(|| -> Result {
-              worker
-                .post_message(&JsValue::from_str(&serde_json::to_string(
-                  &AppMessage::Checkbox {
-                    name: &name,
-                    value: local.checked(),
-                  },
-                )?))
-                .map_err(JsValueError)?;
-              Ok(())
-            }())
-          })?;
-        }
-      }
       WorkerMessage::Clear => {
         self.gpu.clear()?;
       }
@@ -313,80 +261,6 @@ impl App {
       }
       WorkerMessage::OscillatorGain(gain) => {
         self.oscillator_gain_node.gain().set_value(gain);
-      }
-      WorkerMessage::Radio(name, options) => {
-        let id = Self::widget_id("radio", &name);
-
-        if self.document.select_optional(&format!("#{id}"))?.is_none() {
-          let aside = self.document.select("aside")?;
-
-          let div = self
-            .document
-            .create_element("div")
-            .map_err(JsValueError)?
-            .cast::<HtmlDivElement>()?;
-
-          div.set_id(&id);
-
-          aside.append_child(&div).map_err(JsValueError)?;
-
-          let label = self
-            .document
-            .create_element("label")
-            .map_err(JsValueError)?
-            .cast::<HtmlLabelElement>()?;
-
-          label.set_html_for(&id);
-          label.set_inner_text(&format!("{} ", name));
-
-          div.append_child(&label).map_err(JsValueError)?;
-
-          for (i, option) in options.iter().enumerate() {
-            let label = self
-              .document
-              .create_element("label")
-              .map_err(JsValueError)?
-              .cast::<HtmlLabelElement>()?;
-
-            label.set_html_for(option);
-            label.set_inner_text(option);
-
-            let radio = self
-              .document
-              .create_element("input")
-              .map_err(JsValueError)?
-              .cast::<HtmlInputElement>()?;
-
-            radio.set_id(&format!("{}-{}", id, option));
-            radio.set_name(&id);
-            radio.set_type("radio");
-
-            div.append_child(&label).map_err(JsValueError)?;
-            div.append_child(&radio).map_err(JsValueError)?;
-
-            let name = name.clone();
-            let option = option.clone();
-            let worker = self.worker.clone();
-            let stderr = self.stderr.clone();
-            radio.add_event_listener("input", move || {
-              stderr.update(|| -> Result {
-                worker
-                  .post_message(&JsValue::from_str(&serde_json::to_string(
-                    &AppMessage::Radio {
-                      name: &name,
-                      value: &option,
-                    },
-                  )?))
-                  .map_err(JsValueError)?;
-                Ok(())
-              }())
-            })?;
-
-            if i == 0 {
-              radio.set_checked(true);
-            }
-          }
-        }
       }
       WorkerMessage::Record => {
         if !self.recording {
@@ -433,17 +307,11 @@ impl App {
         a.set_href(&href);
         a.click();
       }
-      WorkerMessage::Slider {
-        name,
-        min,
-        max,
-        initial,
-        step,
-      } => {
-        let id = Self::widget_id("slider", &name);
+      WorkerMessage::Widget { name, widget } => {
+        let id = widget.id(&name);
 
-        if self.document.select_optional(&format!("#{id}"))?.is_none() {
-          let aside = self.document.select("aside")?;
+        if self.document.get_element_by_id(&id).is_none() {
+          let key = widget.key(&name);
 
           let label = self
             .document
@@ -454,48 +322,131 @@ impl App {
           label.set_id(&id);
           label.set_inner_text(&name);
 
-          aside.append_child(&label).map_err(JsValueError)?;
+          self.aside.append_child(&label).map_err(JsValueError)?;
 
-          let range = self
-            .document
-            .create_element("input")
-            .map_err(JsValueError)?
-            .cast::<HtmlInputElement>()?;
+          match widget {
+            Widget::Checkbox => {
+              let checkbox = self
+                .document
+                .create_element("input")
+                .map_err(JsValueError)?
+                .cast::<HtmlInputElement>()?;
 
-          range.set_type("range");
-          range.set_min(&min.to_string());
-          range.set_max(&max.to_string());
-          range.set_step(&step.to_string());
-          range.set_default_value(&initial.to_string());
+              checkbox.set_type("checkbox");
 
-          label.append_child(&range).map_err(JsValueError)?;
+              label.append_child(&checkbox).map_err(JsValueError)?;
 
-          let current = self
-            .document
-            .create_element("span")
-            .map_err(JsValueError)?
-            .cast::<HtmlSpanElement>()?;
-          label.append_child(&current).map_err(JsValueError)?;
-          current.set_inner_text(&initial.to_string());
+              let local = checkbox.clone();
+              let worker = self.worker.clone();
+              let stderr = self.stderr.clone();
+              checkbox.add_event_listener("input", move || {
+                stderr.update(|| -> Result {
+                  worker
+                    .post_message(&JsValue::from_str(&serde_json::to_string(
+                      &AppMessage::Widget {
+                        key: &key,
+                        value: serde_json::Value::Bool(local.checked()),
+                      },
+                    )?))
+                    .map_err(JsValueError)?;
+                  Ok(())
+                }())
+              })?;
+            }
+            Widget::Radio { options } => {
+              for (i, option) in options.iter().enumerate() {
+                let option_label = self
+                  .document
+                  .create_element("label")
+                  .map_err(JsValueError)?
+                  .cast::<HtmlLabelElement>()?;
 
-          let local = range.clone();
-          let worker = self.worker.clone();
-          let stderr = self.stderr.clone();
-          range.add_event_listener("input", move || {
-            stderr.update(|| -> Result {
-              let value = local.value();
-              current.set_inner_text(&value);
-              worker
-                .post_message(&JsValue::from_str(&serde_json::to_string(
-                  &AppMessage::Slider {
-                    name: &name,
-                    value: value.parse()?,
-                  },
-                )?))
-                .map_err(JsValueError)?;
-              Ok(())
-            }())
-          })?;
+                option_label.set_html_for(option);
+                option_label.set_inner_text(option);
+                label.append_child(&option_label).map_err(JsValueError)?;
+
+                let radio = self
+                  .document
+                  .create_element("input")
+                  .map_err(JsValueError)?
+                  .cast::<HtmlInputElement>()?;
+
+                radio.set_id(&format!("{}-{}", id, option));
+                radio.set_name(&id);
+                radio.set_type("radio");
+                option_label.append_child(&radio).map_err(JsValueError)?;
+
+                let option = option.clone();
+                let worker = self.worker.clone();
+                let key = key.clone();
+                let stderr = self.stderr.clone();
+                radio.add_event_listener("input", move || {
+                  stderr.update(|| -> Result {
+                    worker
+                      .post_message(&JsValue::from_str(&serde_json::to_string(
+                        &AppMessage::Widget {
+                          key: &key,
+                          value: serde_json::Value::String(option.clone()),
+                        },
+                      )?))
+                      .map_err(JsValueError)?;
+                    Ok(())
+                  }())
+                })?;
+
+                if i == 0 {
+                  radio.set_checked(true);
+                }
+              }
+            }
+            Widget::Slider {
+              min,
+              max,
+              step,
+              initial,
+            } => {
+              let range = self
+                .document
+                .create_element("input")
+                .map_err(JsValueError)?
+                .cast::<HtmlInputElement>()?;
+
+              range.set_type("range");
+              range.set_min(&min.to_string());
+              range.set_max(&max.to_string());
+              range.set_step(&step.to_string());
+              range.set_default_value(&initial.to_string());
+
+              label.append_child(&range).map_err(JsValueError)?;
+
+              let current = self
+                .document
+                .create_element("span")
+                .map_err(JsValueError)?
+                .cast::<HtmlSpanElement>()?;
+              label.append_child(&current).map_err(JsValueError)?;
+              current.set_inner_text(&initial.to_string());
+
+              let local = range.clone();
+              let worker = self.worker.clone();
+              let stderr = self.stderr.clone();
+              range.add_event_listener("input", move || {
+                stderr.update(|| -> Result {
+                  let value = local.value();
+                  current.set_inner_text(&value);
+                  worker
+                    .post_message(&JsValue::from_str(&serde_json::to_string(
+                      &AppMessage::Widget {
+                        key: &key,
+                        value: serde_json::Value::Number(value.parse()?),
+                      },
+                    )?))
+                    .map_err(JsValueError)?;
+                  Ok(())
+                }())
+              })?;
+            }
+          }
         }
       }
     }
@@ -557,9 +508,5 @@ impl App {
 
   fn this(&self) -> Arc<Mutex<Self>> {
     self.this.as_ref().unwrap().clone()
-  }
-
-  fn widget_id(kind: &str, name: &str) -> String {
-    format!("widget-{}-{}", kind, name.replace(' ', "-"))
   }
 }

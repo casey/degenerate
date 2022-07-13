@@ -28,6 +28,7 @@ use {
     WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
     WebGlUniformLocation, Window, Worker,
   },
+  widget::Widget,
 };
 
 type Error = Box<dyn std::error::Error>;
@@ -43,6 +44,7 @@ mod gpu;
 mod js_value_error;
 mod select;
 mod stderr;
+mod widget;
 mod window;
 mod worker_message;
 

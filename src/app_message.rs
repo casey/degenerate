@@ -4,9 +4,10 @@ use super::*;
 #[serde(rename_all = "camelCase")]
 #[serde(tag = "tag", content = "content")]
 pub(crate) enum AppMessage<'a> {
-  Checkbox { name: &'a str, value: bool },
   Frame,
-  Radio { name: &'a str, value: &'a str },
   Script(&'a str),
-  Slider { name: &'a str, value: f64 },
+  Widget {
+    key: &'a str,
+    value: serde_json::Value,
+  },
 }

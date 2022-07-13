@@ -15,14 +15,20 @@ export default async function () {
 
   await execFile('cargo', ['build', '--target', 'wasm32-unknown-unknown']);
 
-  await execFile('wasm-bindgen', [
-    '--target', 'web',
-    '--no-typescript',
-    '--out-dir', 'www',
-    'target/wasm32-unknown-unknown/debug/degenerate.wasm',
-  ], {
-    cwd: '..'
-  });
+  await execFile(
+    'wasm-bindgen',
+    [
+      '--target',
+      'web',
+      '--no-typescript',
+      '--out-dir',
+      'www',
+      'target/wasm32-unknown-unknown/debug/degenerate.wasm',
+    ],
+    {
+      cwd: '..',
+    }
+  );
 
   const app = express();
   app.use(express.static('../www'));

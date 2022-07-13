@@ -69,8 +69,13 @@ function check() {
 // }
 // ```
 function checkbox(name) {
-  self.postMessage(JSON.stringify({ checkbox: name }));
-  return !!widgets['widget-checkbox-' + name];
+  self.postMessage(JSON.stringify({
+    widget: {
+      name,
+      widget: 'checkbox',
+    }
+  }))
+  return !!widgets['checkbox-' + name];
 }
 
 // Mask pixels within a circle.
@@ -340,8 +345,15 @@ function oscillatorFrequency(hz) {
 // }
 // ```
 function radio(name, options) {
-  self.postMessage(JSON.stringify({ radio: [name, options] }))
-  return widgets['widget-radio-' + name] ?? options[0];
+  self.postMessage(JSON.stringify({
+    widget: {
+      name,
+      widget: {
+        radio: {options},
+      },
+    }
+  }))
+  return widgets['radio-' + name] ?? options[0];
 }
 
 // Yield values in the half-open range `[0,iterations)`.
@@ -529,15 +541,19 @@ function sleep(ms) {
 // ```
 function slider(name, min, max, step, initial) {
   self.postMessage(JSON.stringify({
-    slider: {
+    widget: {
       name,
-      min: min ?? 0,
-      max: max ?? 1,
-      step: step ?? 0.001,
-      initial: initial ?? min ?? 0,
+      widget: {
+        slider: {
+          min: min ?? 0,
+          max: max ?? 1,
+          step: step ?? 0.001,
+          initial: initial ?? min ?? 0,
+        },
+      },
   }
   }))
-  return widgets['widget-slider-' + name] ?? initial;
+  return widgets['slider-' + name] ?? initial;
 }
 
 // Mask pixels within a square.
@@ -670,24 +686,6 @@ self.addEventListener('message', async function (event) {
   const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
   const message = JSON.parse(event.data);
   switch (message.tag) {
-    case 'checkbox':
-      widgets['widget-checkbox-' + message.content.name] = message.content.value;
-      break;
-    case 'radio':
-      widgets['widget-radio-' + message.content.name] = message.content.value;
-      break;
-    case 'script':
-      frameCallbacks = [];
-      try {
-        await new AsyncFunction(message.content)();
-      } catch (error) {
-        self.postMessage(JSON.stringify({'error': error.toString()}));
-      }
-      self.postMessage(JSON.stringify('done'));
-      break;
-    case 'slider':
-      widgets['widget-slider-' + message.content.name] = message.content.value;
-      break;
     case 'frame':
       for (let callback of frameCallbacks) {
         callback();
@@ -698,6 +696,18 @@ self.addEventListener('message', async function (event) {
         lastDelta = now - lastFrame;
       }
       lastFrame = now;
+      break;
+    case 'script':
+      frameCallbacks = [];
+      try {
+        await new AsyncFunction(message.content)();
+      } catch (error) {
+        self.postMessage(JSON.stringify({'error': error.toString()}));
+      }
+      self.postMessage(JSON.stringify('done'));
+      break;
+    case 'widget':
+      widgets[message.content.key] = message.content.value;
       break;
   }
 });

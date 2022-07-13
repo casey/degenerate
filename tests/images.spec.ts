@@ -6,12 +6,6 @@ import { test, expect, Page } from '@playwright/test';
 const util = require('node:util');
 const execFile = util.promisify(require('node:child_process').execFile);
 
-// TODO:
-// - break tests into multiple .spec files
-// - use strongly typed widgets
-// - don't look up widgets in page
-// - refactor widget tests
-
 async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -57,7 +51,17 @@ test.beforeEach(async ({ page }) => {
     throw error;
   });
   page.on('console', (message) => {
-    if (process.env.VERBOSE || message.type() == 'error') console.log(message);
+    switch (message.type()) {
+      case 'error':
+        console.error(message);
+      case 'assert':
+        throw message;
+        break;
+      default:
+        if (process.env.VERBOSE) {
+          console.log(message);
+        }
+    }
   });
   await page.waitForSelector('html.ready');
 });
@@ -87,7 +91,8 @@ function imageTest(name, program) {
 
       if (process.platform === 'darwin') {
         await execFile('xattr', [
-          '-wx', 'com.apple.FinderInfo',
+          '-wx',
+          'com.apple.FinderInfo',
           '0000000000000000000C00000000000000000000000000000000000000000000',
           destination,
         ]);
@@ -162,7 +167,7 @@ test('elapsed', async ({ page }) => {
 });
 
 async function outerHTML(page, selector) {
-  return await page.$$eval(selector, elements => elements[0].outerHTML);
+  return await page.$$eval(selector, (elements) => elements[0].outerHTML);
 }
 
 test('slider', async ({ page }) => {
@@ -170,18 +175,19 @@ test('slider', async ({ page }) => {
 
   await run(page, `slider('x', 0, 1, 0.1, 0.5);`);
 
-  await expect(await outerHTML(page, id))
-    .toBe('<label id="widget-slider-x">x<input type="range" min="0" max="1" step="0.1" value="0.5"><span>0.5</span></label>');
+  await expect(await outerHTML(page, id)).toBe(
+    '<label id="widget-slider-x">x<input type="range" min="0" max="1" step="0.1" value="0.5"><span>0.5</span></label>'
+  );
 
   await run(page, `slider('x', 0, 1, 0.1, 0.5);`);
 
   await expect(await page.locator(id).count()).toBe(1);
 
-  await run(page, 'if (slider("x", 0, 1, 0.1, 0.5) !== 0.5) { error("expected 0.5"); }');
+  await run(page, 'console.assert(slider("x", 0, 1, 0.1, 0.5) === 0.5, "expected 0.5")');
 
-  await page.fill(id, '0.2')
+  await page.fill(id, '0.2');
 
-  await run(page, 'if (slider("x", 0, 1, 0.1, 0.5) !== 0.2) { error("expected 0.2"); }');
+  await run(page, 'console.assert(slider("x", 0, 1, 0.1, 0.5) === 0.2, "expected 0.2")');
 });
 
 test('checkbox', async ({ page }) => {
@@ -314,6 +320,11 @@ test('run', async ({ page }) => {
 
   let on = png.decode(await imageBuffer(page)).data;
   await expect(on[0]).toEqual(255);
+});
+
+test('assert', async ({ page }) => {
+  await run(page, 'console.assert(false)');
+  test.fail();
 });
 
 test('error', async ({ page }) => {
