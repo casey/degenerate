@@ -54,6 +54,7 @@ test.beforeEach(async ({ page }) => {
     switch (message.type()) {
       case 'error':
         console.error(message);
+        break;
       case 'assert':
         throw message;
         break;
@@ -322,28 +323,34 @@ test('run', async ({ page }) => {
   await expect(on[0]).toEqual(255);
 });
 
-test('assert', async ({ page }) => {
+test('assert-fail', async ({ page }) => {
+  test.fail();
   await run(page, 'console.assert(false)');
-  test.fail();
 });
 
-test('error', async ({ page }) => {
-  await run(
-    page,
-    `
-      error('foobar');
-    `
-  );
-
+test('error-fail', async ({ page }) => {
+  test.fail();
+  await run(page, "error('foobar')");
   await expect(await page.locator('samp > *')).toHaveText('foobar');
-
-  test.fail();
 });
 
-test('worker-error', async ({ page }) => {
-  await run(page, 'foo');
+test('error-samp', async ({ page }) => {
+  try {
+    await run(page, "error('foobar')");
+  } catch {
+  }
+  await expect(await page.locator('samp > *')).toHaveText('foobar');
+});
 
-  await expect(await page.locator('samp > *')).toHaveText(
-    'ReferenceError: foo is not defined'
-  );
+test('js-error-fail', async ({ page }) => {
+  test.fail();
+  await run(page, 'foo');
+});
+
+test('js-error-samp', async ({ page }) => {
+  try {
+    await run(page, 'foo');
+  } catch {
+  }
+  await expect(await page.locator('samp > *')).toHaveText('ReferenceError: foo is not defined');
 });
