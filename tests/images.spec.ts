@@ -323,14 +323,16 @@ test('run', async ({ page }) => {
   await expect(on[0]).toEqual(255);
 });
 
-test('assert-fail', async ({ page }) => {
-  test.fail();
+test.skip('assert-fail', async ({ page }) => {
   await run(page, 'console.assert(false)');
 });
 
-test('error-fail', async ({ page }) => {
-  test.fail();
+test.skip('error-fail', async ({ page }) => {
   await run(page, "error('foobar')");
+});
+
+test.skip('js-error-fail', async ({ page }) => {
+  await run(page, 'foo');
 });
 
 test('error-samp', async ({ page }) => {
@@ -339,11 +341,6 @@ test('error-samp', async ({ page }) => {
   } catch {
   }
   await expect(await page.locator('samp > *')).toHaveText('foobar');
-});
-
-test('js-error-fail', async ({ page }) => {
-  test.fail();
-  await run(page, 'foo');
 });
 
 test('js-error-samp', async ({ page }) => {
