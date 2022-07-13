@@ -51,17 +51,8 @@ test.beforeEach(async ({ page }) => {
     throw error;
   });
   page.on('console', (message) => {
-    switch (message.type()) {
-      case 'error':
-        console.error(message);
-        break;
-      case 'assert':
-        throw message;
-        break;
-      default:
-        if (process.env.VERBOSE) {
-          console.log(message);
-        }
+    if (process.env.VERBOSE) {
+      console.log(message);
     }
   });
   await page.waitForSelector('html.ready');
@@ -323,21 +314,24 @@ test('run', async ({ page }) => {
   await expect(on[0]).toEqual(255);
 });
 
-test.skip('assert-fail', async ({ page }) => {
-  await run(page, 'console.assert(false)');
+test('assert-fail', async ({ page }) => {
+  test.fail();
+  await run(page, 'assert(false)');
 });
 
-test.skip('error-fail', async ({ page }) => {
-  await run(page, "error('foobar')");
+test('throw-fail', async ({ page }) => {
+  test.fail();
+  await run(page, "throw 'foobar'");
 });
 
-test.skip('js-error-fail', async ({ page }) => {
+test('js-error-fail', async ({ page }) => {
+  test.fail();
   await run(page, 'foo');
 });
 
-test('error-samp', async ({ page }) => {
+test('throw-samp', async ({ page }) => {
   try {
-    await run(page, "error('foobar')");
+    await run(page, "throw 'foobar'");
   } catch {
   }
   await expect(await page.locator('samp > *')).toHaveText('foobar');

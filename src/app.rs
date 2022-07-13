@@ -167,6 +167,10 @@ impl App {
       app.stderr.update(result);
     })?;
 
+    worker.add_event_listener_with_event("error", move |event: MessageEvent| {
+      panic!();
+    })?;
+
     let local = app.clone();
     button.add_event_listener("click", move || {
       let mut app = local.lock().unwrap();

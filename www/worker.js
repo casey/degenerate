@@ -43,6 +43,13 @@ function alpha(alpha) {
   filter.alpha = alpha;
 }
 
+// Assert that `condition` is true, otherwise throw `message`.
+function assert(condition, message) {
+  if (!condition) {
+    throw message ?? "assertion failed";
+  }
+}
+
 // Mask pixels in a checkerboard pattern.
 //
 // ```
@@ -196,15 +203,6 @@ function elapsed() {
 // ```
 function equalizer() {
   filter.mask = MASK_EQUALIZER;
-}
-
-// Display an error message in the console at the bottom of the page.
-//
-// ```
-// error('foo');
-// ```
-function error(error) {
-  self.postMessage(JSON.stringify({error}));
 }
 
 // Returns a promise that resolves when the browser is ready to display a new
