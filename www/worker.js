@@ -81,7 +81,7 @@ function checkbox(name) {
       name,
       widget: 'checkbox',
     }
-  }))
+  }));
   return !!widgets['checkbox-' + name];
 }
 
@@ -350,7 +350,7 @@ function radio(name, options) {
         radio: {options},
       },
     }
-  }))
+  }));
   return widgets['radio-' + name] ?? options[0];
 }
 
