@@ -16,7 +16,7 @@ clippy:
   cargo clippy --target wasm32-unknown-unknown
 
 fmt:
-  prettier --write tests features
+  prettier --write tests features www/{worker.js,index.js}
   cargo fmt --all
 
 fmt-check:

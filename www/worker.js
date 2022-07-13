@@ -2,7 +2,7 @@
 
 importScripts('gl-matrix-min.js', 'randchacha_browser.min.js');
 
-glMatrix.glMatrix.setMatrixArrayType(Array)
+glMatrix.glMatrix.setMatrixArrayType(Array);
 
 let mat2 = glMatrix.mat2;
 let mat2d = glMatrix.mat2d;
@@ -46,7 +46,7 @@ function alpha(alpha) {
 // Assert that `condition` is true, otherwise throw `message`.
 function assert(condition, message) {
   if (!condition) {
-    throw message ?? "assertion failed";
+    throw message ?? 'assertion failed';
   }
 }
 
@@ -76,12 +76,14 @@ function check() {
 // }
 // ```
 function checkbox(name) {
-  self.postMessage(JSON.stringify({
-    widget: {
-      name,
-      widget: 'checkbox',
-    }
-  }));
+  self.postMessage(
+    JSON.stringify({
+      widget: {
+        name,
+        widget: 'checkbox',
+      },
+    })
+  );
   return !!widgets['checkbox-' + name];
 }
 
@@ -144,7 +146,7 @@ function cross() {
 // }
 // ```
 function decibelRange(min, max) {
-  self.postMessage(JSON.stringify({'decibelRange': {min, max}}));
+  self.postMessage(JSON.stringify({ decibelRange: { min, max } }));
 }
 
 // Set the default color. The default color is returned whenever a pixel is sampled
@@ -301,7 +303,7 @@ function mod(divisor, remainder) {
 // }
 // ```
 function oscillatorGain(gain) {
-  self.postMessage(JSON.stringify({'oscillatorGain': gain}));
+  self.postMessage(JSON.stringify({ oscillatorGain: gain }));
 }
 
 // Set the oscillator frequency to `hz` hertz. The oscillator produces a sine wave tone,
@@ -317,7 +319,7 @@ function oscillatorGain(gain) {
 // }
 // ```
 function oscillatorFrequency(hz) {
-  self.postMessage(JSON.stringify({'oscillatorFrequency': hz}));
+  self.postMessage(JSON.stringify({ oscillatorFrequency: hz }));
 }
 
 // Create a new radio button widget with the label `name` and options `options`,
@@ -343,14 +345,16 @@ function oscillatorFrequency(hz) {
 // }
 // ```
 function radio(name, options) {
-  self.postMessage(JSON.stringify({
-    widget: {
-      name,
+  self.postMessage(
+    JSON.stringify({
       widget: {
-        radio: {options},
+        name,
+        widget: {
+          radio: { options },
+        },
       },
-    }
-  }));
+    })
+  );
   return widgets['radio-' + name] ?? options[0];
 }
 
@@ -522,7 +526,7 @@ function scale(scale) {
 // render();
 // ```
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // Create a new slider widget with the given `name`, `min`, `max`, `step`, and
@@ -538,19 +542,21 @@ function sleep(ms) {
 // }
 // ```
 function slider(name, min, max, step, initial) {
-  self.postMessage(JSON.stringify({
-    widget: {
-      name,
+  self.postMessage(
+    JSON.stringify({
       widget: {
-        slider: {
-          min: min ?? 0,
-          max: max ?? 1,
-          step: step ?? 0.001,
-          initial: initial ?? min ?? 0,
+        name,
+        widget: {
+          slider: {
+            min: min ?? 0,
+            max: max ?? 1,
+            step: step ?? 0.001,
+            initial: initial ?? min ?? 0,
+          },
         },
       },
-  }
-  }))
+    })
+  );
   return widgets['slider-' + name] ?? initial;
 }
 
@@ -658,7 +664,10 @@ class Rng {
 class Filter {
   constructor() {
     this.alpha = 1.0;
-    this.colorTransform = mat4.fromScaling(mat4.create(), vec3.fromValues(-1, -1, -1));
+    this.colorTransform = mat4.fromScaling(
+      mat4.create(),
+      vec3.fromValues(-1, -1, -1)
+    );
     this.defaultColor = [0.0, 0.0, 0.0];
     this.coordinates = false;
     this.mask = MASK_ALL;
@@ -700,7 +709,7 @@ self.addEventListener('message', async function (event) {
       try {
         await new AsyncFunction(message.content)();
       } catch (error) {
-        self.postMessage(JSON.stringify({'error': error.toString()}));
+        self.postMessage(JSON.stringify({ error: error.toString() }));
       }
       self.postMessage(JSON.stringify('done'));
       break;
