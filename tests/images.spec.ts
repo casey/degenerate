@@ -331,7 +331,6 @@ test('assert-fail', async ({ page }) => {
 test('error-fail', async ({ page }) => {
   test.fail();
   await run(page, "error('foobar')");
-  await expect(await page.locator('samp > *')).toHaveText('foobar');
 });
 
 test('error-samp', async ({ page }) => {
