@@ -1,3 +1,5 @@
+set positional-arguments
+
 bt := '0'
 
 export RUST_BACKTRACE := bt
@@ -8,13 +10,13 @@ build:
   cargo build
 
 test *args:
-  cd tests && npx playwright test --project=chromium --retries=0 {{args}}
+  cd tests && npx playwright test --project=chromium --retries=0 "$@"
 
 clippy:
   cargo clippy --target wasm32-unknown-unknown
 
 fmt:
-  prettier --write tests
+  prettier --write tests features www/{worker.js,index.js}
   cargo fmt --all
 
 fmt-check:

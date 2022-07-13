@@ -2,8 +2,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as png from 'fast-png';
 import axios from 'axios';
-import { exec } from './common';
 import { test, expect, Page } from '@playwright/test';
+const util = require('node:util');
+const execFile = util.promisify(require('node:child_process').execFile);
 
 async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -25,6 +26,11 @@ async function run(page, program) {
   await page.keyboard.down('Shift');
   await page.keyboard.press('Enter');
   await page.waitForSelector('html.done');
+
+  let messages = await page.locator('samp > *');
+  let count = await messages.count();
+
+  await expect(count).toBe(0);
 }
 
 test.beforeAll(async () => {
@@ -45,7 +51,9 @@ test.beforeEach(async ({ page }) => {
     throw error;
   });
   page.on('console', (message) => {
-    if (process.env.VERBOSE || message.type() == 'error') console.log(message);
+    if (process.env.VERBOSE || message.type() == 'error') {
+      console.log(message);
+    }
   });
   await page.waitForSelector('html.ready');
 });
@@ -74,13 +82,12 @@ function imageTest(name, program) {
       await fs.promises.writeFile(destination, encoded);
 
       if (process.platform === 'darwin') {
-        await exec(`
-          xattr \
-          -wx \
-          com.apple.FinderInfo \
-          0000000000000000000C00000000000000000000000000000000000000000000 \
-          ${destination}
-        `);
+        await execFile('xattr', [
+          '-wx',
+          'com.apple.FinderInfo',
+          '0000000000000000000C00000000000000000000000000000000000000000000',
+          destination,
+        ]);
       }
 
       if (missing) {
@@ -148,6 +155,36 @@ test('elapsed', async ({ page }) => {
         throw "Arrow of time is broken!";
       }
     `
+  );
+});
+
+async function outerHTML(page, selector) {
+  return await page.$$eval(selector, (elements) => elements[0].outerHTML);
+}
+
+test('slider', async ({ page }) => {
+  let id = '#widget-slider-x';
+
+  await run(page, `slider('x', 0, 1, 0.1, 0.5);`);
+
+  await expect(await outerHTML(page, id)).toBe(
+    '<label id="widget-slider-x">x<input type="range" min="0" max="1" step="0.1" value="0.5"><span>0.5</span></label>'
+  );
+
+  await run(page, `slider('x', 0, 1, 0.1, 0.5);`);
+
+  await expect(await page.locator(id).count()).toBe(1);
+
+  await run(
+    page,
+    'console.assert(slider("x", 0, 1, 0.1, 0.5) === 0.5, "expected 0.5")'
+  );
+
+  await page.fill(id, '0.2');
+
+  await run(
+    page,
+    'console.assert(slider("x", 0, 1, 0.1, 0.5) === 0.2, "expected 0.2")'
   );
 });
 
@@ -283,25 +320,32 @@ test('run', async ({ page }) => {
   await expect(on[0]).toEqual(255);
 });
 
-test('error', async ({ page }) => {
-  await run(
-    page,
-    `
-      error('foo');
-    `
-  );
-
-  await expect(await page.locator('samp > *')).toHaveText('foo');
+test('assert-fail', async ({ page }) => {
+  test.fail();
+  await run(page, 'assert(false)');
 });
 
-test('worker-error', async ({ page }) => {
-  await run(
-    page,
-    `
-      foo
-    `
-  );
+test('throw-fail', async ({ page }) => {
+  test.fail();
+  await run(page, "throw 'foobar'");
+});
 
+test('js-error-fail', async ({ page }) => {
+  test.fail();
+  await run(page, 'foo');
+});
+
+test('throw-samp', async ({ page }) => {
+  try {
+    await run(page, "throw 'foobar'");
+  } catch {}
+  await expect(await page.locator('samp > *')).toHaveText('foobar');
+});
+
+test('js-error-samp', async ({ page }) => {
+  try {
+    await run(page, 'foo');
+  } catch {}
   await expect(await page.locator('samp > *')).toHaveText(
     'ReferenceError: foo is not defined'
   );

@@ -82,7 +82,7 @@ jobs:
 
     - name: Format
       run: |
-        npx prettier --check tests
+        npx prettier --check tests features www/{worker.js,index.js}
         cargo fmt --all -- --check
 
     - name: Clippy

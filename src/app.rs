@@ -3,21 +3,22 @@ use super::*;
 pub(crate) struct App {
   analyser_node: AnalyserNode,
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
+  aside: HtmlElement,
   audio_context: AudioContext,
   button: HtmlButtonElement,
   document: Document,
   gpu: Gpu,
   html: HtmlElement,
   nav: HtmlElement,
-  oscillator_node: OscillatorNode,
   oscillator_gain_node: GainNode,
+  oscillator_node: OscillatorNode,
+  recording: bool,
   select: HtmlSelectElement,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
   this: Option<Arc<Mutex<Self>>>,
   window: Window,
   worker: Worker,
-  recording: bool,
 }
 
 lazy_static! {
@@ -73,11 +74,11 @@ impl App {
 
     let stderr = Stderr::get();
 
-    let audio_context =
-      AudioContext::new_with_context_options(AudioContextOptions::new().sample_rate(96000.0))
-        .map_err(JsValueError)?;
+    let audio_context = AudioContext::new().map_err(JsValueError)?;
 
     let analyser_node = audio_context.create_analyser().map_err(JsValueError)?;
+
+    analyser_node.set_smoothing_time_constant(0.5);
 
     let gpu = Gpu::new(&window, &canvas, &analyser_node)?;
 
@@ -105,6 +106,7 @@ impl App {
     let app = Arc::new(Mutex::new(Self {
       analyser_node,
       animation_frame_callback: None,
+      aside: document.select("aside")?.cast::<HtmlElement>()?,
       audio_context,
       button: button.clone(),
       document,
@@ -242,62 +244,11 @@ impl App {
     )?;
 
     match event {
-      WorkerMessage::Checkbox(name) => {
-        let id = format!("widget-checkbox-{name}");
-
-        if self.document.select_optional(&format!("#{id}"))?.is_none() {
-          let aside = self.document.select("aside")?;
-
-          let div = self
-            .document
-            .create_element("div")
-            .map_err(JsValueError)?
-            .cast::<HtmlDivElement>()?;
-
-          aside.append_child(&div).map_err(JsValueError)?;
-
-          let label = self
-            .document
-            .create_element("label")
-            .map_err(JsValueError)?
-            .cast::<HtmlLabelElement>()?;
-
-          label.set_html_for(&id);
-          label.set_inner_text(&name);
-
-          div.append_child(&label).map_err(JsValueError)?;
-
-          let checkbox = self
-            .document
-            .create_element("input")
-            .map_err(JsValueError)?
-            .cast::<HtmlInputElement>()?;
-
-          checkbox.set_type("checkbox");
-          checkbox.set_id(&id);
-
-          div.append_child(&checkbox).map_err(JsValueError)?;
-
-          let local = checkbox.clone();
-          let worker = self.worker.clone();
-          let stderr = self.stderr.clone();
-          checkbox.add_event_listener("input", move || {
-            stderr.update(|| -> Result {
-              worker
-                .post_message(&JsValue::from_str(&serde_json::to_string(
-                  &AppMessage::Checkbox {
-                    name: &name,
-                    value: local.checked(),
-                  },
-                )?))
-                .map_err(JsValueError)?;
-              Ok(())
-            }())
-          })?;
-        }
-      }
       WorkerMessage::Clear => {
         self.gpu.clear()?;
+      }
+      WorkerMessage::DecibelRange { min, max } => {
+        self.gpu.set_decibel_range(min, max);
       }
       WorkerMessage::Done => {
         self.html.set_class_name("done");
@@ -310,80 +261,6 @@ impl App {
       }
       WorkerMessage::OscillatorGain(gain) => {
         self.oscillator_gain_node.gain().set_value(gain);
-      }
-      WorkerMessage::Radio(name, options) => {
-        let id = format!("widget-radio-{name}");
-
-        if self.document.select_optional(&format!("#{id}"))?.is_none() {
-          let aside = self.document.select("aside")?;
-
-          let div = self
-            .document
-            .create_element("div")
-            .map_err(JsValueError)?
-            .cast::<HtmlDivElement>()?;
-
-          div.set_id(&id);
-
-          aside.append_child(&div).map_err(JsValueError)?;
-
-          let label = self
-            .document
-            .create_element("label")
-            .map_err(JsValueError)?
-            .cast::<HtmlLabelElement>()?;
-
-          label.set_html_for(&id);
-          label.set_inner_text(&format!("{} ", name));
-
-          div.append_child(&label).map_err(JsValueError)?;
-
-          for (i, option) in options.iter().enumerate() {
-            let label = self
-              .document
-              .create_element("label")
-              .map_err(JsValueError)?
-              .cast::<HtmlLabelElement>()?;
-
-            label.set_html_for(option);
-            label.set_inner_text(option);
-
-            let radio = self
-              .document
-              .create_element("input")
-              .map_err(JsValueError)?
-              .cast::<HtmlInputElement>()?;
-
-            radio.set_id(&format!("{}-{}", id, option));
-            radio.set_name(&id);
-            radio.set_type("radio");
-
-            div.append_child(&label).map_err(JsValueError)?;
-            div.append_child(&radio).map_err(JsValueError)?;
-
-            let name = name.clone();
-            let option = option.clone();
-            let worker = self.worker.clone();
-            let stderr = self.stderr.clone();
-            radio.add_event_listener("input", move || {
-              stderr.update(|| -> Result {
-                worker
-                  .post_message(&JsValue::from_str(&serde_json::to_string(
-                    &AppMessage::Radio {
-                      name: &name,
-                      value: &option,
-                    },
-                  )?))
-                  .map_err(JsValueError)?;
-                Ok(())
-              }())
-            })?;
-
-            if i == 0 {
-              radio.set_checked(true);
-            }
-          }
-        }
       }
       WorkerMessage::Record => {
         if !self.recording {
@@ -429,6 +306,148 @@ impl App {
         base64::encode_config_buf(png.get_ref(), base64::STANDARD, &mut href);
         a.set_href(&href);
         a.click();
+      }
+      WorkerMessage::Widget { name, widget } => {
+        let id = widget.id(&name);
+
+        if self.document.get_element_by_id(&id).is_none() {
+          let key = widget.key(&name);
+
+          let label = self
+            .document
+            .create_element("label")
+            .map_err(JsValueError)?
+            .cast::<HtmlLabelElement>()?;
+
+          label.set_id(&id);
+          label.set_inner_text(&name);
+
+          self.aside.append_child(&label).map_err(JsValueError)?;
+
+          match widget {
+            Widget::Checkbox => {
+              let checkbox = self
+                .document
+                .create_element("input")
+                .map_err(JsValueError)?
+                .cast::<HtmlInputElement>()?;
+
+              checkbox.set_type("checkbox");
+
+              label.append_child(&checkbox).map_err(JsValueError)?;
+
+              let local = checkbox.clone();
+              let worker = self.worker.clone();
+              let stderr = self.stderr.clone();
+              checkbox.add_event_listener("input", move || {
+                stderr.update(|| -> Result {
+                  worker
+                    .post_message(&JsValue::from_str(&serde_json::to_string(
+                      &AppMessage::Widget {
+                        key: &key,
+                        value: serde_json::Value::Bool(local.checked()),
+                      },
+                    )?))
+                    .map_err(JsValueError)?;
+                  Ok(())
+                }())
+              })?;
+            }
+            Widget::Radio { options } => {
+              for (i, option) in options.iter().enumerate() {
+                let option_label = self
+                  .document
+                  .create_element("label")
+                  .map_err(JsValueError)?
+                  .cast::<HtmlLabelElement>()?;
+
+                option_label.set_html_for(option);
+                option_label.set_inner_text(option);
+                label.append_child(&option_label).map_err(JsValueError)?;
+
+                let radio = self
+                  .document
+                  .create_element("input")
+                  .map_err(JsValueError)?
+                  .cast::<HtmlInputElement>()?;
+
+                radio.set_id(&format!("{}-{}", id, option));
+                radio.set_name(&id);
+                radio.set_type("radio");
+                option_label.append_child(&radio).map_err(JsValueError)?;
+
+                let option = option.clone();
+                let worker = self.worker.clone();
+                let key = key.clone();
+                let stderr = self.stderr.clone();
+                radio.add_event_listener("input", move || {
+                  stderr.update(|| -> Result {
+                    worker
+                      .post_message(&JsValue::from_str(&serde_json::to_string(
+                        &AppMessage::Widget {
+                          key: &key,
+                          value: serde_json::Value::String(option.clone()),
+                        },
+                      )?))
+                      .map_err(JsValueError)?;
+                    Ok(())
+                  }())
+                })?;
+
+                if i == 0 {
+                  radio.set_checked(true);
+                }
+              }
+            }
+            Widget::Slider {
+              min,
+              max,
+              step,
+              initial,
+            } => {
+              let range = self
+                .document
+                .create_element("input")
+                .map_err(JsValueError)?
+                .cast::<HtmlInputElement>()?;
+
+              range.set_type("range");
+              range.set_min(&min.to_string());
+              range.set_max(&max.to_string());
+              range.set_step(&step.to_string());
+              range.set_default_value(&initial.to_string());
+
+              label.append_child(&range).map_err(JsValueError)?;
+
+              let current = self
+                .document
+                .create_element("span")
+                .map_err(JsValueError)?
+                .cast::<HtmlSpanElement>()?;
+              label.append_child(&current).map_err(JsValueError)?;
+              current.set_inner_text(&initial.to_string());
+
+              let local = range.clone();
+              let worker = self.worker.clone();
+              let stderr = self.stderr.clone();
+              range.add_event_listener("input", move || {
+                stderr.update(|| -> Result {
+                  let value = local.value();
+                  current.set_inner_text(&value);
+                  worker
+                    .post_message(&JsValue::from_str(&serde_json::to_string(
+                      &AppMessage::Widget {
+                        key: &key,
+                        value: serde_json::Value::Number(value.parse()?),
+                      },
+                    )?))
+                    .map_err(JsValueError)?;
+                  Ok(())
+                }())
+              })?;
+            }
+          }
+        }
       }
     }
 

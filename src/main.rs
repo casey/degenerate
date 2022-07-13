@@ -21,13 +21,14 @@ use {
   },
   wasm_bindgen::{closure::Closure, convert::FromWasmAbi, JsCast, JsValue},
   web_sys::{
-    AnalyserNode, AudioContext, AudioContextOptions, Document, Element, EventTarget, GainNode,
-    HtmlAnchorElement, HtmlButtonElement, HtmlCanvasElement, HtmlDivElement, HtmlElement,
-    HtmlInputElement, HtmlLabelElement, HtmlOptionElement, HtmlSelectElement, HtmlTextAreaElement,
+    AnalyserNode, AudioContext, Document, Element, EventTarget, GainNode, HtmlAnchorElement,
+    HtmlButtonElement, HtmlCanvasElement, HtmlDivElement, HtmlElement, HtmlInputElement,
+    HtmlLabelElement, HtmlOptionElement, HtmlSelectElement, HtmlSpanElement, HtmlTextAreaElement,
     KeyboardEvent, MediaStream, MediaStreamConstraints, MessageEvent, OscillatorNode,
     WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
     WebGlUniformLocation, Window, Worker,
   },
+  widget::Widget,
 };
 
 type Error = Box<dyn std::error::Error>;
@@ -43,6 +44,7 @@ mod gpu;
 mod js_value_error;
 mod select;
 mod stderr;
+mod widget;
 mod window;
 mod worker_message;
 

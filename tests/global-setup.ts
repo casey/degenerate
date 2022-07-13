@@ -1,8 +1,9 @@
+const util = require('node:util');
+const execFile = util.promisify(require('node:child_process').execFile);
 import * as fs from 'fs';
 import express from 'express';
-import { exec } from './common';
 
-const clean = async () => {
+export default async function () {
   const files = await fs.promises.opendir('../images');
 
   for await (const file of files) {
@@ -11,38 +12,31 @@ const clean = async () => {
       await fs.promises.unlink(path);
     }
   }
-};
 
-const buildWasm = async () => {
-  await exec(`
-    cd ..
-    cargo build --target wasm32-unknown-unknown
-    wasm-bindgen --target web --no-typescript \
-      target/wasm32-unknown-unknown/debug/degenerate.wasm \
-      --out-dir www
-  `);
-};
+  await execFile('cargo', ['build', '--target', 'wasm32-unknown-unknown']);
 
-const runServer = () => {
+  await execFile(
+    'wasm-bindgen',
+    [
+      '--target',
+      'web',
+      '--no-typescript',
+      '--out-dir',
+      'www',
+      'target/wasm32-unknown-unknown/debug/degenerate.wasm',
+    ],
+    {
+      cwd: '..',
+    }
+  );
+
   const app = express();
   app.use(express.static('../www'));
 
   const server = app.listen(0);
   process.env.PORT = server.address().port;
 
-  return server;
-};
-
-async function globalSetup() {
-  await clean();
-
-  await buildWasm();
-
-  const server = runServer();
-
   return () => {
     server.close();
   };
 }
-
-export default globalSetup;
