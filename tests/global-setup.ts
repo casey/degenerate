@@ -36,8 +36,6 @@ export default async function () {
   const server = app.listen(0);
   process.env.PORT = server.address().port;
 
-  return server;
-
   return () => {
     server.close();
   };
