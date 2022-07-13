@@ -37,6 +37,7 @@ features = [
   "Document",
   "DomTokenList",
   "Element",
+  "ErrorEvent",
   "GainNode",
   "HtmlAnchorElement",
   "HtmlButtonElement",
