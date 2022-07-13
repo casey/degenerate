@@ -16,7 +16,7 @@ clippy:
   cargo clippy --target wasm32-unknown-unknown
 
 fmt:
-  prettier --write tests
+  prettier --write tests features
   cargo fmt --all
 
 fmt-check:
