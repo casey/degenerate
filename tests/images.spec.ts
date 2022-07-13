@@ -175,11 +175,17 @@ test('slider', async ({ page }) => {
 
   await expect(await page.locator(id).count()).toBe(1);
 
-  await run(page, 'console.assert(slider("x", 0, 1, 0.1, 0.5) === 0.5, "expected 0.5")');
+  await run(
+    page,
+    'console.assert(slider("x", 0, 1, 0.1, 0.5) === 0.5, "expected 0.5")'
+  );
 
   await page.fill(id, '0.2');
 
-  await run(page, 'console.assert(slider("x", 0, 1, 0.1, 0.5) === 0.2, "expected 0.2")');
+  await run(
+    page,
+    'console.assert(slider("x", 0, 1, 0.1, 0.5) === 0.2, "expected 0.2")'
+  );
 });
 
 test('checkbox', async ({ page }) => {
@@ -332,15 +338,15 @@ test('js-error-fail', async ({ page }) => {
 test('throw-samp', async ({ page }) => {
   try {
     await run(page, "throw 'foobar'");
-  } catch {
-  }
+  } catch {}
   await expect(await page.locator('samp > *')).toHaveText('foobar');
 });
 
 test('js-error-samp', async ({ page }) => {
   try {
     await run(page, 'foo');
-  } catch {
-  }
-  await expect(await page.locator('samp > *')).toHaveText('ReferenceError: foo is not defined');
+  } catch {}
+  await expect(await page.locator('samp > *')).toHaveText(
+    'ReferenceError: foo is not defined'
+  );
 });
