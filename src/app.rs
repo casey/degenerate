@@ -183,12 +183,7 @@ impl App {
     name: &str,
     callback: impl Fn(&mut Self) -> Result + 'static,
   ) -> Result {
-    let local = app.clone();
-    target.add_event_listener(name, move || {
-      let mut app = local.lock().unwrap();
-      let result = callback(&mut app);
-      app.stderr.update(result);
-    })
+    Self::add_event_listener_with_event(app, target, name, move |app, _: Event| callback(app))
   }
 
   fn add_event_listener_with_event<E: FromWasmAbi + 'static>(
