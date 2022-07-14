@@ -102,7 +102,7 @@ impl App {
       animation_frame_callback: None,
       aside: document.select::<HtmlElement>("aside")?,
       audio_context,
-      document: document.clone(),
+      document,
       gpu,
       html,
       nav,
@@ -188,8 +188,8 @@ impl App {
       ["/", "program/", hex] => {
         let bytes = hex::decode(hex)?;
         let program = str::from_utf8(&bytes)?;
-        textarea.set_value(&program);
-        app.lock().unwrap().run_program(&program)?;
+        textarea.set_value(program);
+        app.lock().unwrap().run_program(program)?;
       }
       _ => stderr.update(Err(format!("Unrecognized path: {}", path).into())),
     }
