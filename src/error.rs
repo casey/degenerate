@@ -8,6 +8,15 @@ pub(crate) enum Error {
   Rust(Box<dyn std::error::Error>),
 }
 
+impl Display for Error {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    match self {
+      Self::Rust(e) => write!(f, "{}", e),
+      Self::Js(e) => write!(f, "{:?}", e),
+    }
+  }
+}
+
 impl From<JsValue> for Error {
   fn from(e: JsValue) -> Self {
     Self::Js(e)
@@ -35,12 +44,6 @@ impl From<ImageError> for Error {
 impl From<serde_json::Error> for Error {
   fn from(e: serde_json::Error) -> Self {
     Self::Rust(e.into())
-  }
-}
-
-impl Display for Error {
-  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-    todo!()
   }
 }
 
