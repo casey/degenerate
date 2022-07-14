@@ -1,21 +1,24 @@
 use super::*;
 
 pub(crate) trait Select {
-  fn select(&self, selector: &str) -> Result<Element>;
+  fn select<T: JsCast>(&self, selector: &str) -> Result<T>;
 
-  fn select_optional(&self, selector: &str) -> Result<Option<Element>>;
+  fn select_optional<T: JsCast>(&self, selector: &str) -> Result<Option<T>>;
 }
 
 impl Select for Document {
-  fn select(&self, selector: &str) -> Result<Element> {
+  fn select<T: JsCast>(&self, selector: &str) -> Result<T> {
     Ok(
       self
-        .select_optional(selector)?
+        .select_optional::<T>(selector)?
         .ok_or_else(|| format!("selector `{}` returned no elements", selector))?,
     )
   }
 
-  fn select_optional(&self, selector: &str) -> Result<Option<Element>> {
-    Ok(self.query_selector(selector).map_err(JsValueError)?)
+  fn select_optional<T: JsCast>(&self, selector: &str) -> Result<Option<T>> {
+    match self.query_selector(selector)? {
+      Some(element) => Ok(Some(element.cast::<T>()?)),
+      None => Ok(None),
+    }
   }
 }

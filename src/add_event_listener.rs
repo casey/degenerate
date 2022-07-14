@@ -14,8 +14,7 @@ impl<T: Deref<Target = EventTarget>> AddEventListener for T {
     let closure = Closure::wrap(Box::new(function) as Box<dyn FnMut()>);
     self
       .deref()
-      .add_event_listener_with_callback(event, closure.as_ref().dyn_ref().unwrap())
-      .map_err(JsValueError)?;
+      .add_event_listener_with_callback(event, closure.as_ref().dyn_ref().unwrap())?;
     closure.forget();
     Ok(())
   }
@@ -28,8 +27,7 @@ impl<T: Deref<Target = EventTarget>> AddEventListener for T {
     let closure = Closure::wrap(Box::new(function) as Box<dyn FnMut(E)>);
     self
       .deref()
-      .add_event_listener_with_callback(event, closure.as_ref().dyn_ref().unwrap())
-      .map_err(JsValueError)?;
+      .add_event_listener_with_callback(event, closure.as_ref().dyn_ref().unwrap())?;
     closure.forget();
     Ok(())
   }

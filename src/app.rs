@@ -5,7 +5,6 @@ pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
   aside: HtmlElement,
   audio_context: AudioContext,
-  button: HtmlButtonElement,
   document: Document,
   gpu: Gpu,
   html: HtmlElement,
@@ -13,7 +12,9 @@ pub(crate) struct App {
   oscillator_gain_node: GainNode,
   oscillator_node: OscillatorNode,
   recording: bool,
+  run_button: HtmlButtonElement,
   select: HtmlSelectElement,
+  share_button: HtmlButtonElement,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
   this: Option<Arc<Mutex<Self>>>,
@@ -45,70 +46,62 @@ impl App {
 
     let document = window.get_document();
 
-    let html = document.select("html")?.cast::<HtmlElement>()?;
+    let html = document.select::<HtmlElement>("html")?;
 
-    let textarea = document.select("textarea")?.cast::<HtmlTextAreaElement>()?;
+    let textarea = document.select::<HtmlTextAreaElement>("textarea")?;
 
-    let canvas = document.select("canvas")?.cast::<HtmlCanvasElement>()?;
+    let canvas = document.select::<HtmlCanvasElement>("canvas")?;
 
-    let nav = document.select("nav")?.cast::<HtmlElement>()?;
+    let nav = document.select::<HtmlElement>("nav")?;
 
-    let select = document.select("select")?.cast::<HtmlSelectElement>()?;
+    let select = document.select::<HtmlSelectElement>("select")?;
 
-    let button = document.select("button")?.cast::<HtmlButtonElement>()?;
+    let run_button = document.select::<HtmlButtonElement>("button#run")?;
+
+    let share_button = document.select::<HtmlButtonElement>("button#share")?;
 
     for name in EXAMPLES.keys() {
       let option = document
-        .create_element("option")
-        .map_err(JsValueError)?
+        .create_element("option")?
         .cast::<HtmlOptionElement>()?;
 
       option.set_text(name);
 
       option.set_value(name);
 
-      select
-        .add_with_html_option_element(&option)
-        .map_err(JsValueError)?;
+      select.add_with_html_option_element(&option)?;
     }
 
     let stderr = Stderr::get();
 
-    let audio_context = AudioContext::new().map_err(JsValueError)?;
+    let audio_context = AudioContext::new()?;
 
-    let analyser_node = audio_context.create_analyser().map_err(JsValueError)?;
+    let analyser_node = audio_context.create_analyser()?;
 
     analyser_node.set_smoothing_time_constant(0.5);
 
     let gpu = Gpu::new(&window, &canvas, &analyser_node)?;
 
-    let worker = Worker::new("/worker.js").map_err(JsValueError)?;
+    let worker = Worker::new("/worker.js")?;
 
-    let oscillator_gain_node = audio_context.create_gain().map_err(JsValueError)?;
+    let oscillator_gain_node = audio_context.create_gain()?;
     oscillator_gain_node.gain().set_value(0.0);
 
-    let oscillator_node = audio_context.create_oscillator().map_err(JsValueError)?;
+    let oscillator_node = audio_context.create_oscillator()?;
     oscillator_node.frequency().set_value(60.0);
 
-    oscillator_node
-      .connect_with_audio_node(&oscillator_gain_node)
-      .map_err(JsValueError)?;
-    oscillator_node.start().map_err(JsValueError)?;
+    oscillator_node.connect_with_audio_node(&oscillator_gain_node)?;
+    oscillator_node.start()?;
 
-    oscillator_gain_node
-      .connect_with_audio_node(&audio_context.destination())
-      .map_err(JsValueError)?;
+    oscillator_gain_node.connect_with_audio_node(&audio_context.destination())?;
 
-    oscillator_gain_node
-      .connect_with_audio_node(&analyser_node)
-      .map_err(JsValueError)?;
+    oscillator_gain_node.connect_with_audio_node(&analyser_node)?;
 
     let app = Arc::new(Mutex::new(Self {
       analyser_node,
       animation_frame_callback: None,
-      aside: document.select("aside")?.cast::<HtmlElement>()?,
+      aside: document.select::<HtmlElement>("aside")?,
       audio_context,
-      button: button.clone(),
       document,
       gpu,
       html,
@@ -116,11 +109,13 @@ impl App {
       oscillator_gain_node,
       oscillator_node,
       recording: false,
+      run_button: run_button.clone(),
       select: select.clone(),
-      stderr,
+      share_button: share_button.clone(),
+      stderr: stderr.clone(),
       textarea: textarea.clone(),
       this: None,
-      window,
+      window: window.clone(),
       worker: worker.clone(),
     }));
 
@@ -168,11 +163,36 @@ impl App {
     })?;
 
     let local = app.clone();
-    button.add_event_listener("click", move || {
+    run_button.add_event_listener("click", move || {
       let mut app = local.lock().unwrap();
       let result = app.on_run();
       app.stderr.update(result);
     })?;
+
+    let local = app.clone();
+    share_button.add_event_listener("click", move || {
+      let mut app = local.lock().unwrap();
+      let result = app.on_share();
+      app.stderr.update(result);
+    })?;
+
+    let location = window.location();
+
+    let path = location.pathname()?;
+
+    match path.split_inclusive('/').collect::<Vec<&str>>().as_slice() {
+      ["/"] => {}
+      ["/", "program/" | "program"] => {
+        location.set_pathname("/")?;
+      }
+      ["/", "program/", hex] => {
+        let bytes = hex::decode(hex)?;
+        let program = str::from_utf8(&bytes)?;
+        textarea.set_value(program);
+        app.lock().unwrap().run_program(program)?;
+      }
+      _ => stderr.update(Err(format!("Unrecognized path: {}", path).into())),
+    }
 
     let mut app = app.lock().unwrap();
     app.request_animation_frame()?;
@@ -184,39 +204,34 @@ impl App {
   pub(super) fn on_keydown(&mut self, event: KeyboardEvent) -> Result {
     if event.shift_key() && event.key() == "Enter" {
       event.prevent_default();
-      self
-        .worker
-        .post_message(&JsValue::from_str(&serde_json::to_string(
-          &AppMessage::Script(&self.textarea.value()),
-        )?))
-        .map_err(JsValueError)?;
+      self.run_program(&self.textarea.value())?;
     }
     Ok(())
   }
 
   pub(super) fn on_run(&mut self) -> Result {
-    self
-      .worker
-      .post_message(&JsValue::from_str(&serde_json::to_string(
-        &AppMessage::Script(&self.textarea.value()),
-      )?))
-      .map_err(JsValueError)?;
-    Ok(())
+    self.run_program(&self.textarea.value())
   }
 
   fn request_animation_frame(&mut self) -> Result {
+    self.window.request_animation_frame(
+      self
+        .animation_frame_callback
+        .as_ref()
+        .unwrap()
+        .as_ref()
+        .dyn_ref()
+        .unwrap(),
+    )?;
+    Ok(())
+  }
+
+  pub(super) fn run_program(&self, program: &str) -> Result {
     self
-      .window
-      .request_animation_frame(
-        self
-          .animation_frame_callback
-          .as_ref()
-          .unwrap()
-          .as_ref()
-          .dyn_ref()
-          .unwrap(),
-      )
-      .map_err(JsValueError)?;
+      .worker
+      .post_message(&JsValue::from_str(&serde_json::to_string(
+        &AppMessage::Program(program),
+      )?))?;
     Ok(())
   }
 
@@ -229,8 +244,7 @@ impl App {
       .worker
       .post_message(&JsValue::from_str(&serde_json::to_string(
         &AppMessage::Frame,
-      )?))
-      .map_err(JsValueError)?;
+      )?))?;
 
     Ok(())
   }
@@ -273,14 +287,12 @@ impl App {
           let _ = self
             .window
             .navigator()
-            .media_devices()
-            .map_err(JsValueError)?
+            .media_devices()?
             .get_user_media_with_constraints(
               MediaStreamConstraints::new()
                 .audio(&true.into())
                 .video(&false.into()),
-            )
-            .map_err(JsValueError)?
+            )?
             .then(&closure);
           closure.forget();
         }
@@ -298,8 +310,7 @@ impl App {
         image.write_to(&mut png, ImageOutputFormat::Png)?;
         let a = self
           .document
-          .create_element("a")
-          .map_err(JsValueError)?
+          .create_element("a")?
           .cast::<HtmlAnchorElement>()?;
         a.set_download("degenerate.png");
         let mut href = String::from("data:image/png;base64,");
@@ -315,40 +326,36 @@ impl App {
 
           let label = self
             .document
-            .create_element("label")
-            .map_err(JsValueError)?
+            .create_element("label")?
             .cast::<HtmlLabelElement>()?;
 
           label.set_id(&id);
           label.set_inner_text(&name);
 
-          self.aside.append_child(&label).map_err(JsValueError)?;
+          self.aside.append_child(&label)?;
 
           match widget {
             Widget::Checkbox => {
               let checkbox = self
                 .document
-                .create_element("input")
-                .map_err(JsValueError)?
+                .create_element("input")?
                 .cast::<HtmlInputElement>()?;
 
               checkbox.set_type("checkbox");
 
-              label.append_child(&checkbox).map_err(JsValueError)?;
+              label.append_child(&checkbox)?;
 
               let local = checkbox.clone();
               let worker = self.worker.clone();
               let stderr = self.stderr.clone();
               checkbox.add_event_listener("input", move || {
                 stderr.update(|| -> Result {
-                  worker
-                    .post_message(&JsValue::from_str(&serde_json::to_string(
-                      &AppMessage::Widget {
-                        key: &key,
-                        value: serde_json::Value::Bool(local.checked()),
-                      },
-                    )?))
-                    .map_err(JsValueError)?;
+                  worker.post_message(&JsValue::from_str(&serde_json::to_string(
+                    &AppMessage::Widget {
+                      key: &key,
+                      value: serde_json::Value::Bool(local.checked()),
+                    },
+                  )?))?;
                   Ok(())
                 }())
               })?;
@@ -357,24 +364,22 @@ impl App {
               for (i, option) in options.iter().enumerate() {
                 let option_label = self
                   .document
-                  .create_element("label")
-                  .map_err(JsValueError)?
+                  .create_element("label")?
                   .cast::<HtmlLabelElement>()?;
 
                 option_label.set_html_for(option);
                 option_label.set_inner_text(option);
-                label.append_child(&option_label).map_err(JsValueError)?;
+                label.append_child(&option_label)?;
 
                 let radio = self
                   .document
-                  .create_element("input")
-                  .map_err(JsValueError)?
+                  .create_element("input")?
                   .cast::<HtmlInputElement>()?;
 
                 radio.set_id(&format!("{}-{}", id, option));
                 radio.set_name(&id);
                 radio.set_type("radio");
-                option_label.append_child(&radio).map_err(JsValueError)?;
+                option_label.append_child(&radio)?;
 
                 let option = option.clone();
                 let worker = self.worker.clone();
@@ -382,14 +387,12 @@ impl App {
                 let stderr = self.stderr.clone();
                 radio.add_event_listener("input", move || {
                   stderr.update(|| -> Result {
-                    worker
-                      .post_message(&JsValue::from_str(&serde_json::to_string(
-                        &AppMessage::Widget {
-                          key: &key,
-                          value: serde_json::Value::String(option.clone()),
-                        },
-                      )?))
-                      .map_err(JsValueError)?;
+                    worker.post_message(&JsValue::from_str(&serde_json::to_string(
+                      &AppMessage::Widget {
+                        key: &key,
+                        value: serde_json::Value::String(option.clone()),
+                      },
+                    )?))?;
                     Ok(())
                   }())
                 })?;
@@ -407,8 +410,7 @@ impl App {
             } => {
               let range = self
                 .document
-                .create_element("input")
-                .map_err(JsValueError)?
+                .create_element("input")?
                 .cast::<HtmlInputElement>()?;
 
               range.set_type("range");
@@ -417,14 +419,13 @@ impl App {
               range.set_step(&step.to_string());
               range.set_default_value(&initial.to_string());
 
-              label.append_child(&range).map_err(JsValueError)?;
+              label.append_child(&range)?;
 
               let current = self
                 .document
-                .create_element("span")
-                .map_err(JsValueError)?
+                .create_element("span")?
                 .cast::<HtmlSpanElement>()?;
-              label.append_child(&current).map_err(JsValueError)?;
+              label.append_child(&current)?;
               current.set_inner_text(&initial.to_string());
 
               let local = range.clone();
@@ -434,14 +435,12 @@ impl App {
                 stderr.update(|| -> Result {
                   let value = local.value();
                   current.set_inner_text(&value);
-                  worker
-                    .post_message(&JsValue::from_str(&serde_json::to_string(
-                      &AppMessage::Widget {
-                        key: &key,
-                        value: serde_json::Value::Number(value.parse()?),
-                      },
-                    )?))
-                    .map_err(JsValueError)?;
+                  worker.post_message(&JsValue::from_str(&serde_json::to_string(
+                    &AppMessage::Widget {
+                      key: &key,
+                      value: serde_json::Value::Number(value.parse()?),
+                    },
+                  )?))?;
                   Ok(())
                 }())
               })?;
@@ -459,12 +458,9 @@ impl App {
 
     let media_stream_audio_source_node = self
       .audio_context
-      .create_media_stream_source(&media_stream)
-      .map_err(JsValueError)?;
+      .create_media_stream_source(&media_stream)?;
 
-    media_stream_audio_source_node
-      .connect_with_audio_node(&self.analyser_node)
-      .map_err(JsValueError)?;
+    media_stream_audio_source_node.connect_with_audio_node(&self.analyser_node)?;
 
     self.recording = true;
 
@@ -481,27 +477,35 @@ impl App {
         .ok_or("Failed to get example")?
     ));
 
-    self.textarea.focus().map_err(JsValueError)?;
+    self.textarea.focus()?;
+
+    Ok(())
+  }
+
+  pub(super) fn on_share(&mut self) -> Result {
+    let program = self.textarea.value();
+
+    if !program.is_empty() {
+      let hex = hex::encode(program);
+      let path = format!("/program/{hex}");
+      self
+        .window
+        .history()?
+        .replace_state_with_url(&JsValue::NULL, "", Some(&path))?;
+    }
 
     Ok(())
   }
 
   fn on_input(&self) -> Result {
-    self
-      .html
-      .class_list()
-      .remove_1("done")
-      .map_err(JsValueError)?;
+    self.html.class_list().remove_1("done")?;
 
-    self
-      .nav
-      .class_list()
-      .add_1("fade-out")
-      .map_err(JsValueError)?;
+    self.nav.class_list().add_1("fade-out")?;
 
-    self.button.set_disabled(false);
+    self.run_button.set_disabled(false);
+    self.share_button.set_disabled(false);
 
-    let _promise: Promise = self.audio_context.resume().map_err(JsValueError)?;
+    let _promise: Promise = self.audio_context.resume()?;
 
     Ok(())
   }
