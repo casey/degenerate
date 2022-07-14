@@ -490,10 +490,8 @@ impl App {
       let path = format!("/program/{hex}");
       self
         .window
-        .history()
-        .unwrap()
-        .replace_state_with_url(&JsValue::NULL, "", Some(&path))
-        .unwrap();
+        .history()?
+        .replace_state_with_url(&JsValue::NULL, "", Some(&path))?;
     }
 
     Ok(())

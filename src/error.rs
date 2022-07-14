@@ -1,7 +1,5 @@
 use super::*;
 
-// Use gloo error?
-
 #[derive(Debug)]
 pub(crate) enum Error {
   Js(JsValue),
