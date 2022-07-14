@@ -46,21 +46,19 @@ impl App {
 
     let document = window.get_document();
 
-    let html = document.select("html")?.cast::<HtmlElement>()?;
+    let html = document.select::<HtmlElement>("html")?;
 
-    let textarea = document.select("textarea")?.cast::<HtmlTextAreaElement>()?;
+    let textarea = document.select::<HtmlTextAreaElement>("textarea")?;
 
-    let canvas = document.select("canvas")?.cast::<HtmlCanvasElement>()?;
+    let canvas = document.select::<HtmlCanvasElement>("canvas")?;
 
-    let nav = document.select("nav")?.cast::<HtmlElement>()?;
+    let nav = document.select::<HtmlElement>("nav")?;
 
-    let select = document.select("select")?.cast::<HtmlSelectElement>()?;
+    let select = document.select::<HtmlSelectElement>("select")?;
 
-    let run_button = document.select("button#run")?.cast::<HtmlButtonElement>()?;
+    let run_button = document.select::<HtmlButtonElement>("button#run")?;
 
-    let share_button = document
-      .select("button#share")?
-      .cast::<HtmlButtonElement>()?;
+    let share_button = document.select::<HtmlButtonElement>("button#share")?;
 
     for name in EXAMPLES.keys() {
       let option = document
@@ -111,7 +109,7 @@ impl App {
     let app = Arc::new(Mutex::new(Self {
       analyser_node,
       animation_frame_callback: None,
-      aside: document.select("aside")?.cast::<HtmlElement>()?,
+      aside: document.select::<HtmlElement>("aside")?,
       audio_context,
       document: document.clone(),
       gpu,

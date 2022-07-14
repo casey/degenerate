@@ -8,9 +8,7 @@ impl Stderr {
     Self(
       window()
         .get_document()
-        .select("samp")
-        .unwrap()
-        .cast::<HtmlElement>()
+        .select::<HtmlElement>("samp")
         .unwrap(),
     )
   }
