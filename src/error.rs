@@ -59,4 +59,16 @@ impl From<TryFromIntError> for Error {
   }
 }
 
+impl From<FromHexError> for Error {
+  fn from(e: FromHexError) -> Self {
+    Self::Rust(e.into())
+  }
+}
+
+impl From<Utf8Error> for Error {
+  fn from(e: Utf8Error) -> Self {
+    Self::Rust(e.into())
+  }
+}
+
 impl std::error::Error for Error {}

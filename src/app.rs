@@ -112,10 +112,10 @@ impl App {
       run_button: run_button.clone(),
       select: select.clone(),
       share_button: share_button.clone(),
-      stderr,
+      stderr: stderr.clone(),
       textarea: textarea.clone(),
       this: None,
-      window,
+      window: window.clone(),
       worker: worker.clone(),
     }));
 
@@ -176,23 +176,22 @@ impl App {
       app.stderr.update(result);
     })?;
 
-    // TODO: remove unwraps
+    let location = window.location();
 
-    let path = document.location().unwrap().pathname().unwrap();
+    let path = location.pathname()?;
 
     match path.split_inclusive('/').collect::<Vec<&str>>().as_slice() {
       ["/"] => {}
       ["/", "program/" | "program"] => {
-        document.location().unwrap().set_pathname("/").unwrap();
+        location.set_pathname("/")?;
       }
       ["/", "program/", hex] => {
-        let bytes = hex::decode(hex).unwrap();
-        let program = str::from_utf8(&bytes).unwrap();
+        let bytes = hex::decode(hex)?;
+        let program = str::from_utf8(&bytes)?;
         textarea.set_value(&program);
-        app.lock().unwrap().run_program(&program).unwrap();
+        app.lock().unwrap().run_program(&program)?;
       }
-      ["/", "program/", program, ..] => panic!("too much"),
-      _ => panic!("unrecognized path"),
+      _ => stderr.update(Err(format!("Unrecognized path: {}", path).into())),
     }
 
     let mut app = app.lock().unwrap();
