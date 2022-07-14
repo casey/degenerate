@@ -1,20 +1,22 @@
 use {
   crate::{
     add_event_listener::AddEventListener, app::App, app_message::AppMessage, cast::Cast,
-    filter::Filter, get_document::GetDocument, gpu::Gpu, js_value_error::JsValueError,
-    select::Select, stderr::Stderr, window::window, worker_message::WorkerMessage,
+    error::Error, filter::Filter, get_document::GetDocument, gpu::Gpu, select::Select,
+    stderr::Stderr, window::window, worker_message::WorkerMessage,
   },
-  image::{ImageBuffer, ImageOutputFormat},
+  image::{ImageBuffer, ImageError, ImageOutputFormat},
   js_sys::{Float32Array, Promise},
   lazy_static::lazy_static,
   nalgebra::{Similarity2, UnitComplex},
   serde::{Deserialize, Serialize},
   std::{
     collections::BTreeMap,
+    convert::Infallible,
     f32,
-    fmt::{self, Formatter},
+    fmt::{self, Display, Formatter},
     io::Cursor,
     mem,
+    num::TryFromIntError,
     ops::Deref,
     str,
     string::ToString,
@@ -32,17 +34,16 @@ use {
   widget::Widget,
 };
 
-type Error = Box<dyn std::error::Error>;
 type Result<T = (), E = Error> = std::result::Result<T, E>;
 
 mod add_event_listener;
 mod app;
 mod app_message;
 mod cast;
+mod error;
 mod filter;
 mod get_document;
 mod gpu;
-mod js_value_error;
 mod select;
 mod stderr;
 mod widget;

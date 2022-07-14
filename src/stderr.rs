@@ -15,7 +15,7 @@ impl Stderr {
 
   pub(crate) fn update(&self, result: Result) {
     if let Err(err) = result {
-      self.add(err.as_ref()).unwrap();
+      self.add(&err).unwrap();
     }
   }
 
@@ -26,13 +26,12 @@ impl Stderr {
 
     let div = window()
       .get_document()
-      .create_element("div")
-      .map_err(JsValueError)?
+      .create_element("div")?
       .cast::<HtmlDivElement>()?;
 
     div.set_inner_text(&message);
 
-    self.0.prepend_with_node_1(&div).map_err(JsValueError)?;
+    self.0.prepend_with_node_1(&div)?;
 
     Ok(())
   }

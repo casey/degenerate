@@ -8,7 +8,7 @@ pub(crate) trait Select {
 
 impl Select for Document {
   fn select_optional<T: JsCast>(&self, selector: &str) -> Result<Option<T>> {
-    match self.query_selector(selector).map_err(JsValueError)? {
+    match self.query_selector(selector)? {
       Some(element) => Ok(Some(element.cast::<T>()?)),
       None => Ok(None),
     }
