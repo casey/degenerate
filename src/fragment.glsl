@@ -203,7 +203,7 @@ void main() {
   // threshold above which alpha is zero
   // threshold above which alpha is 1.0
 
-  alpha = -distance * globalAlpha;
+  alpha = (-distance).clamp(0.0, 1.0) * globalAlpha;
 
   // very inside: -1
   // very outside: 1
