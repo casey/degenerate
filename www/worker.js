@@ -486,11 +486,6 @@ function rows(nrows, step) {
   filter.mask = MASK_ROWS;
 }
 
-// Mask pixels where the audio time domain data is large.
-function sample() {
-  filter.mask = MASK_SAMPLE;
-}
-
 // Save the current canvas as a PNG.
 //
 // ```
@@ -570,6 +565,11 @@ function square() {
   filter.mask = MASK_SQUARE;
 }
 
+// Mask pixels where the audio time domain data is large.
+function time_domain() {
+  filter.mask = MASK_TIME_DOMAIN;
+}
+
 // Mask the pixels in the upper half of the canvas.
 //
 // ```
@@ -639,8 +639,8 @@ const MASK_EQUALIZER = 4;
 const MASK_FREQUENCY = 5;
 const MASK_MOD = 6;
 const MASK_ROWS = 7;
-const MASK_SAMPLE = 8;
-const MASK_SQUARE = 9;
+const MASK_SQUARE = 8;
+const MASK_TIME_DOMAIN = 9;
 const MASK_TOP = 10;
 const MASK_WAVE = 11;
 const MASK_X = 12;

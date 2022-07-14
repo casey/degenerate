@@ -10,8 +10,8 @@ const int MASK_EQUALIZER = 4;
 const int MASK_FREQUENCY = 5;
 const int MASK_MOD = 6;
 const int MASK_ROWS = 7;
-const int MASK_SAMPLE = 8; // TODO: rename to MASK_TIME_DOMAIN
-const int MASK_SQUARE = 9;
+const int MASK_SQUARE = 8;
+const int MASK_TIME_DOMAIN = 9;
 const int MASK_TOP = 10;
 const int MASK_WAVE = 11;
 const int MASK_X = 12;
@@ -139,7 +139,7 @@ float shape(vec2 p, uvec2 px) {
       return mod(px, divisor, remainder);
     case MASK_ROWS:
       return rows(px, nrows, step);
-    case MASK_SAMPLE:
+    case MASK_TIME_DOMAIN:
       return time_domain(p);
     case MASK_SQUARE:
       return box(p, 0.5, 0.5);
