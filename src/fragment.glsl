@@ -124,7 +124,7 @@ float check(vec2 p) {
 float shape(vec2 p, uvec2 px) {
   switch (mask) {
     case MASK_ALL:
-      return box(p, 1.0, 1.0);
+      return -1.0;
     case MASK_CHECK:
       return check(p);
     case MASK_CIRCLE:
@@ -189,7 +189,7 @@ void main() {
   // Get the signed distance from the edge of the shape
   float distance = shape(wrapped, pixel_position);
 
-  // Calculate the alpha value to use for blending
+  // Set alpha to zero if we're outside the shape
   float alpha = distance <= 0.0 ? alpha : 0.0;
 
   // Perform alpha blending
