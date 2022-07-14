@@ -88,6 +88,72 @@ bool masked(vec2 position, uvec2 pixel_position) {
   }
 }
 
+float x(vec2 p, float size, float radius) {
+  p = abs(p);
+  return length(p - min(p.x + p.y, size) * 0.5) - radius;
+}
+
+float box(vec2 p, float width, float height) {
+  vec2 d = abs(p) - vec2(width, height);
+  return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+float circle(vec2 p, float radius) {
+  return length(p) - radius;
+}
+
+float cross(vec2 p, float size, float thickness, float radius) {
+  vec2 b = vec2(size, thickness);
+  p = abs(p);
+  p = (p.y > p.x) ? p.yx : p.xy;
+  vec2  q = p - b;
+  float k = max(q.y, q.x);
+  vec2  w = (k > 0.0) ? q : vec2(thickness - p.x, -k);
+  return sign(k) * length(max(w, 0.0)) + radius;
+}
+
+float wave(vec2 p, float thickness) {
+  return abs(p.y - audio_time_domain_sample(p)) - thickness;
+}
+
+// TODO: rename to time_domain and MASK_TIME_DOMAIN;
+float time_domain(vec2 p) {
+  return -abs(audio_time_domain_sample(p));
+}
+
+float frequency(vec2 p, float threshold) {
+  return threshold - audio_frequency_sample(p);
+}
+
+float equalizer(vec2 p) {
+  return quadrant(p).y - audio_frequency_sample(p);
+}
+
+float distance(vec2 position, uvec2 pixel_position) {
+  switch (mask) {
+    case MASK_ALL:
+      return -1.0;
+    case MASK_CIRCLE:
+      return circle(position, 1.0);
+    case MASK_SQUARE:
+      return box(position, 0.5, 0.5);
+    case MASK_X:
+      return x(position, 2.0, 0.25);
+    case MASK_CROSS:
+      return cross(position, 1.0, 0.25, 0.0);
+    case MASK_FREQUENCY:
+      return frequency(position, 0.125);
+    case MASK_SAMPLE:
+      return time_domain(position);
+    case MASK_WAVE:
+      return wave(position, 0.1);
+    case MASK_EQUALIZER:
+      return equalizer(position);
+    default:
+      return 1.0;
+  }
+}
+
 void main() {
   // Get fragment coordinates and transform to [-1, 1]
   vec2 position = gl_FragCoord.xy / resolution * 2.0 - 1.0;
@@ -120,8 +186,27 @@ void main() {
   // Convert color back from [-1,-1] to [0,1]
   vec3 transformed_color = octant(transformed_color_vector.xyz);
 
+  float globalAlpha = alpha;
+
   // Set alpha to 0.0 if outside the mask
   float alpha = masked(wrapped, pixel_position) ? alpha : 0.0;
+
+  float distance = distance(wrapped, pixel_position);
+
+  // max threshold
+  // min threshold
+  // value at max
+  // value at min
+  //
+  // foo.clamp(0.0, 1.0)
+
+  // threshold above which alpha is zero
+  // threshold above which alpha is 1.0
+
+  alpha = -distance * globalAlpha;
+
+  // very inside: -1
+  // very outside: 1
 
   // Perform alpha blending
   vec3 output_color_rgb = transformed_color * alpha + original_color * (1.0 - alpha);
