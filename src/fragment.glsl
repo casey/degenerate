@@ -91,7 +91,7 @@ float equalizer(vec2 p) {
 }
 
 float top(vec2 p) {
-  return p.y;
+  return -p.y;
 }
 
 float rows(uvec2 p, uint nrows, uint step) {
@@ -112,10 +112,21 @@ float mod(uvec2 px, uint divisor, uint remainder) {
   }
 }
 
+float check(vec2 p) {
+  ivec2 i = ivec2((p + 1.0) * 4.0);
+  if (i.x % 2 != i.y % 2) {
+    return -1.0;
+  } else {
+    return 1.0;
+  }
+}
+
 float shape(vec2 p, uvec2 px) {
   switch (mask) {
     case MASK_ALL:
       return box(p, 1.0, 1.0);
+    case MASK_CHECK:
+      return check(p);
     case MASK_CIRCLE:
       return circle(p, 1.0);
     case MASK_CROSS:
@@ -179,7 +190,7 @@ void main() {
   float distance = shape(wrapped, pixel_position);
 
   // Calculate the alpha value to use for blending
-  float alpha = clamp(-distance, 0.0, 1.0) * alpha;
+  float alpha = distance <= 0.0 ? alpha : 0.0;
 
   // Perform alpha blending
   vec3 output_color_rgb = transformed_color * alpha + original_color * (1.0 - alpha);
