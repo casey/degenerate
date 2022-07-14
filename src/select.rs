@@ -1,9 +1,9 @@
 use super::*;
 
 pub(crate) trait Select {
-  fn select_optional<T: JsCast>(&self, selector: &str) -> Result<Option<T>>;
-
   fn select<T: JsCast>(&self, selector: &str) -> Result<T>;
+
+  fn select_optional<T: JsCast>(&self, selector: &str) -> Result<Option<T>>;
 }
 
 impl Select for Document {
