@@ -5,7 +5,8 @@ pub(crate) struct App {
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
   aside: HtmlElement,
   audio_context: AudioContext,
-  button: HtmlButtonElement,
+  run_button: HtmlButtonElement,
+  share_button: HtmlButtonElement,
   document: Document,
   gpu: Gpu,
   html: HtmlElement,
@@ -55,7 +56,11 @@ impl App {
 
     let select = document.select("select")?.cast::<HtmlSelectElement>()?;
 
-    let button = document.select("button")?.cast::<HtmlButtonElement>()?;
+    let run_button = document.select("button#run")?.cast::<HtmlButtonElement>()?;
+
+    let share_button = document
+      .select("button#share")?
+      .cast::<HtmlButtonElement>()?;
 
     for name in EXAMPLES.keys() {
       let option = document
@@ -108,8 +113,8 @@ impl App {
       animation_frame_callback: None,
       aside: document.select("aside")?.cast::<HtmlElement>()?,
       audio_context,
-      button: button.clone(),
-      document,
+      run_button: run_button.clone(),
+      document: document.clone(),
       gpu,
       html,
       nav,
@@ -117,6 +122,7 @@ impl App {
       oscillator_node,
       recording: false,
       select: select.clone(),
+      share_button: share_button.clone(),
       stderr,
       textarea: textarea.clone(),
       this: None,
@@ -168,11 +174,37 @@ impl App {
     })?;
 
     let local = app.clone();
-    button.add_event_listener("click", move || {
+    run_button.add_event_listener("click", move || {
       let mut app = local.lock().unwrap();
       let result = app.on_run();
       app.stderr.update(result);
     })?;
+
+    let local = app.clone();
+    share_button.add_event_listener("click", move || {
+      let mut app = local.lock().unwrap();
+      let result = app.on_share();
+      app.stderr.update(result);
+    })?;
+
+    // TODO:
+    // - redirect /program/ -> /
+    // - how to get url?
+
+    let path = document.location().unwrap().pathname().unwrap();
+
+    match path.split_inclusive('/').collect::<Vec<&str>>().as_slice() {
+      ["/"] => {}
+      ["/", "program/"] => {}
+      ["/", "program/", hex] => {
+        let bytes = hex::decode(hex).unwrap();
+        let program = str::from_utf8(&bytes).unwrap();
+        textarea.set_value(&program);
+        app.lock().unwrap().run_program(&program).unwrap();
+      }
+      ["/", "program/", program, ..] => panic!("too much"),
+      _ => panic!("unrecognized path"),
+    }
 
     let mut app = app.lock().unwrap();
     app.request_animation_frame()?;
@@ -184,24 +216,13 @@ impl App {
   pub(super) fn on_keydown(&mut self, event: KeyboardEvent) -> Result {
     if event.shift_key() && event.key() == "Enter" {
       event.prevent_default();
-      self
-        .worker
-        .post_message(&JsValue::from_str(&serde_json::to_string(
-          &AppMessage::Script(&self.textarea.value()),
-        )?))
-        .map_err(JsValueError)?;
+      self.run_program(&self.textarea.value())?;
     }
     Ok(())
   }
 
   pub(super) fn on_run(&mut self) -> Result {
-    self
-      .worker
-      .post_message(&JsValue::from_str(&serde_json::to_string(
-        &AppMessage::Script(&self.textarea.value()),
-      )?))
-      .map_err(JsValueError)?;
-    Ok(())
+    self.run_program(&self.textarea.value())
   }
 
   fn request_animation_frame(&mut self) -> Result {
@@ -216,6 +237,16 @@ impl App {
           .dyn_ref()
           .unwrap(),
       )
+      .map_err(JsValueError)?;
+    Ok(())
+  }
+
+  pub(super) fn run_program(&self, program: &str) -> Result {
+    self
+      .worker
+      .post_message(&JsValue::from_str(&serde_json::to_string(
+        &AppMessage::Program(program),
+      )?))
       .map_err(JsValueError)?;
     Ok(())
   }
@@ -486,6 +517,23 @@ impl App {
     Ok(())
   }
 
+  pub(super) fn on_share(&mut self) -> Result {
+    let program = self.textarea.value();
+
+    if !program.is_empty() {
+      let hex = hex::encode(program);
+      let path = format!("/program/{hex}");
+      self
+        .window
+        .history()
+        .unwrap()
+        .replace_state_with_url(&JsValue::NULL, "", Some(&path))
+        .unwrap();
+    }
+
+    Ok(())
+  }
+
   fn on_input(&self) -> Result {
     self
       .html
@@ -499,7 +547,8 @@ impl App {
       .add_1("fade-out")
       .map_err(JsValueError)?;
 
-    self.button.set_disabled(false);
+    self.run_button.set_disabled(false);
+    self.share_button.set_disabled(false);
 
     let _promise: Promise = self.audio_context.resume().map_err(JsValueError)?;
 

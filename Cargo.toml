@@ -14,6 +14,7 @@ base64 = "0.13.0"
 console_error_panic_hook = "0.1.7"
 console_log = "0.2.0"
 getrandom = { version = "0.2.6", features = ["js"] }
+hex = "0.4.3"
 image = "0.24.2"
 js-sys = "0.3.57"
 lazy_static = "1.4.0"
@@ -38,6 +39,7 @@ features = [
   "DomTokenList",
   "Element",
   "GainNode",
+  "History",
   "HtmlAnchorElement",
   "HtmlButtonElement",
   "HtmlCanvasElement",

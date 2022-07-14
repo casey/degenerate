@@ -16,6 +16,7 @@ use {
     io::Cursor,
     mem,
     ops::Deref,
+    str,
     string::ToString,
     sync::{Arc, Mutex},
   },
