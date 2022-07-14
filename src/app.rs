@@ -110,7 +110,7 @@ impl App {
       oscillator_node,
       recording: false,
       run_button: run_button.clone(),
-      select: select.clone(),
+      select,
       share_button: share_button.clone(),
       stderr: stderr.clone(),
       textarea: textarea.clone(),
