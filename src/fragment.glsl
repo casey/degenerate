@@ -10,7 +10,7 @@ const int MASK_EQUALIZER = 4;
 const int MASK_FREQUENCY = 5;
 const int MASK_MOD = 6;
 const int MASK_ROWS = 7;
-const int MASK_SAMPLE = 8;
+const int MASK_SAMPLE = 8; // TODO: rename to MASK_TIME_DOMAIN
 const int MASK_SQUARE = 9;
 const int MASK_TOP = 10;
 const int MASK_WAVE = 11;
@@ -50,44 +50,6 @@ float audio_time_domain_sample(vec2 position) {
   return texture(audio_time_domain, quadrant(position)).r;
 }
 
-bool masked(vec2 position, uvec2 pixel_position) {
-  switch (mask) {
-    case MASK_ALL:
-      return true;
-    case MASK_CHECK:
-      ivec2 i = ivec2((position + 1.0) * 4.0);
-      return i.x % 2 != i.y % 2;
-    case MASK_CIRCLE:
-      return length(position) < 1.0;
-    case MASK_CROSS:
-      return abs(position.x) < 0.25 || abs(position.y) < 0.25;
-    case MASK_EQUALIZER:
-      return quadrant(position).y < audio_frequency_sample(position);
-    case MASK_FREQUENCY:
-      return abs(audio_frequency_sample(position)) > 0.125;
-    case MASK_MOD:
-      if (divisor == 0u) {
-        return false;
-      } else {
-        return (pixel_position.y * uint(resolution) + pixel_position.x) % divisor == remainder;
-      }
-    case MASK_ROWS:
-      return pixel_position.y % (nrows + step) < nrows;
-    case MASK_SAMPLE:
-      return abs(audio_time_domain_sample(position)) > 0.01;
-    case MASK_SQUARE:
-      return abs(position.x) < 0.5 && abs(position.y) < 0.5;
-    case MASK_TOP:
-      return position.y > 0.0;
-    case MASK_X:
-      return abs(abs(position.x) - abs(position.y)) < 0.25;
-    case MASK_WAVE:
-      return abs(position.y - audio_time_domain_sample(position)) < 0.1;
-    default:
-      return false;
-  }
-}
-
 float x(vec2 p, float size, float radius) {
   p = abs(p);
   return length(p - min(p.x + p.y, size) * 0.5) - radius;
@@ -116,7 +78,6 @@ float wave(vec2 p, float thickness) {
   return abs(p.y - audio_time_domain_sample(p)) - thickness;
 }
 
-// TODO: rename to time_domain and MASK_TIME_DOMAIN;
 float time_domain(vec2 p) {
   return -abs(audio_time_domain_sample(p));
 }
@@ -129,26 +90,54 @@ float equalizer(vec2 p) {
   return quadrant(p).y - audio_frequency_sample(p);
 }
 
-float distance(vec2 position, uvec2 pixel_position) {
+float top(vec2 p) {
+  return p.y;
+}
+
+float rows(uvec2 p, uint nrows, uint step) {
+  if (p.y % (nrows + step) < nrows) {
+    return -1.0;
+  } else {
+    return 1.0;
+  }
+}
+
+float mod(uvec2 px, uint divisor, uint remainder) {
+  if (divisor == 0u) {
+    return 1.0;
+  } else if ((px.y * uint(resolution) + px.x) % divisor == remainder) {
+    return -1.0;
+  } else {
+    return 1.0;
+  }
+}
+
+float shape(vec2 p, uvec2 px) {
   switch (mask) {
     case MASK_ALL:
-      return -1.0;
+      return box(p, 1.0, 1.0);
     case MASK_CIRCLE:
-      return circle(position, 1.0);
-    case MASK_SQUARE:
-      return box(position, 0.5, 0.5);
-    case MASK_X:
-      return x(position, 2.0, 0.25);
+      return circle(p, 1.0);
     case MASK_CROSS:
-      return cross(position, 1.0, 0.25, 0.0);
-    case MASK_FREQUENCY:
-      return frequency(position, 0.125);
-    case MASK_SAMPLE:
-      return time_domain(position);
-    case MASK_WAVE:
-      return wave(position, 0.1);
+      return cross(p, 1.0, 0.25, 0.0);
     case MASK_EQUALIZER:
-      return equalizer(position);
+      return equalizer(p);
+    case MASK_FREQUENCY:
+      return frequency(p, 0.125);
+    case MASK_MOD:
+      return mod(px, divisor, remainder);
+    case MASK_ROWS:
+      return rows(px, nrows, step);
+    case MASK_SAMPLE:
+      return time_domain(p);
+    case MASK_SQUARE:
+      return box(p, 0.5, 0.5);
+    case MASK_TOP:
+      return top(p);
+    case MASK_WAVE:
+      return wave(p, 0.1);
+    case MASK_X:
+      return x(p, 2.0, 0.25);
     default:
       return 1.0;
   }
@@ -186,27 +175,11 @@ void main() {
   // Convert color back from [-1,-1] to [0,1]
   vec3 transformed_color = octant(transformed_color_vector.xyz);
 
-  float globalAlpha = alpha;
+  // Get the signed distance from the edge of the shape
+  float distance = shape(wrapped, pixel_position);
 
-  // Set alpha to 0.0 if outside the mask
-  float alpha = masked(wrapped, pixel_position) ? alpha : 0.0;
-
-  float distance = distance(wrapped, pixel_position);
-
-  // max threshold
-  // min threshold
-  // value at max
-  // value at min
-  //
-  // foo.clamp(0.0, 1.0)
-
-  // threshold above which alpha is zero
-  // threshold above which alpha is 1.0
-
-  alpha = (-distance).clamp(0.0, 1.0) * globalAlpha;
-
-  // very inside: -1
-  // very outside: 1
+  // Calculate the alpha value to use for blending
+  float alpha = clamp(-distance, 0.0, 1.0) * alpha;
 
   // Perform alpha blending
   vec3 output_color_rgb = transformed_color * alpha + original_color * (1.0 - alpha);
