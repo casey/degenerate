@@ -577,7 +577,11 @@ function transform(rotation, scale, translation) {
   mat3.identity(filter.coordinateTransform);
   mat3.rotate(filter.coordinateTransform, filter.coordinateTransform, rotation);
   mat3.scale(filter.coordinateTransform, filter.coordinateTransform, scale);
-  mat3.translate(filter.coordinateTransform, filter.coordinateTransform, translation);
+  mat3.translate(
+    filter.coordinateTransform,
+    filter.coordinateTransform,
+    translation
+  );
 }
 
 // Mask pixels within the audio waveform.
@@ -664,7 +668,10 @@ class Rng {
 class Filter {
   constructor() {
     this.alpha = 1.0;
-    this.colorTransform = mat4.fromScaling(mat4.create(), vec3.fromValues(-1, -1, -1));
+    this.colorTransform = mat4.fromScaling(
+      mat4.create(),
+      vec3.fromValues(-1, -1, -1)
+    );
     this.coordinateTransform = mat3.create();
     this.defaultColor = [0.0, 0.0, 0.0];
     this.coordinates = false;
