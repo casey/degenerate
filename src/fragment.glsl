@@ -2,25 +2,25 @@
 
 precision highp float;
 
-const int MASK_ALL = 0;
-const int MASK_CHECK = 1;
-const int MASK_CIRCLE = 2;
-const int MASK_CROSS = 3;
-const int MASK_EQUALIZER = 4;
-const int MASK_FREQUENCY = 5;
-const int MASK_MOD = 6;
-const int MASK_ROWS = 7;
-const int MASK_SQUARE = 8;
-const int MASK_TIME_DOMAIN = 9;
-const int MASK_TOP = 10;
-const int MASK_WAVE = 11;
-const int MASK_X = 12;
+const int SHAPE_ALL = 0;
+const int SHAPE_CHECK = 1;
+const int SHAPE_CIRCLE = 2;
+const int SHAPE_CROSS = 3;
+const int SHAPE_EQUALIZER = 4;
+const int SHAPE_FREQUENCY = 5;
+const int SHAPE_MOD = 6;
+const int SHAPE_ROWS = 7;
+const int SHAPE_SQUARE = 8;
+const int SHAPE_TIME_DOMAIN = 9;
+const int SHAPE_TOP = 10;
+const int SHAPE_WAVE = 11;
+const int SHAPE_X = 12;
 
 uniform bool coordinates;
 uniform bool wrap;
 uniform float alpha;
 uniform float resolution;
-uniform int mask;
+uniform int shape;
 uniform mat3 coordinate_transform;
 uniform mat4 color_transform;
 uniform sampler2D audio_frequency;
@@ -121,33 +121,33 @@ float check(vec2 p) {
   }
 }
 
-float shape(vec2 p, uvec2 px) {
-  switch (mask) {
-    case MASK_ALL:
+float sdf(vec2 p, uvec2 px) {
+  switch (shape) {
+    case SHAPE_ALL:
       return -1.0;
-    case MASK_CHECK:
+    case SHAPE_CHECK:
       return check(p);
-    case MASK_CIRCLE:
+    case SHAPE_CIRCLE:
       return circle(p, 1.0);
-    case MASK_CROSS:
+    case SHAPE_CROSS:
       return cross(p, 1.0, 0.25, 0.0);
-    case MASK_EQUALIZER:
+    case SHAPE_EQUALIZER:
       return equalizer(p);
-    case MASK_FREQUENCY:
+    case SHAPE_FREQUENCY:
       return frequency(p, 0.125);
-    case MASK_MOD:
+    case SHAPE_MOD:
       return mod(px, divisor, remainder);
-    case MASK_ROWS:
+    case SHAPE_ROWS:
       return rows(px, nrows, step);
-    case MASK_TIME_DOMAIN:
+    case SHAPE_TIME_DOMAIN:
       return time_domain(p);
-    case MASK_SQUARE:
+    case SHAPE_SQUARE:
       return box(p, 0.5, 0.5);
-    case MASK_TOP:
+    case SHAPE_TOP:
       return top(p);
-    case MASK_WAVE:
+    case SHAPE_WAVE:
       return wave(p, 0.1);
-    case MASK_X:
+    case SHAPE_X:
       return x(p, 2.0, 0.25);
     default:
       return 1.0;
@@ -187,7 +187,7 @@ void main() {
   vec3 transformed_color = octant(transformed_color_vector.xyz);
 
   // Get the signed distance from the edge of the shape
-  float distance = shape(wrapped, pixel_position);
+  float distance = sdf(wrapped, pixel_position);
 
   // Set alpha to zero if we're outside the shape
   float alpha = distance <= 0.0 ? alpha : 0.0;

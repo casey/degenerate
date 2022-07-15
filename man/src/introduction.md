@@ -10,7 +10,7 @@ of the current image filter and call `render()` to apply it.
 
 Image filters have a number of properties, including a coordinate
 transformation, which determines where in the input image pixels will be
-sampled from; a mask, which determines which of those pixels will be modified;
+sampled from; a shape, which determines which of those pixels will be modified;
 and a color transformation, which determines how those pixels will be modified.
 
 Try copying this example program into the text input field at
@@ -19,7 +19,7 @@ Try copying this example program into the text input field at
 ```javascript
 // Set the scale component of the current coordinate transformation
 scale(0.75);
-// Use an x-shaped mask
+// Use the X shape
 x();
 // Use a tenth-turn about the green color axis as the color transformation
 rotateColor('green', 0.1 * TAU);
