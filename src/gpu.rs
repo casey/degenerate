@@ -343,19 +343,19 @@ impl Gpu {
 
     self
       .gl
-      .uniform1ui(Some(self.uniform("divisor")), filter.shape_mod_divisor);
+      .uniform1ui(Some(self.uniform("divisor")), filter.field_mod_divisor);
 
     self
       .gl
-      .uniform1ui(Some(self.uniform("remainder")), filter.shape_mod_remainder);
+      .uniform1ui(Some(self.uniform("remainder")), filter.field_mod_remainder);
 
     self
       .gl
-      .uniform1ui(Some(self.uniform("nrows")), filter.shape_rows_rows);
+      .uniform1ui(Some(self.uniform("nrows")), filter.field_rows_rows);
 
     self
       .gl
-      .uniform1ui(Some(self.uniform("step")), filter.shape_rows_step);
+      .uniform1ui(Some(self.uniform("step")), filter.field_rows_step);
 
     let mut similarity = Similarity2::<f32>::identity();
     similarity.append_rotation_mut(&UnitComplex::from_angle(-filter.rotation));
@@ -381,7 +381,7 @@ impl Gpu {
 
     self
       .gl
-      .uniform1i(Some(self.uniform("shape")), filter.shape as i32);
+      .uniform1i(Some(self.uniform("field")), filter.field as i32);
 
     self
       .gl

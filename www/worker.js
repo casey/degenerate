@@ -14,21 +14,21 @@ let vec2 = glMatrix.vec2;
 let vec3 = glMatrix.vec3;
 let vec4 = glMatrix.vec4;
 
-// Shape that covers all pixels.
+// Field that covers all pixels.
 //
 // ```
 // all();
 // render();
 // ```
 //
-// `SHAPE_ALL` is the default shape, so the above example could have been written
+// `FIELD_ALL` is the default field, so the above example could have been written
 // as:
 //
 // ```
 // render();
 // ```
 function all() {
-  filter.shape = SHAPE_ALL;
+  filter.field = FIELD_ALL;
 }
 
 // Set the alpha blending factor. `alpha` will be used to blend the
@@ -57,7 +57,7 @@ function assert(condition, message) {
 // render();
 // ```
 function check() {
-  filter.shape = SHAPE_CHECK;
+  filter.field = FIELD_CHECK;
 }
 
 // Create a new checkbox widget with the label `name`, and return true if it is
@@ -94,7 +94,7 @@ function checkbox(name) {
 // render();
 // ```
 function circle() {
-  filter.shape = SHAPE_CIRCLE;
+  filter.field = FIELD_CIRCLE;
 }
 
 // Clear the canvas.
@@ -108,14 +108,14 @@ function clear() {
   self.postMessage(JSON.stringify('clear'));
 }
 
-// A cross shape.
+// A cross field.
 //
 // ```
 // cross();
 // render();
 // ```
 function cross() {
-  filter.shape = SHAPE_CROSS;
+  filter.field = FIELD_CROSS;
 }
 
 // Set the decibel range for normalization of raw frequency data into values
@@ -204,7 +204,7 @@ function elapsed() {
 // }
 // ```
 function equalizer() {
-  filter.shape = SHAPE_EQUALIZER;
+  filter.field = FIELD_EQUALIZER;
 }
 
 // Returns a promise that resolves when the browser is ready to display a new
@@ -227,9 +227,9 @@ async function frame() {
   });
 }
 
-// A frequency shape.
+// A frequency field.
 function frequency() {
-  filter.shape = SHAPE_FREQUENCY;
+  filter.field = FIELD_FREQUENCY;
 }
 
 // Set the color transformation to the identity transformation. The identity
@@ -278,16 +278,16 @@ function invert() {
   mat4.fromScaling(filter.colorTransform, vec3.fromValues(-1, -1, -1));
 }
 
-// Shape that covers pixels where the pixel's index mod `divisor` is equal to `remainder`.
+// Field that covers pixels where the pixel's index mod `divisor` is equal to `remainder`.
 //
 // ```
 // mod(7,0);
 // render();
 // ```
 function mod(divisor, remainder) {
-  filter.shapeModDivisor = divisor;
-  filter.shapeModRemainder = remainder;
-  filter.shape = SHAPE_MOD;
+  filter.fieldModDivisor = divisor;
+  filter.fieldModRemainder = remainder;
+  filter.field = FIELD_MOD;
 }
 
 // Set the oscillator gain. The oscillator produces a sine wave tone, useful
@@ -330,7 +330,7 @@ function oscillatorFrequency(hz) {
 // ```
 // while(true) {
 //   reboot();
-//   switch (radio('shape', ['x', 'circle', 'cross'])) {
+//   switch (radio('field', ['x', 'circle', 'cross'])) {
 //     case 'x':
 //       x();
 //       break;
@@ -473,7 +473,7 @@ function rotateColor(axis, radians) {
   }
 }
 
-// Shape that covers pixels where `pixel.y % (nrows + step) < nrows`. Will cover `nrows` pixels and then
+// Field that covers pixels where `pixel.y % (nrows + step) < nrows`. Will cover `nrows` pixels and then
 // skip `step` pixels.
 //
 // ```
@@ -481,9 +481,9 @@ function rotateColor(axis, radians) {
 // render();
 // ```
 function rows(nrows, step) {
-  filter.shapeRowsRows = nrows;
-  filter.shapeRowsStep = step;
-  filter.shape = SHAPE_ROWS;
+  filter.fieldRowsRows = nrows;
+  filter.fieldRowsStep = step;
+  filter.field = FIELD_ROWS;
 }
 
 // Save the current canvas as a PNG.
@@ -555,32 +555,32 @@ function slider(name, min, max, step, initial) {
   return widgets['slider-' + name] ?? initial;
 }
 
-// A square shape.
+// A square field.
 //
 // ```
 // square();
 // render();
 // ```
 function square() {
-  filter.shape = SHAPE_SQUARE;
+  filter.field = FIELD_SQUARE;
 }
 
-// A shape that covers pixels where the audio time domain data is large.
+// A field that covers pixels where the audio time domain data is large.
 function timeDomain() {
-  filter.shape = SHAPE_TIME_DOMAIN;
+  filter.field = FIELD_TIME_DOMAIN;
 }
 
-// A shape covering the top half of the canvas.
+// A field covering the top half of the canvas.
 //
 // ```
 // top();
 // render();
 // ```
 function top() {
-  filter.shape = SHAPE_TOP;
+  filter.field = FIELD_TOP;
 }
 
-// A Waveform shape.
+// A Waveform field.
 //
 // ```
 // record();
@@ -591,7 +591,7 @@ function top() {
 // }
 // ```
 function wave() {
-  filter.shape = SHAPE_WAVE;
+  filter.field = FIELD_WAVE;
 }
 
 // Set wrap. When `wrap` is `true`, out of bounds samples will be wrapped back within bounds.
@@ -606,14 +606,14 @@ function wrap(warp) {
   filter.wrap = warp;
 }
 
-// An X shape.
+// An X field.
 //
 // ```
 // x();
 // render();
 // ```
 function x() {
-  filter.shape = SHAPE_X;
+  filter.field = FIELD_X;
 }
 
 // The ratio of a circle's circumference to its diameter. Useful for expressing
@@ -626,24 +626,24 @@ const PI = Math.PI;
 // to rotate 1/4 turn, use `rotate(1/4 * TAU)`.
 const TAU = Math.PI * 2;
 
-// Shape constants. The shape determines which pixels the current color transform
+// Field constants. The field determines which pixels the current color transform
 // will be applied to. These values should be kept in sync with those in
 // `www/fragment.glsl`. See the corresponding functions and case statements,
-// e.g., `all()` in this file and `case SHAPE_ALL:` in `www/fragment.glsl`, for
-// more details and the shape definition, respectively.
-const SHAPE_ALL = 0;
-const SHAPE_CHECK = 1;
-const SHAPE_CIRCLE = 2;
-const SHAPE_CROSS = 3;
-const SHAPE_EQUALIZER = 4;
-const SHAPE_FREQUENCY = 5;
-const SHAPE_MOD = 6;
-const SHAPE_ROWS = 7;
-const SHAPE_SQUARE = 8;
-const SHAPE_TIME_DOMAIN = 9;
-const SHAPE_TOP = 10;
-const SHAPE_WAVE = 11;
-const SHAPE_X = 12;
+// e.g., `all()` in this file and `case FIELD_ALL:` in `www/fragment.glsl`, for
+// more details and the field definition, respectively.
+const FIELD_ALL = 0;
+const FIELD_CHECK = 1;
+const FIELD_CIRCLE = 2;
+const FIELD_CROSS = 3;
+const FIELD_EQUALIZER = 4;
+const FIELD_FREQUENCY = 5;
+const FIELD_MOD = 6;
+const FIELD_ROWS = 7;
+const FIELD_SQUARE = 8;
+const FIELD_TIME_DOMAIN = 9;
+const FIELD_TOP = 10;
+const FIELD_WAVE = 11;
+const FIELD_X = 12;
 
 class Rng {
   constructor(seed) {
@@ -672,11 +672,11 @@ class Filter {
     this.defaultColor = [0.0, 0.0, 0.0];
     this.rotation = 0.0;
     this.scale = 1.0;
-    this.shape = SHAPE_ALL;
-    this.shapeModDivisor = 0;
-    this.shapeModRemainder = 0;
-    this.shapeRowsRows = 0;
-    this.shapeRowsStep = 0;
+    this.field = FIELD_ALL;
+    this.fieldModDivisor = 0;
+    this.fieldModRemainder = 0;
+    this.fieldRowsRows = 0;
+    this.fieldRowsStep = 0;
     this.wrap = false;
   }
 }

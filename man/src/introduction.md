@@ -10,8 +10,9 @@ of the current image filter and call `render()` to apply it.
 
 Image filters have a number of properties, including a coordinate
 transformation, which determines where in the input image pixels will be
-sampled from; a shape, which determines which of those pixels will be modified;
-and a color transformation, which determines how those pixels will be modified.
+sampled from; a signed distance field, which determines which of those pixels
+will be modified; and a color transformation, which determines how those pixels
+will be modified.
 
 Try copying this example program into the text input field at
 [degenerate.computer](https://degenerate.computer):
@@ -19,7 +20,7 @@ Try copying this example program into the text input field at
 ```javascript
 // Set the scale component of the current coordinate transformation
 scale(0.75);
-// Use the X shape
+// Use the X signed distance field
 x();
 // Use a tenth-turn about the green color axis as the color transformation
 rotateColor('green', 0.1 * TAU);

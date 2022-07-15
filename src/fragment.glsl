@@ -2,25 +2,25 @@
 
 precision highp float;
 
-const int SHAPE_ALL = 0;
-const int SHAPE_CHECK = 1;
-const int SHAPE_CIRCLE = 2;
-const int SHAPE_CROSS = 3;
-const int SHAPE_EQUALIZER = 4;
-const int SHAPE_FREQUENCY = 5;
-const int SHAPE_MOD = 6;
-const int SHAPE_ROWS = 7;
-const int SHAPE_SQUARE = 8;
-const int SHAPE_TIME_DOMAIN = 9;
-const int SHAPE_TOP = 10;
-const int SHAPE_WAVE = 11;
-const int SHAPE_X = 12;
+const int FIELD_ALL = 0;
+const int FIELD_CHECK = 1;
+const int FIELD_CIRCLE = 2;
+const int FIELD_CROSS = 3;
+const int FIELD_EQUALIZER = 4;
+const int FIELD_FREQUENCY = 5;
+const int FIELD_MOD = 6;
+const int FIELD_ROWS = 7;
+const int FIELD_SQUARE = 8;
+const int FIELD_TIME_DOMAIN = 9;
+const int FIELD_TOP = 10;
+const int FIELD_WAVE = 11;
+const int FIELD_X = 12;
 
 uniform bool coordinates;
 uniform bool wrap;
 uniform float alpha;
 uniform float resolution;
-uniform int shape;
+uniform int field;
 uniform mat3 coordinate_transform;
 uniform mat4 color_transform;
 uniform sampler2D audio_frequency;
@@ -121,33 +121,33 @@ float check(vec2 p) {
   }
 }
 
-float sdf(vec2 p, uvec2 px) {
-  switch (shape) {
-    case SHAPE_ALL:
+float distance(vec2 p, uvec2 px) {
+  switch (field) {
+    case FIELD_ALL:
       return -1.0;
-    case SHAPE_CHECK:
+    case FIELD_CHECK:
       return check(p);
-    case SHAPE_CIRCLE:
+    case FIELD_CIRCLE:
       return circle(p, 1.0);
-    case SHAPE_CROSS:
+    case FIELD_CROSS:
       return cross(p, 1.0, 0.25, 0.0);
-    case SHAPE_EQUALIZER:
+    case FIELD_EQUALIZER:
       return equalizer(p);
-    case SHAPE_FREQUENCY:
+    case FIELD_FREQUENCY:
       return frequency(p, 0.125);
-    case SHAPE_MOD:
+    case FIELD_MOD:
       return mod(px, divisor, remainder);
-    case SHAPE_ROWS:
+    case FIELD_ROWS:
       return rows(px, nrows, step);
-    case SHAPE_TIME_DOMAIN:
+    case FIELD_TIME_DOMAIN:
       return time_domain(p);
-    case SHAPE_SQUARE:
+    case FIELD_SQUARE:
       return box(p, 0.5, 0.5);
-    case SHAPE_TOP:
+    case FIELD_TOP:
       return top(p);
-    case SHAPE_WAVE:
+    case FIELD_WAVE:
       return wave(p, 0.1);
-    case SHAPE_X:
+    case FIELD_X:
       return x(p, 2.0, 0.25);
     default:
       return 1.0;
@@ -186,10 +186,10 @@ void main() {
   // Convert color back from [-1,-1] to [0,1]
   vec3 transformed_color = octant(transformed_color_vector.xyz);
 
-  // Get the signed distance from the edge of the shape
-  float distance = sdf(wrapped, pixel_position);
+  // Get the signed distance from the field
+  float distance = distance(wrapped, pixel_position);
 
-  // Set alpha to zero if we're outside the shape
+  // Set alpha to zero if distance is negative
   float alpha = distance <= 0.0 ? alpha : 0.0;
 
   // Perform alpha blending
