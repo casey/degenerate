@@ -37,17 +37,12 @@ impl Gpu {
       .depth(false)
       .stencil(false);
 
-    if js_sys::eval("window.preserveDrawingBuffer")
-      .map_err(JsValueError)?
-      .as_bool()
-      == Some(true)
-    {
+    if js_sys::eval("window.preserveDrawingBuffer")?.as_bool() == Some(true) {
       context_options.preserve_drawing_buffer(true);
     }
 
     let gl = canvas
-      .get_context_with_context_options("webgl2", &context_options.into())
-      .map_err(JsValueError)?
+      .get_context_with_context_options("webgl2", &context_options.into())?
       .ok_or("Failed to retrieve webgl2 context")?
       .cast::<WebGl2RenderingContext>()?;
 
@@ -303,8 +298,7 @@ impl Gpu {
         WebGl2RenderingContext::RED,
         WebGl2RenderingContext::FLOAT,
         Some(&self.audio_time_domain_array),
-      )
-      .map_err(JsValueError)?;
+      )?;
 
     self
       .analyser_node
@@ -336,8 +330,7 @@ impl Gpu {
         WebGl2RenderingContext::RED,
         WebGl2RenderingContext::FLOAT,
         Some(&self.audio_frequency_array),
-      )
-      .map_err(JsValueError)?;
+      )?;
 
     self.gl.uniform1f(Some(self.uniform("alpha")), filter.alpha);
 
@@ -483,18 +476,15 @@ impl Gpu {
     );
 
     let mut array = vec![0; (self.resolution * self.resolution * 4) as usize];
-    self
-      .gl
-      .read_pixels_with_opt_u8_array(
-        0,
-        0,
-        self.resolution as i32,
-        self.resolution as i32,
-        WebGl2RenderingContext::RGBA,
-        WebGl2RenderingContext::UNSIGNED_BYTE,
-        Some(&mut array),
-      )
-      .map_err(JsValueError)?;
+    self.gl.read_pixels_with_opt_u8_array(
+      0,
+      0,
+      self.resolution as i32,
+      self.resolution as i32,
+      WebGl2RenderingContext::RGBA,
+      WebGl2RenderingContext::UNSIGNED_BYTE,
+      Some(&mut array),
+    )?;
 
     let image = ImageBuffer::from_raw(self.resolution, self.resolution, array)
       .ok_or("Failed to create ImageBuffer")?;

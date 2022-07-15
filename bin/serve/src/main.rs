@@ -11,7 +11,9 @@ use {
     net::SocketAddr,
     process::{self, Command},
   },
-  tower_http::{services::ServeDir, set_header::SetResponseHeaderLayer, trace::TraceLayer},
+  tower_http::{
+    services::ServeDir, services::ServeFile, set_header::SetResponseHeaderLayer, trace::TraceLayer,
+  },
   tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
 };
 
@@ -39,12 +41,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
   let app = Router::new()
     .fallback(
-      get_service(ServeDir::new("www")).handle_error(|err| async move {
-        (
-          StatusCode::INTERNAL_SERVER_ERROR,
-          format!("I/O error: {}", err),
-        )
-      }),
+      get_service(ServeDir::new("www").fallback(ServeFile::new("www/index.html"))).handle_error(
+        |err| async move {
+          (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("I/O error: {}", err),
+          )
+        },
+      ),
     )
     .layer(SetResponseHeaderLayer::overriding(
       header::CACHE_CONTROL,

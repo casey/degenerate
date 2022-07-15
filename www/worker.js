@@ -704,7 +704,7 @@ self.addEventListener('message', async function (event) {
       }
       lastFrame = now;
       break;
-    case 'script':
+    case 'program':
       frameCallbacks = [];
       try {
         await new AsyncFunction(message.content)();
