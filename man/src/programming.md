@@ -34,8 +34,8 @@ following steps:
    bounds, wrap them back in bounds
 4. Sample the source image at those coordinates if they are in bounds,
    otherwise use the current default color
-5. If the pixel is inside of the current SDf, apply the color transformation,
-   otherwise use the original color
+5. If the pixel is inside of the current signed distance field, apply the color
+   transformation, otherwise use the original color
 6. Save the generated pixel to the destination image
 
 ## API
