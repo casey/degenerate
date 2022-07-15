@@ -1,7 +1,7 @@
-scale(0.5);
+scale(2.0);
 circle();
 render();
 all();
-scale(filter.scale * 0.9);
+scale(2.0 / 0.9);
 wrap(true);
 render();

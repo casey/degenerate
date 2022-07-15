@@ -1,4 +1,3 @@
-rotate(0.05 * TAU);
-scale(2);
+transform(0.05 * TAU, [0.5, 0.5], [0, 0]);
 x();
 render();
