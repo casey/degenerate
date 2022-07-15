@@ -566,7 +566,7 @@ function square() {
 }
 
 // A shape that covers pixels where the audio time domain data is large.
-function time_domain() {
+function timeDomain() {
   filter.shape = SHAPE_TIME_DOMAIN;
 }
 
