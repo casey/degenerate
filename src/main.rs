@@ -8,7 +8,6 @@ use {
   image::{ImageBuffer, ImageError, ImageOutputFormat},
   js_sys::{Float32Array, Promise},
   lazy_static::lazy_static,
-  nalgebra::{Similarity2, UnitComplex},
   serde::{Deserialize, Serialize},
   std::{
     collections::BTreeMap,

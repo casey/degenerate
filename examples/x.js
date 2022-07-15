@@ -4,7 +4,7 @@ x();
 
 scale(0.5);
 
-for (_ of range(8)) {
+for (let i = 0; i < 8; i++) {
   render();
   wrap(!filter.wrap);
 }

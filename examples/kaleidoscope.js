@@ -1,4 +1,5 @@
 let rotation = 5 / 6 * TAU;
+let scale = 1.0;
 
 while(true) {
   reboot();
@@ -7,11 +8,12 @@ while(true) {
 
   circle();
 
-  scale(filter.scale * 0.75);
+  scale *= 0.75;
+  scale(scale);
 
   wrap(!filter.wrap);
 
-  for (_ of range(8)) {
+  for (let i = 0; i < 8; i++) {
     render();
   }
 
@@ -19,11 +21,11 @@ while(true) {
     rotation += delta() / 30000 * TAU;
   }
 
-  rotate(filter.rotation + rotation);
+  rotate(rotation);
 
   rotateColor('blue', 0.05 * TAU);
 
-  for (_ of range(8)) {
+  for (let i = 0; i < 8; i++) {
     render();
   }
 
