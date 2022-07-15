@@ -2,25 +2,25 @@
 
 precision highp float;
 
-const int MASK_ALL = 0;
-const int MASK_CHECK = 1;
-const int MASK_CIRCLE = 2;
-const int MASK_CROSS = 3;
-const int MASK_EQUALIZER = 4;
-const int MASK_FREQUENCY = 5;
-const int MASK_MOD = 6;
-const int MASK_ROWS = 7;
-const int MASK_SAMPLE = 8;
-const int MASK_SQUARE = 9;
-const int MASK_TOP = 10;
-const int MASK_WAVE = 11;
-const int MASK_X = 12;
+const int FIELD_ALL = 0;
+const int FIELD_CHECK = 1;
+const int FIELD_CIRCLE = 2;
+const int FIELD_CROSS = 3;
+const int FIELD_EQUALIZER = 4;
+const int FIELD_FREQUENCY = 5;
+const int FIELD_MOD = 6;
+const int FIELD_ROWS = 7;
+const int FIELD_SQUARE = 8;
+const int FIELD_TIME_DOMAIN = 9;
+const int FIELD_TOP = 10;
+const int FIELD_WAVE = 11;
+const int FIELD_X = 12;
 
 uniform bool coordinates;
 uniform bool wrap;
 uniform float alpha;
 uniform float resolution;
-uniform int mask;
+uniform int field;
 uniform mat3 coordinate_transform;
 uniform mat4 color_transform;
 uniform sampler2D audio_frequency;
@@ -50,41 +50,107 @@ float audio_time_domain_sample(vec2 position) {
   return texture(audio_time_domain, quadrant(position)).r;
 }
 
-bool masked(vec2 position, uvec2 pixel_position) {
-  switch (mask) {
-    case MASK_ALL:
-      return true;
-    case MASK_CHECK:
-      ivec2 i = ivec2((position + 1.0) * 4.0);
-      return i.x % 2 != i.y % 2;
-    case MASK_CIRCLE:
-      return length(position) < 1.0;
-    case MASK_CROSS:
-      return abs(position.x) < 0.25 || abs(position.y) < 0.25;
-    case MASK_EQUALIZER:
-      return quadrant(position).y < audio_frequency_sample(position);
-    case MASK_FREQUENCY:
-      return abs(audio_frequency_sample(position)) > 0.125;
-    case MASK_MOD:
-      if (divisor == 0u) {
-        return false;
-      } else {
-        return (pixel_position.y * uint(resolution) + pixel_position.x) % divisor == remainder;
-      }
-    case MASK_ROWS:
-      return pixel_position.y % (nrows + step) < nrows;
-    case MASK_SAMPLE:
-      return abs(audio_time_domain_sample(position)) > 0.01;
-    case MASK_SQUARE:
-      return abs(position.x) < 0.5 && abs(position.y) < 0.5;
-    case MASK_TOP:
-      return position.y > 0.0;
-    case MASK_X:
-      return abs(abs(position.x) - abs(position.y)) < 0.25;
-    case MASK_WAVE:
-      return abs(position.y - audio_time_domain_sample(position)) < 0.1;
+float x(vec2 p, float size, float radius) {
+  p = abs(p);
+  return length(p - min(p.x + p.y, size) * 0.5) - radius;
+}
+
+float box(vec2 p, float width, float height) {
+  vec2 d = abs(p) - vec2(width, height);
+  return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+float circle(vec2 p, float radius) {
+  return length(p) - radius;
+}
+
+float cross(vec2 p, float size, float thickness, float radius) {
+  vec2 b = vec2(size, thickness);
+  p = abs(p);
+  p = (p.y > p.x) ? p.yx : p.xy;
+  vec2  q = p - b;
+  float k = max(q.y, q.x);
+  vec2  w = (k > 0.0) ? q : vec2(thickness - p.x, -k);
+  return sign(k) * length(max(w, 0.0)) + radius;
+}
+
+float wave(vec2 p, float thickness) {
+  return abs(p.y - audio_time_domain_sample(p)) - thickness;
+}
+
+float time_domain(vec2 p) {
+  return -abs(audio_time_domain_sample(p));
+}
+
+float frequency(vec2 p, float threshold) {
+  return threshold - audio_frequency_sample(p);
+}
+
+float equalizer(vec2 p) {
+  return quadrant(p).y - audio_frequency_sample(p);
+}
+
+float top(vec2 p) {
+  return -p.y;
+}
+
+float rows(uvec2 p, uint nrows, uint step) {
+  if (p.y % (nrows + step) < nrows) {
+    return -1.0;
+  } else {
+    return 1.0;
+  }
+}
+
+float mod(uvec2 px, uint divisor, uint remainder) {
+  if (divisor == 0u) {
+    return 1.0;
+  } else if ((px.y * uint(resolution) + px.x) % divisor == remainder) {
+    return -1.0;
+  } else {
+    return 1.0;
+  }
+}
+
+float check(vec2 p) {
+  ivec2 i = ivec2((p + 1.0) * 4.0);
+  if (i.x % 2 != i.y % 2) {
+    return -1.0;
+  } else {
+    return 1.0;
+  }
+}
+
+float distance(vec2 p, uvec2 px) {
+  switch (field) {
+    case FIELD_ALL:
+      return -1.0;
+    case FIELD_CHECK:
+      return check(p);
+    case FIELD_CIRCLE:
+      return circle(p, 1.0);
+    case FIELD_CROSS:
+      return cross(p, 1.0, 0.25, 0.0);
+    case FIELD_EQUALIZER:
+      return equalizer(p);
+    case FIELD_FREQUENCY:
+      return frequency(p, 0.125);
+    case FIELD_MOD:
+      return mod(px, divisor, remainder);
+    case FIELD_ROWS:
+      return rows(px, nrows, step);
+    case FIELD_TIME_DOMAIN:
+      return time_domain(p);
+    case FIELD_SQUARE:
+      return box(p, 0.5, 0.5);
+    case FIELD_TOP:
+      return top(p);
+    case FIELD_WAVE:
+      return wave(p, 0.1);
+    case FIELD_X:
+      return x(p, 2.0, 0.25);
     default:
-      return false;
+      return 1.0;
   }
 }
 
@@ -120,8 +186,11 @@ void main() {
   // Convert color back from [-1,-1] to [0,1]
   vec3 transformed_color = octant(transformed_color_vector.xyz);
 
-  // Set alpha to 0.0 if outside the mask
-  float alpha = masked(wrapped, pixel_position) ? alpha : 0.0;
+  // Get the signed distance from the field
+  float distance = distance(wrapped, pixel_position);
+
+  // Set alpha to zero if distance is negative
+  float alpha = distance <= 0.0 ? alpha : 0.0;
 
   // Perform alpha blending
   vec3 output_color_rgb = transformed_color * alpha + original_color * (1.0 - alpha);

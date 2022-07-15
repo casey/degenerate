@@ -1,5 +1,5 @@
 reboot();
-sample();
+timeDomain();
 record();
 while (true) {
   await render();
