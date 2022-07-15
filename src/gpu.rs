@@ -388,7 +388,7 @@ impl Gpu {
 
     self
       .gl
-      .uniform1i(Some(self.uniform("mask")), filter.mask as i32);
+      .uniform1i(Some(self.uniform("shape")), filter.shape as i32);
 
     self
       .gl

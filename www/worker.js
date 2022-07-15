@@ -668,15 +668,15 @@ class Filter {
       mat4.create(),
       vec3.fromValues(-1, -1, -1)
     );
-    this.defaultColor = [0.0, 0.0, 0.0];
     this.coordinates = false;
+    this.defaultColor = [0.0, 0.0, 0.0];
+    this.rotation = 0.0;
+    this.scale = 1.0;
     this.shape = SHAPE_ALL;
     this.shapeModDivisor = 0;
     this.shapeModRemainder = 0;
     this.shapeRowsRows = 0;
     this.shapeRowsStep = 0;
-    this.rotation = 0.0;
-    this.scale = 1.0;
     this.wrap = false;
   }
 }
