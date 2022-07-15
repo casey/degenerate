@@ -110,7 +110,7 @@ impl App {
       oscillator_node,
       recording: false,
       run_button: run_button.clone(),
-      select,
+      select: select.clone(),
       share_button: share_button.clone(),
       stderr: stderr.clone(),
       textarea: textarea.clone(),
@@ -140,7 +140,7 @@ impl App {
       app.on_keydown(event)
     })?;
 
-    Self::add_event_listener(&app, &textarea, "change", move |app| {
+    Self::add_event_listener(&app, &select, "change", move |app| {
       app.on_selection_changed()
     })?;
 
