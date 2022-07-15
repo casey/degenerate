@@ -134,47 +134,23 @@ impl App {
       }) as Box<dyn FnMut(f64)>));
     }
 
-    let local = app.clone();
-    textarea.add_event_listener("input", move || {
-      let app = local.lock().unwrap();
-      let result = app.on_input();
-      app.stderr.update(result);
+    Self::add_event_listener(&app, &textarea, "input", move |app| app.on_input())?;
+
+    Self::add_event_listener_with_event(&app, &textarea, "keydown", move |app, event| {
+      app.on_keydown(event)
     })?;
 
-    let local = app.clone();
-    textarea.add_event_listener_with_event("keydown", move |event| {
-      let mut app = local.lock().unwrap();
-      let result = app.on_keydown(event);
-      app.stderr.update(result);
+    Self::add_event_listener(&app, &select, "change", move |app| {
+      app.on_selection_changed()
     })?;
 
-    let local = app.clone();
-    select.add_event_listener("change", move || {
-      let mut app = local.lock().unwrap();
-      let result = app.on_selection_changed();
-      app.stderr.update(result);
+    Self::add_event_listener_with_event(&app, &worker, "message", move |app, event| {
+      app.on_message(event)
     })?;
 
-    let local = app.clone();
-    worker.add_event_listener_with_event("message", move |event: MessageEvent| {
-      let mut app = local.lock().unwrap();
-      let result = app.on_message(event);
-      app.stderr.update(result);
-    })?;
+    Self::add_event_listener(&app, &run_button, "click", move |app| app.on_run())?;
 
-    let local = app.clone();
-    run_button.add_event_listener("click", move || {
-      let mut app = local.lock().unwrap();
-      let result = app.on_run();
-      app.stderr.update(result);
-    })?;
-
-    let local = app.clone();
-    share_button.add_event_listener("click", move || {
-      let mut app = local.lock().unwrap();
-      let result = app.on_share();
-      app.stderr.update(result);
-    })?;
+    Self::add_event_listener(&app, &share_button, "click", move |app| app.on_share())?;
 
     let location = window.location();
 
@@ -199,6 +175,29 @@ impl App {
     app.html.set_class_name("ready");
 
     Ok(())
+  }
+
+  fn add_event_listener(
+    app: &Arc<Mutex<Self>>,
+    target: &EventTarget,
+    name: &str,
+    callback: impl Fn(&mut Self) -> Result + 'static,
+  ) -> Result {
+    Self::add_event_listener_with_event(app, target, name, move |app, _: Event| callback(app))
+  }
+
+  fn add_event_listener_with_event<E: FromWasmAbi + 'static>(
+    app: &Arc<Mutex<Self>>,
+    target: &EventTarget,
+    name: &str,
+    callback: impl Fn(&mut Self, E) -> Result + 'static,
+  ) -> Result {
+    let local = app.clone();
+    target.add_event_listener_with_event(name, move |event| {
+      let mut app = local.lock().unwrap();
+      let result = callback(&mut app, event);
+      app.stderr.update(result);
+    })
   }
 
   pub(super) fn on_keydown(&mut self, event: KeyboardEvent) -> Result {
