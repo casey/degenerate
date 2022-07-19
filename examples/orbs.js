@@ -1,7 +1,7 @@
 reboot();
 rotateColor('green', 0.05 * TAU);
 circle();
-scale(0.75);
+scale(1 / 0.75);
 wrap(true);
 for (let i = 0; i < 8; i++) {
   render();
