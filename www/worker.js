@@ -446,7 +446,6 @@ function rotateColor(axis, radians) {
   }
 }
 
-<<<<<<< HEAD
 // Set coordinate transform to a rotation.
 //
 // ```
@@ -458,12 +457,7 @@ function rotate(rotation) {
   transform(rotation, [1.0, 1.0], [0.0, 0.0]);
 }
 
-// Mask pixels where `pixel.y % (nrows + step) < nrows`. Will mask `nrows` pixels and then
-||||||| 031b4d8
-// Mask pixels where `pixel.y % (nrows + step) < nrows`. Will mask `nrows` pixels and then
-=======
 // Field that covers pixels where `pixel.y % (nrows + step) < nrows`. Will cover `nrows` pixels and then
->>>>>>> origin/master
 // skip `step` pixels.
 //
 // ```
@@ -570,7 +564,6 @@ function top() {
   filter.field = FIELD_TOP;
 }
 
-<<<<<<< HEAD
 // Set the coordinate transform using `rotation`, `scale`, and `translation`.
 // Arguments that are omitted or undefined are skipped.
 //
@@ -591,12 +584,7 @@ function transform(rotation, scale, translation) {
   );
 }
 
-// Mask pixels within the audio waveform.
-||||||| 031b4d8
-// Mask pixels within the audio waveform.
-=======
 // A Waveform field.
->>>>>>> origin/master
 //
 // ```
 // record();
