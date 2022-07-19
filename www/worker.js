@@ -14,21 +14,21 @@ let vec2 = glMatrix.vec2;
 let vec3 = glMatrix.vec3;
 let vec4 = glMatrix.vec4;
 
-// Mask all pixels.
+// Field that covers all pixels.
 //
 // ```
 // all();
 // render();
 // ```
 //
-// `MASK_ALL` is the default mask, so the above example could have been written
+// `FIELD_ALL` is the default field, so the above example could have been written
 // as:
 //
 // ```
 // render();
 // ```
 function all() {
-  filter.mask = MASK_ALL;
+  filter.field = FIELD_ALL;
 }
 
 // Set the alpha blending factor. `alpha` will be used to blend the
@@ -50,14 +50,14 @@ function assert(condition, message) {
   }
 }
 
-// Mask pixels in a checkerboard pattern.
+// A checkerboard pattern.
 //
 // ```
 // check;
 // render();
 // ```
 function check() {
-  filter.mask = MASK_CHECK;
+  filter.field = FIELD_CHECK;
 }
 
 // Create a new checkbox widget with the label `name`, and return true if it is
@@ -87,14 +87,14 @@ function checkbox(name) {
   return !!widgets['checkbox-' + name];
 }
 
-// Mask pixels within a circle.
+// A circle.
 //
 // ```
 // circle();
 // render();
 // ```
 function circle() {
-  filter.mask = MASK_CIRCLE;
+  filter.field = FIELD_CIRCLE;
 }
 
 // Clear the canvas.
@@ -108,14 +108,14 @@ function clear() {
   self.postMessage(JSON.stringify('clear'));
 }
 
-// Mask pixels within a cross shape.
+// A cross field.
 //
 // ```
 // cross();
 // render();
 // ```
 function cross() {
-  filter.mask = MASK_CROSS;
+  filter.field = FIELD_CROSS;
 }
 
 // Set the decibel range for normalization of raw frequency data into values
@@ -193,7 +193,7 @@ function elapsed() {
   return Date.now() - start;
 }
 
-// Mask pixels in an equalizer pattern.
+// An equalizer pattern.
 //
 // ```
 // record();
@@ -204,7 +204,7 @@ function elapsed() {
 // }
 // ```
 function equalizer() {
-  filter.mask = MASK_EQUALIZER;
+  filter.field = FIELD_EQUALIZER;
 }
 
 // Returns a promise that resolves when the browser is ready to display a new
@@ -227,9 +227,9 @@ async function frame() {
   });
 }
 
-// Mask pixels where the audio frequency data is large.
+// A frequency field.
 function frequency() {
-  filter.mask = MASK_FREQUENCY;
+  filter.field = FIELD_FREQUENCY;
 }
 
 // Set the color transformation to the identity transformation. The identity
@@ -278,16 +278,16 @@ function invert() {
   mat4.fromScaling(filter.colorTransform, vec3.fromValues(-1, -1, -1));
 }
 
-// Mask pixels where the pixel's index mod `divisor` is equal to `remainder`.
+// Field that covers pixels where the pixel's index mod `divisor` is equal to `remainder`.
 //
 // ```
 // mod(7,0);
 // render();
 // ```
 function mod(divisor, remainder) {
-  filter.maskModDivisor = divisor;
-  filter.maskModRemainder = remainder;
-  filter.mask = MASK_MOD;
+  filter.fieldModDivisor = divisor;
+  filter.fieldModRemainder = remainder;
+  filter.field = FIELD_MOD;
 }
 
 // Set the oscillator gain. The oscillator produces a sine wave tone, useful
@@ -330,7 +330,7 @@ function oscillatorFrequency(hz) {
 // ```
 // while(true) {
 //   reboot();
-//   switch (radio('shape', ['x', 'circle', 'cross'])) {
+//   switch (radio('field', ['x', 'circle', 'cross'])) {
 //     case 'x':
 //       x();
 //       break;
@@ -446,6 +446,7 @@ function rotateColor(axis, radians) {
   }
 }
 
+<<<<<<< HEAD
 // Set coordinate transform to a rotation.
 //
 // ```
@@ -458,6 +459,11 @@ function rotate(rotation) {
 }
 
 // Mask pixels where `pixel.y % (nrows + step) < nrows`. Will mask `nrows` pixels and then
+||||||| 031b4d8
+// Mask pixels where `pixel.y % (nrows + step) < nrows`. Will mask `nrows` pixels and then
+=======
+// Field that covers pixels where `pixel.y % (nrows + step) < nrows`. Will cover `nrows` pixels and then
+>>>>>>> origin/master
 // skip `step` pixels.
 //
 // ```
@@ -465,14 +471,9 @@ function rotate(rotation) {
 // render();
 // ```
 function rows(nrows, step) {
-  filter.maskRowsRows = nrows;
-  filter.maskRowsStep = step;
-  filter.mask = MASK_ROWS;
-}
-
-// Mask pixels where the audio time domain data is large.
-function sample() {
-  filter.mask = MASK_SAMPLE;
+  filter.fieldRowsRows = nrows;
+  filter.fieldRowsStep = step;
+  filter.field = FIELD_ROWS;
 }
 
 // Save the current canvas as a PNG.
@@ -544,26 +545,32 @@ function slider(name, min, max, step, initial) {
   return widgets['slider-' + name] ?? initial;
 }
 
-// Mask pixels within a square.
+// A square field.
 //
 // ```
 // square();
 // render();
 // ```
 function square() {
-  filter.mask = MASK_SQUARE;
+  filter.field = FIELD_SQUARE;
 }
 
-// Mask the pixels in the upper half of the canvas.
+// A field that covers pixels where the audio time domain data is large.
+function timeDomain() {
+  filter.field = FIELD_TIME_DOMAIN;
+}
+
+// A field covering the top half of the canvas.
 //
 // ```
 // top();
 // render();
 // ```
 function top() {
-  filter.mask = MASK_TOP;
+  filter.field = FIELD_TOP;
 }
 
+<<<<<<< HEAD
 // Set the coordinate transform using `rotation`, `scale`, and `translation`.
 // Arguments that are omitted or undefined are skipped.
 //
@@ -585,6 +592,11 @@ function transform(rotation, scale, translation) {
 }
 
 // Mask pixels within the audio waveform.
+||||||| 031b4d8
+// Mask pixels within the audio waveform.
+=======
+// A Waveform field.
+>>>>>>> origin/master
 //
 // ```
 // record();
@@ -595,7 +607,7 @@ function transform(rotation, scale, translation) {
 // }
 // ```
 function wave() {
-  filter.mask = MASK_WAVE;
+  filter.field = FIELD_WAVE;
 }
 
 // Set wrap. When `wrap` is `true`, out of bounds samples will be wrapped back within bounds.
@@ -610,14 +622,14 @@ function wrap(warp) {
   filter.wrap = warp;
 }
 
-// Mask pixels in an X shape.
+// An X field.
 //
 // ```
 // x();
 // render();
 // ```
 function x() {
-  filter.mask = MASK_X;
+  filter.field = FIELD_X;
 }
 
 // The ratio of a circle's circumference to its diameter. Useful for expressing
@@ -630,24 +642,24 @@ const PI = Math.PI;
 // to rotate 1/4 turn, use `rotate(1/4 * TAU)`.
 const TAU = Math.PI * 2;
 
-// Mask constants. The mask determines which pixels the current color transform
+// Field constants. The field determines which pixels the current color transform
 // will be applied to. These values should be kept in sync with those in
 // `www/fragment.glsl`. See the corresponding functions and case statements,
-// e.g., `all()` in this file and `case MASK_ALL:` in `www/fragment.glsl`, for
-// more details and the mask definition, respectively.
-const MASK_ALL = 0;
-const MASK_CHECK = 1;
-const MASK_CIRCLE = 2;
-const MASK_CROSS = 3;
-const MASK_EQUALIZER = 4;
-const MASK_FREQUENCY = 5;
-const MASK_MOD = 6;
-const MASK_ROWS = 7;
-const MASK_SAMPLE = 8;
-const MASK_SQUARE = 9;
-const MASK_TOP = 10;
-const MASK_WAVE = 11;
-const MASK_X = 12;
+// e.g., `all()` in this file and `case FIELD_ALL:` in `www/fragment.glsl`, for
+// more details and the field definition, respectively.
+const FIELD_ALL = 0;
+const FIELD_CHECK = 1;
+const FIELD_CIRCLE = 2;
+const FIELD_CROSS = 3;
+const FIELD_EQUALIZER = 4;
+const FIELD_FREQUENCY = 5;
+const FIELD_MOD = 6;
+const FIELD_ROWS = 7;
+const FIELD_SQUARE = 8;
+const FIELD_TIME_DOMAIN = 9;
+const FIELD_TOP = 10;
+const FIELD_WAVE = 11;
+const FIELD_X = 12;
 
 class Rng {
   constructor(seed) {
@@ -673,13 +685,13 @@ class Filter {
       vec3.fromValues(-1, -1, -1)
     );
     this.coordinateTransform = mat3.create();
-    this.defaultColor = [0.0, 0.0, 0.0];
     this.coordinates = false;
-    this.mask = MASK_ALL;
-    this.maskModDivisor = 0;
-    this.maskModRemainder = 0;
-    this.maskRowsRows = 0;
-    this.maskRowsStep = 0;
+    this.defaultColor = [0.0, 0.0, 0.0];
+    this.field = FIELD_ALL;
+    this.fieldModDivisor = 0;
+    this.fieldModRemainder = 0;
+    this.fieldRowsRows = 0;
+    this.fieldRowsStep = 0;
     this.wrap = false;
   }
 }
