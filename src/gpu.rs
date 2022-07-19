@@ -357,12 +357,6 @@ impl Gpu {
       .gl
       .uniform1ui(Some(self.uniform("step")), filter.field_rows_step);
 
-    let mut similarity = Similarity2::<f32>::identity();
-    similarity.append_rotation_mut(&UnitComplex::from_angle(-filter.rotation));
-    if filter.scale != 0.0 {
-      similarity.append_scaling_mut(filter.scale);
-    }
-
     self.gl.uniform_matrix4fv_with_f32_array(
       Some(self.uniform("color_transform")),
       false,
@@ -372,7 +366,7 @@ impl Gpu {
     self.gl.uniform_matrix3fv_with_f32_array(
       Some(self.uniform("coordinate_transform")),
       false,
-      similarity.inverse().to_homogeneous().as_slice(),
+      &filter.coordinate_transform,
     );
 
     self

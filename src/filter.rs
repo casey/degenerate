@@ -5,10 +5,9 @@ use super::*;
 pub(crate) struct Filter {
   pub(crate) alpha: f32,
   pub(crate) color_transform: [f32; 16],
+  pub(crate) coordinate_transform: [f32; 9],
   pub(crate) coordinates: bool,
   pub(crate) default_color: [f32; 3],
-  pub(crate) rotation: f32,
-  pub(crate) scale: f32,
   pub(crate) field: u32,
   pub(crate) field_mod_divisor: u32,
   pub(crate) field_mod_remainder: u32,

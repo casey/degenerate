@@ -1,5 +1,5 @@
 x();
-scale(0.5);
+scale(2.0);
 for (let i = 0; i < 8; i++) {
   render();
 }

@@ -15,7 +15,7 @@ for (let i = 0; i < 20; i++) {
 
 rotateColor('blue', 0.1 * TAU);
 
-rotate(filter.rotation + 0.1 * TAU);
+rotate(0.2 * TAU);
 
 for (let i = 0; i < 10; i++) {
   rng.choose(fields)();

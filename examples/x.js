@@ -2,9 +2,9 @@ reboot();
 
 x();
 
-scale(0.5);
+scale(2);
 
-for (_ of range(8)) {
+for (let i = 0; i < 8; i++) {
   render();
-  wrap(!filter.wrap);
+  wrap(i % 2 == 0);
 }

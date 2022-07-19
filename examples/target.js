@@ -2,8 +2,8 @@ reboot();
 
 circle();
 
-scale(0.5);
+scale(2.0);
 
-for (_ of range(8)) {
+for (let i = 0; i < 8; i++) {
   render();
 }

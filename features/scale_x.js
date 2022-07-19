@@ -1,3 +1,3 @@
-scale(2);
+scale(0.5);
 x();
 render();

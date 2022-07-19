@@ -5,7 +5,7 @@ for (let i = 0; i < 10; i++) {
   render();
 }
 rotateColor('blue', 0.09 * TAU);
-rotate(filter.rotation + 0.09 * TAU);
+rotate(0.16 * TAU);
 for (let i = 0; i < 10; i++) {
   render();
 }

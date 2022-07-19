@@ -6,10 +6,10 @@ while (true) {
     alpha(1);
   }
   circle();
-  scale(filter.scale * 0.5);
-  for (_ of range(8)) {
+  transform(0, [2, 2], [0, 0]);
+  for (let i = 0; i < 8; i++) {
     render();
-    wrap(!filter.wrap);
+    wrap(i % 2 == 0);
   }
   await frame();
 }

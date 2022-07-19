@@ -358,22 +358,6 @@ function radio(name, options) {
   return widgets['radio-' + name] ?? options[0];
 }
 
-// Yield values in the half-open range `[0,iterations)`.
-//
-// ```
-// x();
-// scale(0.9);
-// for(_ of range(10)) {
-//   render();
-//   await sleep(1000);
-// }
-// ```
-function* range(iterations) {
-  for (let i = 0; i < iterations; i++) {
-    yield i;
-  }
-}
-
 // Reset the image filter and clear the canvas.
 // ```
 // x();
@@ -436,17 +420,6 @@ function resolution(resolution) {
   }
 }
 
-// Set `rotation` to the current rotation.
-//
-// ```
-// rotate(0.1);
-// x();
-// render();
-// ```
-function rotate(rotation) {
-  filter.rotation = rotation;
-}
-
 // Use rotation as the color transformation.
 //
 // Valid values for `axis` are `red`, `green`, and `blue`. Applying `rotateColor` multiple
@@ -471,6 +444,17 @@ function rotateColor(axis, radians) {
       mat4.fromZRotation(filter.colorTransform, radians);
       break;
   }
+}
+
+// Set coordinate transform to a rotation.
+//
+// ```
+// rotate(0.1);
+// x();
+// render();
+// ```
+function rotate(rotation) {
+  transform(rotation, [1.0, 1.0], [0.0, 0.0]);
 }
 
 // Field that covers pixels where `pixel.y % (nrows + step) < nrows`. Will cover `nrows` pixels and then
@@ -508,7 +492,7 @@ function save() {
 // render();
 // ```
 function scale(scale) {
-  filter.scale = scale;
+  transform(0, [scale, scale], [0.0, 0.0]);
 }
 
 // Return a promise that resolves after `ms` milliseconds.
@@ -578,6 +562,26 @@ function timeDomain() {
 // ```
 function top() {
   filter.field = FIELD_TOP;
+}
+
+// Set the coordinate transform using `rotation`, `scale`, and `translation`.
+// Arguments that are omitted or undefined are skipped.
+//
+// ```
+// circle();
+// render();
+// transform(TAU / 3, [2.0, 0.5], [0.1, 0.5]);
+// render();
+// ```
+function transform(rotation, scale, translation) {
+  mat3.identity(filter.coordinateTransform);
+  mat3.rotate(filter.coordinateTransform, filter.coordinateTransform, rotation);
+  mat3.scale(filter.coordinateTransform, filter.coordinateTransform, scale);
+  mat3.translate(
+    filter.coordinateTransform,
+    filter.coordinateTransform,
+    translation
+  );
 }
 
 // A Waveform field.
@@ -668,10 +672,9 @@ class Filter {
       mat4.create(),
       vec3.fromValues(-1, -1, -1)
     );
+    this.coordinateTransform = mat3.create();
     this.coordinates = false;
     this.defaultColor = [0.0, 0.0, 0.0];
-    this.rotation = 0.0;
-    this.scale = 1.0;
     this.field = FIELD_ALL;
     this.fieldModDivisor = 0;
     this.fieldModRemainder = 0;
