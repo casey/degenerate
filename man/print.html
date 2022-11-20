@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="programming.html"><strong aria-hidden="true">2.</strong> Programming</a></li><li class="chapter-item expanded "><a href="rendering.html"><strong aria-hidden="true">3.</strong> Rendering</a></li><li class="chapter-item expanded "><a href="nfts.html"><strong aria-hidden="true">4.</strong> Degenerate NFTs</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="programming.html"><strong aria-hidden="true">2.</strong> Programming</a></li><li class="chapter-item expanded "><a href="rendering.html"><strong aria-hidden="true">3.</strong> Rendering</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -976,24 +976,6 @@ emits a full-screen triangle.</p>
 <a href="https://github.com/casey/degenerate/blob/master/src/fragment.glsl">fragment.glsl</a>,
 performs the bulk of the rendering by determining the color of each pixel of
 the triangle produced by the vertex shader,</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="degenerate-bitcoin-nfts"><a class="header" href="#degenerate-bitcoin-nfts">Degenerate Bitcoin NFTs</a></h1>
-<p><strong><a href="nfts.html#warnings">The Command Line is the Frontline: This is the bleeding edge.</a></strong></p>
-<p>Degenerate NFTs are generative art produced by <a href="nfts.html#degenerate">Degenerate</a> and issued as NFTs on the Bitcoin blockchain using the <a href="nfts.html#ordinals">Ordinal</a> NFT scheme.</p>
-<p>We are minting NFTs in order to gain experience with the technology, gather feedback, and build a community. Degenerate NFTs should be treated as digital baubles that glint and glimmer but may suddenly and spontaneously shatter.</p>
-<h2 id="mints"><a class="header" href="#mints">Mints</a></h2>
-<p>Mints will be announced on <a href="https://twitter.com/degencomputer">Twitter</a>. Until the underlying NFT scheme is mature, we'll be giving away NFTs or selling them for nominal amounts of sats using the Lightning Network.</p>
-<p>Minted NFTs will be posted to <a href="https://instagram.com/degencomputer">Instagram</a>.</p>
-<h2 id="discussion-and-help"><a class="header" href="#discussion-and-help">Discussion and Help</a></h2>
-<p>Visit the <a href="https://discord.gg/87cjuz4FYg">Degenerate Discord</a> to discuss the Degenerate engine, ordinals, Degenerate NFTs, or get help minting your own Ordinal NFTs of any kind.</p>
-<h2 id="minting-sending-and-receiving-ordinals"><a class="header" href="#minting-sending-and-receiving-ordinals">Minting, sending, and receiving Ordinals</a></h2>
-<p>Ordinal NFTs are bound to ordinal numbers, a numbering scheme for satoshis. Ownership of ordinals is tracked using the Bitcoin blockchain, and transferring ordinals is done using Bitcoin transactions.</p>
-<p>There are no ordinal-aware wallets, so transfers must be done manually, either by misappropriating existing wallet software, or by writing your own.</p>
-<p>To find a good ordinal number to attach an NFT to, use an ord API server. A public instance is running at api.ordinals.com:8000. To look up the ordinal numbers in a given UTXO, use the list API endpoint. <a href="http://api.ordinals.com:8000/list/c581fd4054f1663c7193c640b4d81eeb3d4fca06f1bb29937a082c9122b1a1d6:0">Example API URL for c581fd4054f1663c7193c640b4d81eeb3d4fca06f1bb29937a082c9122b1a1d6:0</a>.</p>
-<p>Ordinal NFTs can be minted and verified using the <code>mint</code> and <code>verify</code> subcommands of the <a href="https://github.com/casey/ord"><code>ord</code> utility</a>.</p>
-<h2 id="warnings"><a class="header" href="#warnings">Warnings</a></h2>
-<p>Ordinals, the Ordinal NFT scheme, and Degenerate NFTs should be considered pre-alpha quality and subject to change at any time.</p>
-<p>Ordinal numbers, defined in <a href="https://github.com/casey/ord/blob/master/bip.mediawiki">The Ordinal BIP</a>, are a mapping of ordinal numbers to satoshis, and ultimately to UTXOs. Ordinal NFTs are assigned to ordinal numbers, and thus rely on the stability and correctness of the underlying mapping. The Ordinal mapping is extremely simple and believe to be complete and bug-free, but further review and discussion is most welcome. The Ordinal spec, <code>ord</code> command line tool, and issue tracker are hosted in the <a href="https://github.com/casey/ord/">ord GitHub repository</a>.</p>
-<p>The Ordinal NFT scheme, implemented <a href="https://github.com/casey/ord/blob/master/src/nft.rs">here</a>, is a scheme for issuing NFTs and assigning them to ordinal numbers, allowing their ownership to be tracked on the Bitcoin blockchain. The NFT scheme has received minimal review, and should be considered unstable. Improvements to the NFT schema may be necessary that render previously issued NFTs invalid according to the new schema.</p>
 
                     </main>
 
