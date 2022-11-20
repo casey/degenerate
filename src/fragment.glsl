@@ -50,21 +50,24 @@ float audio_time_domain_sample(vec2 position) {
   return texture(audio_time_domain, quadrant(position)).r;
 }
 
-float x(vec2 p, float size, float radius) {
-  p = abs(p);
-  return length(p - min(p.x + p.y, size) * 0.5) - radius;
+float field_all() {
+  return -1.0;
 }
 
-float box(vec2 p, float width, float height) {
-  vec2 d = abs(p) - vec2(width, height);
-  return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+float field_check(vec2 p) {
+  ivec2 i = ivec2((p + 1.0) * 4.0);
+  if (i.x % 2 != i.y % 2) {
+    return -1.0;
+  } else {
+    return 1.0;
+  }
 }
 
-float circle(vec2 p, float radius) {
+float field_circle(vec2 p, float radius) {
   return length(p) - radius;
 }
 
-float cross(vec2 p, float size, float thickness, float radius) {
+float field_cross(vec2 p, float size, float thickness, float radius) {
   vec2 b = vec2(size, thickness);
   p = abs(p);
   p = (p.y > p.x) ? p.yx : p.xy;
@@ -74,35 +77,15 @@ float cross(vec2 p, float size, float thickness, float radius) {
   return sign(k) * length(max(w, 0.0)) + radius;
 }
 
-float wave(vec2 p, float thickness) {
-  return abs(p.y - audio_time_domain_sample(p)) - thickness;
-}
-
-float time_domain(vec2 p) {
-  return -abs(audio_time_domain_sample(p));
-}
-
-float frequency(vec2 p, float threshold) {
-  return threshold - audio_frequency_sample(p);
-}
-
-float equalizer(vec2 p) {
+float field_equalizer(vec2 p) {
   return quadrant(p).y - audio_frequency_sample(p);
 }
 
-float top(vec2 p) {
-  return -p.y;
+float field_frequency(vec2 p, float threshold) {
+  return threshold - audio_frequency_sample(p);
 }
 
-float rows(uvec2 p, uint nrows, uint step) {
-  if (p.y % (nrows + step) < nrows) {
-    return -1.0;
-  } else {
-    return 1.0;
-  }
-}
-
-float mod(uvec2 px, uint divisor, uint remainder) {
+float field_mod(uvec2 px, uint divisor, uint remainder) {
   if (divisor == 0u) {
     return 1.0;
   } else if ((px.y * uint(resolution) + px.x) % divisor == remainder) {
@@ -112,45 +95,70 @@ float mod(uvec2 px, uint divisor, uint remainder) {
   }
 }
 
-float check(vec2 p) {
-  ivec2 i = ivec2((p + 1.0) * 4.0);
-  if (i.x % 2 != i.y % 2) {
+float field_none() {
+  return 1.0;
+}
+
+float field_rows(uvec2 p, uint nrows, uint step) {
+  if (p.y % (nrows + step) < nrows) {
     return -1.0;
   } else {
     return 1.0;
   }
 }
 
-float distance(vec2 p, uvec2 px) {
+float field_box(vec2 p, float width, float height) {
+  vec2 d = abs(p) - vec2(width, height);
+  return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+float field_time_domain(vec2 p) {
+  return -abs(audio_time_domain_sample(p));
+}
+
+float field_top(vec2 p) {
+  return -p.y;
+}
+
+float field_wave(vec2 p, float thickness) {
+  return abs(p.y - audio_time_domain_sample(p)) - thickness;
+}
+
+float field_x(vec2 p, float size, float radius) {
+  p = abs(p);
+  return length(p - min(p.x + p.y, size) * 0.5) - radius;
+}
+
+float distance_field(vec2 p, uvec2 px) {
   switch (field) {
     case FIELD_ALL:
-      return -1.0;
+      return field_all();
     case FIELD_CHECK:
-      return check(p);
+      return field_check(p);
     case FIELD_CIRCLE:
-      return circle(p, 1.0);
+      return field_circle(p, 1.0);
     case FIELD_CROSS:
-      return cross(p, 1.0, 0.25, 0.0);
+      return field_cross(p, 1.0, 0.25, 0.0);
     case FIELD_EQUALIZER:
-      return equalizer(p);
+      return field_equalizer(p);
     case FIELD_FREQUENCY:
-      return frequency(p, 0.125);
+      return field_frequency(p, 0.125);
     case FIELD_MOD:
-      return mod(px, divisor, remainder);
+      return field_mod(px, divisor, remainder);
     case FIELD_ROWS:
-      return rows(px, nrows, step);
-    case FIELD_TIME_DOMAIN:
-      return time_domain(p);
+      return field_rows(px, nrows, step);
     case FIELD_SQUARE:
-      return box(p, 0.5, 0.5);
+      return field_box(p, 0.5, 0.5);
+    case FIELD_TIME_DOMAIN:
+      return field_time_domain(p);
     case FIELD_TOP:
-      return top(p);
+      return field_top(p);
     case FIELD_WAVE:
-      return wave(p, 0.1);
+      return field_wave(p, 0.1);
     case FIELD_X:
-      return x(p, 2.0, 0.25);
+      return field_x(p, 2.0, 0.25);
     default:
-      return 1.0;
+      return field_none();
   }
 }
 
@@ -187,7 +195,7 @@ void main() {
   vec3 transformed_color = octant(transformed_color_vector.xyz);
 
   // Get the signed distance from the field
-  float distance = distance(wrapped, pixel_position);
+  float distance = distance_field(wrapped, pixel_position);
 
   // Set alpha to zero if distance is negative
   float alpha = distance <= 0.0 ? alpha : 0.0;
