@@ -49,7 +49,7 @@ serve:
   cargo run --package serve
 
 build-web:
-  cargo --release build --target wasm32-unknown-unknown
+  cargo build --release --target wasm32-unknown-unknown
   wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/release/degenerate.wasm --out-dir www
 
 open:
