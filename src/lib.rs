@@ -4,7 +4,7 @@ use {
   web_sys::{DedicatedWorkerGlobalScope, MessageEvent},
 };
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[serde(tag = "tag", content = "content")]
 pub enum AppMessage {
@@ -16,7 +16,7 @@ pub enum AppMessage {
   },
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum WorkerMessage {
   Clear,
@@ -32,7 +32,7 @@ pub enum WorkerMessage {
   Widget { name: String, widget: Widget },
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Widget {
   Checkbox,
@@ -47,7 +47,25 @@ pub enum Widget {
   },
 }
 
-#[derive(Debug, Serialize)]
+impl Widget {
+  pub fn id(&self, name: &str) -> String {
+    format!("widget-{}-{name}", self.kind())
+  }
+
+  pub fn key(&self, name: &str) -> String {
+    format!("{}-{name}", self.kind())
+  }
+
+  fn kind(&self) -> &str {
+    match self {
+      Self::Checkbox => "checkbox",
+      Self::Slider { .. } => "slider",
+      Self::Radio { .. } => "radio",
+    }
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Filter {
   pub alpha: f32,
