@@ -80,11 +80,22 @@ impl App {
 
     let gpu = Gpu::new(&window, &canvas, &analyser_node)?;
 
-    // let worker = Worker::new("/worker.js")?;
+    let location = window.location();
 
-    let mut worker_options = WorkerOptions::new();
-    worker_options.type_(WorkerType::Module);
-    let worker = Worker::new_with_options("/loader.js", &worker_options)?;
+    let loader = location.pathname()? == "/loader";
+
+    let worker = if loader {
+      nav.remove();
+      run_button.remove();
+      select.remove();
+      share_button.remove();
+      textarea.remove();
+      let mut worker_options = WorkerOptions::new();
+      worker_options.type_(WorkerType::Module);
+      Worker::new_with_options("/loader.js", &worker_options)?
+    } else {
+      Worker::new("/worker.js")?
+    };
 
     let oscillator_gain_node = audio_context.create_gain()?;
     oscillator_gain_node.gain().set_value(0.0);
@@ -154,12 +165,10 @@ impl App {
 
     Self::add_event_listener(&app, &share_button, "click", move |app| app.on_share())?;
 
-    let location = window.location();
-
     let path = location.pathname()?;
 
     match path.split_inclusive('/').collect::<Vec<&str>>().as_slice() {
-      ["/"] => {}
+      ["/"] | ["/", "loader"] => {}
       ["/", "program/" | "program"] => {
         location.set_pathname("/")?;
       }

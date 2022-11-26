@@ -1,19 +1,19 @@
 use {
-  degenerate::{Process, System},
+  degenerate::{Filter, Process, System},
   wasm_bindgen::prelude::wasm_bindgen,
 };
 
-struct Program {
-  system: System,
-}
+// TODO:
+// - hide ui
+// - avoid UI flash
+// - automatically reload when binary changes
+
+struct Program;
 
 impl Process for Program {
   fn new(system: System) -> Self {
-    Self { system }
-  }
-
-  fn on_frame(&mut self) {
-    self.system.save()
+    system.render(Filter::default());
+    Self
   }
 }
 

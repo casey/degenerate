@@ -41,10 +41,6 @@ impl System {
     closure.forget();
   }
 
-  pub fn save(&self) {
-    self.post_message(WorkerMessage::Save);
-  }
-
   fn post_message(&self, worker_message: WorkerMessage) {
     self
       .dedicated_worker_global_scope
@@ -52,6 +48,14 @@ impl System {
         &serde_json::to_string(&worker_message).unwrap(),
       ))
       .unwrap();
+  }
+
+  pub fn render(&self, filter: Filter) {
+    self.post_message(WorkerMessage::Render(filter));
+  }
+
+  pub fn save(&self) {
+    self.post_message(WorkerMessage::Save);
   }
 }
 
@@ -71,6 +75,26 @@ pub struct Filter {
   pub wrap: bool,
 }
 
+impl Default for Filter {
+  fn default() -> Self {
+    Self {
+      alpha: 1.0,
+      color_transform: [
+        -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+      ],
+      coordinate_transform: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+      coordinates: false,
+      default_color: [0.0, 0.0, 0.0],
+      field: 0,
+      field_mod_divisor: 0,
+      field_mod_remainder: 0,
+      field_rows_rows: 0,
+      field_rows_step: 0,
+      wrap: false,
+    }
+  }
+}
+
 pub trait Process {
   fn new(system: System) -> Self
   where
@@ -83,7 +107,7 @@ pub trait Process {
     System::execute(Box::new(Self::new(System::new())));
   }
 
-  fn on_frame(&mut self);
+  fn on_frame(&mut self) {}
 
   fn on_message(&mut self, message: AppMessage) {
     if let AppMessage::Frame = message {
