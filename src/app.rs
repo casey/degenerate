@@ -126,7 +126,7 @@ impl App {
       stderr: stderr.clone(),
       textarea: textarea.clone(),
       this: None,
-      window: window.clone(),
+      window,
       worker: worker.clone(),
     }));
 
