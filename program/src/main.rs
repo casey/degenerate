@@ -4,6 +4,7 @@ use degenerate::{Filter, Process, System};
 // - automatically reload when binary changes
 // - write multiple separate binaries
 // - listen on port 80
+// - re-render when window changes size
 
 struct Program {
   system: System,
