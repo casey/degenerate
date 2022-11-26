@@ -6,6 +6,7 @@ pub(crate) struct App {
   aside: HtmlElement,
   audio_context: AudioContext,
   document: Document,
+  frame: u64,
   gpu: Gpu,
   html: HtmlElement,
   nav: HtmlElement,
@@ -116,6 +117,7 @@ impl App {
       aside: document.select::<HtmlElement>("aside")?,
       audio_context,
       document,
+      frame: 0,
       gpu,
       html,
       nav,
@@ -240,7 +242,7 @@ impl App {
     self
       .worker
       .post_message(&JsValue::from_str(&serde_json::to_string(
-        &AppMessage::Program(program),
+        &AppMessage::Program(program.into()),
       )?))?;
     Ok(())
   }
@@ -253,8 +255,10 @@ impl App {
     self
       .worker
       .post_message(&JsValue::from_str(&serde_json::to_string(
-        &AppMessage::Frame,
+        &AppMessage::Frame(self.frame),
       )?))?;
+
+    self.frame += 1;
 
     Ok(())
   }
@@ -362,7 +366,7 @@ impl App {
                 stderr.update(|| -> Result {
                   worker.post_message(&JsValue::from_str(&serde_json::to_string(
                     &AppMessage::Widget {
-                      key: &key,
+                      key: key.clone(),
                       value: serde_json::Value::Bool(local.checked()),
                     },
                   )?))?;
@@ -399,7 +403,7 @@ impl App {
                   stderr.update(|| -> Result {
                     worker.post_message(&JsValue::from_str(&serde_json::to_string(
                       &AppMessage::Widget {
-                        key: &key,
+                        key: key.clone(),
                         value: serde_json::Value::String(option.clone()),
                       },
                     )?))?;
@@ -447,7 +451,7 @@ impl App {
                   current.set_inner_text(&value);
                   worker.post_message(&JsValue::from_str(&serde_json::to_string(
                     &AppMessage::Widget {
-                      key: &key,
+                      key: key.clone(),
                       value: serde_json::Value::Number(value.parse()?),
                     },
                   )?))?;

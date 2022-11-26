@@ -8,7 +8,7 @@ use {
 #[serde(rename_all = "camelCase")]
 #[serde(tag = "tag", content = "content")]
 pub enum AppMessage {
-  Frame,
+  Frame(u64),
   Program(String),
   Widget {
     key: String,
@@ -107,11 +107,11 @@ pub trait Process {
     System::execute(Box::new(Self::new(System::new())));
   }
 
-  fn frame(&mut self) {}
+  fn frame(&mut self, n: u64);
 
   fn message(&mut self, message: AppMessage) {
-    if let AppMessage::Frame = message {
-      self.frame();
+    if let AppMessage::Frame(n) = message {
+      self.frame(n);
     }
   }
 }

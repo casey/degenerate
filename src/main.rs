@@ -1,15 +1,13 @@
 use {
   crate::{
-    add_event_listener::AddEventListener, app::App, app_message::AppMessage, cast::Cast,
-    error::Error, get_document::GetDocument, gpu::Gpu, select::Select, stderr::Stderr,
-    window::window,
+    add_event_listener::AddEventListener, app::App, cast::Cast, error::Error,
+    get_document::GetDocument, gpu::Gpu, select::Select, stderr::Stderr, window::window,
   },
-  degenerate::{Filter, Widget, WorkerMessage},
+  degenerate::{AppMessage, Filter, Widget, WorkerMessage},
   hex::FromHexError,
   image::{ImageBuffer, ImageError, ImageOutputFormat},
   js_sys::{Float32Array, Promise},
   lazy_static::lazy_static,
-  serde::Serialize,
   std::{
     collections::BTreeMap,
     convert::Infallible,
@@ -38,7 +36,6 @@ type Result<T = (), E = Error> = std::result::Result<T, E>;
 
 mod add_event_listener;
 mod app;
-mod app_message;
 mod cast;
 mod error;
 mod get_document;

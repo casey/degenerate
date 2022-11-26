@@ -8,7 +8,9 @@ use {
 // - avoid UI flash
 // - automatically reload when binary changes
 
-struct Program;
+struct Program {
+  system: System,
+}
 
 impl Process for Program {
   fn new(system: System) -> Self {
