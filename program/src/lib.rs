@@ -12,8 +12,13 @@ struct Program;
 
 impl Process for Program {
   fn new(system: System) -> Self {
-    system.render(Filter::default());
-    Self
+    Self { system }
+  }
+
+  fn frame(&mut self, n: u64) {
+    if n == 0 {
+      self.system.render(Filter::default());
+    }
   }
 }
 

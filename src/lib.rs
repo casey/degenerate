@@ -30,7 +30,7 @@ impl System {
 
   fn execute(mut program: Box<dyn Process>) {
     let closure = Closure::wrap(Box::new(move |e: MessageEvent| {
-      program.on_message(serde_json::from_str(&e.data().as_string().unwrap()).unwrap())
+      program.message(serde_json::from_str(&e.data().as_string().unwrap()).unwrap())
     }) as Box<dyn FnMut(MessageEvent)>);
 
     js_sys::global()
@@ -107,11 +107,11 @@ pub trait Process {
     System::execute(Box::new(Self::new(System::new())));
   }
 
-  fn on_frame(&mut self) {}
+  fn frame(&mut self) {}
 
-  fn on_message(&mut self, message: AppMessage) {
+  fn message(&mut self, message: AppMessage) {
     if let AppMessage::Frame = message {
-      self.on_frame();
+      self.frame();
     }
   }
 }
