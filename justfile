@@ -53,7 +53,7 @@ build-web:
   wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/release/degenerate.wasm --out-dir www
 
 open:
-  open http://localhost:8000
+  open http://localhost
 
 update-test-images:
   #!/usr/bin/env bash

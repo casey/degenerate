@@ -3,7 +3,6 @@ use degenerate::{Filter, Process, System};
 // TODO:
 // - automatically reload when binary changes
 // - write multiple separate binaries
-// - listen on port 80
 // - re-render when window changes size
 // - reimplement examples
 // - deploy programs to web
