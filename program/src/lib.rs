@@ -5,6 +5,8 @@ use {
 
 // TODO:
 // - automatically reload when binary changes
+// - write multiple separate binaries
+// - listen on port 80
 
 struct Program {
   system: System,
