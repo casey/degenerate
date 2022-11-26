@@ -61,7 +61,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ))
     .layer(TraceLayer::new_for_http());
 
-  let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
+  let addr = SocketAddr::from(([0, 0, 0, 0], 80));
   eprintln!("Listening on {}", addr);
 
   axum::Server::bind(&addr)
