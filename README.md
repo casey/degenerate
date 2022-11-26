@@ -12,7 +12,7 @@
 <br>
 
 Degenerate is an programmable generative art engine that runs in the browser
-that can be programmed using Rust or JavaScript. It is deployed at
+that can be programmed with Rust or JavaScript. It is deployed at
 [degenerate.computer](https://degenerate.computer).
 
 Quick Start

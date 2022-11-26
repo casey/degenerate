@@ -1,7 +1,7 @@
 Programming
 ===========
 
-Degenerate can be programming using Rust programs or JavaScript scripts.
+Degenerate can be programmed using Rust or JavaScript.
 
 JavaScript Scripts
 ------------------
