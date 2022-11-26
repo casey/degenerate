@@ -6,6 +6,7 @@ use degenerate::{Filter, Process, System};
 // - listen on port 80
 // - re-render when window changes size
 // - reimplement examples
+// - deploy programs to web
 
 struct Program {
   system: System,
