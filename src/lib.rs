@@ -10,7 +10,7 @@ use {
 #[serde(tag = "tag", content = "content")]
 pub enum AppMessage {
   Frame(f64),
-  Program(String),
+  Script(String),
   Widget {
     key: String,
     value: serde_json::Value,

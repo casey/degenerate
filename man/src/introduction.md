@@ -1,4 +1,5 @@
-# Introduction
+Introduction
+============
 
 Degenerate is a programmable generative art engine. It is developed on
 [GitHub](https://github.com/casey/degenerate/) and deployed on the web at
@@ -14,7 +15,7 @@ sampled from; a signed distance field, which determines which of those pixels
 will be modified; and a color transformation, which determines how those pixels
 will be modified.
 
-Try copying this example program into the text input field at
+Try copying this example script into the text input field at
 [degenerate.computer](https://degenerate.computer):
 
 ```javascript
@@ -31,18 +32,20 @@ render();
 Press the `Run` button or `Shift + Enter` to run it. Try running it repeatedly
 to see the effects of iterated rendering.
 
-For more information about the JavaScript programming API, see
+For more information about the JavaScript and Rust programming API, see
 [Programming](programming.md). For more details about how the rendering engine
 works, see [Rendering](rendering.md).
 
-## Development
+Development
+-----------
 
 Degenerate is developed on [GitHub](https://github.com/casey/degenerate/). If
 you're interested in contributing, take a look at the codebase, and pop into
 [the Discord](https://discord.gg/87cjuz4FYg) for some suggestions for a good
 first issue.
 
-## Suggestions
+Suggestions
+-----------
 
 Experiment, experiment, experiment! Clever combinations of commands craft
 charming consequences. Check out and modify some examples by using the
@@ -50,7 +53,8 @@ drop-down menu in the upper right corner of the page. Try changing the filter
 and rendering in a loop, or just mash `Shift + Enter` over and over again to
 see what happens.
 
-## Saving your creations
+Saving your creations
+---------------------
 
 ```javascript
 // Make the resolution nice and big
@@ -62,12 +66,20 @@ render();
 save();
 ```
 
-## Learning JavaScript
+Learning JavaScript
+-------------------
 
-Degenerate is programmed with JavaScript. An introduction to JavaScript is
-outside of the scope of this document. The reader is referred the excellent
+An introduction to JavaScript is outside of the scope of this document. The
+reader is referred to the excellent
 [Mozilla Developer Network](https://developer.mozilla.org/en-US/)
 [introduction to JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript),
 [JavaScript tutorial](https://developer.mozilla.org/en-US/docs/Learn/JavaScript).
 and
-[JavaScript reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference),
+[JavaScript reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference).
+
+Learning Rust
+-------------
+
+An introduction to Rust is outside of the scope of this document. The reader is
+referred to the excellent
+[Rust Book](https://doc.rust-lang.org/book/).

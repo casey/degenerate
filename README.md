@@ -12,10 +12,11 @@
 <br>
 
 Degenerate is an programmable generative art engine that runs in the browser
-that can be programmed with JavaScript. It is deployed at
+that can be programmed with Rust or JavaScript. It is deployed at
 [degenerate.computer](https://degenerate.computer).
 
-## Quick Start
+Quick Start
+-----------
 
 - Go to https://degenerate.computer
 
@@ -45,12 +46,14 @@ Please consult the
 [Degenerate Programmer's Manual](https://degenerate.computer/man) for more
 information.
 
-## Credits
+Credits
+-------
 
 `degenerate` is written by [Casey Rodarmor](https://rodarmor.com) and
 [Liam Scalzulli](https://liam.rs).
 
-## Prior Art
+Prior Art
+---------
 
 Degenerate builds on the techniques used in
 [casey/blaster](https://github.com/casey/blaster), an audio-reactive visuals

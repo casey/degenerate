@@ -291,7 +291,7 @@ function mod(divisor, remainder) {
 }
 
 // Set the oscillator gain. The oscillator produces a sine wave tone, useful
-// for debugging audio-reactive programs.
+// for debugging audio-reactive scripts.
 //
 // ```
 // equalizer()
@@ -307,7 +307,7 @@ function oscillatorGain(gain) {
 }
 
 // Set the oscillator frequency to `hz` hertz. The oscillator produces a sine wave tone,
-// useful for debugging audio-reactive programs.
+// useful for debugging audio-reactive scripts.
 //
 // ```
 // equalizer()
@@ -707,7 +707,7 @@ self.addEventListener('message', async function (event) {
       }
       lastFrame = now;
       break;
-    case 'program':
+    case 'script':
       frameCallbacks = [];
       try {
         await new AsyncFunction(message.content)();
