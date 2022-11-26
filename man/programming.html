@@ -135,8 +135,10 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="programming"><a class="header" href="#programming">Programming</a></h1>
-<p>Degenerate programs are written in JavaScript and sent to a Web Worker for
-execution. The program then sends back a series of <code>Filter</code> objects from the
+<p>Degenerate can be programmed using Rust or JavaScript.</p>
+<h2 id="javascript-scripts"><a class="header" href="#javascript-scripts">JavaScript Scripts</a></h2>
+<p>Degenerate scripts are written in JavaScript and sent to a Web Worker for
+execution. The script then sends back a series of <code>Filter</code> objects from the
 worker thread, which are used to configure image filters that the renderer
 applies in the main thread.</p>
 <p>The JavaScript API is concerned with setting properties of the current <code>Filter</code>
@@ -146,6 +148,8 @@ with interactive widgets.</p>
 or more filters can produce surprising and beautiful results, and varying image
 filters over time or applying the same image filter in a loop can yield
 striking animations.</p>
+<h2 id="rust-programs"><a class="header" href="#rust-programs">Rust Programs</a></h2>
+<p>The Rust programming interface is undocumented.</p>
 <h2 id="image-filter-properties"><a class="header" href="#image-filter-properties">Image Filter Properties</a></h2>
 <p>Image filters read from a source image and write to a destination image. Every
 time an image filter is applied, those images are swapped.</p>
@@ -461,7 +465,7 @@ function mod(divisor, remainder) {
 }
 
 // Set the oscillator gain. The oscillator produces a sine wave tone, useful
-// for debugging audio-reactive programs.
+// for debugging audio-reactive scripts.
 //
 // ```
 // equalizer()
@@ -477,7 +481,7 @@ function oscillatorGain(gain) {
 }
 
 // Set the oscillator frequency to `hz` hertz. The oscillator produces a sine wave tone,
-// useful for debugging audio-reactive programs.
+// useful for debugging audio-reactive scripts.
 //
 // ```
 // equalizer()
@@ -877,7 +881,7 @@ self.addEventListener('message', async function (event) {
       }
       lastFrame = now;
       break;
-    case 'program':
+    case 'script':
       frameCallbacks = [];
       try {
         await new AsyncFunction(message.content)();

@@ -147,7 +147,7 @@ transformation, which determines where in the input image pixels will be
 sampled from; a signed distance field, which determines which of those pixels
 will be modified; and a color transformation, which determines how those pixels
 will be modified.</p>
-<p>Try copying this example program into the text input field at
+<p>Try copying this example script into the text input field at
 <a href="https://degenerate.computer">degenerate.computer</a>:</p>
 <pre><code class="language-javascript">// Set the scale component of the current coordinate transformation
 scale(0.75);
@@ -160,7 +160,7 @@ render();
 </code></pre>
 <p>Press the <code>Run</code> button or <code>Shift + Enter</code> to run it. Try running it repeatedly
 to see the effects of iterated rendering.</p>
-<p>For more information about the JavaScript programming API, see
+<p>For more information about the JavaScript and Rust programming API, see
 <a href="programming.html">Programming</a>. For more details about how the rendering engine
 works, see <a href="rendering.html">Rendering</a>.</p>
 <h2 id="development"><a class="header" href="#development">Development</a></h2>
@@ -184,16 +184,22 @@ render();
 save();
 </code></pre>
 <h2 id="learning-javascript"><a class="header" href="#learning-javascript">Learning JavaScript</a></h2>
-<p>Degenerate is programmed with JavaScript. An introduction to JavaScript is
-outside of the scope of this document. The reader is referred the excellent
+<p>An introduction to JavaScript is outside of the scope of this document. The
+reader is referred to the excellent
 <a href="https://developer.mozilla.org/en-US/">Mozilla Developer Network</a>
 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript">introduction to JavaScript</a>,
 <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript">JavaScript tutorial</a>.
 and
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference">JavaScript reference</a>,</p>
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference">JavaScript reference</a>.</p>
+<h2 id="learning-rust"><a class="header" href="#learning-rust">Learning Rust</a></h2>
+<p>An introduction to Rust is outside of the scope of this document. The reader is
+referred to the excellent
+<a href="https://doc.rust-lang.org/book/">Rust Book</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="programming"><a class="header" href="#programming">Programming</a></h1>
-<p>Degenerate programs are written in JavaScript and sent to a Web Worker for
-execution. The program then sends back a series of <code>Filter</code> objects from the
+<p>Degenerate can be programmed using Rust or JavaScript.</p>
+<h2 id="javascript-scripts"><a class="header" href="#javascript-scripts">JavaScript Scripts</a></h2>
+<p>Degenerate scripts are written in JavaScript and sent to a Web Worker for
+execution. The script then sends back a series of <code>Filter</code> objects from the
 worker thread, which are used to configure image filters that the renderer
 applies in the main thread.</p>
 <p>The JavaScript API is concerned with setting properties of the current <code>Filter</code>
@@ -203,6 +209,8 @@ with interactive widgets.</p>
 or more filters can produce surprising and beautiful results, and varying image
 filters over time or applying the same image filter in a loop can yield
 striking animations.</p>
+<h2 id="rust-programs"><a class="header" href="#rust-programs">Rust Programs</a></h2>
+<p>The Rust programming interface is undocumented.</p>
 <h2 id="image-filter-properties"><a class="header" href="#image-filter-properties">Image Filter Properties</a></h2>
 <p>Image filters read from a source image and write to a destination image. Every
 time an image filter is applied, those images are swapped.</p>
@@ -518,7 +526,7 @@ function mod(divisor, remainder) {
 }
 
 // Set the oscillator gain. The oscillator produces a sine wave tone, useful
-// for debugging audio-reactive programs.
+// for debugging audio-reactive scripts.
 //
 // ```
 // equalizer()
@@ -534,7 +542,7 @@ function oscillatorGain(gain) {
 }
 
 // Set the oscillator frequency to `hz` hertz. The oscillator produces a sine wave tone,
-// useful for debugging audio-reactive programs.
+// useful for debugging audio-reactive scripts.
 //
 // ```
 // equalizer()
@@ -934,7 +942,7 @@ self.addEventListener('message', async function (event) {
       }
       lastFrame = now;
       break;
-    case 'program':
+    case 'script':
       frameCallbacks = [];
       try {
         await new AsyncFunction(message.content)();
