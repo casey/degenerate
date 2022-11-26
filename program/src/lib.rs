@@ -1,23 +1,23 @@
 use {
-  degenerate::{execute, post_message, AppMessage, WorkerMessage},
+  degenerate::{Process, System},
   wasm_bindgen::prelude::wasm_bindgen,
 };
 
-struct Program {}
+struct Program {
+  system: System,
+}
 
-impl degenerate::Program for Program {
-  fn new() -> Self {
-    Self {}
+impl Process for Program {
+  fn new(system: System) -> Self {
+    Self { system }
   }
 
-  fn on_message(&mut self, message: AppMessage) {
-    if let AppMessage::Frame = message {
-      post_message(WorkerMessage::Save);
-    }
+  fn on_frame(&mut self) {
+    self.system.save()
   }
 }
 
 #[wasm_bindgen(start)]
 pub fn start() {
-  execute::<Program>();
+  Program::execute();
 }

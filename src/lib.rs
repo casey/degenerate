@@ -16,6 +16,45 @@ pub enum AppMessage {
   },
 }
 
+pub struct System {
+  dedicated_worker_global_scope: DedicatedWorkerGlobalScope,
+}
+
+impl System {
+  fn new() -> Self {
+    Self {
+      dedicated_worker_global_scope: js_sys::global()
+        .unchecked_into::<DedicatedWorkerGlobalScope>(),
+    }
+  }
+
+  fn execute(mut program: Box<dyn Process>) {
+    let closure = Closure::wrap(Box::new(move |e: MessageEvent| {
+      program.on_message(serde_json::from_str(&e.data().as_string().unwrap()).unwrap())
+    }) as Box<dyn FnMut(MessageEvent)>);
+
+    js_sys::global()
+      .unchecked_into::<DedicatedWorkerGlobalScope>()
+      .add_event_listener_with_callback("message", closure.as_ref().dyn_ref().unwrap())
+      .unwrap();
+
+    closure.forget();
+  }
+
+  pub fn save(&self) {
+    self.post_message(WorkerMessage::Save);
+  }
+
+  fn post_message(&self, worker_message: WorkerMessage) {
+    self
+      .dedicated_worker_global_scope
+      .post_message(&JsValue::from_str(
+        &serde_json::to_string(&worker_message).unwrap(),
+      ))
+      .unwrap();
+  }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Filter {
@@ -32,12 +71,25 @@ pub struct Filter {
   pub wrap: bool,
 }
 
-pub trait Program {
-  fn new() -> Self
+pub trait Process {
+  fn new(system: System) -> Self
   where
     Self: Sized;
 
-  fn on_message(&mut self, message: AppMessage);
+  fn execute()
+  where
+    Self: Sized + 'static,
+  {
+    System::execute(Box::new(Self::new(System::new())));
+  }
+
+  fn on_frame(&mut self);
+
+  fn on_message(&mut self, message: AppMessage) {
+    if let AppMessage::Frame = message {
+      self.on_frame();
+    }
+  }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -87,31 +139,4 @@ pub enum WorkerMessage {
   Resolution(u32),
   Save,
   Widget { name: String, widget: Widget },
-}
-
-pub fn execute<T: Program + 'static>() {
-  execute_inner(Box::new(T::new()));
-}
-
-fn execute_inner(mut program: Box<dyn Program>) {
-  let closure = Closure::wrap(Box::new(move |e: MessageEvent| {
-    program.on_message(serde_json::from_str(&e.data().as_string().unwrap()).unwrap())
-  }) as Box<dyn FnMut(MessageEvent)>);
-
-  js_sys::global()
-    .unchecked_into::<DedicatedWorkerGlobalScope>()
-    .add_event_listener_with_callback("message", closure.as_ref().dyn_ref().unwrap())
-    .unwrap();
-
-  closure.forget();
-}
-
-pub fn post_message(worker_message: WorkerMessage) {
-  let global = js_sys::global().unchecked_into::<DedicatedWorkerGlobalScope>();
-
-  global
-    .post_message(&JsValue::from_str(
-      &serde_json::to_string(&worker_message).unwrap(),
-    ))
-    .unwrap();
 }
