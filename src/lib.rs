@@ -17,7 +17,7 @@ pub enum AppMessage {
   },
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Copy, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Filter {
   pub alpha: f32,

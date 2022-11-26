@@ -1,10 +1,10 @@
 use degenerate::{Filter, Process, System};
 
-struct Program {
+struct FadeIn {
   system: System,
 }
 
-impl Process for Program {
+impl Process for FadeIn {
   fn new(system: System) -> Self {
     Self { system }
   }
@@ -17,6 +17,27 @@ impl Process for Program {
   }
 }
 
+struct X {
+  system: System,
+}
+
+impl Process for X {
+  fn new(system: System) -> Self {
+    Self { system }
+  }
+
+  fn init(&mut self) {
+    let mut filter = Filter::default().x();
+    filter.coordinate_transform = [2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0];
+
+    for i in 0..8 {
+      self.system.render(filter);
+      filter.wrap = i % 2 == 0;
+    }
+  }
+}
+
 fn main() {
-  Program::execute();
+  // FadeIn::execute();
+  X::execute();
 }
