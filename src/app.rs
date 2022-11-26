@@ -246,6 +246,8 @@ impl App {
   fn on_animation_frame(&mut self, timestamp: f64) -> Result {
     self.request_animation_frame()?;
 
+    self.gpu.resize()?;
+
     self
       .worker
       .post_message(&JsValue::from_str(&serde_json::to_string(
