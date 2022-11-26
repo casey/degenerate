@@ -29,7 +29,7 @@ use {
     HtmlLabelElement, HtmlOptionElement, HtmlSelectElement, HtmlSpanElement, HtmlTextAreaElement,
     KeyboardEvent, MediaStream, MediaStreamConstraints, MessageEvent, OscillatorNode,
     WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
-    WebGlUniformLocation, Window, Worker,
+    WebGlUniformLocation, Window, Worker, WorkerOptions, WorkerType,
   },
   widget::Widget,
 };

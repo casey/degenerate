@@ -39,7 +39,7 @@ build-manual:
   mdbook build man
 
 clean:
-  rm www/degenerate{.js,_bg.wasm}
+  rm -f www/{degenerate,program}{.js,_bg.wasm}
   cargo clean
 
 doc-web:

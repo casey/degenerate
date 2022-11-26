@@ -80,7 +80,11 @@ impl App {
 
     let gpu = Gpu::new(&window, &canvas, &analyser_node)?;
 
-    let worker = Worker::new("/worker.js")?;
+    // let worker = Worker::new("/worker.js")?;
+
+    let mut worker_options = WorkerOptions::new();
+    worker_options.type_(WorkerType::Module);
+    let worker = Worker::new_with_options("/loader.js", &worker_options)?;
 
     let oscillator_gain_node = audio_context.create_gain()?;
     oscillator_gain_node.gain().set_value(0.0);

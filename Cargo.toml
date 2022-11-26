@@ -7,7 +7,7 @@ license = "CC0-1.0"
 autotests = false
 
 [workspace]
-members = [".", "bin/serve"]
+members = [".", "bin/serve", "program"]
 
 [dependencies]
 base64 = "0.13.0"
@@ -34,6 +34,7 @@ features = [
   "AudioDestinationNode",
   "AudioParam",
   "CanvasRenderingContext2d",
+  "DedicatedWorkerGlobalScope",
   "Document",
   "DomTokenList",
   "Element",
@@ -72,6 +73,8 @@ features = [
   "WebGlUniformLocation",
   "Window",
   "Worker",
+  "WorkerOptions",
+  "WorkerType",
   "console",
 ]
 

@@ -24,14 +24,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     .with(tracing_subscriber::fmt::layer())
     .init();
 
-  let mut watch = Command::new("cargo")
+  let mut watch_main = Command::new("cargo")
     .arg("watch")
     .arg("--shell")
     .arg("cargo build --release --target wasm32-unknown-unknown && wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/release/degenerate.wasm --out-dir www")
     .spawn()?;
 
+  let mut watch_worker = Command::new("cargo")
+    .arg("watch")
+    .arg("--shell")
+    .arg("cargo build --release --target wasm32-unknown-unknown --package program && wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/release/program.wasm --out-dir www")
+    .spawn()?;
+
   ctrlc::set_handler(move || {
-    watch.kill().unwrap();
+    watch_main.kill().unwrap();
+    watch_worker.kill().unwrap();
     process::exit(0);
   })
   .expect("Error setting Ctrl-C handler");
