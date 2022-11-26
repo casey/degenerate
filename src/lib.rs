@@ -1,4 +1,5 @@
 use {
+  js_sys::Date,
   serde::{Deserialize, Serialize},
   wasm_bindgen::{closure::Closure, JsCast, JsValue},
   web_sys::{DedicatedWorkerGlobalScope, MessageEvent},

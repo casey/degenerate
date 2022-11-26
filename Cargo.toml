@@ -62,7 +62,6 @@ features = [
   "MessageEvent",
   "Navigator",
   "OscillatorNode",
-  "Performance",
   "WebGl2RenderingContext",
   "WebGlActiveInfo",
   "WebGlBuffer",
