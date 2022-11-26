@@ -8,7 +8,7 @@ use {
     Router,
   },
   std::{
-    net::ToSocketAddrs,
+    net::SocketAddr,
     process::{self, Command},
   },
   tower_http::{
@@ -44,11 +44,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   })
   .expect("Error setting Ctrl-C handler");
 
-  let addr = ("0.0.0.0", 80)
-    .to_socket_addrs()?
-    .next()
-    .ok_or_else(|| format!("failed to get socket addrs"))?;
-
   let router = Router::new()
     .fallback(
       get_service(ServeDir::new("www").fallback(ServeFile::new("www/index.html"))).handle_error(
@@ -65,6 +60,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
       HeaderValue::from_static("no-store"),
     ))
     .layer(TraceLayer::new_for_http());
+
+  let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
+  eprintln!("Listening on {}", addr);
 
   axum::Server::bind(&addr)
     .serve(router.into_make_service())
