@@ -8,7 +8,7 @@ use {
 #[serde(rename_all = "camelCase")]
 #[serde(tag = "tag", content = "content")]
 pub enum AppMessage {
-  Frame,
+  Frame(f64),
   Program(String),
   Widget {
     key: String,
@@ -70,7 +70,7 @@ pub trait Process {
     System::execute(Box::new(Self::new(System::new())));
   }
 
-  fn frame(&mut self) {}
+  fn frame(&mut self, _timestamp: f64) {}
 
   fn init(&mut self) {}
 }
@@ -106,9 +106,13 @@ impl System {
   }
 
   fn message(process: &mut dyn Process, message: AppMessage) {
-    if let AppMessage::Frame = message {
-      process.frame();
+    if let AppMessage::Frame(timestamp) = message {
+      process.frame(timestamp);
     }
+  }
+
+  pub fn now() -> f64 {
+    Date::now()
   }
 
   fn post_message(&self, worker_message: WorkerMessage) {
@@ -118,6 +122,10 @@ impl System {
         &serde_json::to_string(&worker_message).unwrap(),
       ))
       .unwrap();
+  }
+
+  pub fn clear(&self) {
+    self.post_message(WorkerMessage::Clear);
   }
 
   pub fn error(&self, error: impl ToString) {

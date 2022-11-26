@@ -16,8 +16,11 @@ impl Process for Program {
     Self { system }
   }
 
-  fn init(&mut self) {
-    self.system.render(Filter::default().x());
+  fn frame(&mut self, timestamp: f64) {
+    self.system.clear();
+    let mut filter = Filter::default().x();
+    filter.alpha = (timestamp / 5000.0).min(1.0) as f32;
+    self.system.render(filter);
   }
 }
 

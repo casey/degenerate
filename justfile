@@ -68,3 +68,17 @@ update-glmatrix:
 diff name:
   -compare images/{{name}}.png images/{{name}}.actual-memory.png diff.png
   open diff.png
+
+rustc:
+ rustc \
+ --edition=2021 \
+ --crate-type bin \
+ --emit=dep-info,link \
+ -C opt-level=3 \
+ -C embed-bitcode=no \
+ --out-dir tmp \
+ --target wasm32-unknown-unknown \
+ -L dependency=/Users/rodarmor/src/degenerate/target/wasm32-unknown-unknown/release/deps \
+ -L dependency=/Users/rodarmor/src/degenerate/target/release/deps \
+ --extern degenerate=/Users/rodarmor/src/degenerate/target/wasm32-unknown-unknown/release/deps/libdegenerate-5151a704cd5b835e.rlib \
+ program/src/main.rs

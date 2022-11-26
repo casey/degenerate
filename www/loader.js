@@ -1,5 +1,5 @@
 'use strict';
 
-import main from '/program.js';
+import main from '/main.js';
 
 await main();
