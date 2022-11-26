@@ -92,7 +92,7 @@ impl App {
       Worker::new_with_options("/loader.js", &worker_options)?
     } else {
       main.class_list().add_1("fade-in")?;
-      Worker::new("/worker.js")?
+      Worker::new("/interpreter.js")?
     };
 
     let oscillator_gain_node = audio_context.create_gain()?;
@@ -172,9 +172,9 @@ impl App {
       }
       ["/", "program/", hex] => {
         let bytes = hex::decode(hex)?;
-        let program = str::from_utf8(&bytes)?;
-        textarea.set_value(program);
-        app.lock().unwrap().run_program(program)?;
+        let script = str::from_utf8(&bytes)?;
+        textarea.set_value(script);
+        app.lock().unwrap().run_script(script)?;
       }
       _ => stderr.update(Err(format!("Unrecognized path: {}", path).into())),
     }
@@ -212,13 +212,13 @@ impl App {
   pub(super) fn on_keydown(&mut self, event: KeyboardEvent) -> Result {
     if event.shift_key() && event.key() == "Enter" {
       event.prevent_default();
-      self.run_program(&self.textarea.value())?;
+      self.run_script(&self.textarea.value())?;
     }
     Ok(())
   }
 
   pub(super) fn on_run(&mut self) -> Result {
-    self.run_program(&self.textarea.value())
+    self.run_script(&self.textarea.value())
   }
 
   fn request_animation_frame(&mut self) -> Result {
@@ -234,11 +234,11 @@ impl App {
     Ok(())
   }
 
-  pub(super) fn run_program(&self, program: &str) -> Result {
+  pub(super) fn run_script(&self, script: &str) -> Result {
     self
       .worker
       .post_message(&JsValue::from_str(&serde_json::to_string(
-        &AppMessage::Program(program.into()),
+        &AppMessage::Script(script.into()),
       )?))?;
     Ok(())
   }
@@ -491,10 +491,10 @@ impl App {
   }
 
   pub(super) fn on_share(&mut self) -> Result {
-    let program = self.textarea.value();
+    let script = self.textarea.value();
 
-    if !program.is_empty() {
-      let hex = hex::encode(program);
+    if !script.is_empty() {
+      let hex = hex::encode(script);
       let path = format!("/program/{hex}");
       self
         .window

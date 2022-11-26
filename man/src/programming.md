@@ -1,7 +1,13 @@
-# Programming
+Programming
+===========
 
-Degenerate programs are written in JavaScript and sent to a Web Worker for
-execution. The program then sends back a series of `Filter` objects from the
+Degenerate can be programming using Rust programs or JavaScript scripts.
+
+JavaScript Scripts
+------------------
+
+Degenerate scripts are written in JavaScript and sent to a Web Worker for
+execution. The script then sends back a series of `Filter` objects from the
 worker thread, which are used to configure image filters that the renderer
 applies in the main thread.
 
@@ -14,7 +20,13 @@ or more filters can produce surprising and beautiful results, and varying image
 filters over time or applying the same image filter in a loop can yield
 striking animations.
 
-## Image Filter Properties
+Rust Programs
+-------------
+
+The Rust programming interface is undocumented.
+
+Image Filter Properties
+-----------------------
 
 Image filters read from a source image and write to a destination image. Every
 time an image filter is applied, those images are swapped.
@@ -38,8 +50,9 @@ following steps:
    transformation, otherwise use the original color
 6. Save the generated pixel to the destination image
 
-## API
+API
+---
 
 ```javascript
-{{#include ../../www/worker.js}}
+{{#include ../../www/interpreter.js}}
 ```

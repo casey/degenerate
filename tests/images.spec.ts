@@ -21,8 +21,8 @@ async function imageBuffer(page) {
   );
 }
 
-async function run(page, program) {
-  await page.locator('textarea').fill(program);
+async function run(page, script) {
+  await page.locator('textarea').fill(script);
   await page.keyboard.down('Shift');
   await page.keyboard.press('Enter');
   await page.waitForSelector('html.done');
@@ -58,9 +58,9 @@ test.beforeEach(async ({ page }) => {
   await page.waitForSelector('html.ready');
 });
 
-function imageTest(name, program) {
+function imageTest(name, script) {
   test(name, async ({ page }) => {
-    await run(page, program);
+    await run(page, script);
 
     const encoded = await imageBuffer(page);
 
