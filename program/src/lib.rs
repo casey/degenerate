@@ -4,8 +4,6 @@ use {
 };
 
 // TODO:
-// - hide ui
-// - avoid UI flash
 // - automatically reload when binary changes
 
 struct Program {
