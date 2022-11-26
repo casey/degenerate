@@ -46,6 +46,8 @@ impl App {
 
     let html = document.select::<HtmlElement>("html")?;
 
+    let main = document.select::<HtmlElement>("main")?;
+
     let textarea = document.select::<HtmlTextAreaElement>("textarea")?;
 
     let canvas = document.select::<HtmlCanvasElement>("canvas")?;
@@ -85,15 +87,11 @@ impl App {
     let loader = location.pathname()? == "/loader";
 
     let worker = if loader {
-      nav.remove();
-      run_button.remove();
-      select.remove();
-      share_button.remove();
-      textarea.remove();
       let mut worker_options = WorkerOptions::new();
       worker_options.type_(WorkerType::Module);
       Worker::new_with_options("/loader.js", &worker_options)?
     } else {
+      main.class_list().add_1("fade-in")?;
       Worker::new("/worker.js")?
     };
 

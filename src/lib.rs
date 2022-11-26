@@ -32,6 +32,26 @@ pub struct Filter {
   pub wrap: bool,
 }
 
+// const int FIELD_ALL = 0;
+// const int FIELD_CHECK = 1;
+// const int FIELD_CIRCLE = 2;
+// const int FIELD_CROSS = 3;
+// const int FIELD_EQUALIZER = 4;
+// const int FIELD_FREQUENCY = 5;
+// const int FIELD_MOD = 6;
+// const int FIELD_ROWS = 7;
+// const int FIELD_SQUARE = 8;
+// const int FIELD_TIME_DOMAIN = 9;
+// const int FIELD_TOP = 10;
+// const int FIELD_WAVE = 11;
+// const int FIELD_X = 12;
+
+impl Filter {
+  pub fn x(self) -> Self {
+    Self { field: 12, ..self }
+  }
+}
+
 impl Default for Filter {
   fn default() -> Self {
     Self {

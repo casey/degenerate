@@ -135,6 +135,17 @@ textarea {
   width: 100%;
 }
 
+main {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.fade-in {
+  opacity: 1;
+  transition: opacity 1s linear;
+  visibility: visible;
+}
+
 .fade-out {
   opacity: 0;
   transition: visibility 0s 1s, opacity 1s linear;

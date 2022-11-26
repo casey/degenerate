@@ -18,7 +18,7 @@ impl Process for Program {
   }
 
   fn init(&mut self) {
-    self.system.render(Filter::default());
+    self.system.render(Filter::default().x());
   }
 }
 
