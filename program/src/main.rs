@@ -5,6 +5,7 @@ use degenerate::{Filter, Process, System};
 // - write multiple separate binaries
 // - listen on port 80
 // - re-render when window changes size
+// - reimplement examples
 
 struct Program {
   system: System,
