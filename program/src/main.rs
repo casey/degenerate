@@ -1,7 +1,4 @@
-use {
-  degenerate::{Filter, Process, System},
-  wasm_bindgen::prelude::wasm_bindgen,
-};
+use degenerate::{Filter, Process, System};
 
 // TODO:
 // - automatically reload when binary changes
@@ -22,7 +19,6 @@ impl Process for Program {
   }
 }
 
-#[wasm_bindgen(start)]
-pub fn start() {
+fn main() {
   Program::execute();
 }
