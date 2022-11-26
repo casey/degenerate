@@ -1,14 +1,13 @@
 use {
   crate::{
-    add_event_listener::AddEventListener, app::App, app_message::AppMessage, cast::Cast,
-    error::Error, filter::Filter, get_document::GetDocument, gpu::Gpu, select::Select,
-    stderr::Stderr, window::window, worker_message::WorkerMessage,
+    add_event_listener::AddEventListener, app::App, cast::Cast, error::Error,
+    get_document::GetDocument, gpu::Gpu, select::Select, stderr::Stderr, window::window,
   },
+  degenerate::{AppMessage, Filter, Widget, WorkerMessage},
   hex::FromHexError,
   image::{ImageBuffer, ImageError, ImageOutputFormat},
   js_sys::{Float32Array, Promise},
   lazy_static::lazy_static,
-  serde::{Deserialize, Serialize},
   std::{
     collections::BTreeMap,
     convert::Infallible,
@@ -29,26 +28,21 @@ use {
     HtmlLabelElement, HtmlOptionElement, HtmlSelectElement, HtmlSpanElement, HtmlTextAreaElement,
     KeyboardEvent, MediaStream, MediaStreamConstraints, MessageEvent, OscillatorNode,
     WebGl2RenderingContext, WebGlContextAttributes, WebGlFramebuffer, WebGlTexture,
-    WebGlUniformLocation, Window, Worker,
+    WebGlUniformLocation, Window, Worker, WorkerOptions, WorkerType,
   },
-  widget::Widget,
 };
 
 type Result<T = (), E = Error> = std::result::Result<T, E>;
 
 mod add_event_listener;
 mod app;
-mod app_message;
 mod cast;
 mod error;
-mod filter;
 mod get_document;
 mod gpu;
 mod select;
 mod stderr;
-mod widget;
 mod window;
-mod worker_message;
 
 fn main() {
   console_error_panic_hook::set_once();

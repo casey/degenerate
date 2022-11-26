@@ -27,7 +27,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   let mut watch = Command::new("cargo")
     .arg("watch")
     .arg("--shell")
-    .arg("cargo build --release --target wasm32-unknown-unknown && wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/release/degenerate.wasm --out-dir www")
+    .arg(concat!(
+      "cargo build --release --target wasm32-unknown-unknown",
+      " && ",
+      "wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/release/degenerate.wasm --out-dir www",
+      " && ",
+      "cargo build --release --target wasm32-unknown-unknown --package program",
+      " && ",
+      "wasm-bindgen --target web --no-typescript target/wasm32-unknown-unknown/release/program.wasm --out-dir www"
+    ))
     .spawn()?;
 
   ctrlc::set_handler(move || {
@@ -36,10 +44,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   })
   .expect("Error setting Ctrl-C handler");
 
-  let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
-  eprintln!("Listening on {}", addr);
-
-  let app = Router::new()
+  let router = Router::new()
     .fallback(
       get_service(ServeDir::new("www").fallback(ServeFile::new("www/index.html"))).handle_error(
         |err| async move {
@@ -56,8 +61,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ))
     .layer(TraceLayer::new_for_http());
 
+  let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
+  eprintln!("Listening on {}", addr);
+
   axum::Server::bind(&addr)
-    .serve(app.into_make_service())
+    .serve(router.into_make_service())
     .await?;
 
   Ok(())

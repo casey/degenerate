@@ -46,6 +46,8 @@ impl App {
 
     let html = document.select::<HtmlElement>("html")?;
 
+    let main = document.select::<HtmlElement>("main")?;
+
     let textarea = document.select::<HtmlTextAreaElement>("textarea")?;
 
     let canvas = document.select::<HtmlCanvasElement>("canvas")?;
@@ -80,7 +82,18 @@ impl App {
 
     let gpu = Gpu::new(&window, &canvas, &analyser_node)?;
 
-    let worker = Worker::new("/worker.js")?;
+    let location = window.location();
+
+    let loader = location.pathname()? == "/loader";
+
+    let worker = if loader {
+      let mut worker_options = WorkerOptions::new();
+      worker_options.type_(WorkerType::Module);
+      Worker::new_with_options("/loader.js", &worker_options)?
+    } else {
+      main.class_list().add_1("fade-in")?;
+      Worker::new("/worker.js")?
+    };
 
     let oscillator_gain_node = audio_context.create_gain()?;
     oscillator_gain_node.gain().set_value(0.0);
@@ -113,7 +126,7 @@ impl App {
       stderr: stderr.clone(),
       textarea: textarea.clone(),
       this: None,
-      window: window.clone(),
+      window,
       worker: worker.clone(),
     }));
 
@@ -150,12 +163,10 @@ impl App {
 
     Self::add_event_listener(&app, &share_button, "click", move |app| app.on_share())?;
 
-    let location = window.location();
-
     let path = location.pathname()?;
 
     match path.split_inclusive('/').collect::<Vec<&str>>().as_slice() {
-      ["/"] => {}
+      ["/"] | ["/", "loader"] => {}
       ["/", "program/" | "program"] => {
         location.set_pathname("/")?;
       }
@@ -227,12 +238,12 @@ impl App {
     self
       .worker
       .post_message(&JsValue::from_str(&serde_json::to_string(
-        &AppMessage::Program(program),
+        &AppMessage::Program(program.into()),
       )?))?;
     Ok(())
   }
 
-  fn on_animation_frame(&mut self, _timestamp: f64) -> Result {
+  fn on_animation_frame(&mut self, timestamp: f64) -> Result {
     self.request_animation_frame()?;
 
     self.gpu.resize()?;
@@ -240,7 +251,7 @@ impl App {
     self
       .worker
       .post_message(&JsValue::from_str(&serde_json::to_string(
-        &AppMessage::Frame,
+        &AppMessage::Frame(timestamp),
       )?))?;
 
     Ok(())
@@ -349,7 +360,7 @@ impl App {
                 stderr.update(|| -> Result {
                   worker.post_message(&JsValue::from_str(&serde_json::to_string(
                     &AppMessage::Widget {
-                      key: &key,
+                      key: key.clone(),
                       value: serde_json::Value::Bool(local.checked()),
                     },
                   )?))?;
@@ -386,7 +397,7 @@ impl App {
                   stderr.update(|| -> Result {
                     worker.post_message(&JsValue::from_str(&serde_json::to_string(
                       &AppMessage::Widget {
-                        key: &key,
+                        key: key.clone(),
                         value: serde_json::Value::String(option.clone()),
                       },
                     )?))?;
@@ -434,7 +445,7 @@ impl App {
                   current.set_inner_text(&value);
                   worker.post_message(&JsValue::from_str(&serde_json::to_string(
                     &AppMessage::Widget {
-                      key: &key,
+                      key: key.clone(),
                       value: serde_json::Value::Number(value.parse()?),
                     },
                   )?))?;
