@@ -17,10 +17,8 @@ impl Process for Program {
     Self { system }
   }
 
-  fn frame(&mut self, n: u64) {
-    if n == 0 {
-      self.system.render(Filter::default());
-    }
+  fn init(&mut self) {
+    self.system.render(Filter::default());
   }
 }
 

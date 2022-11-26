@@ -8,55 +8,12 @@ use {
 #[serde(rename_all = "camelCase")]
 #[serde(tag = "tag", content = "content")]
 pub enum AppMessage {
-  Frame(u64),
+  Frame,
   Program(String),
   Widget {
     key: String,
     value: serde_json::Value,
   },
-}
-
-pub struct System {
-  dedicated_worker_global_scope: DedicatedWorkerGlobalScope,
-}
-
-impl System {
-  fn new() -> Self {
-    Self {
-      dedicated_worker_global_scope: js_sys::global()
-        .unchecked_into::<DedicatedWorkerGlobalScope>(),
-    }
-  }
-
-  fn execute(mut program: Box<dyn Process>) {
-    let closure = Closure::wrap(Box::new(move |e: MessageEvent| {
-      program.message(serde_json::from_str(&e.data().as_string().unwrap()).unwrap())
-    }) as Box<dyn FnMut(MessageEvent)>);
-
-    js_sys::global()
-      .unchecked_into::<DedicatedWorkerGlobalScope>()
-      .add_event_listener_with_callback("message", closure.as_ref().dyn_ref().unwrap())
-      .unwrap();
-
-    closure.forget();
-  }
-
-  fn post_message(&self, worker_message: WorkerMessage) {
-    self
-      .dedicated_worker_global_scope
-      .post_message(&JsValue::from_str(
-        &serde_json::to_string(&worker_message).unwrap(),
-      ))
-      .unwrap();
-  }
-
-  pub fn render(&self, filter: Filter) {
-    self.post_message(WorkerMessage::Render(filter));
-  }
-
-  pub fn save(&self) {
-    self.post_message(WorkerMessage::Save);
-  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -107,12 +64,66 @@ pub trait Process {
     System::execute(Box::new(Self::new(System::new())));
   }
 
-  fn frame(&mut self, n: u64);
+  fn frame(&mut self) {}
 
-  fn message(&mut self, message: AppMessage) {
-    if let AppMessage::Frame(n) = message {
-      self.frame(n);
+  fn init(&mut self) {}
+}
+
+pub struct System {
+  dedicated_worker_global_scope: DedicatedWorkerGlobalScope,
+}
+
+impl System {
+  fn new() -> Self {
+    Self {
+      dedicated_worker_global_scope: js_sys::global()
+        .unchecked_into::<DedicatedWorkerGlobalScope>(),
     }
+  }
+
+  fn execute(mut process: Box<dyn Process>) {
+    process.init();
+
+    let closure = Closure::wrap(Box::new(move |e: MessageEvent| {
+      Self::message(
+        process.as_mut(),
+        serde_json::from_str(&e.data().as_string().unwrap()).unwrap(),
+      )
+    }) as Box<dyn FnMut(MessageEvent)>);
+
+    js_sys::global()
+      .unchecked_into::<DedicatedWorkerGlobalScope>()
+      .add_event_listener_with_callback("message", closure.as_ref().dyn_ref().unwrap())
+      .unwrap();
+
+    closure.forget();
+  }
+
+  fn message(process: &mut dyn Process, message: AppMessage) {
+    if let AppMessage::Frame = message {
+      process.frame();
+    }
+  }
+
+  fn post_message(&self, worker_message: WorkerMessage) {
+    self
+      .dedicated_worker_global_scope
+      .post_message(&JsValue::from_str(
+        &serde_json::to_string(&worker_message).unwrap(),
+      ))
+      .unwrap();
+  }
+
+  pub fn error(&self, error: impl ToString) {
+    self.post_message(WorkerMessage::Error(error.to_string()));
+  }
+
+  pub fn render(&self, filter: Filter) {
+    self.post_message(WorkerMessage::Render(filter));
+  }
+
+  pub fn save(&self) {
+    self.post_message(WorkerMessage::Save);
   }
 }
 

@@ -6,7 +6,6 @@ pub(crate) struct App {
   aside: HtmlElement,
   audio_context: AudioContext,
   document: Document,
-  frame: u64,
   gpu: Gpu,
   html: HtmlElement,
   nav: HtmlElement,
@@ -117,7 +116,6 @@ impl App {
       aside: document.select::<HtmlElement>("aside")?,
       audio_context,
       document,
-      frame: 0,
       gpu,
       html,
       nav,
@@ -255,10 +253,8 @@ impl App {
     self
       .worker
       .post_message(&JsValue::from_str(&serde_json::to_string(
-        &AppMessage::Frame(self.frame),
+        &AppMessage::Frame,
       )?))?;
-
-    self.frame += 1;
 
     Ok(())
   }
