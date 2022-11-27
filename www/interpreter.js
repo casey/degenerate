@@ -28,7 +28,7 @@ let vec4 = glMatrix.vec4;
 // render();
 // ```
 function all() {
-  filter.field = "All";
+  filter.field = 'All';
 }
 
 // Set the alpha blending factor. `alpha` will be used to blend the
@@ -57,7 +57,7 @@ function assert(condition, message) {
 // render();
 // ```
 function check() {
-  filter.field = "Check";
+  filter.field = 'Check';
 }
 
 // Create a new checkbox widget with the label `name`, and return true if it is
@@ -94,7 +94,7 @@ function checkbox(name) {
 // render();
 // ```
 function circle() {
-  filter.field = "Circle";
+  filter.field = 'Circle';
 }
 
 // Clear the canvas.
@@ -115,7 +115,7 @@ function clear() {
 // render();
 // ```
 function cross() {
-  filter.field = "Cross";
+  filter.field = 'Cross';
 }
 
 // Set the decibel range for normalization of raw frequency data into values
@@ -204,7 +204,7 @@ function elapsed() {
 // }
 // ```
 function equalizer() {
-  filter.field = "Equalizer";
+  filter.field = 'Equalizer';
 }
 
 // Returns a promise that resolves when the browser is ready to display a new
@@ -229,7 +229,7 @@ async function frame() {
 
 // A frequency field.
 function frequency() {
-  filter.field = "Frequency";
+  filter.field = 'Frequency';
 }
 
 // Set the color transformation to the identity transformation. The identity
@@ -285,7 +285,7 @@ function invert() {
 // render();
 // ```
 function mod(divisor, remainder) {
-  filter.field = {"Mod": {"divisor": divisor, "remainder": remainder}};
+  filter.field = { Mod: { divisor, remainder } };
 }
 
 // Set the oscillator gain. The oscillator produces a sine wave tone, useful
@@ -300,8 +300,8 @@ function mod(divisor, remainder) {
 //   await render();
 // }
 // ```
-function oscillatorGain(gain) {
-  self.postMessage(JSON.stringify({ oscillatorGain: gain }));
+function oscillatorGain(oscillatorGain) {
+  self.postMessage(JSON.stringify({ oscillatorGain }));
 }
 
 // Set the oscillator frequency to `hz` hertz. The oscillator produces a sine wave tone,
@@ -316,8 +316,8 @@ function oscillatorGain(gain) {
 //   await render();
 // }
 // ```
-function oscillatorFrequency(hz) {
-  self.postMessage(JSON.stringify({ oscillatorFrequency: hz }));
+function oscillatorFrequency(oscillatorFrequency) {
+  self.postMessage(JSON.stringify({ oscillatorFrequency }));
 }
 
 // Create a new radio button widget with the label `name` and options `options`,
@@ -463,7 +463,7 @@ function rotate(rotation) {
 // render();
 // ```
 function rows(on, off) {
-  filter.field = {"Rows": {"on": on, "off": off}};
+  filter.field = { Rows: { on, off } };
 }
 
 // Save the current canvas as a PNG.
@@ -542,12 +542,12 @@ function slider(name, min, max, step, initial) {
 // render();
 // ```
 function square() {
-  filter.field = "Square";
+  filter.field = 'Square';
 }
 
 // A field that covers pixels where the audio time domain data is large.
 function timeDomain() {
-  filter.field = "TimeDomain";
+  filter.field = 'TimeDomain';
 }
 
 // A field covering the top half of the canvas.
@@ -557,7 +557,7 @@ function timeDomain() {
 // render();
 // ```
 function top() {
-  filter.field = "Top";
+  filter.field = 'Top';
 }
 
 // Set the coordinate transform using `rotation`, `scale`, and `translation`.
@@ -591,7 +591,7 @@ function transform(rotation, scale, translation) {
 // }
 // ```
 function wave() {
-  filter.field = "Wave";
+  filter.field = 'Wave';
 }
 
 // Set wrap. When `wrap` is `true`, out of bounds samples will be wrapped back within bounds.
@@ -613,7 +613,7 @@ function wrap(warp) {
 // render();
 // ```
 function x() {
-  filter.field = "X";
+  filter.field = 'X';
 }
 
 // The ratio of a circle's circumference to its diameter. Useful for expressing
@@ -652,7 +652,7 @@ class Filter {
     this.coordinateTransform = mat3.create();
     this.coordinates = false;
     this.defaultColor = [0.0, 0.0, 0.0];
-    this.field = "All";
+    this.field = 'All';
     this.wrap = false;
   }
 }
