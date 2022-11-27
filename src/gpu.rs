@@ -349,9 +349,9 @@ impl Gpu {
       );
 
       self.gl.uniform_matrix3fv_with_f32_array(
-        Some(self.uniform("coordinate_transform")),
+        Some(self.uniform("position_transform")),
         false,
-        filter.coordinate_transform.as_slice(),
+        filter.position_transform.as_slice(),
       );
 
       self

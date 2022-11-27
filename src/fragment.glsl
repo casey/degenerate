@@ -21,7 +21,7 @@ uniform bool wrap;
 uniform float alpha;
 uniform float resolution;
 uniform int field;
-uniform mat3 coordinate_transform;
+uniform mat3 position_transform;
 uniform mat4 color_transform;
 uniform sampler2D audio_frequency;
 uniform sampler2D audio_time_domain;
@@ -166,8 +166,8 @@ void main() {
   // Get fragment coordinates and transform to [-1, 1]
   vec2 position = gl_FragCoord.xy / resolution * 2.0 - 1.0;
 
-  // Transform position by coordinate transform matrix
-  vec2 transformed = (coordinate_transform * vec3(position, 1.0)).xy;
+  // Transform position by position transform matrix
+  vec2 transformed = (position_transform * vec3(position, 1.0)).xy;
 
   // Wrap transformed position to be within [-1, 1] if enabled
   vec2 wrapped = wrap

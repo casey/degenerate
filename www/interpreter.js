@@ -576,12 +576,12 @@ function top() {
 // render();
 // ```
 function transform(rotation, scale, translation) {
-  mat3.identity(filter.coordinateTransform);
-  mat3.rotate(filter.coordinateTransform, filter.coordinateTransform, rotation);
-  mat3.scale(filter.coordinateTransform, filter.coordinateTransform, scale);
+  mat3.identity(filter.positionTransform);
+  mat3.rotate(filter.positionTransform, filter.positionTransform, rotation);
+  mat3.scale(filter.positionTransform, filter.positionTransform, scale);
   mat3.translate(
-    filter.coordinateTransform,
-    filter.coordinateTransform,
+    filter.positionTransform,
+    filter.positionTransform,
     translation
   );
 }
@@ -655,7 +655,7 @@ class Filter {
       mat4.create(),
       vec3.fromValues(-1, -1, -1)
     );
-    this.coordinateTransform = mat3.create();
+    this.positionTransform = mat3.create();
     this.coordinates = false;
     this.defaultColor = [0.0, 0.0, 0.0];
     this.field = 'All';

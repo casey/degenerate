@@ -28,12 +28,12 @@ pub enum Event {
   },
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Filter {
   pub alpha: f32,
   pub color_transform: Matrix4,
-  pub coordinate_transform: Matrix3,
+  pub position_transform: Matrix3,
   pub coordinates: bool,
   pub default_color: [f32; 3],
   pub field: Field,
@@ -60,14 +60,14 @@ impl Filter {
     }
   }
 
-  pub fn coordinate_transform(self, coordinate_transform: impl Into<Matrix3>) -> Self {
+  pub fn position(self, position_transform: impl Into<Matrix3>) -> Self {
     Self {
-      coordinate_transform: coordinate_transform.into(),
+      position_transform: position_transform.into(),
       ..self
     }
   }
 
-  pub fn color_transform(self, color_transform: impl Into<Matrix4>) -> Self {
+  pub fn color(self, color_transform: impl Into<Matrix4>) -> Self {
     Self {
       color_transform: color_transform.into(),
       ..self
@@ -85,6 +85,11 @@ impl Filter {
   pub fn times(self, times: u32) -> Self {
     Self { times, ..self }
   }
+
+  pub fn render(self) -> Self {
+    System::render(self.clone());
+    self
+  }
 }
 
 impl Default for Filter {
@@ -92,7 +97,7 @@ impl Default for Filter {
     Self {
       alpha: 1.0,
       color_transform: Similarity3::from_scaling(-1.0).into(),
-      coordinate_transform: Matrix3::identity(),
+      position_transform: Matrix3::identity(),
       coordinates: false,
       default_color: [0.0, 0.0, 0.0],
       field: Field::All,
@@ -102,7 +107,7 @@ impl Default for Filter {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Field {
   All,
   Check,
@@ -120,17 +125,18 @@ pub enum Field {
 }
 
 pub struct System {
-  dedicated_worker_global_scope: DedicatedWorkerGlobalScope,
   frame: u64,
   delta: f32,
   time: f32,
 }
 
+thread_local! {
+  static SELF: DedicatedWorkerGlobalScope = js_sys::global().dyn_into().unwrap();
+}
+
 impl System {
   fn new() -> Self {
     Self {
-      dedicated_worker_global_scope: js_sys::global()
-        .unchecked_into::<DedicatedWorkerGlobalScope>(),
       frame: 0,
       delta: 0.0,
       time: 0.0,
@@ -164,7 +170,7 @@ impl System {
   }
 
   pub fn clear(&self) {
-    self.send(Message::Clear);
+    Self::send(Message::Clear);
   }
 
   pub fn delta(&self) -> f32 {
@@ -175,21 +181,22 @@ impl System {
     self.frame
   }
 
-  pub fn render(&self, filter: Filter) {
-    self.send(Message::Render(filter));
+  pub fn render(filter: Filter) {
+    Self::send(Message::Render(filter));
   }
 
   pub fn time(&self) -> f32 {
     self.time
   }
 
-  pub fn send(&self, message: Message) {
-    self
-      .dedicated_worker_global_scope
-      .post_message(&JsValue::from_str(
-        &serde_json::to_string(&message).unwrap(),
-      ))
-      .unwrap();
+  pub fn send(message: Message) {
+    SELF.with(|dedicated_worker_global_scope| {
+      dedicated_worker_global_scope
+        .post_message(&JsValue::from_str(
+          &serde_json::to_string(&message).unwrap(),
+        ))
+        .unwrap();
+    });
   }
 }
 
