@@ -21,14 +21,14 @@ let vec4 = glMatrix.vec4;
 // render();
 // ```
 //
-// `FIELD_ALL` is the default field, so the above example could have been written
+// All is the default field, so the above example could have been written
 // as:
 //
 // ```
 // render();
 // ```
 function all() {
-  filter.field = FIELD_ALL;
+  filter.field = 'All';
 }
 
 // Set the alpha blending factor. `alpha` will be used to blend the
@@ -57,7 +57,7 @@ function assert(condition, message) {
 // render();
 // ```
 function check() {
-  filter.field = FIELD_CHECK;
+  filter.field = 'Check';
 }
 
 // Create a new checkbox widget with the label `name`, and return true if it is
@@ -94,7 +94,7 @@ function checkbox(name) {
 // render();
 // ```
 function circle() {
-  filter.field = FIELD_CIRCLE;
+  filter.field = 'Circle';
 }
 
 // Clear the canvas.
@@ -115,7 +115,7 @@ function clear() {
 // render();
 // ```
 function cross() {
-  filter.field = FIELD_CROSS;
+  filter.field = 'Cross';
 }
 
 // Set the decibel range for normalization of raw frequency data into values
@@ -204,7 +204,7 @@ function elapsed() {
 // }
 // ```
 function equalizer() {
-  filter.field = FIELD_EQUALIZER;
+  filter.field = 'Equalizer';
 }
 
 // Returns a promise that resolves when the browser is ready to display a new
@@ -229,7 +229,7 @@ async function frame() {
 
 // A frequency field.
 function frequency() {
-  filter.field = FIELD_FREQUENCY;
+  filter.field = 'Frequency';
 }
 
 // Set the color transformation to the identity transformation. The identity
@@ -285,9 +285,7 @@ function invert() {
 // render();
 // ```
 function mod(divisor, remainder) {
-  filter.fieldModDivisor = divisor;
-  filter.fieldModRemainder = remainder;
-  filter.field = FIELD_MOD;
+  filter.field = { Mod: { divisor, remainder } };
 }
 
 // Set the oscillator gain. The oscillator produces a sine wave tone, useful
@@ -302,8 +300,8 @@ function mod(divisor, remainder) {
 //   await render();
 // }
 // ```
-function oscillatorGain(gain) {
-  self.postMessage(JSON.stringify({ oscillatorGain: gain }));
+function oscillatorGain(oscillatorGain) {
+  self.postMessage(JSON.stringify({ oscillatorGain }));
 }
 
 // Set the oscillator frequency to `hz` hertz. The oscillator produces a sine wave tone,
@@ -318,8 +316,8 @@ function oscillatorGain(gain) {
 //   await render();
 // }
 // ```
-function oscillatorFrequency(hz) {
-  self.postMessage(JSON.stringify({ oscillatorFrequency: hz }));
+function oscillatorFrequency(oscillatorFrequency) {
+  self.postMessage(JSON.stringify({ oscillatorFrequency }));
 }
 
 // Create a new radio button widget with the label `name` and options `options`,
@@ -464,10 +462,8 @@ function rotate(rotation) {
 // rows(1, 9);
 // render();
 // ```
-function rows(nrows, step) {
-  filter.fieldRowsRows = nrows;
-  filter.fieldRowsStep = step;
-  filter.field = FIELD_ROWS;
+function rows(on, off) {
+  filter.field = { Rows: { on, off } };
 }
 
 // Save the current canvas as a PNG.
@@ -546,12 +542,12 @@ function slider(name, min, max, step, initial) {
 // render();
 // ```
 function square() {
-  filter.field = FIELD_SQUARE;
+  filter.field = 'Square';
 }
 
 // A field that covers pixels where the audio time domain data is large.
 function timeDomain() {
-  filter.field = FIELD_TIME_DOMAIN;
+  filter.field = 'TimeDomain';
 }
 
 // A field covering the top half of the canvas.
@@ -561,7 +557,7 @@ function timeDomain() {
 // render();
 // ```
 function top() {
-  filter.field = FIELD_TOP;
+  filter.field = 'Top';
 }
 
 // Set the coordinate transform using `rotation`, `scale`, and `translation`.
@@ -595,7 +591,7 @@ function transform(rotation, scale, translation) {
 // }
 // ```
 function wave() {
-  filter.field = FIELD_WAVE;
+  filter.field = 'Wave';
 }
 
 // Set wrap. When `wrap` is `true`, out of bounds samples will be wrapped back within bounds.
@@ -617,7 +613,7 @@ function wrap(warp) {
 // render();
 // ```
 function x() {
-  filter.field = FIELD_X;
+  filter.field = 'X';
 }
 
 // The ratio of a circle's circumference to its diameter. Useful for expressing
@@ -629,25 +625,6 @@ const PI = Math.PI;
 // rotations in radians, where a full 360° turn is equal to `TAU` For example,
 // to rotate 1/4 turn, use `rotate(1/4 * TAU)`.
 const TAU = Math.PI * 2;
-
-// Field constants. The field determines which pixels the current color transform
-// will be applied to. These values should be kept in sync with those in
-// `www/fragment.glsl`. See the corresponding functions and case statements,
-// e.g., `all()` in this file and `case FIELD_ALL:` in `www/fragment.glsl`, for
-// more details and the field definition, respectively.
-const FIELD_ALL = 0;
-const FIELD_CHECK = 1;
-const FIELD_CIRCLE = 2;
-const FIELD_CROSS = 3;
-const FIELD_EQUALIZER = 4;
-const FIELD_FREQUENCY = 5;
-const FIELD_MOD = 6;
-const FIELD_ROWS = 7;
-const FIELD_SQUARE = 8;
-const FIELD_TIME_DOMAIN = 9;
-const FIELD_TOP = 10;
-const FIELD_WAVE = 11;
-const FIELD_X = 12;
 
 class Rng {
   constructor(seed) {
@@ -675,11 +652,7 @@ class Filter {
     this.coordinateTransform = mat3.create();
     this.coordinates = false;
     this.defaultColor = [0.0, 0.0, 0.0];
-    this.field = FIELD_ALL;
-    this.fieldModDivisor = 0;
-    this.fieldModRemainder = 0;
-    this.fieldRowsRows = 0;
-    this.fieldRowsStep = 0;
+    this.field = 'All';
     this.wrap = false;
   }
 }
