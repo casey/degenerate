@@ -16,6 +16,10 @@ pub type Similarity3 = nalgebra::Similarity3<f32>;
 pub type Translation2 = nalgebra::Translation2<f32>;
 pub type Vector3 = nalgebra::Vector3<f32>;
 
+thread_local! {
+  static SELF: DedicatedWorkerGlobalScope = js_sys::global().dyn_into().unwrap();
+}
+
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[serde(tag = "tag", content = "content")]
@@ -129,10 +133,6 @@ pub struct System {
   delta: f32,
   time: f32,
   clear: bool,
-}
-
-thread_local! {
-  static SELF: DedicatedWorkerGlobalScope = js_sys::global().dyn_into().unwrap();
 }
 
 impl System {
