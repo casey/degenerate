@@ -1,39 +1,6 @@
-use degenerate::{nalgebra::Matrix3, Event, Field, Filter, Message, System};
+#![allow(unused)]
 
-// let r = 5 / 6 * TAU;
-// let s = 1 / 0.75;
-
-// while(true) {
-//   reboot();
-
-//   rotateColor('green', 0.05 * TAU);
-
-//   circle();
-
-//   scale(s);
-
-//   wrap(!filter.wrap);
-
-//   for (let i = 0; i < 8; i++) {
-//     render();
-//   }
-
-//   if (checkbox('rotate')) {
-//     r += delta() / 30000 * TAU;
-//   }
-
-//   transform(r, [s, s], [0, 0]);
-
-//   rotateColor('blue', 0.05 * TAU);
-
-//   for (let i = 0; i < 8; i++) {
-//     render();
-//   }
-
-//   await frame();
-// }
-
-// Press the `Run` button or `Shift + Enter` to execute
+use degenerate::*;
 
 fn fade_in(system: &System, event: Event) {
   if let Event::Frame(timestamp) = event {
@@ -48,37 +15,25 @@ fn fade_in(system: &System, event: Event) {
 
 fn stretch(system: &System, event: &Event) {
   if let Event::Frame(t) = event {
-    if system.frame() >= 0 {
-      system.send(Message::Clear);
-      for _ in 0..8 {
-        system.send(Message::Render(Filter {
-          field: Field::Circle,
-          coordinate_transform: Matrix3::new(
-            1.0 / (t / 1000.0),
-            0.0,
-            0.0,
-            0.0,
-            2.0,
-            0.0,
-            0.0,
-            0.0,
-            1.0,
-          ),
-          ..Filter::default()
-        }));
-      }
+    system.send(Message::Clear);
+    for _ in 0..8 {
+      system.send(Message::Render(Filter {
+        field: Field::Circle,
+        coordinate_transform: Scale2::new(1.0 / (t / 10000.0), 2.0).into(),
+        ..Filter::default()
+      }));
     }
   }
 }
 
 fn target(system: &System, event: &Event) {
-  if let Event::Frame(t) = event {
-    if system.frame() >= 0 {
+  if let Event::Frame(_) = event {
+    if system.frame() == 0 {
       system.send(Message::Clear);
       for _ in 0..8 {
         system.send(Message::Render(Filter {
           field: Field::Circle,
-          coordinate_transform: Matrix3::new(2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0),
+          coordinate_transform: Similarity2::from_scaling(2.0).into(),
           ..Filter::default()
         }));
       }
@@ -86,6 +41,81 @@ fn target(system: &System, event: &Event) {
   }
 }
 
+fn kaleidoscope(system: &System, event: &Event) {
+  let r = 5.0 / 6.0 * TAU;
+  let s = 1.0 / 0.75;
+  if let Event::Frame(t) = event {
+    system.send(Message::Clear);
+
+    for _ in 0..8 {
+      system.send(Message::Render(Filter {
+        field: Field::Circle,
+        color_transform: Rotation3::from_axis_angle(&Vector3::y_axis(), 0.05 * TAU).into(),
+        coordinate_transform: Similarity2::from_scaling(s).into(),
+        wrap: true,
+        ..Filter::default()
+      }));
+    }
+
+    let r = r + t / 30000.0 * TAU;
+
+    for _ in 0..8 {
+      system.send(Message::Render(Filter {
+        field: Field::Circle,
+        color_transform: Rotation3::from_axis_angle(&Vector3::z_axis(), 0.05 * TAU).into(),
+        coordinate_transform: Similarity2::from_parts(
+          Translation2::identity(),
+          Rotation2::new(r).into(),
+          s,
+        )
+        .into(),
+        wrap: true,
+        ..Filter::default()
+      }));
+    }
+  }
+}
+
+fn orbs(system: &System, event: &Event) {
+  if let Event::Frame(_) = event {
+    system.send(Message::Clear);
+
+    for _ in 0..8 {
+      system.send(Message::Render(Filter {
+        field: Field::Circle,
+        color_transform: Rotation3::from_axis_angle(&Vector3::y_axis(), 0.05 * TAU).into(),
+        coordinate_transform: Similarity2::from_scaling(1.0 / 0.75).into(),
+        wrap: true,
+        ..Filter::default()
+      }));
+    }
+
+    for _ in 0..8 {
+      system.send(Message::Render(Filter {
+        field: Field::Circle,
+        color_transform: Rotation3::from_axis_angle(&Vector3::z_axis(), 0.05 * TAU).into(),
+        coordinate_transform: Similarity2::from_scaling(1.0 / 0.75).into(),
+        wrap: true,
+        ..Filter::default()
+      }));
+    }
+  }
+}
+
+fn x(system: &System, event: &Event) {
+  if let Event::Frame(_) = event {
+    system.send(Message::Clear);
+    for i in 0..8 {
+      system.send(Message::Render(Filter {
+        field: Field::X,
+        wrap: i % 2 == 1,
+        coordinate_transform: Similarity2::from_scaling(2.0).into(),
+        ..Filter::default()
+      }));
+    }
+  }
+}
+
 fn main() {
-  System::execute(target);
+  System::execute(x);
 }

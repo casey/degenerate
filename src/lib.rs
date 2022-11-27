@@ -1,11 +1,19 @@
 use {
-  nalgebra::Matrix3,
   serde::{Deserialize, Serialize},
   wasm_bindgen::{closure::Closure, JsCast, JsValue},
   web_sys::{DedicatedWorkerGlobalScope, MessageEvent},
 };
 
-pub use nalgebra;
+pub use std::f32::consts::TAU;
+
+pub type Matrix3 = nalgebra::Matrix3<f32>;
+pub type Matrix4 = nalgebra::Matrix4<f32>;
+pub type Rotation2 = nalgebra::Rotation2<f32>;
+pub type Rotation3 = nalgebra::Rotation3<f32>;
+pub type Scale2 = nalgebra::Scale2<f32>;
+pub type Similarity2 = nalgebra::Similarity2<f32>;
+pub type Translation2 = nalgebra::Translation2<f32>;
+pub type Vector3 = nalgebra::Vector3<f32>;
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -23,8 +31,8 @@ pub enum Event {
 #[serde(rename_all = "camelCase")]
 pub struct Filter {
   pub alpha: f32,
-  pub color_transform: [f32; 16],
-  pub coordinate_transform: Matrix3<f32>,
+  pub color_transform: Matrix4,
+  pub coordinate_transform: Matrix3,
   pub coordinates: bool,
   pub default_color: [f32; 3],
   pub field: Field,
@@ -52,9 +60,9 @@ impl Default for Filter {
   fn default() -> Self {
     Self {
       alpha: 1.0,
-      color_transform: [
+      color_transform: Matrix4::new(
         -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-      ],
+      ),
       coordinate_transform: Matrix3::identity(),
       coordinates: false,
       default_color: [0.0, 0.0, 0.0],
@@ -67,6 +75,8 @@ impl Default for Filter {
 pub struct System {
   dedicated_worker_global_scope: DedicatedWorkerGlobalScope,
   frame: u64,
+  delta: f32,
+  last_frame: f32,
 }
 
 impl System {
@@ -75,6 +85,8 @@ impl System {
       dedicated_worker_global_scope: js_sys::global()
         .unchecked_into::<DedicatedWorkerGlobalScope>(),
       frame: 0,
+      delta: 0.0,
+      last_frame: 0.0,
     }
   }
 
@@ -84,10 +96,15 @@ impl System {
     let closure = Closure::wrap(Box::new(move |e: MessageEvent| {
       let event = serde_json::from_str(&e.data().as_string().unwrap()).unwrap();
 
+      if let Event::Frame(timestamp) = event {
+        system.delta = timestamp - system.last_frame;
+      }
+
       f(&system, &event);
 
-      if let Event::Frame(_) = event {
+      if let Event::Frame(timestamp) = event {
         system.frame += 1;
+        system.last_frame = timestamp;
       }
     }) as Box<dyn FnMut(MessageEvent)>);
 
@@ -101,6 +118,10 @@ impl System {
 
   pub fn frame(&self) -> u64 {
     self.frame
+  }
+
+  pub fn delta(&self) -> f32 {
+    self.delta
   }
 
   pub fn send(&self, message: Message) {
