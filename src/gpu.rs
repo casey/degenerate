@@ -344,13 +344,13 @@ impl Gpu {
     self.gl.uniform_matrix4fv_with_f32_array(
       Some(self.uniform("color_transform")),
       false,
-      &filter.color_transform.as_slice(),
+      filter.color_transform.as_slice(),
     );
 
     self.gl.uniform_matrix3fv_with_f32_array(
       Some(self.uniform("coordinate_transform")),
       false,
-      &filter.coordinate_transform.as_slice(),
+      filter.coordinate_transform.as_slice(),
     );
 
     self
