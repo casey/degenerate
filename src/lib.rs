@@ -16,6 +16,10 @@ pub type Similarity3 = nalgebra::Similarity3<f32>;
 pub type Translation2 = nalgebra::Translation2<f32>;
 pub type Vector3 = nalgebra::Vector3<f32>;
 
+thread_local! {
+  static SELF: DedicatedWorkerGlobalScope = js_sys::global().dyn_into().unwrap();
+}
+
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[serde(tag = "tag", content = "content")]
@@ -28,19 +32,86 @@ pub enum Event {
   },
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Filter {
   pub alpha: f32,
   pub color_transform: Matrix4,
-  pub coordinate_transform: Matrix3,
+  pub position_transform: Matrix3,
   pub coordinates: bool,
   pub default_color: [f32; 3],
   pub field: Field,
+  pub times: u32,
   pub wrap: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+impl Filter {
+  pub fn new() -> Self {
+    Self::default()
+  }
+
+  pub fn x(self) -> Self {
+    Self {
+      field: Field::X,
+      ..self
+    }
+  }
+
+  pub fn circle(self) -> Self {
+    Self {
+      field: Field::Circle,
+      ..self
+    }
+  }
+
+  pub fn position(self, position_transform: impl Into<Matrix3>) -> Self {
+    Self {
+      position_transform: position_transform.into(),
+      ..self
+    }
+  }
+
+  pub fn color(self, color_transform: impl Into<Matrix4>) -> Self {
+    Self {
+      color_transform: color_transform.into(),
+      ..self
+    }
+  }
+
+  pub fn alpha(self, alpha: f32) -> Self {
+    Self { alpha, ..self }
+  }
+
+  pub fn wrap(self, wrap: bool) -> Self {
+    Self { wrap, ..self }
+  }
+
+  pub fn times(self, times: u32) -> Self {
+    Self { times, ..self }
+  }
+
+  pub fn render(self) -> Self {
+    System::render(self.clone());
+    self
+  }
+}
+
+impl Default for Filter {
+  fn default() -> Self {
+    Self {
+      alpha: 1.0,
+      color_transform: Similarity3::from_scaling(-1.0).into(),
+      position_transform: Matrix3::identity(),
+      coordinates: false,
+      default_color: [0.0, 0.0, 0.0],
+      field: Field::All,
+      times: 1,
+      wrap: false,
+    }
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Field {
   All,
   Check,
@@ -57,53 +128,41 @@ pub enum Field {
   X,
 }
 
-impl Default for Filter {
-  fn default() -> Self {
-    Self {
-      alpha: 1.0,
-      color_transform: Similarity3::from_scaling(-1.0).into(),
-      coordinate_transform: Matrix3::identity(),
-      coordinates: false,
-      default_color: [0.0, 0.0, 0.0],
-      field: Field::All,
-      wrap: false,
-    }
-  }
-}
-
 pub struct System {
-  dedicated_worker_global_scope: DedicatedWorkerGlobalScope,
   frame: u64,
   delta: f32,
-  last_frame: f32,
+  time: f32,
+  clear: bool,
 }
 
 impl System {
   fn new() -> Self {
     Self {
-      dedicated_worker_global_scope: js_sys::global()
-        .unchecked_into::<DedicatedWorkerGlobalScope>(),
       frame: 0,
       delta: 0.0,
-      last_frame: 0.0,
+      time: 0.0,
+      clear: true,
     }
   }
 
-  pub fn execute<T: Fn(&System, &Event) + 'static>(f: T) {
+  pub fn execute<F: Fn(&mut System) + 'static>(f: F) {
+    Self::execute_inner(Box::new(f))
+  }
+
+  fn execute_inner(f: Box<dyn Fn(&mut System) + 'static>) {
     let mut system = System::new();
 
     let closure = Closure::wrap(Box::new(move |e: MessageEvent| {
       let event = serde_json::from_str(&e.data().as_string().unwrap()).unwrap();
 
-      if let Event::Frame(timestamp) = event {
-        system.delta = timestamp - system.last_frame;
-      }
-
-      f(&system, &event);
-
-      if let Event::Frame(timestamp) = event {
+      if let Event::Frame(time) = event {
+        system.delta = time - system.time;
+        system.time = time;
+        if system.clear {
+          Self::send(Message::Clear);
+        }
+        f(&mut system);
         system.frame += 1;
-        system.last_frame = timestamp;
       }
     }) as Box<dyn FnMut(MessageEvent)>);
 
@@ -115,21 +174,34 @@ impl System {
     closure.forget();
   }
 
-  pub fn frame(&self) -> u64 {
-    self.frame
+  pub fn clear(&mut self, clear: bool) {
+    self.clear = clear;
   }
 
   pub fn delta(&self) -> f32 {
     self.delta
   }
 
-  pub fn send(&self, message: Message) {
-    self
-      .dedicated_worker_global_scope
-      .post_message(&JsValue::from_str(
-        &serde_json::to_string(&message).unwrap(),
-      ))
-      .unwrap();
+  pub fn frame(&self) -> u64 {
+    self.frame
+  }
+
+  pub fn render(filter: Filter) {
+    Self::send(Message::Render(filter));
+  }
+
+  pub fn time(&self) -> f32 {
+    self.time
+  }
+
+  pub fn send(message: Message) {
+    SELF.with(|dedicated_worker_global_scope| {
+      dedicated_worker_global_scope
+        .post_message(&JsValue::from_str(
+          &serde_json::to_string(&message).unwrap(),
+        ))
+        .unwrap();
+    });
   }
 }
 
