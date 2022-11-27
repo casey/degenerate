@@ -12,6 +12,7 @@ pub type Rotation2 = nalgebra::Rotation2<f32>;
 pub type Rotation3 = nalgebra::Rotation3<f32>;
 pub type Scale2 = nalgebra::Scale2<f32>;
 pub type Similarity2 = nalgebra::Similarity2<f32>;
+pub type Similarity3 = nalgebra::Similarity3<f32>;
 pub type Translation2 = nalgebra::Translation2<f32>;
 pub type Vector3 = nalgebra::Vector3<f32>;
 
@@ -60,9 +61,7 @@ impl Default for Filter {
   fn default() -> Self {
     Self {
       alpha: 1.0,
-      color_transform: Matrix4::new(
-        -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-      ),
+      color_transform: Similarity3::from_scaling(-1.0).into(),
       coordinate_transform: Matrix3::identity(),
       coordinates: false,
       default_color: [0.0, 0.0, 0.0],
