@@ -75,7 +75,7 @@ pub struct System {
   dedicated_worker_global_scope: DedicatedWorkerGlobalScope,
   frame: u64,
   delta: f32,
-  last_frame: f32,
+  time: f32,
 }
 
 impl System {
@@ -85,25 +85,21 @@ impl System {
         .unchecked_into::<DedicatedWorkerGlobalScope>(),
       frame: 0,
       delta: 0.0,
-      last_frame: 0.0,
+      time: 0.0,
     }
   }
 
-  pub fn execute<T: Fn(&System, &Event) + 'static>(f: T) {
+  pub fn execute<T: Fn(&System) + 'static>(f: T) {
     let mut system = System::new();
 
     let closure = Closure::wrap(Box::new(move |e: MessageEvent| {
       let event = serde_json::from_str(&e.data().as_string().unwrap()).unwrap();
 
-      if let Event::Frame(timestamp) = event {
-        system.delta = timestamp - system.last_frame;
-      }
-
-      f(&system, &event);
-
-      if let Event::Frame(timestamp) = event {
+      if let Event::Frame(time) = event {
+        system.delta = time - system.time;
+        system.time = time;
+        f(&system);
         system.frame += 1;
-        system.last_frame = timestamp;
       }
     }) as Box<dyn FnMut(MessageEvent)>);
 
@@ -121,6 +117,10 @@ impl System {
 
   pub fn delta(&self) -> f32 {
     self.delta
+  }
+
+  pub fn time(&self) -> f32 {
+    self.time
   }
 
   pub fn send(&self, message: Message) {
