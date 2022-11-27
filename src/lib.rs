@@ -1,8 +1,11 @@
 use {
+  nalgebra::Matrix3,
   serde::{Deserialize, Serialize},
   wasm_bindgen::{closure::Closure, JsCast, JsValue},
   web_sys::{DedicatedWorkerGlobalScope, MessageEvent},
 };
+
+pub use nalgebra;
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -21,7 +24,7 @@ pub enum Event {
 pub struct Filter {
   pub alpha: f32,
   pub color_transform: [f32; 16],
-  pub coordinate_transform: [f32; 9],
+  pub coordinate_transform: Matrix3<f32>,
   pub coordinates: bool,
   pub default_color: [f32; 3],
   pub field: Field,
@@ -52,7 +55,7 @@ impl Default for Filter {
       color_transform: [
         -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
       ],
-      coordinate_transform: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+      coordinate_transform: Matrix3::identity(),
       coordinates: false,
       default_color: [0.0, 0.0, 0.0],
       field: Field::All,
@@ -63,6 +66,7 @@ impl Default for Filter {
 
 pub struct System {
   dedicated_worker_global_scope: DedicatedWorkerGlobalScope,
+  frame: u64,
 }
 
 impl System {
@@ -70,17 +74,21 @@ impl System {
     Self {
       dedicated_worker_global_scope: js_sys::global()
         .unchecked_into::<DedicatedWorkerGlobalScope>(),
+      frame: 0,
     }
   }
 
-  pub fn execute<T: Fn(&System, Event) + 'static>(f: T) {
-    let system = System::new();
+  pub fn execute<T: Fn(&System, &Event) + 'static>(f: T) {
+    let mut system = System::new();
 
     let closure = Closure::wrap(Box::new(move |e: MessageEvent| {
-      f(
-        &system,
-        serde_json::from_str(&e.data().as_string().unwrap()).unwrap(),
-      )
+      let event = serde_json::from_str(&e.data().as_string().unwrap()).unwrap();
+
+      f(&system, &event);
+
+      if let Event::Frame(_) = event {
+        system.frame += 1;
+      }
     }) as Box<dyn FnMut(MessageEvent)>);
 
     js_sys::global()
@@ -89,6 +97,10 @@ impl System {
       .unwrap();
 
     closure.forget();
+  }
+
+  pub fn frame(&self) -> u64 {
+    self.frame
   }
 
   pub fn send(&self, message: Message) {
