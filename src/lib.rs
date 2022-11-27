@@ -25,7 +25,7 @@ pub struct Filter {
   pub coordinate_transform: [f32; 9],
   pub coordinates: bool,
   pub default_color: [f32; 3],
-  pub field: u32,
+  pub field: Field,
   pub field_mod_divisor: u32,
   pub field_mod_remainder: u32,
   pub field_rows_on: u32,
@@ -33,9 +33,29 @@ pub struct Filter {
   pub wrap: bool,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub enum Field {
+  All,
+  Check,
+  Circle,
+  Cross,
+  Equalizer,
+  Frequency,
+  Mod,
+  Rows,
+  Square,
+  TimeDomain,
+  Top,
+  Wave,
+  X,
+}
+
 impl Filter {
   pub fn x(self) -> Self {
-    Self { field: 12, ..self }
+    Self {
+      field: Field::X,
+      ..self
+    }
   }
 }
 
@@ -49,7 +69,7 @@ impl Default for Filter {
       coordinate_transform: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
       coordinates: false,
       default_color: [0.0, 0.0, 0.0],
-      field: 0,
+      field: Field::All,
       field_mod_divisor: 0,
       field_mod_remainder: 0,
       field_rows_on: 0,

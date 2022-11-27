@@ -374,9 +374,24 @@ impl Gpu {
       .gl
       .uniform1ui(Some(self.uniform("wrap")), filter.wrap as u32);
 
-    self
-      .gl
-      .uniform1i(Some(self.uniform("field")), filter.field as i32);
+    self.gl.uniform1i(
+      Some(self.uniform("field")),
+      match filter.field {
+        Field::All => 0,
+        Field::Check => 1,
+        Field::Circle => 2,
+        Field::Cross => 3,
+        Field::Equalizer => 4,
+        Field::Frequency => 5,
+        Field::Mod => 6,
+        Field::Rows => 7,
+        Field::Square => 8,
+        Field::TimeDomain => 9,
+        Field::Top => 10,
+        Field::Wave => 11,
+        Field::X => 12,
+      },
+    );
 
     self
       .gl

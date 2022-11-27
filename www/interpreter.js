@@ -635,19 +635,19 @@ const TAU = Math.PI * 2;
 // `www/fragment.glsl`. See the corresponding functions and case statements,
 // e.g., `all()` in this file and `case FIELD_ALL:` in `www/fragment.glsl`, for
 // more details and the field definition, respectively.
-const FIELD_ALL = 0;
-const FIELD_CHECK = 1;
-const FIELD_CIRCLE = 2;
-const FIELD_CROSS = 3;
-const FIELD_EQUALIZER = 4;
-const FIELD_FREQUENCY = 5;
-const FIELD_MOD = 6;
-const FIELD_ROWS = 7;
-const FIELD_SQUARE = 8;
-const FIELD_TIME_DOMAIN = 9;
-const FIELD_TOP = 10;
-const FIELD_WAVE = 11;
-const FIELD_X = 12;
+const FIELD_ALL = "All";
+const FIELD_CHECK = "Check";
+const FIELD_CIRCLE = "Circle";
+const FIELD_CROSS = "Cross";
+const FIELD_EQUALIZER = "Equalizer";
+const FIELD_FREQUENCY = "Frequency";
+const FIELD_MOD = "Mod";
+const FIELD_ROWS = "Rows";
+const FIELD_SQUARE = "Square";
+const FIELD_TIME_DOMAIN = "TimeDomain";
+const FIELD_TOP = "Top";
+const FIELD_WAVE = "Wave";
+const FIELD_X = "X";
 
 class Rng {
   constructor(seed) {
