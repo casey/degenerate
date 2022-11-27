@@ -192,7 +192,9 @@ impl App {
     name: &str,
     callback: impl Fn(&mut Self) -> Result + 'static,
   ) -> Result {
-    Self::add_event_listener_with_event(app, target, name, move |app, _: Event| callback(app))
+    Self::add_event_listener_with_event(app, target, name, move |app, _: web_sys::Event| {
+      callback(app)
+    })
   }
 
   fn add_event_listener_with_event<E: FromWasmAbi + 'static>(
@@ -237,9 +239,9 @@ impl App {
   pub(super) fn run_script(&self, script: &str) -> Result {
     self
       .worker
-      .post_message(&JsValue::from_str(&serde_json::to_string(
-        &AppMessage::Script(script.into()),
-      )?))?;
+      .post_message(&JsValue::from_str(&serde_json::to_string(&Event::Script(
+        script.into(),
+      ))?))?;
     Ok(())
   }
 
@@ -250,9 +252,9 @@ impl App {
 
     self
       .worker
-      .post_message(&JsValue::from_str(&serde_json::to_string(
-        &AppMessage::Frame(timestamp as f32),
-      )?))?;
+      .post_message(&JsValue::from_str(&serde_json::to_string(&Event::Frame(
+        timestamp as f32,
+      ))?))?;
 
     Ok(())
   }
@@ -266,25 +268,25 @@ impl App {
     )?;
 
     match event {
-      WorkerMessage::Clear => {
+      Message::Clear => {
         self.gpu.clear()?;
       }
-      WorkerMessage::DecibelRange { min, max } => {
+      Message::DecibelRange { min, max } => {
         self.gpu.set_decibel_range(min, max);
       }
-      WorkerMessage::Done => {
+      Message::Done => {
         self.html.set_class_name("done");
       }
-      WorkerMessage::Error(error) => {
+      Message::Error(error) => {
         self.stderr.update(Err(error.into()));
       }
-      WorkerMessage::OscillatorFrequency(frequency) => {
+      Message::OscillatorFrequency(frequency) => {
         self.oscillator_node.frequency().set_value(frequency);
       }
-      WorkerMessage::OscillatorGain(gain) => {
+      Message::OscillatorGain(gain) => {
         self.oscillator_gain_node.gain().set_value(gain);
       }
-      WorkerMessage::Record => {
+      Message::Record => {
         if !self.recording {
           let local = self.this();
           let closure = Closure::wrap(Box::new(move |stream: JsValue| {
@@ -305,14 +307,14 @@ impl App {
           closure.forget();
         }
       }
-      WorkerMessage::Render(filter) => {
+      Message::Render(filter) => {
         self.gpu.render(&filter)?;
         self.gpu.present()?;
       }
-      WorkerMessage::Resolution(resolution) => {
+      Message::Resolution(resolution) => {
         self.gpu.lock_resolution(resolution);
       }
-      WorkerMessage::Save => {
+      Message::Save => {
         let image = self.gpu.save_image()?;
         let mut png = Cursor::new(Vec::new());
         image.write_to(&mut png, ImageOutputFormat::Png)?;
@@ -326,7 +328,7 @@ impl App {
         a.set_href(&href);
         a.click();
       }
-      WorkerMessage::Widget { name, widget } => {
+      Message::Widget { name, widget } => {
         let id = widget.id(&name);
 
         if self.document.get_element_by_id(&id).is_none() {
@@ -359,7 +361,7 @@ impl App {
               checkbox.add_event_listener("input", move || {
                 stderr.update(|| -> Result {
                   worker.post_message(&JsValue::from_str(&serde_json::to_string(
-                    &AppMessage::Widget {
+                    &Event::Widget {
                       key: key.clone(),
                       value: serde_json::Value::Bool(local.checked()),
                     },
@@ -396,7 +398,7 @@ impl App {
                 radio.add_event_listener("input", move || {
                   stderr.update(|| -> Result {
                     worker.post_message(&JsValue::from_str(&serde_json::to_string(
-                      &AppMessage::Widget {
+                      &Event::Widget {
                         key: key.clone(),
                         value: serde_json::Value::String(option.clone()),
                       },
@@ -444,7 +446,7 @@ impl App {
                   let value = local.value();
                   current.set_inner_text(&value);
                   worker.post_message(&JsValue::from_str(&serde_json::to_string(
-                    &AppMessage::Widget {
+                    &Event::Widget {
                       key: key.clone(),
                       value: serde_json::Value::Number(value.parse()?),
                     },

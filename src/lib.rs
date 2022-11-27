@@ -7,7 +7,7 @@ use {
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[serde(tag = "tag", content = "content")]
-pub enum AppMessage {
+pub enum Event {
   Frame(f32),
   Script(String),
   Widget {
@@ -61,23 +61,6 @@ impl Default for Filter {
   }
 }
 
-pub trait Process {
-  fn new(system: System) -> Self
-  where
-    Self: Sized;
-
-  fn execute()
-  where
-    Self: Sized + 'static,
-  {
-    System::execute(Box::new(Self::new(System::new())));
-  }
-
-  fn frame(&mut self, _timestamp: f32) {}
-
-  fn init(&mut self) {}
-}
-
 pub struct System {
   dedicated_worker_global_scope: DedicatedWorkerGlobalScope,
 }
@@ -90,12 +73,12 @@ impl System {
     }
   }
 
-  fn execute(mut process: Box<dyn Process>) {
-    process.init();
+  pub fn execute<T: Fn(&System, Event) + 'static>(f: T) {
+    let system = System::new();
 
     let closure = Closure::wrap(Box::new(move |e: MessageEvent| {
-      Self::message(
-        process.as_mut(),
+      f(
+        &system,
         serde_json::from_str(&e.data().as_string().unwrap()).unwrap(),
       )
     }) as Box<dyn FnMut(MessageEvent)>);
@@ -108,35 +91,13 @@ impl System {
     closure.forget();
   }
 
-  fn message(process: &mut dyn Process, message: AppMessage) {
-    if let AppMessage::Frame(timestamp) = message {
-      process.frame(timestamp);
-    }
-  }
-
-  fn post_message(&self, worker_message: WorkerMessage) {
+  pub fn send(&self, message: Message) {
     self
       .dedicated_worker_global_scope
       .post_message(&JsValue::from_str(
-        &serde_json::to_string(&worker_message).unwrap(),
+        &serde_json::to_string(&message).unwrap(),
       ))
       .unwrap();
-  }
-
-  pub fn clear(&self) {
-    self.post_message(WorkerMessage::Clear);
-  }
-
-  pub fn error(&self, error: impl ToString) {
-    self.post_message(WorkerMessage::Error(error.to_string()));
-  }
-
-  pub fn render(&self, filter: Filter) {
-    self.post_message(WorkerMessage::Render(filter));
-  }
-
-  pub fn save(&self) {
-    self.post_message(WorkerMessage::Save);
   }
 }
 
@@ -175,7 +136,7 @@ impl Widget {
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub enum WorkerMessage {
+pub enum Message {
   Clear,
   DecibelRange { min: f32, max: f32 },
   Done,
