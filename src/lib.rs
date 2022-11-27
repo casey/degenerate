@@ -40,6 +40,48 @@ pub struct Filter {
   pub wrap: bool,
 }
 
+impl Filter {
+  pub fn new() -> Self {
+    Self::default()
+  }
+
+  pub fn x(self) -> Self {
+    Self {
+      field: Field::X,
+      ..self
+    }
+  }
+
+  pub fn circle(self) -> Self {
+    Self {
+      field: Field::Circle,
+      ..self
+    }
+  }
+
+  pub fn coordinate_transform(self, coordinate_transform: Matrix3) -> Self {
+    Self {
+      coordinate_transform,
+      ..self
+    }
+  }
+
+  pub fn color_transform(self, color_transform: Matrix4) -> Self {
+    Self {
+      color_transform,
+      ..self
+    }
+  }
+
+  pub fn alpha(self, alpha: f32) -> Self {
+    Self { alpha, ..self }
+  }
+
+  pub fn wrap(self, wrap: bool) -> Self {
+    Self { wrap, ..self }
+  }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Field {
   All,
@@ -90,6 +132,10 @@ impl System {
   }
 
   pub fn execute<T: Fn(&System) + 'static>(f: T) {
+    Self::execute_inner(Box::new(f))
+  }
+
+  fn execute_inner(f: Box<dyn Fn(&System) + 'static>) {
     let mut system = System::new();
 
     let closure = Closure::wrap(Box::new(move |e: MessageEvent| {
