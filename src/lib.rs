@@ -60,16 +60,16 @@ impl Filter {
     }
   }
 
-  pub fn coordinate_transform(self, coordinate_transform: Matrix3) -> Self {
+  pub fn coordinate_transform(self, coordinate_transform: impl Into<Matrix3>) -> Self {
     Self {
-      coordinate_transform,
+      coordinate_transform: coordinate_transform.into(),
       ..self
     }
   }
 
-  pub fn color_transform(self, color_transform: Matrix4) -> Self {
+  pub fn color_transform(self, color_transform: impl Into<Matrix4>) -> Self {
     Self {
-      color_transform,
+      color_transform: color_transform.into(),
       ..self
     }
   }
@@ -137,7 +137,7 @@ impl System {
     }
   }
 
-  pub fn execute<T: Fn(&System) + 'static>(f: T) {
+  pub fn execute<F: Fn(&System) + 'static>(f: F) {
     Self::execute_inner(Box::new(f))
   }
 

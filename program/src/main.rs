@@ -12,7 +12,7 @@ fn stretch(system: &System) {
   system.render(
     Filter::new()
       .circle()
-      .coordinate_transform(Scale2::new(1.0 / (system.time() / 10000.0), 2.0).into())
+      .coordinate_transform(Scale2::new(1.0 / (system.time() / 10000.0), 2.0))
       .times(8),
   );
 }
@@ -23,7 +23,7 @@ fn target(system: &System) {
     system.render(
       Filter::new()
         .circle()
-        .coordinate_transform(Similarity2::from_scaling(2.0).into())
+        .coordinate_transform(Similarity2::from_scaling(2.0))
         .times(8),
     );
   }
@@ -37,8 +37,8 @@ fn kaleidoscope(system: &System) {
   system.render(
     Filter::new()
       .circle()
-      .color_transform(Rotation3::from_axis_angle(&Vector3::y_axis(), 0.05 * TAU).into())
-      .coordinate_transform(Similarity2::from_scaling(s).into())
+      .color_transform(Rotation3::from_axis_angle(&Vector3::y_axis(), 0.05 * TAU))
+      .coordinate_transform(Similarity2::from_scaling(s))
       .wrap(true)
       .times(8),
   );
@@ -48,10 +48,12 @@ fn kaleidoscope(system: &System) {
   system.render(
     Filter::new()
       .circle()
-      .color_transform(Rotation3::from_axis_angle(&Vector3::z_axis(), 0.05 * TAU).into())
-      .coordinate_transform(
-        Similarity2::from_parts(Translation2::identity(), Rotation2::new(r).into(), s).into(),
-      )
+      .color_transform(Rotation3::from_axis_angle(&Vector3::z_axis(), 0.05 * TAU))
+      .coordinate_transform(Similarity2::from_parts(
+        Translation2::identity(),
+        Rotation2::new(r).into(),
+        s,
+      ))
       .wrap(true)
       .times(8),
   );
@@ -63,8 +65,8 @@ fn orbs(system: &System) {
   system.render(
     Filter::new()
       .circle()
-      .color_transform(Rotation3::from_axis_angle(&Vector3::y_axis(), 0.05 * TAU).into())
-      .coordinate_transform(Similarity2::from_scaling(1.0 / 0.75).into())
+      .color_transform(Rotation3::from_axis_angle(&Vector3::y_axis(), 0.05 * TAU))
+      .coordinate_transform(Similarity2::from_scaling(1.0 / 0.75))
       .wrap(true)
       .times(8),
   );
@@ -72,8 +74,8 @@ fn orbs(system: &System) {
   system.render(
     Filter::new()
       .circle()
-      .color_transform(Rotation3::from_axis_angle(&Vector3::z_axis(), 0.05 * TAU).into())
-      .coordinate_transform(Similarity2::from_scaling(1.0 / 0.75).into())
+      .color_transform(Rotation3::from_axis_angle(&Vector3::z_axis(), 0.05 * TAU))
+      .coordinate_transform(Similarity2::from_scaling(1.0 / 0.75))
       .wrap(true)
       .times(8),
   );
@@ -86,7 +88,7 @@ fn x(system: &System) {
       Filter::new()
         .x()
         .wrap(i % 2 == 1)
-        .coordinate_transform(Similarity2::from_scaling(2.0).into()),
+        .coordinate_transform(Similarity2::from_scaling(2.0)),
     );
   }
 }
