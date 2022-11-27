@@ -3,7 +3,7 @@
 use degenerate::*;
 
 fn fade_in(system: &System) {
-  system.send(Message::Clear);
+  system.clear();
   system.render(Filter {
     field: Field::X,
     alpha: (system.time() / 5000.0).min(1.0),
@@ -12,7 +12,7 @@ fn fade_in(system: &System) {
 }
 
 fn stretch(system: &System) {
-  system.send(Message::Clear);
+  system.clear();
   for _ in 0..8 {
     system.render(Filter {
       field: Field::Circle,
@@ -24,7 +24,7 @@ fn stretch(system: &System) {
 
 fn target(system: &System) {
   if system.frame() == 0 {
-    system.send(Message::Clear);
+    system.clear();
     for _ in 0..8 {
       system.render(Filter {
         field: Field::Circle,
@@ -38,7 +38,7 @@ fn target(system: &System) {
 fn kaleidoscope(system: &System) {
   let r = 5.0 / 6.0 * TAU;
   let s = 1.0 / 0.75;
-  system.send(Message::Clear);
+  system.clear();
 
   for _ in 0..8 {
     system.render(Filter {
@@ -69,7 +69,7 @@ fn kaleidoscope(system: &System) {
 }
 
 fn orbs(system: &System) {
-  system.send(Message::Clear);
+  system.clear();
 
   for _ in 0..8 {
     system.render(Filter {
@@ -93,7 +93,7 @@ fn orbs(system: &System) {
 }
 
 fn x(system: &System) {
-  system.send(Message::Clear);
+  system.clear();
   for i in 0..8 {
     system.render(Filter {
       field: Field::X,

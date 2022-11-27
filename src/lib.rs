@@ -111,12 +111,16 @@ impl System {
     closure.forget();
   }
 
-  pub fn frame(&self) -> u64 {
-    self.frame
+  pub fn clear(&self) {
+    self.send(Message::Clear);
   }
 
   pub fn delta(&self) -> f32 {
     self.delta
+  }
+
+  pub fn frame(&self) -> u64 {
+    self.frame
   }
 
   pub fn render(&self, filter: Filter) {
