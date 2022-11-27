@@ -251,7 +251,7 @@ impl App {
     self
       .worker
       .post_message(&JsValue::from_str(&serde_json::to_string(
-        &AppMessage::Frame(timestamp),
+        &AppMessage::Frame(timestamp as f32),
       )?))?;
 
     Ok(())

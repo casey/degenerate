@@ -1,5 +1,4 @@
 use {
-  js_sys::Date,
   serde::{Deserialize, Serialize},
   wasm_bindgen::{closure::Closure, JsCast, JsValue},
   web_sys::{DedicatedWorkerGlobalScope, MessageEvent},
@@ -9,7 +8,7 @@ use {
 #[serde(rename_all = "camelCase")]
 #[serde(tag = "tag", content = "content")]
 pub enum AppMessage {
-  Frame(f64),
+  Frame(f32),
   Script(String),
   Widget {
     key: String,
@@ -46,15 +45,6 @@ pub enum Field {
   X,
 }
 
-impl Filter {
-  pub fn x(self) -> Self {
-    Self {
-      field: Field::X,
-      ..self
-    }
-  }
-}
-
 impl Default for Filter {
   fn default() -> Self {
     Self {
@@ -83,7 +73,7 @@ pub trait Process {
     System::execute(Box::new(Self::new(System::new())));
   }
 
-  fn frame(&mut self, _timestamp: f64) {}
+  fn frame(&mut self, _timestamp: f32) {}
 
   fn init(&mut self) {}
 }
@@ -122,10 +112,6 @@ impl System {
     if let AppMessage::Frame(timestamp) = message {
       process.frame(timestamp);
     }
-  }
-
-  pub fn now() -> f64 {
-    Date::now()
   }
 
   fn post_message(&self, worker_message: WorkerMessage) {

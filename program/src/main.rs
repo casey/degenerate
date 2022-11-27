@@ -1,4 +1,4 @@
-use degenerate::{Filter, Process, System};
+use degenerate::{Field, Filter, Process, System};
 
 struct Program {
   system: System,
@@ -9,11 +9,13 @@ impl Process for Program {
     Self { system }
   }
 
-  fn frame(&mut self, timestamp: f64) {
+  fn frame(&mut self, timestamp: f32) {
     self.system.clear();
-    let mut filter = Filter::default().x();
-    filter.alpha = (timestamp / 5000.0).min(1.0) as f32;
-    self.system.render(filter);
+    self.system.render(Filter {
+      field: Field::X,
+      alpha: (timestamp / 5000.0).min(1.0),
+      ..Filter::default()
+    });
   }
 }
 
