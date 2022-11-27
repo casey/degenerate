@@ -285,9 +285,7 @@ function invert() {
 // render();
 // ```
 function mod(divisor, remainder) {
-  filter.fieldModDivisor = divisor;
-  filter.fieldModRemainder = remainder;
-  filter.field = "Mod";
+  filter.field = {"Mod": {"divisor": divisor, "remainder": remainder}};
 }
 
 // Set the oscillator gain. The oscillator produces a sine wave tone, useful
@@ -657,8 +655,6 @@ class Filter {
     this.coordinates = false;
     this.defaultColor = [0.0, 0.0, 0.0];
     this.field = "All";
-    this.fieldModDivisor = 0;
-    this.fieldModRemainder = 0;
     this.fieldRowsOn = 0;
     this.fieldRowsOff = 0;
     this.wrap = false;

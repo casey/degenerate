@@ -343,15 +343,6 @@ impl Gpu {
 
     self
       .gl
-      .uniform1ui(Some(self.uniform("mod_divisor")), filter.field_mod_divisor);
-
-    self.gl.uniform1ui(
-      Some(self.uniform("mod_remainder")),
-      filter.field_mod_remainder,
-    );
-
-    self
-      .gl
       .uniform1ui(Some(self.uniform("rows_on")), filter.field_rows_on);
 
     self
@@ -383,7 +374,15 @@ impl Gpu {
         Field::Cross => 3,
         Field::Equalizer => 4,
         Field::Frequency => 5,
-        Field::Mod => 6,
+        Field::Mod { divisor, remainder } => {
+          self
+            .gl
+            .uniform1ui(Some(self.uniform("mod_divisor")), divisor);
+          self
+            .gl
+            .uniform1ui(Some(self.uniform("mod_remainder")), remainder);
+          6
+        }
         Field::Rows => 7,
         Field::Square => 8,
         Field::TimeDomain => 9,
