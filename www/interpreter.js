@@ -21,14 +21,14 @@ let vec4 = glMatrix.vec4;
 // render();
 // ```
 //
-// `FIELD_ALL` is the default field, so the above example could have been written
+// All is the default field, so the above example could have been written
 // as:
 //
 // ```
 // render();
 // ```
 function all() {
-  filter.field = FIELD_ALL;
+  filter.field = "All";
 }
 
 // Set the alpha blending factor. `alpha` will be used to blend the
@@ -57,7 +57,7 @@ function assert(condition, message) {
 // render();
 // ```
 function check() {
-  filter.field = FIELD_CHECK;
+  filter.field = "Check";
 }
 
 // Create a new checkbox widget with the label `name`, and return true if it is
@@ -94,7 +94,7 @@ function checkbox(name) {
 // render();
 // ```
 function circle() {
-  filter.field = FIELD_CIRCLE;
+  filter.field = "Circle";
 }
 
 // Clear the canvas.
@@ -115,7 +115,7 @@ function clear() {
 // render();
 // ```
 function cross() {
-  filter.field = FIELD_CROSS;
+  filter.field = "Cross";
 }
 
 // Set the decibel range for normalization of raw frequency data into values
@@ -204,7 +204,7 @@ function elapsed() {
 // }
 // ```
 function equalizer() {
-  filter.field = FIELD_EQUALIZER;
+  filter.field = "Equalizer";
 }
 
 // Returns a promise that resolves when the browser is ready to display a new
@@ -229,7 +229,7 @@ async function frame() {
 
 // A frequency field.
 function frequency() {
-  filter.field = FIELD_FREQUENCY;
+  filter.field = "Frequency";
 }
 
 // Set the color transformation to the identity transformation. The identity
@@ -287,7 +287,7 @@ function invert() {
 function mod(divisor, remainder) {
   filter.fieldModDivisor = divisor;
   filter.fieldModRemainder = remainder;
-  filter.field = FIELD_MOD;
+  filter.field = "Mod";
 }
 
 // Set the oscillator gain. The oscillator produces a sine wave tone, useful
@@ -467,7 +467,7 @@ function rotate(rotation) {
 function rows(on, off) {
   filter.fieldRowsOn = on;
   filter.fieldRowsOff = off;
-  filter.field = FIELD_ROWS;
+  filter.field = "Rows";
 }
 
 // Save the current canvas as a PNG.
@@ -546,12 +546,12 @@ function slider(name, min, max, step, initial) {
 // render();
 // ```
 function square() {
-  filter.field = FIELD_SQUARE;
+  filter.field = "Square";
 }
 
 // A field that covers pixels where the audio time domain data is large.
 function timeDomain() {
-  filter.field = FIELD_TIME_DOMAIN;
+  filter.field = "TimeDomain";
 }
 
 // A field covering the top half of the canvas.
@@ -561,7 +561,7 @@ function timeDomain() {
 // render();
 // ```
 function top() {
-  filter.field = FIELD_TOP;
+  filter.field = "Top";
 }
 
 // Set the coordinate transform using `rotation`, `scale`, and `translation`.
@@ -595,7 +595,7 @@ function transform(rotation, scale, translation) {
 // }
 // ```
 function wave() {
-  filter.field = FIELD_WAVE;
+  filter.field = "Wave";
 }
 
 // Set wrap. When `wrap` is `true`, out of bounds samples will be wrapped back within bounds.
@@ -617,7 +617,7 @@ function wrap(warp) {
 // render();
 // ```
 function x() {
-  filter.field = FIELD_X;
+  filter.field = "X";
 }
 
 // The ratio of a circle's circumference to its diameter. Useful for expressing
@@ -629,25 +629,6 @@ const PI = Math.PI;
 // rotations in radians, where a full 360° turn is equal to `TAU` For example,
 // to rotate 1/4 turn, use `rotate(1/4 * TAU)`.
 const TAU = Math.PI * 2;
-
-// Field constants. The field determines which pixels the current color transform
-// will be applied to. These values should be kept in sync with those in
-// `www/fragment.glsl`. See the corresponding functions and case statements,
-// e.g., `all()` in this file and `case FIELD_ALL:` in `www/fragment.glsl`, for
-// more details and the field definition, respectively.
-const FIELD_ALL = "All";
-const FIELD_CHECK = "Check";
-const FIELD_CIRCLE = "Circle";
-const FIELD_CROSS = "Cross";
-const FIELD_EQUALIZER = "Equalizer";
-const FIELD_FREQUENCY = "Frequency";
-const FIELD_MOD = "Mod";
-const FIELD_ROWS = "Rows";
-const FIELD_SQUARE = "Square";
-const FIELD_TIME_DOMAIN = "TimeDomain";
-const FIELD_TOP = "Top";
-const FIELD_WAVE = "Wave";
-const FIELD_X = "X";
 
 class Rng {
   constructor(seed) {
@@ -675,7 +656,7 @@ class Filter {
     this.coordinateTransform = mat3.create();
     this.coordinates = false;
     this.defaultColor = [0.0, 0.0, 0.0];
-    this.field = FIELD_ALL;
+    this.field = "All";
     this.fieldModDivisor = 0;
     this.fieldModRemainder = 0;
     this.fieldRowsOn = 0;
