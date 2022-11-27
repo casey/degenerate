@@ -9,25 +9,23 @@ fn fade_in(system: &System) {
 
 fn stretch(system: &System) {
   system.clear();
-  for _ in 0..8 {
-    system.render(
-      Filter::new()
-        .circle()
-        .coordinate_transform(Scale2::new(1.0 / (system.time() / 10000.0), 2.0).into()),
-    );
-  }
+  system.render(
+    Filter::new()
+      .circle()
+      .coordinate_transform(Scale2::new(1.0 / (system.time() / 10000.0), 2.0).into())
+      .times(8),
+  );
 }
 
 fn target(system: &System) {
   if system.frame() == 0 {
     system.clear();
-    for _ in 0..8 {
-      system.render(
-        Filter::new()
-          .circle()
-          .coordinate_transform(Similarity2::from_scaling(2.0).into()),
-      );
-    }
+    system.render(
+      Filter::new()
+        .circle()
+        .coordinate_transform(Similarity2::from_scaling(2.0).into())
+        .times(8),
+    );
   }
 }
 
@@ -36,53 +34,49 @@ fn kaleidoscope(system: &System) {
   let s = 1.0 / 0.75;
   system.clear();
 
-  for _ in 0..8 {
-    system.render(
-      Filter::new()
-        .circle()
-        .color_transform(Rotation3::from_axis_angle(&Vector3::y_axis(), 0.05 * TAU).into())
-        .coordinate_transform(Similarity2::from_scaling(s).into())
-        .wrap(true),
-    );
-  }
+  system.render(
+    Filter::new()
+      .circle()
+      .color_transform(Rotation3::from_axis_angle(&Vector3::y_axis(), 0.05 * TAU).into())
+      .coordinate_transform(Similarity2::from_scaling(s).into())
+      .wrap(true)
+      .times(8),
+  );
 
   let r = r + system.time() / 30000.0 * TAU;
 
-  for _ in 0..8 {
-    system.render(
-      Filter::new()
-        .circle()
-        .color_transform(Rotation3::from_axis_angle(&Vector3::z_axis(), 0.05 * TAU).into())
-        .coordinate_transform(
-          Similarity2::from_parts(Translation2::identity(), Rotation2::new(r).into(), s).into(),
-        )
-        .wrap(true),
-    );
-  }
+  system.render(
+    Filter::new()
+      .circle()
+      .color_transform(Rotation3::from_axis_angle(&Vector3::z_axis(), 0.05 * TAU).into())
+      .coordinate_transform(
+        Similarity2::from_parts(Translation2::identity(), Rotation2::new(r).into(), s).into(),
+      )
+      .wrap(true)
+      .times(8),
+  );
 }
 
 fn orbs(system: &System) {
   system.clear();
 
-  for _ in 0..8 {
-    system.render(
-      Filter::new()
-        .circle()
-        .color_transform(Rotation3::from_axis_angle(&Vector3::y_axis(), 0.05 * TAU).into())
-        .coordinate_transform(Similarity2::from_scaling(1.0 / 0.75).into())
-        .wrap(true),
-    );
-  }
+  system.render(
+    Filter::new()
+      .circle()
+      .color_transform(Rotation3::from_axis_angle(&Vector3::y_axis(), 0.05 * TAU).into())
+      .coordinate_transform(Similarity2::from_scaling(1.0 / 0.75).into())
+      .wrap(true)
+      .times(8),
+  );
 
-  for _ in 0..8 {
-    system.render(
-      Filter::new()
-        .circle()
-        .color_transform(Rotation3::from_axis_angle(&Vector3::z_axis(), 0.05 * TAU).into())
-        .coordinate_transform(Similarity2::from_scaling(1.0 / 0.75).into())
-        .wrap(true),
-    )
-  }
+  system.render(
+    Filter::new()
+      .circle()
+      .color_transform(Rotation3::from_axis_angle(&Vector3::z_axis(), 0.05 * TAU).into())
+      .coordinate_transform(Similarity2::from_scaling(1.0 / 0.75).into())
+      .wrap(true)
+      .times(8),
+  );
 }
 
 fn x(system: &System) {
@@ -98,5 +92,5 @@ fn x(system: &System) {
 }
 
 fn main() {
-  System::execute(stretch);
+  System::execute(orbs);
 }

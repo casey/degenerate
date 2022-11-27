@@ -37,6 +37,7 @@ pub struct Filter {
   pub coordinates: bool,
   pub default_color: [f32; 3],
   pub field: Field,
+  pub times: u32,
   pub wrap: bool,
 }
 
@@ -80,6 +81,25 @@ impl Filter {
   pub fn wrap(self, wrap: bool) -> Self {
     Self { wrap, ..self }
   }
+
+  pub fn times(self, times: u32) -> Self {
+    Self { times, ..self }
+  }
+}
+
+impl Default for Filter {
+  fn default() -> Self {
+    Self {
+      alpha: 1.0,
+      color_transform: Similarity3::from_scaling(-1.0).into(),
+      coordinate_transform: Matrix3::identity(),
+      coordinates: false,
+      default_color: [0.0, 0.0, 0.0],
+      field: Field::All,
+      times: 1,
+      wrap: false,
+    }
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -97,20 +117,6 @@ pub enum Field {
   Top,
   Wave,
   X,
-}
-
-impl Default for Filter {
-  fn default() -> Self {
-    Self {
-      alpha: 1.0,
-      color_transform: Similarity3::from_scaling(-1.0).into(),
-      coordinate_transform: Matrix3::identity(),
-      coordinates: false,
-      default_color: [0.0, 0.0, 0.0],
-      field: Field::All,
-      wrap: false,
-    }
-  }
 }
 
 pub struct System {

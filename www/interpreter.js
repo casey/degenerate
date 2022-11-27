@@ -550,6 +550,12 @@ function timeDomain() {
   filter.field = 'TimeDomain';
 }
 
+// Execute the filter `times` times.
+function times(times) {
+  filter.times = times;
+}
+
+
 // A field covering the top half of the canvas.
 //
 // ```
@@ -653,6 +659,7 @@ class Filter {
     this.coordinates = false;
     this.defaultColor = [0.0, 0.0, 0.0];
     this.field = 'All';
+    this.times = 1;
     this.wrap = false;
   }
 }
