@@ -128,6 +128,7 @@ pub struct System {
   frame: u64,
   delta: f32,
   time: f32,
+  clear: bool,
 }
 
 thread_local! {
@@ -140,14 +141,15 @@ impl System {
       frame: 0,
       delta: 0.0,
       time: 0.0,
+      clear: true,
     }
   }
 
-  pub fn execute<F: Fn(&System) + 'static>(f: F) {
+  pub fn execute<F: Fn(&mut System) + 'static>(f: F) {
     Self::execute_inner(Box::new(f))
   }
 
-  fn execute_inner(f: Box<dyn Fn(&System) + 'static>) {
+  fn execute_inner(f: Box<dyn Fn(&mut System) + 'static>) {
     let mut system = System::new();
 
     let closure = Closure::wrap(Box::new(move |e: MessageEvent| {
@@ -156,7 +158,10 @@ impl System {
       if let Event::Frame(time) = event {
         system.delta = time - system.time;
         system.time = time;
-        f(&system);
+        if system.clear {
+          Self::send(Message::Clear);
+        }
+        f(&mut system);
         system.frame += 1;
       }
     }) as Box<dyn FnMut(MessageEvent)>);
@@ -169,8 +174,8 @@ impl System {
     closure.forget();
   }
 
-  pub fn clear(&self) {
-    Self::send(Message::Clear);
+  pub fn clear(&mut self, clear: bool) {
+    self.clear = clear;
   }
 
   pub fn delta(&self) -> f32 {

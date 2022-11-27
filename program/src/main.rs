@@ -2,17 +2,14 @@
 
 use degenerate::*;
 
-fn fade_in(system: &System) {
-  system.clear();
-
+fn fade_in(system: &mut System) {
   Filter::new()
     .x()
     .alpha((system.time() / 5000.0).min(1.0))
     .render();
 }
 
-fn stretch(system: &System) {
-  system.clear();
+fn stretch(system: &mut System) {
   Filter::new()
     .circle()
     .position(Scale2::new(1.0 / (system.time() / 10000.0), 2.0))
@@ -20,9 +17,8 @@ fn stretch(system: &System) {
     .render();
 }
 
-fn target(system: &System) {
+fn target(system: &mut System) {
   if system.frame() == 0 {
-    system.clear();
     Filter::new()
       .circle()
       .position(Similarity2::from_scaling(2.0))
@@ -31,10 +27,8 @@ fn target(system: &System) {
   }
 }
 
-fn kaleidoscope(system: &System) {
+fn kaleidoscope(system: &mut System) {
   let s = 1.0 / 0.75;
-  system.clear();
-
   Filter::new()
     .circle()
     .color(Rotation3::from_axis_angle(&Vector3::y_axis(), 0.05 * TAU))
@@ -51,9 +45,7 @@ fn kaleidoscope(system: &System) {
     .render();
 }
 
-fn orbs(system: &System) {
-  system.clear();
-
+fn orbs(system: &mut System) {
   Filter::new()
     .circle()
     .color(Rotation3::from_axis_angle(&Vector3::y_axis(), 0.05 * TAU))
@@ -65,8 +57,7 @@ fn orbs(system: &System) {
     .render();
 }
 
-fn x(system: &System) {
-  system.clear();
+fn x(system: &mut System) {
   for i in 0..8 {
     Filter::new()
       .x()
