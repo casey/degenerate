@@ -555,7 +555,6 @@ function times(times) {
   filter.times = times;
 }
 
-
 // A field covering the top half of the canvas.
 //
 // ```
