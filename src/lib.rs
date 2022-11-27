@@ -119,6 +119,10 @@ impl System {
     self.delta
   }
 
+  pub fn render(&self, filter: Filter) {
+    self.send(Message::Render(filter));
+  }
+
   pub fn time(&self) -> f32 {
     self.time
   }
