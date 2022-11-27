@@ -26,10 +26,10 @@ uniform mat4 color_transform;
 uniform sampler2D audio_frequency;
 uniform sampler2D audio_time_domain;
 uniform sampler2D source;
-uniform uint divisor;
-uniform uint nrows;
-uniform uint remainder;
-uniform uint step;
+uniform uint mod_divisor;
+uniform uint mod_remainder;
+uniform uint rows_off;
+uniform uint rows_on;
 uniform vec3 default_color;
 
 out vec4 output_color;
@@ -144,9 +144,9 @@ float distance_field(vec2 p, uvec2 px) {
     case FIELD_FREQUENCY:
       return field_frequency(p, 0.125);
     case FIELD_MOD:
-      return field_mod(px, divisor, remainder);
+      return field_mod(px, mod_divisor, mod_remainder);
     case FIELD_ROWS:
-      return field_rows(px, nrows, step);
+      return field_rows(px, rows_on, rows_off);
     case FIELD_SQUARE:
       return field_box(p, 0.5, 0.5);
     case FIELD_TIME_DOMAIN:

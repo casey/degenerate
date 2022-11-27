@@ -3,7 +3,7 @@ use {
     add_event_listener::AddEventListener, app::App, cast::Cast, error::Error,
     get_document::GetDocument, gpu::Gpu, select::Select, stderr::Stderr, window::window,
   },
-  degenerate::{AppMessage, Filter, Widget, WorkerMessage},
+  degenerate::{AppMessage, Field, Filter, Widget, WorkerMessage},
   hex::FromHexError,
   image::{ImageBuffer, ImageError, ImageOutputFormat},
   js_sys::{Float32Array, Promise},

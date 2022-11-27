@@ -341,22 +341,6 @@ impl Gpu {
       filter.default_color[2],
     );
 
-    self
-      .gl
-      .uniform1ui(Some(self.uniform("divisor")), filter.field_mod_divisor);
-
-    self
-      .gl
-      .uniform1ui(Some(self.uniform("remainder")), filter.field_mod_remainder);
-
-    self
-      .gl
-      .uniform1ui(Some(self.uniform("nrows")), filter.field_rows_rows);
-
-    self
-      .gl
-      .uniform1ui(Some(self.uniform("step")), filter.field_rows_step);
-
     self.gl.uniform_matrix4fv_with_f32_array(
       Some(self.uniform("color_transform")),
       false,
@@ -373,9 +357,36 @@ impl Gpu {
       .gl
       .uniform1ui(Some(self.uniform("wrap")), filter.wrap as u32);
 
-    self
-      .gl
-      .uniform1i(Some(self.uniform("field")), filter.field as i32);
+    self.gl.uniform1i(
+      Some(self.uniform("field")),
+      match filter.field {
+        Field::All => 0,
+        Field::Check => 1,
+        Field::Circle => 2,
+        Field::Cross => 3,
+        Field::Equalizer => 4,
+        Field::Frequency => 5,
+        Field::Mod { divisor, remainder } => {
+          self
+            .gl
+            .uniform1ui(Some(self.uniform("mod_divisor")), divisor);
+          self
+            .gl
+            .uniform1ui(Some(self.uniform("mod_remainder")), remainder);
+          6
+        }
+        Field::Rows { on, off } => {
+          self.gl.uniform1ui(Some(self.uniform("rows_on")), on);
+          self.gl.uniform1ui(Some(self.uniform("rows_off")), off);
+          7
+        }
+        Field::Square => 8,
+        Field::TimeDomain => 9,
+        Field::Top => 10,
+        Field::Wave => 11,
+        Field::X => 12,
+      },
+    );
 
     self
       .gl
