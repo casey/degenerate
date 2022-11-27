@@ -343,19 +343,20 @@ impl Gpu {
 
     self
       .gl
-      .uniform1ui(Some(self.uniform("divisor")), filter.field_mod_divisor);
+      .uniform1ui(Some(self.uniform("mod_divisor")), filter.field_mod_divisor);
+
+    self.gl.uniform1ui(
+      Some(self.uniform("mod_remainder")),
+      filter.field_mod_remainder,
+    );
 
     self
       .gl
-      .uniform1ui(Some(self.uniform("remainder")), filter.field_mod_remainder);
+      .uniform1ui(Some(self.uniform("rows_on")), filter.field_rows_on);
 
     self
       .gl
-      .uniform1ui(Some(self.uniform("nrows")), filter.field_rows_rows);
-
-    self
-      .gl
-      .uniform1ui(Some(self.uniform("step")), filter.field_rows_step);
+      .uniform1ui(Some(self.uniform("rows_off")), filter.field_rows_off);
 
     self.gl.uniform_matrix4fv_with_f32_array(
       Some(self.uniform("color_transform")),

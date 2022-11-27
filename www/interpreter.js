@@ -464,9 +464,9 @@ function rotate(rotation) {
 // rows(1, 9);
 // render();
 // ```
-function rows(nrows, step) {
-  filter.fieldRowsRows = nrows;
-  filter.fieldRowsStep = step;
+function rows(on, off) {
+  filter.fieldRowsOn = on;
+  filter.fieldRowsOff = off;
   filter.field = FIELD_ROWS;
 }
 
@@ -678,8 +678,8 @@ class Filter {
     this.field = FIELD_ALL;
     this.fieldModDivisor = 0;
     this.fieldModRemainder = 0;
-    this.fieldRowsRows = 0;
-    this.fieldRowsStep = 0;
+    this.fieldRowsOn = 0;
+    this.fieldRowsOff = 0;
     this.wrap = false;
   }
 }

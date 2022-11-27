@@ -28,8 +28,8 @@ pub struct Filter {
   pub field: u32,
   pub field_mod_divisor: u32,
   pub field_mod_remainder: u32,
-  pub field_rows_rows: u32,
-  pub field_rows_step: u32,
+  pub field_rows_on: u32,
+  pub field_rows_off: u32,
   pub wrap: bool,
 }
 
@@ -52,8 +52,8 @@ impl Default for Filter {
       field: 0,
       field_mod_divisor: 0,
       field_mod_remainder: 0,
-      field_rows_rows: 0,
-      field_rows_step: 0,
+      field_rows_on: 0,
+      field_rows_off: 0,
       wrap: false,
     }
   }
