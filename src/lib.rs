@@ -26,8 +26,6 @@ pub struct Filter {
   pub coordinates: bool,
   pub default_color: [f32; 3],
   pub field: Field,
-  pub field_rows_on: u32,
-  pub field_rows_off: u32,
   pub wrap: bool,
 }
 
@@ -40,7 +38,7 @@ pub enum Field {
   Equalizer,
   Frequency,
   Mod { divisor: u32, remainder: u32 },
-  Rows,
+  Rows { on: u32, off: u32 },
   Square,
   TimeDomain,
   Top,
@@ -68,8 +66,6 @@ impl Default for Filter {
       coordinates: false,
       default_color: [0.0, 0.0, 0.0],
       field: Field::All,
-      field_rows_on: 0,
-      field_rows_off: 0,
       wrap: false,
     }
   }

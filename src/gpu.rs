@@ -341,14 +341,6 @@ impl Gpu {
       filter.default_color[2],
     );
 
-    self
-      .gl
-      .uniform1ui(Some(self.uniform("rows_on")), filter.field_rows_on);
-
-    self
-      .gl
-      .uniform1ui(Some(self.uniform("rows_off")), filter.field_rows_off);
-
     self.gl.uniform_matrix4fv_with_f32_array(
       Some(self.uniform("color_transform")),
       false,
@@ -383,7 +375,11 @@ impl Gpu {
             .uniform1ui(Some(self.uniform("mod_remainder")), remainder);
           6
         }
-        Field::Rows => 7,
+        Field::Rows { on, off } => {
+          self.gl.uniform1ui(Some(self.uniform("rows_on")), on);
+          self.gl.uniform1ui(Some(self.uniform("rows_off")), off);
+          7
+        }
         Field::Square => 8,
         Field::TimeDomain => 9,
         Field::Top => 10,

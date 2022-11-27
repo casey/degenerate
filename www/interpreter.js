@@ -463,9 +463,7 @@ function rotate(rotation) {
 // render();
 // ```
 function rows(on, off) {
-  filter.fieldRowsOn = on;
-  filter.fieldRowsOff = off;
-  filter.field = "Rows";
+  filter.field = {"Rows": {"on": on, "off": off}};
 }
 
 // Save the current canvas as a PNG.
@@ -655,8 +653,6 @@ class Filter {
     this.coordinates = false;
     this.defaultColor = [0.0, 0.0, 0.0];
     this.field = "All";
-    this.fieldRowsOn = 0;
-    this.fieldRowsOff = 0;
     this.wrap = false;
   }
 }
