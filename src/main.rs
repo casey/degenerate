@@ -3,7 +3,7 @@ use {
     add_event_listener::AddEventListener, app::App, cast::Cast, error::Error,
     get_document::GetDocument, gpu::Gpu, select::Select, stderr::Stderr, window::window,
   },
-  degenerate::{AppMessage, Field, Filter, Widget, WorkerMessage},
+  degenerate::{Event, Field, Filter, Message, Widget},
   hex::FromHexError,
   image::{ImageBuffer, ImageError, ImageOutputFormat},
   js_sys::{Float32Array, Promise},
@@ -23,7 +23,7 @@ use {
   },
   wasm_bindgen::{closure::Closure, convert::FromWasmAbi, JsCast, JsValue},
   web_sys::{
-    AnalyserNode, AudioContext, Document, Event, EventTarget, GainNode, HtmlAnchorElement,
+    AnalyserNode, AudioContext, Document, EventTarget, GainNode, HtmlAnchorElement,
     HtmlButtonElement, HtmlCanvasElement, HtmlDivElement, HtmlElement, HtmlInputElement,
     HtmlLabelElement, HtmlOptionElement, HtmlSelectElement, HtmlSpanElement, HtmlTextAreaElement,
     KeyboardEvent, MediaStream, MediaStreamConstraints, MessageEvent, OscillatorNode,
