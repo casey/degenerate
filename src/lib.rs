@@ -161,7 +161,7 @@ impl System {
     }
   }
 
-  fn execute_inner(&mut self, process: Box<dyn Process + 'static>) {
+  fn execute_inner(&mut self, mut process: Box<dyn Process + 'static>) {
     let mut frame = Frame::default();
 
     if let Some(listener) = &self.listener {
@@ -259,7 +259,7 @@ pub trait Process {
     true
   }
 
-  fn frame(&self, frame: Frame);
+  fn frame(&mut self, frame: Frame);
 
   fn execute(self)
   where
@@ -271,9 +271,9 @@ pub trait Process {
 
 impl<T> Process for T
 where
-  T: Fn(Frame),
+  T: FnMut(Frame),
 {
-  fn frame(&self, frame: Frame) {
-    self(frame)
+  fn frame(&mut self, frame: Frame) {
+    self(frame);
   }
 }
