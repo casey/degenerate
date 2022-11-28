@@ -129,7 +129,6 @@ pub enum Field {
 }
 
 pub struct System {
-  arguments: Option<Vec<&'static str>>,
   clear: bool,
   delta: f32,
   frame: u64,
@@ -139,7 +138,6 @@ pub struct System {
 impl System {
   fn new() -> Self {
     Self {
-      arguments: None,
       clear: true,
       delta: 0.0,
       frame: 0,
