@@ -17,7 +17,7 @@ pub type Translation2 = nalgebra::Translation2<f32>;
 pub type Vector3 = nalgebra::Vector3<f32>;
 
 thread_local! {
-  static SELF: DedicatedWorkerGlobalScope = js_sys::global().dyn_into().unwrap();
+  static SCOPE: DedicatedWorkerGlobalScope = js_sys::global().dyn_into().unwrap();
 }
 
 #[derive(Serialize, Deserialize)]
@@ -129,19 +129,19 @@ pub enum Field {
 }
 
 pub struct System {
-  frame: u64,
-  delta: f32,
-  time: f32,
   clear: bool,
+  delta: f32,
+  frame: u64,
+  time: f32,
 }
 
 impl System {
   fn new() -> Self {
     Self {
-      frame: 0,
-      delta: 0.0,
-      time: 0.0,
       clear: true,
+      delta: 0.0,
+      frame: 0,
+      time: 0.0,
     }
   }
 
@@ -195,13 +195,17 @@ impl System {
   }
 
   pub fn send(message: Message) {
-    SELF.with(|dedicated_worker_global_scope| {
-      dedicated_worker_global_scope
+    SCOPE.with(|scope| {
+      scope
         .post_message(&JsValue::from_str(
           &serde_json::to_string(&message).unwrap(),
         ))
         .unwrap();
     });
+  }
+
+  pub fn error(message: impl ToString) {
+    Self::send(Message::Error(message.to_string()));
   }
 }
 
