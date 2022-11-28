@@ -22,11 +22,15 @@ thread_local! {
 }
 
 pub fn send(message: Message) {
-  SYSTEM.with(|cell| cell.borrow_mut().send(message));
+  SYSTEM.with(|system| system.borrow_mut().send(message));
 }
 
 pub fn error(message: impl ToString) {
-  SYSTEM.with(|cell| cell.borrow_mut().send(Message::Error(message.to_string())));
+  SYSTEM.with(|system| {
+    system
+      .borrow_mut()
+      .send(Message::Error(message.to_string()))
+  });
 }
 
 #[derive(Serialize, Deserialize)]
@@ -100,7 +104,7 @@ impl Filter {
   }
 
   pub fn render(self) -> Self {
-    SYSTEM.with(|cell| cell.borrow_mut().send(Message::Render(self.clone())));
+    SYSTEM.with(|system| system.borrow_mut().send(Message::Render(self.clone())));
     self
   }
 }
@@ -261,7 +265,7 @@ pub trait Process {
   where
     Self: Sized + 'static,
   {
-    SYSTEM.with(|cell| cell.borrow_mut().execute_inner(Box::new(self)));
+    SYSTEM.with(|system| system.borrow_mut().execute_inner(Box::new(self)));
   }
 }
 
