@@ -1,5 +1,6 @@
 use {
   serde::{Deserialize, Serialize},
+  std::cell::RefCell,
   wasm_bindgen::{closure::Closure, JsCast, JsValue},
   web_sys::{DedicatedWorkerGlobalScope, MessageEvent},
 };
@@ -17,7 +18,15 @@ pub type Translation2 = nalgebra::Translation2<f32>;
 pub type Vector3 = nalgebra::Vector3<f32>;
 
 thread_local! {
-  static SCOPE: DedicatedWorkerGlobalScope = js_sys::global().dyn_into().unwrap();
+  static SYSTEM: RefCell<System> = RefCell::new(System::new());
+}
+
+pub fn send(message: Message) {
+  SYSTEM.with(|cell| cell.borrow_mut().send(message));
+}
+
+pub fn error(message: impl ToString) {
+  SYSTEM.with(|cell| cell.borrow_mut().send(Message::Error(message.to_string())));
 }
 
 #[derive(Serialize, Deserialize)]
@@ -91,7 +100,7 @@ impl Filter {
   }
 
   pub fn render(self) -> Self {
-    System::render(self.clone());
+    SYSTEM.with(|cell| cell.borrow_mut().send(Message::Render(self.clone())));
     self
   }
 }
@@ -128,84 +137,67 @@ pub enum Field {
   X,
 }
 
+#[derive(Default, Copy, Clone)]
+pub struct Frame {
+  pub delta: f32,
+  pub number: u64,
+  pub time: f32,
+}
+
 pub struct System {
-  clear: bool,
-  delta: f32,
-  frame: u64,
-  time: f32,
+  scope: DedicatedWorkerGlobalScope,
+  listener: Option<Closure<dyn FnMut(MessageEvent)>>,
 }
 
 impl System {
   fn new() -> Self {
     Self {
-      clear: true,
-      delta: 0.0,
-      frame: 0,
-      time: 0.0,
+      scope: js_sys::global().dyn_into().unwrap(),
+      listener: None,
     }
   }
 
-  pub fn execute<F: Fn(&mut System) + 'static>(f: F) {
-    Self::execute_inner(Box::new(f))
-  }
+  fn execute_inner(&mut self, process: Box<dyn Process + 'static>) {
+    let mut frame = Frame::default();
 
-  fn execute_inner(f: Box<dyn Fn(&mut System) + 'static>) {
-    let mut system = System::new();
+    if let Some(listener) = &self.listener {
+      self
+        .scope
+        .remove_event_listener_with_callback("message", listener.as_ref().dyn_ref().unwrap())
+        .unwrap()
+    }
+
+    self.listener = None;
 
     let closure = Closure::wrap(Box::new(move |e: MessageEvent| {
       let event = serde_json::from_str(&e.data().as_string().unwrap()).unwrap();
 
       if let Event::Frame(time) = event {
-        system.delta = time - system.time;
-        system.time = time;
-        if system.clear {
-          Self::send(Message::Clear);
+        frame.delta = time - frame.time;
+        frame.time = time;
+        if process.clear() {
+          SYSTEM.with(|system| system.borrow_mut().send(Message::Clear));
         }
-        f(&mut system);
-        system.frame += 1;
+        process.frame(frame);
+        frame.number += 1;
       }
     }) as Box<dyn FnMut(MessageEvent)>);
 
-    js_sys::global()
-      .unchecked_into::<DedicatedWorkerGlobalScope>()
+    self
+      .scope
       .add_event_listener_with_callback("message", closure.as_ref().dyn_ref().unwrap())
       .unwrap();
 
-    closure.forget();
+    self.listener = Some(closure);
   }
 
-  pub fn clear(&mut self, clear: bool) {
-    self.clear = clear;
-  }
-
-  pub fn delta(&self) -> f32 {
-    self.delta
-  }
-
-  pub fn frame(&self) -> u64 {
-    self.frame
-  }
-
-  pub fn render(filter: Filter) {
-    Self::send(Message::Render(filter));
-  }
-
-  pub fn time(&self) -> f32 {
-    self.time
-  }
-
-  pub fn send(message: Message) {
-    SCOPE.with(|scope| {
-      scope
-        .post_message(&JsValue::from_str(
-          &serde_json::to_string(&message).unwrap(),
-        ))
-        .unwrap();
-    });
-  }
-
-  pub fn error(message: impl ToString) {
-    Self::send(Message::Error(message.to_string()));
+  fn send(&self, message: Message) {
+    self
+      .scope
+      .post_message(&JsValue::from_str(
+        &serde_json::to_string(&message).unwrap(),
+      ))
+      .unwrap();
   }
 }
 
@@ -256,4 +248,28 @@ pub enum Message {
   Resolution(u32),
   Save,
   Widget { name: String, widget: Widget },
+}
+
+pub trait Process {
+  fn clear(&self) -> bool {
+    true
+  }
+
+  fn frame(&self, frame: Frame);
+
+  fn execute(self)
+  where
+    Self: Sized + 'static,
+  {
+    SYSTEM.with(|cell| cell.borrow_mut().execute_inner(Box::new(self)));
+  }
+}
+
+impl<T> Process for T
+where
+  T: Fn(Frame),
+{
+  fn frame(&self, frame: Frame) {
+    self(frame)
+  }
 }
