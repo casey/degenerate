@@ -91,9 +91,9 @@ impl App {
       worker_options.type_(WorkerType::Module);
       Worker::new_with_options("/loader.js", &worker_options)?
     } else {
+      main.class_list().add_1("fade-in")?;
       Worker::new("/interpreter.js")?
     };
-    main.class_list().add_1("fade-in")?;
 
     let oscillator_gain_node = audio_context.create_gain()?;
     oscillator_gain_node.gain().set_value(0.0);
