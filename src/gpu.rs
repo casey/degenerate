@@ -266,7 +266,7 @@ impl Gpu {
       sum += amplitude * amplitude;
     }
     let spl = (sum / self.audio_time_domain_data.len() as f32).sqrt();
-    self.gl.uniform1f(Some(self.uniform("spl")), spl);
+    self.uniform1f("spl", spl);
 
     self
       .audio_time_domain_array
@@ -322,33 +322,23 @@ impl Gpu {
         Some(&self.audio_frequency_array),
       )?;
 
-    self.gl.uniform1f(Some(self.uniform("alpha")), filter.alpha);
+    self.uniform1f("alpha", filter.alpha);
 
-    self.gl.uniform3f(
-      Some(self.uniform("default_color")),
+    self.uniform3f(
+      "default_color",
       filter.default_color[0],
       filter.default_color[1],
       filter.default_color[2],
     );
 
-    self.gl.uniform_matrix4fv_with_f32_array(
-      Some(self.uniform("color_transform")),
-      false,
-      filter.color_transform.as_slice(),
-    );
+    self.uniform_matrix4fv("color_transform", &filter.color_transform);
 
-    self.gl.uniform_matrix3fv_with_f32_array(
-      Some(self.uniform("position_transform")),
-      false,
-      filter.position_transform.as_slice(),
-    );
+    self.uniform_matrix3fv("position_transform", &filter.position_transform);
 
-    self
-      .gl
-      .uniform1ui(Some(self.uniform("wrap")), filter.wrap as u32);
+    self.uniform1ui("wrap", filter.wrap as u32);
 
-    self.gl.uniform1i(
-      Some(self.uniform("field")),
+    self.uniform1i(
+      "field",
       match filter.field {
         Field::All => 0,
         Field::Check => 1,
@@ -357,17 +347,13 @@ impl Gpu {
         Field::Equalizer => 4,
         Field::Frequency => 5,
         Field::Mod { divisor, remainder } => {
-          self
-            .gl
-            .uniform1ui(Some(self.uniform("mod_divisor")), divisor);
-          self
-            .gl
-            .uniform1ui(Some(self.uniform("mod_remainder")), remainder);
+          self.uniform1ui("mod_divisor", divisor);
+          self.uniform1ui("mod_remainder", remainder);
           6
         }
         Field::Rows { on, off } => {
-          self.gl.uniform1ui(Some(self.uniform("rows_on")), on);
-          self.gl.uniform1ui(Some(self.uniform("rows_off")), off);
+          self.uniform1ui("rows_on", on);
+          self.uniform1ui("rows_off", off);
           7
         }
         Field::Square => 8,
@@ -378,9 +364,7 @@ impl Gpu {
       },
     );
 
-    self
-      .gl
-      .uniform1ui(Some(self.uniform("coordinates")), filter.coordinates as u32);
+    self.uniform1ui("coordinates", filter.coordinates as u32);
 
     self.gl.bind_framebuffer(
       WebGl2RenderingContext::FRAMEBUFFER,
@@ -407,6 +391,34 @@ impl Gpu {
     }
 
     Ok(())
+  }
+
+  fn uniform1i(&self, name: &str, value: i32) {
+    self.gl.uniform1i(Some(self.uniform(name)), value);
+  }
+
+  fn uniform1ui(&self, name: &str, value: u32) {
+    self.gl.uniform1ui(Some(self.uniform(name)), value);
+  }
+
+  fn uniform1f(&self, name: &str, value: f32) {
+    self.gl.uniform1f(Some(self.uniform(name)), value);
+  }
+
+  fn uniform3f(&self, name: &str, f0: f32, f1: f32, f2: f32) {
+    self.gl.uniform3f(Some(self.uniform(name)), f0, f1, f2);
+  }
+
+  fn uniform_matrix4fv(&self, name: &str, data: &Matrix4<f32>) {
+    self
+      .gl
+      .uniform_matrix4fv_with_f32_array(Some(self.uniform(name)), false, data.as_slice());
+  }
+
+  fn uniform_matrix3fv(&self, name: &str, data: &Matrix3<f32>) {
+    self
+      .gl
+      .uniform_matrix3fv_with_f32_array(Some(self.uniform(name)), false, data.as_slice());
   }
 
   fn create_texture(gl: &WebGl2RenderingContext, resolution: u32) -> Result<WebGlTexture> {
@@ -469,9 +481,7 @@ impl Gpu {
     self.canvas.set_height(self.height);
     self.canvas.set_width(self.width);
 
-    self
-      .gl
-      .uniform1f(Some(self.uniform("resolution")), self.resolution as f32);
+    self.uniform1f("resolution", self.resolution as f32);
 
     self
       .gl
