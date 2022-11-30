@@ -96,5 +96,5 @@ fn pattern_opaque(frame: Frame) {
 
 fn main() {
   send(Message::Record);
-  kaleidoscope.execute();
+  x.execute();
 }
