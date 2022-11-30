@@ -257,142 +257,152 @@ impl Gpu {
   pub(crate) fn render(&mut self, filter: &Filter) -> Result {
     self.resize()?;
 
-    for _ in 0..filter.times {
-      self.gl.bind_framebuffer(
-        WebGl2RenderingContext::FRAMEBUFFER,
-        Some(&self.frame_buffer),
-      );
+    self.gl.bind_framebuffer(
+      WebGl2RenderingContext::FRAMEBUFFER,
+      Some(&self.frame_buffer),
+    );
 
-      self.gl.framebuffer_texture_2d(
-        WebGl2RenderingContext::FRAMEBUFFER,
-        WebGl2RenderingContext::COLOR_ATTACHMENT0,
+    self.gl.framebuffer_texture_2d(
+      WebGl2RenderingContext::FRAMEBUFFER,
+      WebGl2RenderingContext::COLOR_ATTACHMENT0,
+      WebGl2RenderingContext::TEXTURE_2D,
+      Some(&self.destination),
+      0,
+    );
+
+    self.gl.active_texture(WebGl2RenderingContext::TEXTURE0);
+    self
+      .gl
+      .bind_texture(WebGl2RenderingContext::TEXTURE_2D, Some(&self.source));
+
+    self
+      .analyser_node
+      .get_float_time_domain_data(&mut self.audio_time_domain_data);
+
+    let mut sum = 0.0;
+    for amplitude in &self.audio_time_domain_data {
+      sum += amplitude * amplitude;
+    }
+    let spl = (sum / self.audio_time_domain_data.len() as f32).sqrt();
+    self.gl.uniform1f(Some(self.uniform("spl")), spl);
+
+    self
+      .audio_time_domain_array
+      .copy_from(&self.audio_time_domain_data);
+    self.gl.active_texture(WebGl2RenderingContext::TEXTURE1);
+    self.gl.bind_texture(
+      WebGl2RenderingContext::TEXTURE_2D,
+      Some(&self.audio_time_domain_texture),
+    );
+    self
+      .gl
+      .tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_array_buffer_view(
         WebGl2RenderingContext::TEXTURE_2D,
-        Some(&self.destination),
         0,
-      );
+        0,
+        0,
+        self.audio_time_domain_data.len() as i32,
+        1,
+        WebGl2RenderingContext::RED,
+        WebGl2RenderingContext::FLOAT,
+        Some(&self.audio_time_domain_array),
+      )?;
 
-      self.gl.active_texture(WebGl2RenderingContext::TEXTURE0);
-      self
-        .gl
-        .bind_texture(WebGl2RenderingContext::TEXTURE_2D, Some(&self.source));
+    self
+      .analyser_node
+      .get_float_frequency_data(&mut self.audio_frequency_data);
 
-      self
-        .analyser_node
-        .get_float_time_domain_data(&mut self.audio_time_domain_data);
-      self
-        .audio_time_domain_array
-        .copy_from(&self.audio_time_domain_data);
-      self.gl.active_texture(WebGl2RenderingContext::TEXTURE1);
-      self.gl.bind_texture(
+    let scale_factor = 1.0 / (self.decibels_max - self.decibels_min);
+
+    for bucket in &mut self.audio_frequency_data {
+      *bucket = ((*bucket - self.decibels_min) * scale_factor).clamp(0.0, 1.0);
+    }
+
+    self
+      .audio_frequency_array
+      .copy_from(&self.audio_frequency_data);
+    self.gl.active_texture(WebGl2RenderingContext::TEXTURE2);
+    self.gl.bind_texture(
+      WebGl2RenderingContext::TEXTURE_2D,
+      Some(&self.audio_frequency_texture),
+    );
+    self
+      .gl
+      .tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_array_buffer_view(
         WebGl2RenderingContext::TEXTURE_2D,
-        Some(&self.audio_time_domain_texture),
-      );
-      self
-        .gl
-        .tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_array_buffer_view(
-          WebGl2RenderingContext::TEXTURE_2D,
-          0,
-          0,
-          0,
-          self.audio_time_domain_data.len() as i32,
-          1,
-          WebGl2RenderingContext::RED,
-          WebGl2RenderingContext::FLOAT,
-          Some(&self.audio_time_domain_array),
-        )?;
+        0,
+        0,
+        0,
+        self.audio_frequency_data.len() as i32,
+        1,
+        WebGl2RenderingContext::RED,
+        WebGl2RenderingContext::FLOAT,
+        Some(&self.audio_frequency_array),
+      )?;
 
-      self
-        .analyser_node
-        .get_float_frequency_data(&mut self.audio_frequency_data);
+    self.gl.uniform1f(Some(self.uniform("alpha")), filter.alpha);
 
-      let scale_factor = 1.0 / (self.decibels_max - self.decibels_min);
+    self.gl.uniform3f(
+      Some(self.uniform("default_color")),
+      filter.default_color[0],
+      filter.default_color[1],
+      filter.default_color[2],
+    );
 
-      for bucket in &mut self.audio_frequency_data {
-        *bucket = ((*bucket - self.decibels_min) * scale_factor).clamp(0.0, 1.0);
-      }
+    self.gl.uniform_matrix4fv_with_f32_array(
+      Some(self.uniform("color_transform")),
+      false,
+      filter.color_transform.as_slice(),
+    );
 
-      self
-        .audio_frequency_array
-        .copy_from(&self.audio_frequency_data);
-      self.gl.active_texture(WebGl2RenderingContext::TEXTURE2);
-      self.gl.bind_texture(
-        WebGl2RenderingContext::TEXTURE_2D,
-        Some(&self.audio_frequency_texture),
-      );
-      self
-        .gl
-        .tex_sub_image_2d_with_i32_and_i32_and_u32_and_type_and_opt_array_buffer_view(
-          WebGl2RenderingContext::TEXTURE_2D,
-          0,
-          0,
-          0,
-          self.audio_frequency_data.len() as i32,
-          1,
-          WebGl2RenderingContext::RED,
-          WebGl2RenderingContext::FLOAT,
-          Some(&self.audio_frequency_array),
-        )?;
+    self.gl.uniform_matrix3fv_with_f32_array(
+      Some(self.uniform("position_transform")),
+      false,
+      filter.position_transform.as_slice(),
+    );
 
-      self.gl.uniform1f(Some(self.uniform("alpha")), filter.alpha);
+    self
+      .gl
+      .uniform1ui(Some(self.uniform("wrap")), filter.wrap as u32);
 
-      self.gl.uniform3f(
-        Some(self.uniform("default_color")),
-        filter.default_color[0],
-        filter.default_color[1],
-        filter.default_color[2],
-      );
+    self.gl.uniform1f(Some(self.uniform("base")), filter.base);
 
-      self.gl.uniform_matrix4fv_with_f32_array(
-        Some(self.uniform("color_transform")),
-        false,
-        filter.color_transform.as_slice(),
-      );
+    self.gl.uniform1i(
+      Some(self.uniform("field")),
+      match filter.field {
+        Field::All => 0,
+        Field::Check => 1,
+        Field::Circle => 2,
+        Field::Cross => 3,
+        Field::Equalizer => 4,
+        Field::Frequency => 5,
+        Field::Mod { divisor, remainder } => {
+          self
+            .gl
+            .uniform1ui(Some(self.uniform("mod_divisor")), divisor);
+          self
+            .gl
+            .uniform1ui(Some(self.uniform("mod_remainder")), remainder);
+          6
+        }
+        Field::Rows { on, off } => {
+          self.gl.uniform1ui(Some(self.uniform("rows_on")), on);
+          self.gl.uniform1ui(Some(self.uniform("rows_off")), off);
+          7
+        }
+        Field::Square => 8,
+        Field::TimeDomain => 9,
+        Field::Top => 10,
+        Field::Wave => 11,
+        Field::X => 12,
+      },
+    );
 
-      self.gl.uniform_matrix3fv_with_f32_array(
-        Some(self.uniform("position_transform")),
-        false,
-        filter.position_transform.as_slice(),
-      );
+    self
+      .gl
+      .uniform1ui(Some(self.uniform("coordinates")), filter.coordinates as u32);
 
-      self
-        .gl
-        .uniform1ui(Some(self.uniform("wrap")), filter.wrap as u32);
-
-      self.gl.uniform1i(
-        Some(self.uniform("field")),
-        match filter.field {
-          Field::All => 0,
-          Field::Check => 1,
-          Field::Circle => 2,
-          Field::Cross => 3,
-          Field::Equalizer => 4,
-          Field::Frequency => 5,
-          Field::Mod { divisor, remainder } => {
-            self
-              .gl
-              .uniform1ui(Some(self.uniform("mod_divisor")), divisor);
-            self
-              .gl
-              .uniform1ui(Some(self.uniform("mod_remainder")), remainder);
-            6
-          }
-          Field::Rows { on, off } => {
-            self.gl.uniform1ui(Some(self.uniform("rows_on")), on);
-            self.gl.uniform1ui(Some(self.uniform("rows_off")), off);
-            7
-          }
-          Field::Square => 8,
-          Field::TimeDomain => 9,
-          Field::Top => 10,
-          Field::Wave => 11,
-          Field::X => 12,
-        },
-      );
-
-      self
-        .gl
-        .uniform1ui(Some(self.uniform("coordinates")), filter.coordinates as u32);
-
+    for _ in 0..filter.times {
       self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 3);
 
       mem::swap(&mut self.source, &mut self.destination);

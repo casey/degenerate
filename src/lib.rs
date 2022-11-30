@@ -63,6 +63,20 @@ impl Filter {
     Self::default()
   }
 
+  pub fn equalizer(self) -> Self {
+    Self {
+      field: Field::Equalizer,
+      ..self
+    }
+  }
+
+  pub fn frequency(self) -> Self {
+    Self {
+      field: Field::Frequency,
+      ..self
+    }
+  }
+
   pub fn x(self) -> Self {
     Self {
       field: Field::X,
@@ -73,6 +87,34 @@ impl Filter {
   pub fn circle(self) -> Self {
     Self {
       field: Field::Circle,
+      ..self
+    }
+  }
+
+  pub fn square(self) -> Self {
+    Self {
+      field: Field::Square,
+      ..self
+    }
+  }
+
+  pub fn cross(self) -> Self {
+    Self {
+      field: Field::Cross,
+      ..self
+    }
+  }
+
+  pub fn top(self) -> Self {
+    Self {
+      field: Field::Top,
+      ..self
+    }
+  }
+
+  pub fn check(self) -> Self {
+    Self {
+      field: Field::Check,
       ..self
     }
   }
