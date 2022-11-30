@@ -1,13 +1,15 @@
+#![allow(unused_variables, dead_code)]
+
 use degenerate::*;
 
-fn _fade_in(frame: Frame) {
+fn fade_in(frame: Frame) {
   Filter::new()
     .x()
     .alpha((frame.time / 5000.0).min(1.0))
     .render();
 }
 
-fn _stretch(frame: Frame) {
+fn stretch(frame: Frame) {
   Filter::new()
     .circle()
     .position(Scale2::new(1.0 / (frame.time / 10000.0), 2.0))
@@ -15,7 +17,7 @@ fn _stretch(frame: Frame) {
     .render();
 }
 
-fn _target() {
+fn target(frame: Frame) {
   Filter::new()
     .circle()
     .position(Similarity2::from_scaling(2.0))
@@ -41,7 +43,7 @@ fn kaleidoscope(frame: Frame) {
     .render();
 }
 
-fn _orbs() {
+fn orbs(frame: Frame) {
   Filter::new()
     .circle()
     .color(Rotation3::from_axis_angle(&Vector3::y_axis(), 0.05 * TAU))
@@ -53,16 +55,46 @@ fn _orbs() {
     .render();
 }
 
-fn _x() {
-  for i in 0..8 {
+fn x(frame: Frame) {
+  for i in 0..16 {
     Filter::new()
       .x()
-      .wrap(i % 2 == 1)
+      .wrap(true)
       .position(Similarity2::from_scaling(2.0))
       .render();
   }
 }
 
+fn frequency(frame: Frame) {
+  Filter::new().frequency().render();
+}
+
+fn equalizer(frame: Frame) {
+  Filter::new().equalizer().render();
+}
+
+fn pattern(frame: Frame) {
+  for i in 0..8 {
+    Filter::new()
+      .alpha(0.75)
+      .circle()
+      .position(Similarity2::from_scaling(2.0))
+      .wrap(i % 2 == 0)
+      .render();
+  }
+}
+
+fn pattern_opaque(frame: Frame) {
+  for i in 0..8 {
+    Filter::new()
+      .circle()
+      .position(Similarity2::from_scaling(2.0))
+      .wrap(i % 2 == 0)
+      .render();
+  }
+}
+
 fn main() {
-  kaleidoscope.execute();
+  send(Message::Record);
+  x.execute();
 }

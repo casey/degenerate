@@ -8,6 +8,7 @@ use {
   image::{ImageBuffer, ImageError, ImageOutputFormat},
   js_sys::{Float32Array, Promise},
   lazy_static::lazy_static,
+  nalgebra::{Matrix3, Matrix4},
   std::{
     collections::BTreeMap,
     convert::Infallible,
