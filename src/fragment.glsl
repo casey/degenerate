@@ -153,11 +153,11 @@ float distance_field(vec2 p, uvec2 px) {
     case FIELD_TIME_DOMAIN:
       return field_time_domain(p);
     case FIELD_TOP:
-      return field_top(p, base - 1.0);
+      return field_top(p);
     case FIELD_WAVE:
       return field_wave(p, 0.1);
     case FIELD_X:
-      return field_x(p, 2.0, sqrt(0.25 * 0.25 * 2.0) + spl);
+      return field_x(p, 2.0, 0.25 + spl);
     default:
       return field_none();
   }

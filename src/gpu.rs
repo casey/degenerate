@@ -257,24 +257,6 @@ impl Gpu {
   pub(crate) fn render(&mut self, filter: &Filter) -> Result {
     self.resize()?;
 
-    self.gl.bind_framebuffer(
-      WebGl2RenderingContext::FRAMEBUFFER,
-      Some(&self.frame_buffer),
-    );
-
-    self.gl.framebuffer_texture_2d(
-      WebGl2RenderingContext::FRAMEBUFFER,
-      WebGl2RenderingContext::COLOR_ATTACHMENT0,
-      WebGl2RenderingContext::TEXTURE_2D,
-      Some(&self.destination),
-      0,
-    );
-
-    self.gl.active_texture(WebGl2RenderingContext::TEXTURE0);
-    self
-      .gl
-      .bind_texture(WebGl2RenderingContext::TEXTURE_2D, Some(&self.source));
-
     self
       .analyser_node
       .get_float_time_domain_data(&mut self.audio_time_domain_data);
@@ -365,8 +347,6 @@ impl Gpu {
       .gl
       .uniform1ui(Some(self.uniform("wrap")), filter.wrap as u32);
 
-    self.gl.uniform1f(Some(self.uniform("base")), filter.base);
-
     self.gl.uniform1i(
       Some(self.uniform("field")),
       match filter.field {
@@ -402,7 +382,25 @@ impl Gpu {
       .gl
       .uniform1ui(Some(self.uniform("coordinates")), filter.coordinates as u32);
 
+    self.gl.bind_framebuffer(
+      WebGl2RenderingContext::FRAMEBUFFER,
+      Some(&self.frame_buffer),
+    );
+
     for _ in 0..filter.times {
+      self.gl.framebuffer_texture_2d(
+        WebGl2RenderingContext::FRAMEBUFFER,
+        WebGl2RenderingContext::COLOR_ATTACHMENT0,
+        WebGl2RenderingContext::TEXTURE_2D,
+        Some(&self.destination),
+        0,
+      );
+
+      self.gl.active_texture(WebGl2RenderingContext::TEXTURE0);
+      self
+        .gl
+        .bind_texture(WebGl2RenderingContext::TEXTURE_2D, Some(&self.source));
+
       self.gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 3);
 
       mem::swap(&mut self.source, &mut self.destination);
