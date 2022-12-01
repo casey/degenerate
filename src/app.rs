@@ -44,6 +44,8 @@ impl App {
 
     let document = window.get_document();
 
+    let body = document.body().ok_or("failed to get document body")?;
+
     let html = document.select::<HtmlElement>("html")?;
 
     let main = document.select::<HtmlElement>("main")?;
@@ -143,6 +145,11 @@ impl App {
         let result = app.on_animation_frame(timestamp);
         app.stderr.update(result);
       }) as Box<dyn FnMut(f64)>));
+    }
+
+    if loader {
+      Self::add_event_listener(&app, &body, "keydown", move |app| app.on_input())?;
+      Self::add_event_listener(&app, &body, "click", move |app| app.on_input())?;
     }
 
     Self::add_event_listener(&app, &textarea, "input", move |app| app.on_input())?;
