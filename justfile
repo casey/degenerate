@@ -68,3 +68,7 @@ update-glmatrix:
 diff name:
   -compare images/{{name}}.png images/{{name}}.actual-memory.png diff.png
   open diff.png
+
+install-dependencies:
+  rustup target add wasm32-unknown-unknown
+  cargo install wasm-bindgen-cli
