@@ -224,14 +224,6 @@ impl App {
       event.prevent_default();
       self.run_script(&self.textarea.value())?;
     }
-
-    if event.key() == " " {
-      self.on_input()?;
-      self
-        .worker
-        .post_message(&JsValue::from_str(&serde_json::to_string(&Event::Beat)?))?;
-    }
-
     Ok(())
   }
 
