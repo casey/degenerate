@@ -1,4 +1,0 @@
-x();
-render();
-reboot();
-render();

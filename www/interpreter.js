@@ -28,7 +28,7 @@ let vec4 = glMatrix.vec4;
 // render();
 // ```
 function all() {
-  filter.field = 'All';
+  filter.message.field = 'All';
 }
 
 // Set the alpha blending factor. `alpha` will be used to blend the
@@ -40,7 +40,7 @@ function all() {
 // render();
 // ```
 function alpha(alpha) {
-  filter.alpha = alpha;
+  filter.message.alpha = alpha;
 }
 
 // Assert that `condition` is true, otherwise throw `message`.
@@ -57,7 +57,7 @@ function assert(condition, message) {
 // render();
 // ```
 function check() {
-  filter.field = 'Check';
+  filter.message.field = 'Check';
 }
 
 // Create a new checkbox widget with the label `name`, and return true if it is
@@ -94,7 +94,7 @@ function checkbox(name) {
 // render();
 // ```
 function circle() {
-  filter.field = 'Circle';
+  filter.message.field = 'Circle';
 }
 
 // Clear the canvas.
@@ -115,7 +115,7 @@ function clear() {
 // render();
 // ```
 function cross() {
-  filter.field = 'Cross';
+  filter.message.field = 'Cross';
 }
 
 // Set the decibel range for normalization of raw frequency data into values
@@ -158,7 +158,7 @@ function decibelRange(min, max) {
 // render();
 // ```
 function defaultColor(defaultColor) {
-  filter.defaultColor = defaultColor;
+  filter.message.defaultColor = defaultColor;
 }
 
 // Return the number of milliseconds that have elapsed between this frame and the last.
@@ -204,32 +204,12 @@ function elapsed() {
 // }
 // ```
 function equalizer() {
-  filter.field = 'Equalizer';
-}
-
-// Returns a promise that resolves when the browser is ready to display a new
-// frame. Call `await frame()` in your rendering loop to only render when
-// necessary and make sure each frame is displayed after rendering.
-//
-// ```
-// scale(0.99);
-// while (true) {
-//   circle();
-//   render();
-//   x()
-//   render();
-//   await frame();
-// }
-// ```
-async function frame() {
-  await new Promise((resolve, reject) => {
-    frameCallbacks.push(resolve);
-  });
+  filter.message.field = 'Equalizer';
 }
 
 // A frequency field.
 function frequency() {
-  filter.field = 'Frequency';
+  filter.message.field = 'Frequency';
 }
 
 // Set the color transformation to the identity transformation. The identity
@@ -242,7 +222,7 @@ function frequency() {
 // render();
 // ```
 function identity() {
-  mat4.identity(filter.colorTransform);
+  mat4.identity(filter.message.colorTransform);
 }
 
 // If `coordinates` is true, use the coordinate of the sample as the input color,
@@ -256,7 +236,7 @@ function identity() {
 // render();
 // ```
 function coordinates(coordinates) {
-  filter.coordinates = coordinates;
+  filter.message.coordinates = coordinates;
 }
 
 // Set the color transformation to inversion.
@@ -275,7 +255,7 @@ function coordinates(coordinates) {
 // render();
 // ```
 function invert() {
-  mat4.fromScaling(filter.colorTransform, vec3.fromValues(-1, -1, -1));
+  mat4.fromScaling(filter.message.colorTransform, vec3.fromValues(-1, -1, -1));
 }
 
 // Field that covers pixels where the pixel's index mod `divisor` is equal to `remainder`.
@@ -285,7 +265,7 @@ function invert() {
 // render();
 // ```
 function mod(divisor, remainder) {
-  filter.field = { Mod: { divisor, remainder } };
+  filter.message.field = { Mod: { divisor, remainder } };
 }
 
 // Set the oscillator gain. The oscillator produces a sine wave tone, useful
@@ -356,17 +336,6 @@ function radio(name, options) {
   return widgets['radio-' + name] ?? options[0];
 }
 
-// Reset the image filter and clear the canvas.
-// ```
-// x();
-// render();
-// reboot();
-// ```
-function reboot() {
-  reset();
-  clear();
-}
-
 // Enable audio recording.
 function record() {
   self.postMessage(JSON.stringify('record'));
@@ -385,9 +354,8 @@ function record() {
 //   await render();
 // }
 // ```
-async function render() {
-  self.postMessage(JSON.stringify({ render: filter }));
-  await frame();
+function render() {
+  self.postMessage(JSON.stringify({ render: filter.message }));
 }
 
 // Reset the image filter.
@@ -433,13 +401,13 @@ function resolution(resolution) {
 function rotateColor(axis, radians) {
   switch (axis) {
     case 'red':
-      mat4.fromXRotation(filter.colorTransform, radians);
+      mat4.fromXRotation(filter.message.colorTransform, radians);
       break;
     case 'green':
-      mat4.fromYRotation(filter.colorTransform, radians);
+      mat4.fromYRotation(filter.message.colorTransform, radians);
       break;
     case 'blue':
-      mat4.fromZRotation(filter.colorTransform, radians);
+      mat4.fromZRotation(filter.message.colorTransform, radians);
       break;
   }
 }
@@ -463,7 +431,7 @@ function rotate(rotation) {
 // render();
 // ```
 function rows(on, off) {
-  filter.field = { Rows: { on, off } };
+  filter.message.field = { Rows: { on, off } };
 }
 
 // Save the current canvas as a PNG.
@@ -542,17 +510,17 @@ function slider(name, min, max, step, initial) {
 // render();
 // ```
 function square() {
-  filter.field = 'Square';
+  filter.message.field = 'Square';
 }
 
 // A field that covers pixels where the audio time domain data is large.
 function timeDomain() {
-  filter.field = 'TimeDomain';
+  filter.message.field = 'TimeDomain';
 }
 
 // Execute the filter `times` times.
 function times(times) {
-  filter.times = times;
+  filter.message.times = times;
 }
 
 // A field covering the top half of the canvas.
@@ -562,7 +530,7 @@ function times(times) {
 // render();
 // ```
 function top() {
-  filter.field = 'Top';
+  filter.message.field = 'Top';
 }
 
 // Set the coordinate transform using `rotation`, `scale`, and `translation`.
@@ -575,12 +543,12 @@ function top() {
 // render();
 // ```
 function transform(rotation, scale, translation) {
-  mat3.identity(filter.positionTransform);
-  mat3.rotate(filter.positionTransform, filter.positionTransform, rotation);
-  mat3.scale(filter.positionTransform, filter.positionTransform, scale);
+  mat3.identity(filter.message.positionTransform);
+  mat3.rotate(filter.message.positionTransform, filter.message.positionTransform, rotation);
+  mat3.scale(filter.message.positionTransform, filter.message.positionTransform, scale);
   mat3.translate(
-    filter.positionTransform,
-    filter.positionTransform,
+    filter.message.positionTransform,
+    filter.message.positionTransform,
     translation
   );
 }
@@ -596,7 +564,7 @@ function transform(rotation, scale, translation) {
 // }
 // ```
 function wave() {
-  filter.field = 'Wave';
+  filter.message.field = 'Wave';
 }
 
 // Set wrap. When `wrap` is `true`, out of bounds samples will be wrapped back within bounds.
@@ -608,7 +576,7 @@ function wave() {
 // render();
 // ```
 function wrap(warp) {
-  filter.wrap = warp;
+  filter.message.wrap = warp;
 }
 
 // An X field.
@@ -618,7 +586,7 @@ function wrap(warp) {
 // render();
 // ```
 function x() {
-  filter.field = 'X';
+  filter.message.field = 'X';
 }
 
 // The ratio of a circle's circumference to its diameter. Useful for expressing
@@ -649,21 +617,24 @@ class Rng {
 
 class Filter {
   constructor() {
-    this.alpha = 1.0;
-    this.colorTransform = mat4.fromScaling(
-      mat4.create(),
-      vec3.fromValues(-1, -1, -1)
-    );
-    this.positionTransform = mat3.create();
-    this.coordinates = false;
-    this.defaultColor = [0.0, 0.0, 0.0];
-    this.field = 'All';
-    this.times = 1;
-    this.wrap = false;
+    this.message = {
+      alpha: 1.0,
+      colorTransform: mat4.fromScaling(
+        mat4.create(),
+        vec3.fromValues(-1, -1, -1)
+      ),
+      positionTransform: mat3.create(),
+      coordinates: false,
+      defaultColor: [0.0, 0.0, 0.0],
+      field: 'All',
+      times: 1,
+      wrap: false,
+    };
   }
 }
 
-let frameCallbacks = [];
+let state = null;
+let frame = 0;
 let lastDelta = 0;
 let lastFrame = 0;
 let rng = new Rng();
@@ -676,10 +647,12 @@ self.addEventListener('message', async function (event) {
   const message = JSON.parse(event.data);
   switch (message.tag) {
     case 'frame':
-      for (let callback of frameCallbacks) {
-        callback();
+      if (state) {
+        reset();
+        clear();
+        state.callback()
+        frame += 1;
       }
-      frameCallbacks = [];
       let now = Date.now();
       if (lastFrame > 0) {
         lastDelta = now - lastFrame;
@@ -687,9 +660,12 @@ self.addEventListener('message', async function (event) {
       lastFrame = now;
       break;
     case 'script':
-      frameCallbacks = [];
       try {
-        await new AsyncFunction(message.content)();
+        clear();
+        state = {};
+        state.callback = new AsyncFunction(message.content);
+        state.callback();
+        frame += 1;
       } catch (error) {
         self.postMessage(JSON.stringify({ error: error.toString() }));
       }
