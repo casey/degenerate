@@ -150,11 +150,7 @@ impl App {
     }
 
     if loader {
-      Self::add_event_listener(&app, &body, "keydown", move |app| app.on_input())?;
-      Self::add_event_listener(&app, &body, "click", move |app| app.on_input())?;
-      Self::add_event_listener_with_event(&app, &body, "keydown", move |app, event| {
-        app.on_keydown(event)
-      })?;
+      Self::add_event_listener(&app, &body, "click", move |app| app.on_click())?;
     }
 
     Self::add_event_listener(&app, &textarea, "input", move |app| app.on_input())?;
@@ -527,15 +523,28 @@ impl App {
     Ok(())
   }
 
-  fn on_input(&self) -> Result {
+  fn start(&mut self) -> Result {
     if !self.started {
       self.html.class_list().remove_1("done")?;
       self.nav.class_list().add_1("fade-out")?;
       self.run_button.set_disabled(false);
       self.share_button.set_disabled(false);
       let _: Promise = self.audio_context.resume()?;
+      self.started = true;
     }
+    Ok(())
+  }
 
+  fn on_click(&mut self) -> Result {
+    self.start()?;
+    self
+      .worker
+      .post_message(&JsValue::from_str(&serde_json::to_string(&Event::Beat)?))?;
+    Ok(())
+  }
+
+  fn on_input(&mut self) -> Result {
+    self.start()?;
     Ok(())
   }
 
