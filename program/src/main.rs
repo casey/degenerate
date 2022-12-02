@@ -56,7 +56,7 @@ fn orbs(frame: Frame) {
 }
 
 fn x(frame: Frame) {
-  for i in 0..(frame.beat % 4 * 2) + 1 {
+  for i in 0..8 {
     Filter::new()
       .x()
       .wrap(true)
