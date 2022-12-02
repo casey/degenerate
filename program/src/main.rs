@@ -56,11 +56,11 @@ fn orbs(frame: Frame) {
 }
 
 fn x(frame: Frame) {
-  for i in 0..16 {
+  for i in 0..8 {
     Filter::new()
       .x()
       .wrap(true)
-      .position(Similarity2::from_scaling(2.0))
+      .position(Similarity2::from_scaling((frame.beat % 4 + 1) as f32))
       .render();
   }
 }
