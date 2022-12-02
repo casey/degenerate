@@ -513,12 +513,10 @@ impl App {
     let script = self.textarea.value();
 
     if !script.is_empty() {
-      let hex = hex::encode(script);
-      let path = format!("#/program/{hex}");
       self
         .window
-        .history()?
-        .replace_state_with_url(&JsValue::NULL, "", Some(&path))?;
+        .location()
+        .set_hash(&format!("#/program/{}", hex::encode(script)))?;
     }
 
     Ok(())
