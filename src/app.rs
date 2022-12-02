@@ -87,7 +87,19 @@ impl App {
 
     let location = window.location();
 
-    let loader = location.pathname()? == "/loader";
+    let hash = location.hash()?;
+
+    let arguments = hash
+      .strip_prefix('#')
+      .map(|fragment| {
+        fragment
+          .split('/')
+          .filter(|component| !component.is_empty())
+          .collect::<Vec<&str>>()
+      })
+      .unwrap_or_default();
+
+    let loader = arguments == ["loader"];
 
     let worker = if loader {
       let mut worker_options = WorkerOptions::new();
@@ -172,20 +184,15 @@ impl App {
 
     Self::add_event_listener(&app, &share_button, "click", move |app| app.on_share())?;
 
-    let path = location.pathname()?;
-
-    match path.split_inclusive('/').collect::<Vec<&str>>().as_slice() {
-      ["/"] | ["/", "loader"] => {}
-      ["/", "program/" | "program"] => {
-        location.set_pathname("/")?;
-      }
-      ["/", "program/", hex] => {
+    match arguments.as_slice() {
+      [] | ["loader"] | ["program"] => {}
+      ["program", hex] => {
         let bytes = hex::decode(hex)?;
         let script = str::from_utf8(&bytes)?;
         textarea.set_value(script);
         app.lock().unwrap().run_script(script)?;
       }
-      _ => stderr.update(Err(format!("Unrecognized path: {}", path).into())),
+      _ => stderr.update(Err(format!("Unrecognized path: {}", hash).into())),
     }
 
     let mut app = app.lock().unwrap();
@@ -505,12 +512,10 @@ impl App {
     let script = self.textarea.value();
 
     if !script.is_empty() {
-      let hex = hex::encode(script);
-      let path = format!("/program/{hex}");
       self
         .window
-        .history()?
-        .replace_state_with_url(&JsValue::NULL, "", Some(&path))?;
+        .location()
+        .set_hash(&format!("#/program/{}", hex::encode(script)))?;
     }
 
     Ok(())

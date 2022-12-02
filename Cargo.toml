@@ -40,7 +40,6 @@ features = [
   "DomTokenList",
   "Element",
   "GainNode",
-  "History",
   "HtmlAnchorElement",
   "HtmlButtonElement",
   "HtmlCanvasElement",
