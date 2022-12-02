@@ -150,8 +150,8 @@ impl App {
     }
 
     if loader {
-      Self::add_event_listener(&app, &body, "click", move |app| app.on_click())?;
-      Self::add_event_listener(&app, &body, "keydown", move |app| app.on_input())?;
+      Self::add_event_listener(&app, &body, "click", move |app| app.on_beat())?;
+      Self::add_event_listener(&app, &body, "keydown", move |app| app.on_beat())?;
     }
 
     Self::add_event_listener(&app, &textarea, "input", move |app| app.on_input())?;
@@ -528,7 +528,7 @@ impl App {
     Ok(())
   }
 
-  fn on_click(&mut self) -> Result {
+  fn on_beat(&mut self) -> Result {
     self.start()?;
     self
       .worker
