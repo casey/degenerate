@@ -45,7 +45,7 @@ clean:
 doc-web:
   cargo doc --open --target wasm32-unknown-unknown
 
-serve: install-deps
+serve:
   cargo run --package serve
 
 build-web:
@@ -69,6 +69,6 @@ diff name:
   -compare images/{{name}}.png images/{{name}}.actual-memory.png diff.png
   open diff.png
 
-install-deps:
+install-dependencies:
   rustup target add wasm32-unknown-unknown
   cargo install wasm-bindgen-cli
