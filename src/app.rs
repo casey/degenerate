@@ -81,7 +81,7 @@ impl App {
 
     let analyser_node = audio_context.create_analyser()?;
 
-    analyser_node.set_smoothing_time_constant(0.1);
+    analyser_node.set_smoothing_time_constant(0.5);
 
     let gpu = Gpu::new(&window, &canvas, &analyser_node)?;
 
