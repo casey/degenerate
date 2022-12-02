@@ -15,6 +15,7 @@ pub(crate) struct App {
   run_button: HtmlButtonElement,
   select: HtmlSelectElement,
   share_button: HtmlButtonElement,
+  started: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
   this: Option<Arc<Mutex<Self>>>,
@@ -43,6 +44,8 @@ impl App {
     let window = window();
 
     let document = window.get_document();
+
+    let body = document.body().ok_or("failed to get document body")?;
 
     let html = document.select::<HtmlElement>("html")?;
 
@@ -123,6 +126,7 @@ impl App {
       run_button: run_button.clone(),
       select: select.clone(),
       share_button: share_button.clone(),
+      started: false,
       stderr: stderr.clone(),
       textarea: textarea.clone(),
       this: None,
@@ -143,6 +147,11 @@ impl App {
         let result = app.on_animation_frame(timestamp);
         app.stderr.update(result);
       }) as Box<dyn FnMut(f64)>));
+    }
+
+    if loader {
+      Self::add_event_listener(&app, &body, "click", move |app| app.on_beat())?;
+      Self::add_event_listener(&app, &body, "keydown", move |app| app.on_beat())?;
     }
 
     Self::add_event_listener(&app, &textarea, "input", move |app| app.on_input())?;
@@ -507,16 +516,28 @@ impl App {
     Ok(())
   }
 
-  fn on_input(&self) -> Result {
-    self.html.class_list().remove_1("done")?;
+  fn start(&mut self) -> Result {
+    if !self.started {
+      self.html.class_list().remove_1("done")?;
+      self.nav.class_list().add_1("fade-out")?;
+      self.run_button.set_disabled(false);
+      self.share_button.set_disabled(false);
+      let _: Promise = self.audio_context.resume()?;
+      self.started = true;
+    }
+    Ok(())
+  }
 
-    self.nav.class_list().add_1("fade-out")?;
+  fn on_beat(&mut self) -> Result {
+    self.start()?;
+    self
+      .worker
+      .post_message(&JsValue::from_str(&serde_json::to_string(&Event::Beat)?))?;
+    Ok(())
+  }
 
-    self.run_button.set_disabled(false);
-    self.share_button.set_disabled(false);
-
-    let _promise: Promise = self.audio_context.resume()?;
-
+  fn on_input(&mut self) -> Result {
+    self.start()?;
     Ok(())
   }
 

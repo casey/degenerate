@@ -20,6 +20,7 @@ uniform bool coordinates;
 uniform bool wrap;
 uniform float alpha;
 uniform float resolution;
+uniform float spl;
 uniform int field;
 uniform mat3 position_transform;
 uniform mat4 color_transform;
@@ -136,7 +137,7 @@ float distance_field(vec2 p, uvec2 px) {
     case FIELD_CHECK:
       return field_check(p);
     case FIELD_CIRCLE:
-      return field_circle(p, 1.0);
+      return field_circle(p, 1.0 + spl);
     case FIELD_CROSS:
       return field_cross(p, 1.0, 0.25, 0.0);
     case FIELD_EQUALIZER:
@@ -156,7 +157,7 @@ float distance_field(vec2 p, uvec2 px) {
     case FIELD_WAVE:
       return field_wave(p, 0.1);
     case FIELD_X:
-      return field_x(p, 2.0, 0.25);
+      return field_x(p, 2.0, 0.25 + spl);
     default:
       return field_none();
   }

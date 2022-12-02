@@ -37,6 +37,7 @@ pub fn error(message: impl ToString) {
 #[serde(rename_all = "camelCase")]
 #[serde(tag = "tag", content = "content")]
 pub enum Event {
+  Beat,
   Frame(f32),
   Script(String),
   Widget {
@@ -63,6 +64,20 @@ impl Filter {
     Self::default()
   }
 
+  pub fn equalizer(self) -> Self {
+    Self {
+      field: Field::Equalizer,
+      ..self
+    }
+  }
+
+  pub fn frequency(self) -> Self {
+    Self {
+      field: Field::Frequency,
+      ..self
+    }
+  }
+
   pub fn x(self) -> Self {
     Self {
       field: Field::X,
@@ -73,6 +88,34 @@ impl Filter {
   pub fn circle(self) -> Self {
     Self {
       field: Field::Circle,
+      ..self
+    }
+  }
+
+  pub fn square(self) -> Self {
+    Self {
+      field: Field::Square,
+      ..self
+    }
+  }
+
+  pub fn cross(self) -> Self {
+    Self {
+      field: Field::Cross,
+      ..self
+    }
+  }
+
+  pub fn top(self) -> Self {
+    Self {
+      field: Field::Top,
+      ..self
+    }
+  }
+
+  pub fn check(self) -> Self {
+    Self {
+      field: Field::Check,
       ..self
     }
   }
@@ -146,6 +189,7 @@ pub struct Frame {
   pub delta: f32,
   pub number: u64,
   pub time: f32,
+  pub beat: u64,
 }
 
 pub struct System {
@@ -176,14 +220,20 @@ impl System {
     let closure = Closure::wrap(Box::new(move |e: MessageEvent| {
       let event = serde_json::from_str(&e.data().as_string().unwrap()).unwrap();
 
-      if let Event::Frame(time) = event {
-        frame.delta = time - frame.time;
-        frame.time = time;
-        if process.clear() {
-          SYSTEM.with(|system| system.borrow_mut().send(Message::Clear));
+      match event {
+        Event::Frame(time) => {
+          frame.delta = time - frame.time;
+          frame.time = time;
+          if process.clear() {
+            SYSTEM.with(|system| system.borrow_mut().send(Message::Clear));
+          }
+          process.frame(frame);
+          frame.number += 1;
         }
-        process.frame(frame);
-        frame.number += 1;
+        Event::Beat => {
+          frame.beat += 1;
+        }
+        _ => {}
       }
     }) as Box<dyn FnMut(MessageEvent)>);
 
