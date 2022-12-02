@@ -90,10 +90,14 @@ impl App {
     let hash = location.hash()?;
 
     let arguments = hash
-      .trim_start_matches('#')
-      .split('/')
-      .filter(|component| !component.is_empty())
-      .collect::<Vec<&str>>();
+      .strip_prefix('#')
+      .map(|fragment| {
+        fragment
+          .split('/')
+          .filter(|component| !component.is_empty())
+          .collect::<Vec<&str>>()
+      })
+      .unwrap_or_default();
 
     let loader = arguments == ["loader"];
 
@@ -181,19 +185,14 @@ impl App {
     Self::add_event_listener(&app, &share_button, "click", move |app| app.on_share())?;
 
     match arguments.as_slice() {
-      [] | ["loader"] => {}
-      ["program"] => {
-        location.set_pathname("/")?;
-      }
+      [] | ["loader"] | ["program"] => {}
       ["program", hex] => {
         let bytes = hex::decode(hex)?;
         let script = str::from_utf8(&bytes)?;
         textarea.set_value(script);
         app.lock().unwrap().run_script(script)?;
       }
-      _ => stderr.update(Err(
-        format!("Unrecognized hash: {}", arguments.join("/")).into(),
-      )),
+      _ => stderr.update(Err(format!("Unrecognized path: {}", hash).into())),
     }
 
     let mut app = app.lock().unwrap();
