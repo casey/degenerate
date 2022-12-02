@@ -56,13 +56,11 @@ fn orbs(frame: Frame) {
 }
 
 fn x(frame: Frame) {
-  for i in 0..8 {
-    Filter::new()
-      .x()
-      .wrap(true)
-      .position(Similarity2::from_scaling((frame.beat % 4 + 1) as f32))
-      .render();
-  }
+  Filter::new()
+    .x()
+    .wrap(true)
+    .position(Similarity2::from_scaling((1 + frame.beat % 4) as f32))
+    .render();
 }
 
 fn frequency(frame: Frame) {
