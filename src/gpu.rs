@@ -265,7 +265,9 @@ impl Gpu {
     for amplitude in &self.audio_time_domain_data {
       sum += amplitude * amplitude;
     }
-    let spl = (sum / self.audio_time_domain_data.len() as f32).sqrt();
+    let spl = (sum / self.audio_time_domain_data.len() as f32)
+      .sqrt()
+      .clamp(0.0, 1.0);
     self.uniform1f("spl", spl);
 
     self

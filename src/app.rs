@@ -15,6 +15,7 @@ pub(crate) struct App {
   run_button: HtmlButtonElement,
   select: HtmlSelectElement,
   share_button: HtmlButtonElement,
+  started: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
   this: Option<Arc<Mutex<Self>>>,
@@ -80,7 +81,7 @@ impl App {
 
     let analyser_node = audio_context.create_analyser()?;
 
-    analyser_node.set_smoothing_time_constant(0.5);
+    analyser_node.set_smoothing_time_constant(0.1);
 
     let gpu = Gpu::new(&window, &canvas, &analyser_node)?;
 
@@ -125,6 +126,7 @@ impl App {
       run_button: run_button.clone(),
       select: select.clone(),
       share_button: share_button.clone(),
+      started: false,
       stderr: stderr.clone(),
       textarea: textarea.clone(),
       this: None,
@@ -150,6 +152,9 @@ impl App {
     if loader {
       Self::add_event_listener(&app, &body, "keydown", move |app| app.on_input())?;
       Self::add_event_listener(&app, &body, "click", move |app| app.on_input())?;
+      Self::add_event_listener_with_event(&app, &body, "keydown", move |app, event| {
+        app.on_keydown(event)
+      })?;
     }
 
     Self::add_event_listener(&app, &textarea, "input", move |app| app.on_input())?;
@@ -223,6 +228,14 @@ impl App {
       event.prevent_default();
       self.run_script(&self.textarea.value())?;
     }
+
+    if event.key() == " " {
+      self.on_input()?;
+      self
+        .worker
+        .post_message(&JsValue::from_str(&serde_json::to_string(&Event::Beat)?))?;
+    }
+
     Ok(())
   }
 
@@ -515,14 +528,13 @@ impl App {
   }
 
   fn on_input(&self) -> Result {
-    self.html.class_list().remove_1("done")?;
-
-    self.nav.class_list().add_1("fade-out")?;
-
-    self.run_button.set_disabled(false);
-    self.share_button.set_disabled(false);
-
-    let _promise: Promise = self.audio_context.resume()?;
+    if !self.started {
+      self.html.class_list().remove_1("done")?;
+      self.nav.class_list().add_1("fade-out")?;
+      self.run_button.set_disabled(false);
+      self.share_button.set_disabled(false);
+      let _: Promise = self.audio_context.resume()?;
+    }
 
     Ok(())
   }
