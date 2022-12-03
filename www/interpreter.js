@@ -678,10 +678,10 @@ class State {
     this.delta = 0;
     this.environment = {}; // todo: test
     this.filter = new Filter();
-    this.frame = this.start;
     this.rng = new Rng();
     this.script = new Function(script);
     this.start = Date.now();
+    this.frame = this.start;
   }
 }
 
