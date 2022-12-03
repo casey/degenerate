@@ -216,26 +216,6 @@ function equalizer() {
   state.filter.field = 'Equalizer';
 }
 
-// Returns a promise that resolves when the browser is ready to display a new
-// frame. Call `await frame()` in your rendering loop to only render when
-// necessary and make sure each frame is displayed after rendering.
-//
-// ```
-// scale(0.99);
-// while (true) {
-//   circle();
-//   render();
-//   x()
-//   render();
-//   await frame();
-// }
-// ```
-async function frame() {
-  await new Promise((resolve, reject) => {
-    state.frameCallbacks.push(resolve);
-  });
-}
-
 // A frequency field.
 function frequency() {
   state.filter.field = 'Frequency';
@@ -699,7 +679,6 @@ class State {
     this.environment = {}; // todo: test
     this.filter = new Filter();
     this.frame = this.start;
-    this.frameCallbacks = [];
     this.rng = new Rng();
     this.script = new Function(script);
     this.start = Date.now();
@@ -720,7 +699,6 @@ self.addEventListener('message', async function (event) {
           state = null;
           break;
         }
-        state.frameCallbacks.length = 0;
         let now = Date.now();
         state.delta = now - state.frame;
         state.frame = now;
