@@ -199,7 +199,7 @@ function delta() {
 // }
 // ```
 function elapsed() {
-  return Date.now() - start;
+  return Date.now() - state.start;
 }
 
 // An equalizer pattern.
@@ -691,12 +691,12 @@ class State {
     this.delta = 0;
     this.frameCallbacks = [];
     this.rng = new Rng();
+    this.start = Date.now();
   }
 }
 
 let filter = new Filter();
 let lastFrame = 0;
-let start = Date.now();
 let state = null;
 let widgets = {};
 
