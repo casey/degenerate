@@ -650,7 +650,7 @@ self.addEventListener('message', async function (event) {
       if (state) {
         reset();
         clear();
-        await state.callback()
+        await state.callback();
         self.postMessage(JSON.stringify('present'));
         frame += 1;
       }
