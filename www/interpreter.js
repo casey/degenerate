@@ -648,6 +648,9 @@ self.addEventListener('message', async function (event) {
   switch (message.tag) {
     case 'frame':
       if (state) {
+        if (frame == 0) {
+          start = Date.now();
+        }
         reset();
         clear();
         await state.callback();
@@ -662,13 +665,10 @@ self.addEventListener('message', async function (event) {
       break;
     case 'script':
       try {
-        reset();
-        clear();
+        frame = 0;
+        widgets = {};
         state = {};
         state.callback = new AsyncFunction(message.content);
-        await state.callback();
-        self.postMessage(JSON.stringify('present'));
-        frame += 1;
       } catch (error) {
         self.postMessage(JSON.stringify({ error: error.toString() }));
       }
