@@ -253,6 +253,10 @@ impl App {
   }
 
   pub(super) fn run_script(&self, script: &str) -> Result {
+    while let Some(child) = self.aside.last_child() {
+      self.aside.remove_child(&child)?;
+    }
+
     self
       .worker
       .post_message(&JsValue::from_str(&serde_json::to_string(&Event::Script(
