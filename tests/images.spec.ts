@@ -292,6 +292,16 @@ test('radio-initial', async ({ page }) => {
   );
 });
 
+test('widgets-are-removed-on-new-script', async ({ page }) => {
+  await run(page, "checkbox('x');");
+
+  await expect(await page.locator('#widget-checkbox-x').count()).toBe(1);
+
+  await run(page, '');
+
+  await expect(await page.locator('#widget-checkbox-x').count()).toBe(0);
+});
+
 test('delta', async ({ page }) => {
   await run(
     page,
