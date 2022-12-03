@@ -1,32 +1,29 @@
-let r = 5 / 6 * TAU;
+if (this.r == undefined) {
+  this.r = 5 / 6 * TAU;
+}
+
 let s = 1 / 0.75;
 
-while(true) {
-  reboot();
+reboot();
 
-  rotateColor('green', 0.05 * TAU);
+rotateColor('green', 0.05 * TAU);
 
-  circle();
+circle();
 
-  scale(s);
+scale(s);
 
-  wrap(true);
+wrap(true);
 
-  for (let i = 0; i < 8; i++) {
-    render();
-  }
+times(8);
 
-  if (checkbox('rotate')) {
-    r += delta() / 30000 * TAU;
-  }
+render();
 
-  transform(r, [s, s], [0, 0]);
-
-  rotateColor('blue', 0.05 * TAU);
-
-  for (let i = 0; i < 8; i++) {
-    render();
-  }
-
-  await frame();
+if (checkbox('rotate')) {
+  this.r += delta() / 30000 * TAU;
 }
+
+transform(this.r, [s, s], [0, 0]);
+
+rotateColor('blue', 0.05 * TAU);
+
+render();

@@ -694,13 +694,15 @@ class Filter {
 }
 
 class State {
-  constructor() {
+  constructor(script) {
     this.delta = 0;
-    this.frameCallbacks = [];
-    this.rng = new Rng();
-    this.start = Date.now();
+    this.environment = {}; // todo: test
     this.filter = new Filter();
     this.frame = this.start;
+    this.frameCallbacks = [];
+    this.rng = new Rng();
+    this.script = new Function(script);
+    this.start = Date.now();
   }
 }
 
@@ -708,13 +710,15 @@ let state = null;
 let widgets = {};
 
 self.addEventListener('message', async function (event) {
-  const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
   const message = JSON.parse(event.data);
   switch (message.tag) {
     case 'frame':
       if (state) {
-        for (let callback of state.frameCallbacks) {
-          callback();
+        let done = state.script.call(state.environment);
+        if (done === true) {
+          self.postMessage(JSON.stringify('done'));
+          state = null;
+          break;
         }
         state.frameCallbacks.length = 0;
         let now = Date.now();
@@ -723,13 +727,11 @@ self.addEventListener('message', async function (event) {
       }
       break;
     case 'script':
-      state = new State();
       try {
-        await new AsyncFunction(message.content)();
+        state = new State(message.content);
       } catch (error) {
         self.postMessage(JSON.stringify({ error: error.toString() }));
       }
-      self.postMessage(JSON.stringify('done'));
       break;
     case 'widget':
       widgets[message.content.key] = message.content.value;
