@@ -653,7 +653,10 @@ self.addEventListener('message', async function (event) {
         }
         reset();
         clear();
-        await state.callback();
+        let done = await state.callback();
+        if (done) {
+          state = null;
+        }
         self.postMessage(JSON.stringify('present'));
         frame += 1;
       }
