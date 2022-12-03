@@ -276,12 +276,13 @@ impl App {
   }
 
   fn on_message(&mut self, event: MessageEvent) -> Result {
-    let event = serde_json::from_str(
-      &event
-        .data()
-        .as_string()
-        .ok_or("Failed to retrieve event data as a string")?,
-    )?;
+    let json = event
+      .data()
+      .as_string()
+      .ok_or("Failed to retrieve event data as a string")?;
+
+    let event = serde_json::from_str(&json)
+      .map_err(|err| format!("failed to deserialized message: {err}: {json}"))?;
 
     match event {
       Message::Clear => {
