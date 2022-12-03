@@ -185,7 +185,7 @@ function defaultColor(defaultColor) {
 // }
 // ```
 function delta() {
-  return lastDelta;
+  return state.delta;
 }
 
 // Return the number of milliseconds that have elapsed since the page was loaded.
@@ -688,13 +688,13 @@ class Filter {
 
 class State {
   constructor() {
+    this.delta = 0;
     this.frameCallbacks = [];
     this.rng = new Rng();
   }
 }
 
 let filter = new Filter();
-let lastDelta = 0;
 let lastFrame = 0;
 let start = Date.now();
 let state = null;
@@ -712,8 +712,8 @@ self.addEventListener('message', async function (event) {
         state.frameCallbacks.length = 0;
       }
       let now = Date.now();
-      if (lastFrame > 0) {
-        lastDelta = now - lastFrame;
+      if (state && lastFrame > 0) {
+        state.delta = now - lastFrame;
       }
       lastFrame = now;
       break;
