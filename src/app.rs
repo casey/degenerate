@@ -275,6 +275,30 @@ impl App {
     Ok(())
   }
 
+  fn record(&mut self) -> Result {
+    if !self.recording {
+      let local = self.this();
+      let closure = Closure::wrap(Box::new(move |stream: JsValue| {
+        let mut app = local.lock().unwrap();
+        let result = app.on_get_user_media(stream);
+        app.stderr.update(result);
+      }) as Box<dyn FnMut(JsValue)>);
+      let _ = self
+        .window
+        .navigator()
+        .media_devices()?
+        .get_user_media_with_constraints(
+          MediaStreamConstraints::new()
+            .audio(&true.into())
+            .video(&false.into()),
+        )?
+        .then(&closure);
+      closure.forget();
+    }
+
+    Ok(())
+  }
+
   fn on_message(&mut self, event: MessageEvent) -> Result {
     let event = serde_json::from_str(
       &event
@@ -302,30 +326,12 @@ impl App {
       Message::OscillatorGain(gain) => {
         self.oscillator_gain_node.gain().set_value(gain);
       }
-      Message::Record => {
-        if !self.recording {
-          let local = self.this();
-          let closure = Closure::wrap(Box::new(move |stream: JsValue| {
-            let mut app = local.lock().unwrap();
-            let result = app.on_get_user_media(stream);
-            app.stderr.update(result);
-          }) as Box<dyn FnMut(JsValue)>);
-          let _ = self
-            .window
-            .navigator()
-            .media_devices()?
-            .get_user_media_with_constraints(
-              MediaStreamConstraints::new()
-                .audio(&true.into())
-                .video(&false.into()),
-            )?
-            .then(&closure);
-          closure.forget();
-        }
+      Message::Record => self.record()?,
+      Message::Present => {
+        self.gpu.present()?;
       }
       Message::Render(filter) => {
         self.gpu.render(&filter)?;
-        self.gpu.present()?;
       }
       Message::Resolution(resolution) => {
         self.gpu.lock_resolution(resolution);
@@ -529,6 +535,7 @@ impl App {
       self.share_button.set_disabled(false);
       let _: Promise = self.audio_context.resume()?;
       self.started = true;
+      self.record()?;
     }
     Ok(())
   }

@@ -651,6 +651,7 @@ self.addEventListener('message', async function (event) {
         reset();
         clear();
         state.callback()
+        self.postMessage(JSON.stringify('present'));
         frame += 1;
       }
       let now = Date.now();
@@ -661,10 +662,12 @@ self.addEventListener('message', async function (event) {
       break;
     case 'script':
       try {
+        reset();
         clear();
         state = {};
         state.callback = new AsyncFunction(message.content);
         state.callback();
+        self.postMessage(JSON.stringify('present'));
         frame += 1;
       } catch (error) {
         self.postMessage(JSON.stringify({ error: error.toString() }));

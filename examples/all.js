@@ -1,5 +1,2 @@
-reboot();
-
 all();
-
 render();

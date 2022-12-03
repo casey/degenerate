@@ -1,10 +1,9 @@
-reboot();
-
 x();
+
+wrap(true);
 
 scale(2);
 
-for (let i = 0; i < 8; i++) {
-  render();
-  wrap(i % 2 == 0);
-}
+times(8);
+
+render();

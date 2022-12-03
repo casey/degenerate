@@ -299,6 +299,7 @@ pub enum Message {
   OscillatorGain(f32),
   Record,
   Render(Filter),
+  Present,
   Resolution(u32),
   Save,
   Widget { name: String, widget: Widget },

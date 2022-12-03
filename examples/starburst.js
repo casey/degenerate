@@ -1,5 +1,3 @@
-reboot();
-
 const fields = [all, circle, cross, square, top, x];
 
 rng.seed(3);
