@@ -84,7 +84,7 @@ function checkbox(name) {
       },
     })
   );
-  return !!state.widgets['checkbox-' + name];
+  return !!widgets['checkbox-' + name];
 }
 
 // A circle.
@@ -353,7 +353,7 @@ function radio(name, options) {
       },
     })
   );
-  return state.widgets['radio-' + name] ?? options[0];
+  return widgets['radio-' + name] ?? options[0];
 }
 
 // Reset the image filter and clear the canvas.
@@ -532,7 +532,7 @@ function slider(name, min, max, step, initial) {
       },
     })
   );
-  return state.widgets['slider-' + name] ?? initial;
+  return widgets['slider-' + name] ?? initial;
 }
 
 // A square field.
@@ -666,7 +666,6 @@ class Filter {
 class State {
   constructor() {
     this.frameCallbacks = [];
-    this.widgets = {};
   }
 }
 
@@ -676,6 +675,7 @@ let lastFrame = 0;
 let rng = null;
 let start = Date.now();
 let state = null;
+let widgets = {};
 
 self.addEventListener('message', async function (event) {
   const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
@@ -705,7 +705,7 @@ self.addEventListener('message', async function (event) {
       self.postMessage(JSON.stringify('done'));
       break;
     case 'widget':
-      state.widgets[message.content.key] = message.content.value;
+      widgets[message.content.key] = message.content.value;
       break;
   }
 });
