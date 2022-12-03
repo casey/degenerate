@@ -84,7 +84,7 @@ function checkbox(name) {
       },
     })
   );
-  return !!widgets['checkbox-' + name];
+  return !!state.widgets['checkbox-' + name];
 }
 
 // A circle.
@@ -223,7 +223,7 @@ function equalizer() {
 // ```
 async function frame() {
   await new Promise((resolve, reject) => {
-    frameCallbacks.push(resolve);
+    state.frameCallbacks.push(resolve);
   });
 }
 
@@ -353,7 +353,7 @@ function radio(name, options) {
       },
     })
   );
-  return widgets['radio-' + name] ?? options[0];
+  return state.widgets['radio-' + name] ?? options[0];
 }
 
 // Reset the image filter and clear the canvas.
@@ -532,7 +532,7 @@ function slider(name, min, max, step, initial) {
       },
     })
   );
-  return widgets['slider-' + name] ?? initial;
+  return state.widgets['slider-' + name] ?? initial;
 }
 
 // A square field.
@@ -663,23 +663,31 @@ class Filter {
   }
 }
 
-let frameCallbacks = [];
+class State {
+  constructor() {
+    this.frameCallbacks = [];
+    this.widgets = {};
+  }
+}
+
+let filter = new Filter();
 let lastDelta = 0;
 let lastFrame = 0;
-let rng = new Rng();
+let rng = null;
 let start = Date.now();
-let filter = new Filter();
-let widgets = {};
+let state = null;
 
 self.addEventListener('message', async function (event) {
   const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
   const message = JSON.parse(event.data);
   switch (message.tag) {
     case 'frame':
-      for (let callback of frameCallbacks) {
-        callback();
+      if (state) {
+        for (let callback of state.frameCallbacks) {
+          callback();
+        }
+        state.frameCallbacks.length = 0;
       }
-      frameCallbacks = [];
       let now = Date.now();
       if (lastFrame > 0) {
         lastDelta = now - lastFrame;
@@ -687,7 +695,8 @@ self.addEventListener('message', async function (event) {
       lastFrame = now;
       break;
     case 'script':
-      frameCallbacks = [];
+      rng = new Rng();
+      state = new State();
       try {
         await new AsyncFunction(message.content)();
       } catch (error) {
@@ -696,7 +705,7 @@ self.addEventListener('message', async function (event) {
       self.postMessage(JSON.stringify('done'));
       break;
     case 'widget':
-      widgets[message.content.key] = message.content.value;
+      state.widgets[message.content.key] = message.content.value;
       break;
   }
 });
