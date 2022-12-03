@@ -500,7 +500,6 @@ function seed(n) {
   state.rng.seed(n);
 }
 
-
 // Set the current scale to `scale`. The scale factor is applied to sample coordinates before
 // looking up the pixel under those coordinates.
 //
@@ -599,8 +598,16 @@ function top() {
 // ```
 function transform(rotation, scale, translation) {
   mat3.identity(state.filter.positionTransform);
-  mat3.rotate(state.filter.positionTransform, state.filter.positionTransform, rotation);
-  mat3.scale(state.filter.positionTransform, state.filter.positionTransform, scale);
+  mat3.rotate(
+    state.filter.positionTransform,
+    state.filter.positionTransform,
+    rotation
+  );
+  mat3.scale(
+    state.filter.positionTransform,
+    state.filter.positionTransform,
+    scale
+  );
   mat3.translate(
     state.filter.positionTransform,
     state.filter.positionTransform,
