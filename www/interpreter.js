@@ -60,6 +60,15 @@ function check() {
   filter.field = 'Check';
 }
 
+// Choose a random element from `array`.
+//
+// ```
+// scale(choose([1,2,3]));
+// ```
+function choose(array) {
+  return state.rng.choose(array);
+}
+
 // Create a new checkbox widget with the label `name`, and return true if it is
 // checked. Calls with same `name` will all refer to the same checkbox, making
 // it safe to call repeatedly.
@@ -478,6 +487,20 @@ function save() {
   self.postMessage(JSON.stringify('save'));
 }
 
+// Seed RNG with `n`.
+//
+// ```
+// seed(1);
+// let a = choose([1,2,3]);
+// seed(1);
+// let b = choose([1,2,3]);
+// console.assert(a == b);
+// ```
+function seed(n) {
+  state.rng.seed(n);
+}
+
+
 // Set the current scale to `scale`. The scale factor is applied to sample coordinates before
 // looking up the pixel under those coordinates.
 //
@@ -666,13 +689,13 @@ class Filter {
 class State {
   constructor() {
     this.frameCallbacks = [];
+    this.rng = new Rng();
   }
 }
 
 let filter = new Filter();
 let lastDelta = 0;
 let lastFrame = 0;
-let rng = null;
 let start = Date.now();
 let state = null;
 let widgets = {};
@@ -695,7 +718,6 @@ self.addEventListener('message', async function (event) {
       lastFrame = now;
       break;
     case 'script':
-      rng = new Rng();
       state = new State();
       try {
         await new AsyncFunction(message.content)();
