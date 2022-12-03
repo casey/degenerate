@@ -700,10 +700,10 @@ class State {
     this.rng = new Rng();
     this.start = Date.now();
     this.filter = new Filter();
+    this.frame = this.start;
   }
 }
 
-let lastFrame = 0;
 let state = null;
 let widgets = {};
 
@@ -717,12 +717,10 @@ self.addEventListener('message', async function (event) {
           callback();
         }
         state.frameCallbacks.length = 0;
+        let now = Date.now();
+        state.delta = now - state.frame;
+        state.frame = now;
       }
-      let now = Date.now();
-      if (state && lastFrame > 0) {
-        state.delta = now - lastFrame;
-      }
-      lastFrame = now;
       break;
     case 'script':
       state = new State();
