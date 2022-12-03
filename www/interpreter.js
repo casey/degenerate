@@ -650,7 +650,7 @@ self.addEventListener('message', async function (event) {
       if (state) {
         reset();
         clear();
-        state.callback()
+        await state.callback()
         self.postMessage(JSON.stringify('present'));
         frame += 1;
       }
@@ -666,7 +666,7 @@ self.addEventListener('message', async function (event) {
         clear();
         state = {};
         state.callback = new AsyncFunction(message.content);
-        state.callback();
+        await state.callback();
         self.postMessage(JSON.stringify('present'));
         frame += 1;
       } catch (error) {
