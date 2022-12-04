@@ -374,9 +374,8 @@ function record() {
 //   await render();
 // }
 // ```
-async function render() {
+function render() {
   self.postMessage(JSON.stringify({ render: state.filter }));
-  await frame();
 }
 
 // Reset the image filter.
@@ -491,19 +490,6 @@ function seed(n) {
 // ```
 function scale(scale) {
   transform(0, [scale, scale], [0.0, 0.0]);
-}
-
-// Return a promise that resolves after `ms` milliseconds.
-//
-// ```
-// circle();
-// render();
-// await sleep(1000);
-// scale(0.5);
-// render();
-// ```
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // Create a new slider widget with the given `name`, `min`, `max`, `step`, and
@@ -693,12 +679,8 @@ self.addEventListener('message', async function (event) {
   switch (message.tag) {
     case 'frame':
       if (state) {
-        let done = state.script.call(state.environment);
-        if (done === true) {
-          self.postMessage(JSON.stringify('done'));
-          state = null;
-          break;
-        }
+        state.script.call(state.environment);
+        self.postMessage(JSON.stringify('done'));
         let now = Date.now();
         state.delta = now - state.frame;
         state.frame = now;

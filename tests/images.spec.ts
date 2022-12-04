@@ -23,8 +23,8 @@ async function imageBuffer(page) {
 
 async function run(page, script) {
   await page.locator('textarea').fill(script);
-  await page.keyboard.down('Shift');
-  await page.keyboard.press('Enter');
+  await page.keyboard.press('Shift+Enter');
+  await page.keyboard.press('Control+Enter');
   await page.waitForSelector('html.done');
 
   let messages = await page.locator('samp > *');
@@ -147,12 +147,13 @@ test('elapsed', async ({ page }) => {
   await run(
     page,
     `
-      let first = elapsed();
-      await sleep(100);
-      let second = elapsed();
-
-      if (second <= first) {
-        throw "Arrow of time is broken!";
+      if (this.first == undefined) {
+        this.first = elapsed();
+      } else {
+        let second = elapsed();
+        if (second <= first) {
+          throw "Arrow of time is broken!";
+        }
       }
     `
   );
@@ -306,7 +307,6 @@ test('delta', async ({ page }) => {
   await run(
     page,
     `
-      await frame();
       let x = delta();
       if (x === 0) {
         throw "Frame delta was zero: " + x;

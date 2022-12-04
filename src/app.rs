@@ -231,7 +231,14 @@ impl App {
     if event.shift_key() && event.key() == "Enter" {
       event.prevent_default();
       self.run_script(&self.textarea.value())?;
+    } else if event.ctrl_key() && event.key() == "Enter" {
+      self
+        .worker
+        .post_message(&JsValue::from_str(&serde_json::to_string(&Event::Frame(
+          0.0,
+        ))?))?;
     }
+
     Ok(())
   }
 
@@ -270,11 +277,11 @@ impl App {
 
     self.gpu.resize()?;
 
-    self
-      .worker
-      .post_message(&JsValue::from_str(&serde_json::to_string(&Event::Frame(
-        timestamp as f32,
-      ))?))?;
+    // self
+    //   .worker
+    //   .post_message(&JsValue::from_str(&serde_json::to_string(&Event::Frame(
+    //     timestamp as f32,
+    //   ))?))?;
 
     Ok(())
   }
