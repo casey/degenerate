@@ -199,7 +199,7 @@ function delta() {
 // }
 // ```
 function elapsed() {
-  return Date.now() - state.start;
+  return state.frame - state.start;
 }
 
 // An equalizer pattern.

@@ -323,6 +323,7 @@ test('delta', async ({ page }) => {
     `
   );
   await sleep(10);
+  await animation_frame(page);
 });
 
 test('run', async ({ page }) => {
