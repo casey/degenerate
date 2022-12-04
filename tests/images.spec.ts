@@ -311,11 +311,18 @@ test('delta', async ({ page }) => {
   await run(
     page,
     `
-      if (delta() === 0) {
+      if (this.elapsed == undefined) {
+        this.elapsed = 0;
+      }
+
+      if (this.elapsed + delta() != elapsed()) {
         throw "Frame delta was zero.";
       }
+
+      this.elapsed += delta();
     `
   );
+  await sleep(10);
 });
 
 test('run', async ({ page }) => {
