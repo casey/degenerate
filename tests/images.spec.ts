@@ -27,7 +27,7 @@ async function run(page, script) {
   await animation_frame(page);
 }
 
-async function animation_frame(page, script) {
+async function animation_frame(page) {
   await page.keyboard.press('Control+Enter');
   await page.waitForSelector('html.done');
 
@@ -326,6 +326,8 @@ test('run', async ({ page }) => {
   );
 
   await page.locator('button', { hasText: 'run' }).click();
+
+  await animation_frame(page);
 
   await page.waitForSelector('html.done');
 
