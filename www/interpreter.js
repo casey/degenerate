@@ -679,11 +679,11 @@ self.addEventListener('message', async function (event) {
   switch (message.tag) {
     case 'frame':
       if (state) {
-        state.script.call(state.environment);
-        self.postMessage(JSON.stringify('done'));
         let now = Date.now();
         state.delta = now - state.frame;
         state.frame = now;
+        state.script.call(state.environment);
+        self.postMessage(JSON.stringify('done'));
       }
       break;
     case 'script':

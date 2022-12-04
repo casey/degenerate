@@ -24,6 +24,10 @@ async function imageBuffer(page) {
 async function run(page, script) {
   await page.locator('textarea').fill(script);
   await page.keyboard.press('Shift+Enter');
+  await animation_frame(page);
+}
+
+async function animation_frame(page, script) {
   await page.keyboard.press('Control+Enter');
   await page.waitForSelector('html.done');
 
@@ -44,7 +48,7 @@ test.beforeAll(async () => {
 
 test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 256, height: 256 });
-  await page.goto(`http://localhost:${process.env.PORT}`);
+  await page.goto(`http://localhost:${process.env.PORT}/#/test`);
   await page.evaluate('window.preserveDrawingBuffer = true');
   page.on('pageerror', (error) => {
     console.log(error.message);
@@ -307,9 +311,8 @@ test('delta', async ({ page }) => {
   await run(
     page,
     `
-      let x = delta();
-      if (x === 0) {
-        throw "Frame delta was zero: " + x;
+      if (delta() === 0) {
+        throw "Frame delta was zero.";
       }
     `
   );

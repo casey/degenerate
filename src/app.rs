@@ -21,6 +21,7 @@ pub(crate) struct App {
   this: Option<Arc<Mutex<Self>>>,
   window: Window,
   worker: Worker,
+  test: bool,
 }
 
 lazy_static! {
@@ -143,6 +144,7 @@ impl App {
       textarea: textarea.clone(),
       this: None,
       window,
+      test: arguments == ["test"],
       worker: worker.clone(),
     }));
 
@@ -185,7 +187,7 @@ impl App {
     Self::add_event_listener(&app, &share_button, "click", move |app| app.on_share())?;
 
     match arguments.as_slice() {
-      [] | ["loader"] | ["program"] => {}
+      [] | ["loader"] | ["program"] | ["test"] => {}
       ["program", hex] => {
         let bytes = hex::decode(hex)?;
         let script = str::from_utf8(&bytes)?;
@@ -232,11 +234,7 @@ impl App {
       event.prevent_default();
       self.run_script(&self.textarea.value())?;
     } else if event.ctrl_key() && event.key() == "Enter" {
-      self
-        .worker
-        .post_message(&JsValue::from_str(&serde_json::to_string(&Event::Frame(
-          0.0,
-        ))?))?;
+      self.send_event(Event::Frame(0.0))?;
     }
 
     Ok(())
@@ -263,12 +261,7 @@ impl App {
     while let Some(child) = self.aside.last_child() {
       self.aside.remove_child(&child)?;
     }
-
-    self
-      .worker
-      .post_message(&JsValue::from_str(&serde_json::to_string(&Event::Script(
-        script.into(),
-      ))?))?;
+    self.send_event(Event::Script(script.into()))?;
     Ok(())
   }
 
@@ -277,11 +270,9 @@ impl App {
 
     self.gpu.resize()?;
 
-    // self
-    //   .worker
-    //   .post_message(&JsValue::from_str(&serde_json::to_string(&Event::Frame(
-    //     timestamp as f32,
-    //   ))?))?;
+    if !self.test {
+      self.send_event(Event::Frame(timestamp as f32))?;
+    }
 
     Ok(())
   }
@@ -533,6 +524,13 @@ impl App {
     Ok(())
   }
 
+  fn send_event(&self, event: Event) -> Result {
+    self
+      .worker
+      .post_message(&JsValue::from_str(&serde_json::to_string(&event)?))?;
+    Ok(())
+  }
+
   fn start(&mut self) -> Result {
     if !self.started {
       self.html.class_list().remove_1("done")?;
@@ -547,9 +545,7 @@ impl App {
 
   fn on_beat(&mut self) -> Result {
     self.start()?;
-    self
-      .worker
-      .post_message(&JsValue::from_str(&serde_json::to_string(&Event::Beat)?))?;
+    self.send_event(Event::Beat)?;
     Ok(())
   }
 
