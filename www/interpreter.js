@@ -682,7 +682,11 @@ self.addEventListener('message', async function (event) {
         let now = Date.now();
         state.delta = now - state.frame;
         state.frame = now;
-        state.script.call(state.environment);
+        try {
+          state.script.call(state.environment);
+        } catch (error) {
+          self.postMessage(JSON.stringify({ error: error.toString() }));
+        }
         self.postMessage(JSON.stringify('done'));
       }
       break;

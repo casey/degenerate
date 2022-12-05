@@ -324,6 +324,8 @@ test('delta', async ({ page }) => {
   );
   await sleep(10);
   await animation_frame(page);
+  await sleep(10);
+  await animation_frame(page);
 });
 
 test('run', async ({ page }) => {
@@ -334,6 +336,8 @@ test('run', async ({ page }) => {
   );
 
   await page.locator('button', { hasText: 'run' }).click();
+
+  await sleep(10);
 
   await animation_frame(page);
 
