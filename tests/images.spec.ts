@@ -329,15 +329,9 @@ test('delta', async ({ page }) => {
 });
 
 test('run', async ({ page }) => {
-  await page.locator('textarea').fill(
-    `
-      render();
-    `
-  );
+  await page.locator('textarea').fill('render();');
 
   await page.locator('button', { hasText: 'run' }).click();
-
-  await sleep(10);
 
   await animation_frame(page);
 
