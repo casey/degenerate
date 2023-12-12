@@ -195,6 +195,12 @@ impl App {
       _ => stderr.update(Err(format!("Unrecognized path: {}", hash).into())),
     }
 
+    if let Some(data_run) = textarea.get_attribute("data-run") {
+      if data_run == "true" {
+        app.lock().unwrap().run_script(&textarea.value())?;
+      }
+    }
+
     let mut app = app.lock().unwrap();
     app.request_animation_frame()?;
     app.html.set_class_name("ready");
