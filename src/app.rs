@@ -3,18 +3,18 @@ use super::*;
 pub(crate) struct App {
   analyser_node: AnalyserNode,
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
-  aside: HtmlElement,
+  aside: Option<HtmlElement>,
   audio_context: AudioContext,
   document: Document,
   gpu: Gpu,
   html: HtmlElement,
-  nav: HtmlElement,
+  nav: Option<HtmlElement>,
   oscillator_gain_node: GainNode,
   oscillator_node: OscillatorNode,
   recording: bool,
-  run_button: HtmlButtonElement,
-  select: HtmlSelectElement,
-  share_button: HtmlButtonElement,
+  run_button: Option<HtmlButtonElement>,
+  select: Option<HtmlSelectElement>,
+  share_button: Option<HtmlButtonElement>,
   started: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
@@ -55,24 +55,26 @@ impl App {
 
     let canvas = document.select::<HtmlCanvasElement>("canvas")?;
 
-    let nav = document.select::<HtmlElement>("nav")?;
+    let nav = document.select::<HtmlElement>("nav").ok();
 
-    let select = document.select::<HtmlSelectElement>("select")?;
+    let select = document.select::<HtmlSelectElement>("select").ok();
 
-    let run_button = document.select::<HtmlButtonElement>("button#run")?;
+    let run_button = document.select::<HtmlButtonElement>("button#run").ok();
 
-    let share_button = document.select::<HtmlButtonElement>("button#share")?;
+    let share_button = document.select::<HtmlButtonElement>("button#share").ok();
 
-    for name in EXAMPLES.keys() {
-      let option = document
-        .create_element("option")?
-        .cast::<HtmlOptionElement>()?;
+    if let Some(ref select) = select {
+      for name in EXAMPLES.keys() {
+        let option = document
+          .create_element("option")?
+          .cast::<HtmlOptionElement>()?;
 
-      option.set_text(name);
+        option.set_text(name);
 
-      option.set_value(name);
+        option.set_value(name);
 
-      select.add_with_html_option_element(&option)?;
+        select.add_with_html_option_element(&option)?;
+      }
     }
 
     let stderr = Stderr::get();
@@ -126,12 +128,12 @@ impl App {
     let app = Arc::new(Mutex::new(Self {
       analyser_node,
       animation_frame_callback: None,
-      aside: document.select::<HtmlElement>("aside")?,
+      aside: document.select::<HtmlElement>("aside").ok(),
       audio_context,
       document,
       gpu,
       html,
-      nav,
+      nav: nav.clone(),
       oscillator_gain_node,
       oscillator_node,
       recording: false,
@@ -172,17 +174,23 @@ impl App {
       app.on_keydown(event)
     })?;
 
-    Self::add_event_listener(&app, &select, "change", move |app| {
-      app.on_selection_changed()
-    })?;
+    if let Some(ref select) = select {
+      Self::add_event_listener(&app, &select, "change", move |app| {
+        app.on_selection_changed()
+      })?;
+    }
 
     Self::add_event_listener_with_event(&app, &worker, "message", move |app, event| {
       app.on_message(event)
     })?;
 
-    Self::add_event_listener(&app, &run_button, "click", move |app| app.on_run())?;
+    if let Some(run_button) = run_button {
+      Self::add_event_listener(&app, &run_button, "click", move |app| app.on_run())?;
+    }
 
-    Self::add_event_listener(&app, &share_button, "click", move |app| app.on_share())?;
+    if let Some(share_button) = share_button {
+      Self::add_event_listener(&app, &share_button, "click", move |app| app.on_share())?;
+    }
 
     match arguments.as_slice() {
       [] | ["loader"] | ["program"] => {}
@@ -259,8 +267,10 @@ impl App {
   }
 
   pub(super) fn run_script(&self, script: &str) -> Result {
-    while let Some(child) = self.aside.last_child() {
-      self.aside.remove_child(&child)?;
+    if let Some(aside) = &self.aside {
+      while let Some(child) = aside.last_child() {
+        aside.remove_child(&child)?;
+      }
     }
 
     self
@@ -369,7 +379,9 @@ impl App {
           label.set_id(&id);
           label.set_inner_text(&name);
 
-          self.aside.append_child(&label)?;
+          if let Some(aside) = &self.aside {
+            aside.append_child(&label)?;
+          }
 
           match widget {
             Widget::Checkbox => {
@@ -507,12 +519,16 @@ impl App {
   fn on_selection_changed(&mut self) -> Result {
     self.on_input()?;
 
-    self.textarea.set_value(&format!(
-      "{}\n// Press the `Run` button or `Shift + Enter` to execute",
-      EXAMPLES
-        .get(&*self.select.value())
-        .ok_or("Failed to get example")?
-    ));
+    if let Some(select) = &self.select {
+      let example = EXAMPLES
+          .get(&*select.value())
+          .ok_or("Failed to get example")?;
+
+      self.textarea.set_value(&format!(
+          "{}\n// Press the `Run` button or `Shift + Enter` to execute",
+          example
+      ));
+    }
 
     self.textarea.focus()?;
 
@@ -535,9 +551,19 @@ impl App {
   fn start(&mut self) -> Result {
     if !self.started {
       self.html.class_list().remove_1("done")?;
-      self.nav.class_list().add_1("fade-out")?;
-      self.run_button.set_disabled(false);
-      self.share_button.set_disabled(false);
+
+      if let Some(nav) = &self.nav {
+        nav.class_list().add_1("fade-out")?;
+      }
+
+      if let Some(run_button) = &self.run_button {
+        run_button.set_disabled(false);
+      }
+
+      if let Some(share_button) = &self.share_button {
+        share_button.set_disabled(false);
+      }
+
       let _: Promise = self.audio_context.resume()?;
       self.started = true;
     }
