@@ -49,11 +49,31 @@ impl App {
 
     let html = document.select::<HtmlElement>("html")?;
 
-    let main = document.select::<HtmlElement>("main")?;
+    let main = document.select::<HtmlElement>("main").ok();
 
-    let textarea = document.select::<HtmlTextAreaElement>("textarea")?;
+    let textarea = match document.select::<HtmlTextAreaElement>("textarea") {
+      Ok(existing_textarea) => existing_textarea,
+      Err(_) => {
+        let new_textarea = document
+          .create_element("textarea")?
+          .cast::<HtmlTextAreaElement>()?;
+        body.prepend_with_node_1(&new_textarea)?;
 
-    let canvas = document.select::<HtmlCanvasElement>("canvas")?;
+        new_textarea
+      }
+    };
+
+    let canvas = match document.select::<HtmlCanvasElement>("canvas") {
+      Ok(existing_canvas) => existing_canvas,
+      Err(_) => {
+        let new_canvas = document
+          .create_element("canvas")?
+          .cast::<HtmlCanvasElement>()?;
+        body.prepend_with_node_1(&new_canvas)?;
+
+        new_canvas
+      }
+    };
 
     let nav = document.select::<HtmlElement>("nav").ok();
 
@@ -74,6 +94,13 @@ impl App {
         option.set_value(name);
 
         select.add_with_html_option_element(&option)?;
+      }
+    }
+
+    let mut degenerate_script: Option<String> = None;
+    if let Some(degenerate_script_element) = document.query_selector("script[type='degenerate']").ok().flatten() {
+      if let Some(degenerate_script_content) = degenerate_script_element.text_content() {
+        degenerate_script = Some(degenerate_script_content);
       }
     }
 
@@ -108,7 +135,10 @@ impl App {
       worker_options.type_(WorkerType::Module);
       Worker::new_with_options("/loader.js", &worker_options)?
     } else {
-      main.class_list().add_1("fade-in")?;
+      if let Some(main) = main {
+        main.class_list().add_1("fade-in")?;
+      }
+
       Worker::new("/interpreter.js")?
     };
 
@@ -203,10 +233,8 @@ impl App {
       _ => stderr.update(Err(format!("Unrecognized path: {}", hash).into())),
     }
 
-    if let Some(data_run) = textarea.get_attribute("data-run") {
-      if data_run == "true" {
-        app.lock().unwrap().run_script(&textarea.value())?;
-      }
+    if let Some(degenerate_script) = degenerate_script {
+      app.lock().unwrap().run_script(&degenerate_script)?;
     }
 
     let mut app = app.lock().unwrap();
