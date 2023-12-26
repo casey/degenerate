@@ -1,7 +1,7 @@
 use super::*;
 
 #[derive(Clone)]
-pub(crate) struct Stderr(HtmlElement);
+pub(crate) struct Stderr(Option<HtmlElement>);
 
 impl Stderr {
   pub(crate) fn get() -> Self {
@@ -9,7 +9,7 @@ impl Stderr {
       window()
         .get_document()
         .select::<HtmlElement>("samp")
-        .unwrap(),
+        .ok(),
     )
   }
 
@@ -31,7 +31,9 @@ impl Stderr {
 
     div.set_inner_text(&message);
 
-    self.0.prepend_with_node_1(&div)?;
+    if let Some(stderr_element) = &self.0 {
+      stderr_element.prepend_with_node_1(&div)?;
+    }
 
     Ok(())
   }
