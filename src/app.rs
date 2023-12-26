@@ -57,6 +57,8 @@ impl App {
         let new_textarea = document
           .create_element("textarea")?
           .cast::<HtmlTextAreaElement>()?;
+
+        new_textarea.set_attribute("style", "display: none;")?;
         body.prepend_with_node_1(&new_textarea)?;
 
         new_textarea
