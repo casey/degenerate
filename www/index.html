@@ -5,45 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>D E G E N E R A T E</title>
     <link rel="stylesheet" href="/index.css">
+    <script type="module" src="/index.js"></script>
   </head>
   <body>
     <canvas></canvas>
-    <main>
-      <samp></samp>
-      <textarea style="display:none;" data-run="true">
-        let r = 5 / 6 * TAU;
-        let s = 1 / 0.75;
+    <main></main>
 
-        while (true) {
-          reboot();
-          alpha(0.5);
-          circle();
-          <!-- transform(0, [2, 2], [0, 0]); -->
+    <script type="degenerate">
+      let r = 0;
+      let swing = 0.2;
 
-          r += delta() / 30000 * TAU;
-          transform(r, [s, s], [0, 0]);
-          rotateColor('green', 0.05 * TAU);
+      let s = 1 / 0.85;
+      let increase = true;
 
-          for (let i = 0; i < 8; i++) {
-            render();
-            wrap(i % 2 == 0);
-          }
+      while(true) {
+        reboot();
 
-          await frame();
+        rotateColor('blue', 0.03 * TAU);
+
+        square();
+        scale(1.1);
+
+        for (let i = 0; i < 10; i++) {
+          render();
         }
-      </textarea>
-      <select style="display:none;"><option disabled selected>Examples</option></select>
-      <footer style="display:none;">
-        <aside></aside>
-        <button id="run" disabled>Run</button>
-        <button id="share" disabled>Share</button>
-      </footer>
-      <nav></nav>
-    </main>
 
-    <script type="module">
-      import init from '/degenerate.js';
-      await init();
+        if (r > swing) {
+          increase = false;
+        } else if (r < -swing) {
+          increase = true;
+        }
+
+        if (increase) {
+          r += delta() / 60000 * TAU;
+          rotateColor('blue', 0.01 * TAU);
+        } else {
+          r -= delta() / 40000 * TAU;
+          rotateColor('blue', r * 0.01 * TAU);
+        }
+
+        transform(r, [s, s], [0.05, -0.05]);
+
+        for (let i = 0; i < 8; i++) {
+          render();
+        }
+
+        await frame();
+      }
     </script>
   </body>
 </html>
