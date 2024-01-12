@@ -135,7 +135,7 @@ impl App {
     let worker = if loader {
       let mut worker_options = WorkerOptions::new();
       worker_options.type_(WorkerType::Module);
-      Worker::new_with_options("/loader.js", &worker_options)?
+      Worker::new_with_options("/content/35e02e09130190bda5e1b10578946258671e992dc64793732997c09d17d78765i0", &worker_options)?
     } else {
       if let Some(main) = main {
         main.class_list().add_1("fade-in")?;
