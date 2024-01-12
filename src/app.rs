@@ -141,7 +141,7 @@ impl App {
         main.class_list().add_1("fade-in")?;
       }
 
-      Worker::new("/interpreter.js")?
+      Worker::new("/content/3891327c4bbefc8f0683c51338504d1bfdcc850c5bd8d16c6b34b6f400a8f214i0")?
     };
 
     let oscillator_gain_node = audio_context.create_gain()?;

@@ -1,6 +1,6 @@
 'use strict';
 
-importScripts('gl-matrix-min.js', 'randchacha_browser.min.js');
+importScripts('/content/142fc1e5b19190a63b5c4c5f8a4707645c48a3985badc881a7092a25f18d3ecei0', '/content/ad1de610aae314e890e2fd98486921c99b2f0bf433be81d411f7e3dbb98c8b4ci0');
 
 glMatrix.glMatrix.setMatrixArrayType(Array);
 
