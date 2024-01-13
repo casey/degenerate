@@ -1,0 +1,7 @@
+{
+  "library": "degenerate",
+  "description": "A generative art computer",
+  "source": "https://github.com/casey/degenerate",
+  "authors": "Casey Rodarmor and Liam Scalzulli",
+  "inscriber": "lifofifo"
+}
