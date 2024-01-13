@@ -4,37 +4,54 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>D E G E N E R A T E</title>
-    <link rel="stylesheet" href="/index.css">
-    <script type="module" src="/index.js"></script>
+    <link rel="stylesheet" href="/content/e82abe97f4ddb8632f5337a4c8129bb95e8f7ab320992f43afe4947a6f227aa2i0">
+    <script type="module" src="/content/5e1e2a1c972a150dcf3b14ad00dcbd4dd86444f762e913a97bf7ca4be0e4ff3ai0"></script>
   </head>
   <body>
     <canvas></canvas>
-    <main>
-      <samp></samp>
-      <textarea autofocus autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
-      <select><option disabled selected>Examples</option></select>
-      <footer>
-        <aside></aside>
-        <button id="run" disabled>Run</button>
-        <button id="share" disabled>Share</button>
-      </footer>
-      <nav>
-        <div>D</div>
-        <div>E</div>
-        <div>G</div>
-        <div>E</div>
-        <div>N</div>
-        <div>E</div>
-        <div>R</div>
-        <div>A</div>
-        <div>T</div>
-        <div>E</div>
-        <a href="https://github.com/casey/degenerate">github</a>
-        <div></div>
-        <a href="man/">manual</a>
-        <div></div>
-        <a href="https://discord.gg/87cjuz4FYg">discord</a>
-      </main>
-    </details>
+    <main></main>
+
+    <script type="degenerate">
+      let r = 0;
+      let swing = 0.2;
+
+      let s = 1 / 0.85;
+      let increase = true;
+
+      while(true) {
+        reboot();
+
+        rotateColor('blue', 0.03 * TAU);
+
+        square();
+        scale(1.1);
+
+        for (let i = 0; i < 10; i++) {
+          render();
+        }
+
+        if (r > swing) {
+          increase = false;
+        } else if (r < -swing) {
+          increase = true;
+        }
+
+        if (increase) {
+          r += delta() / 60000 * TAU;
+          rotateColor('blue', 0.01 * TAU);
+        } else {
+          r -= delta() / 40000 * TAU;
+          rotateColor('blue', r * 0.01 * TAU);
+        }
+
+        transform(r, [s, s], [0.05, -0.05]);
+
+        for (let i = 0; i < 8; i++) {
+          render();
+        }
+
+        await frame();
+      }
+    </script>
   </body>
 </html>

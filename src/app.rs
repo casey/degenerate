@@ -3,18 +3,18 @@ use super::*;
 pub(crate) struct App {
   analyser_node: AnalyserNode,
   animation_frame_callback: Option<Closure<dyn FnMut(f64)>>,
-  aside: HtmlElement,
+  aside: Option<HtmlElement>,
   audio_context: AudioContext,
   document: Document,
   gpu: Gpu,
   html: HtmlElement,
-  nav: HtmlElement,
+  nav: Option<HtmlElement>,
   oscillator_gain_node: GainNode,
   oscillator_node: OscillatorNode,
   recording: bool,
-  run_button: HtmlButtonElement,
-  select: HtmlSelectElement,
-  share_button: HtmlButtonElement,
+  run_button: Option<HtmlButtonElement>,
+  select: Option<HtmlSelectElement>,
+  share_button: Option<HtmlButtonElement>,
   started: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
@@ -49,30 +49,61 @@ impl App {
 
     let html = document.select::<HtmlElement>("html")?;
 
-    let main = document.select::<HtmlElement>("main")?;
+    let main = document.select::<HtmlElement>("main").ok();
 
-    let textarea = document.select::<HtmlTextAreaElement>("textarea")?;
+    let textarea = match document.select::<HtmlTextAreaElement>("textarea") {
+      Ok(existing_textarea) => existing_textarea,
+      Err(_) => {
+        let new_textarea = document
+          .create_element("textarea")?
+          .cast::<HtmlTextAreaElement>()?;
 
-    let canvas = document.select::<HtmlCanvasElement>("canvas")?;
+        new_textarea.set_attribute("style", "display: none;")?;
+        body.prepend_with_node_1(&new_textarea)?;
 
-    let nav = document.select::<HtmlElement>("nav")?;
+        new_textarea
+      }
+    };
 
-    let select = document.select::<HtmlSelectElement>("select")?;
+    let canvas = match document.select::<HtmlCanvasElement>("canvas") {
+      Ok(existing_canvas) => existing_canvas,
+      Err(_) => {
+        let new_canvas = document
+          .create_element("canvas")?
+          .cast::<HtmlCanvasElement>()?;
+        body.prepend_with_node_1(&new_canvas)?;
 
-    let run_button = document.select::<HtmlButtonElement>("button#run")?;
+        new_canvas
+      }
+    };
 
-    let share_button = document.select::<HtmlButtonElement>("button#share")?;
+    let nav = document.select::<HtmlElement>("nav").ok();
 
-    for name in EXAMPLES.keys() {
-      let option = document
-        .create_element("option")?
-        .cast::<HtmlOptionElement>()?;
+    let select = document.select::<HtmlSelectElement>("select").ok();
 
-      option.set_text(name);
+    let run_button = document.select::<HtmlButtonElement>("button#run").ok();
 
-      option.set_value(name);
+    let share_button = document.select::<HtmlButtonElement>("button#share").ok();
 
-      select.add_with_html_option_element(&option)?;
+    if let Some(ref select) = select {
+      for name in EXAMPLES.keys() {
+        let option = document
+          .create_element("option")?
+          .cast::<HtmlOptionElement>()?;
+
+        option.set_text(name);
+
+        option.set_value(name);
+
+        select.add_with_html_option_element(&option)?;
+      }
+    }
+
+    let mut degenerate_script: Option<String> = None;
+    if let Some(degenerate_script_element) = document.query_selector("script[type='degenerate']").ok().flatten() {
+      if let Some(degenerate_script_content) = degenerate_script_element.text_content() {
+        degenerate_script = Some(degenerate_script_content);
+      }
     }
 
     let stderr = Stderr::get();
@@ -104,10 +135,13 @@ impl App {
     let worker = if loader {
       let mut worker_options = WorkerOptions::new();
       worker_options.type_(WorkerType::Module);
-      Worker::new_with_options("/loader.js", &worker_options)?
+      Worker::new_with_options("/content/35e02e09130190bda5e1b10578946258671e992dc64793732997c09d17d78765i0", &worker_options)?
     } else {
-      main.class_list().add_1("fade-in")?;
-      Worker::new("/interpreter.js")?
+      if let Some(main) = main {
+        main.class_list().add_1("fade-in")?;
+      }
+
+      Worker::new("/content/3891327c4bbefc8f0683c51338504d1bfdcc850c5bd8d16c6b34b6f400a8f214i0")?
     };
 
     let oscillator_gain_node = audio_context.create_gain()?;
@@ -126,12 +160,12 @@ impl App {
     let app = Arc::new(Mutex::new(Self {
       analyser_node,
       animation_frame_callback: None,
-      aside: document.select::<HtmlElement>("aside")?,
+      aside: document.select::<HtmlElement>("aside").ok(),
       audio_context,
       document,
       gpu,
       html,
-      nav,
+      nav: nav.clone(),
       oscillator_gain_node,
       oscillator_node,
       recording: false,
@@ -172,17 +206,23 @@ impl App {
       app.on_keydown(event)
     })?;
 
-    Self::add_event_listener(&app, &select, "change", move |app| {
-      app.on_selection_changed()
-    })?;
+    if let Some(ref select) = select {
+      Self::add_event_listener(&app, &select, "change", move |app| {
+        app.on_selection_changed()
+      })?;
+    }
 
     Self::add_event_listener_with_event(&app, &worker, "message", move |app, event| {
       app.on_message(event)
     })?;
 
-    Self::add_event_listener(&app, &run_button, "click", move |app| app.on_run())?;
+    if let Some(run_button) = run_button {
+      Self::add_event_listener(&app, &run_button, "click", move |app| app.on_run())?;
+    }
 
-    Self::add_event_listener(&app, &share_button, "click", move |app| app.on_share())?;
+    if let Some(share_button) = share_button {
+      Self::add_event_listener(&app, &share_button, "click", move |app| app.on_share())?;
+    }
 
     match arguments.as_slice() {
       [] | ["loader"] | ["program"] => {}
@@ -193,6 +233,10 @@ impl App {
         app.lock().unwrap().run_script(script)?;
       }
       _ => stderr.update(Err(format!("Unrecognized path: {}", hash).into())),
+    }
+
+    if let Some(degenerate_script) = degenerate_script {
+      app.lock().unwrap().run_script(&degenerate_script)?;
     }
 
     let mut app = app.lock().unwrap();
@@ -253,8 +297,10 @@ impl App {
   }
 
   pub(super) fn run_script(&self, script: &str) -> Result {
-    while let Some(child) = self.aside.last_child() {
-      self.aside.remove_child(&child)?;
+    if let Some(aside) = &self.aside {
+      while let Some(child) = aside.last_child() {
+        aside.remove_child(&child)?;
+      }
     }
 
     self
@@ -363,7 +409,9 @@ impl App {
           label.set_id(&id);
           label.set_inner_text(&name);
 
-          self.aside.append_child(&label)?;
+          if let Some(aside) = &self.aside {
+            aside.append_child(&label)?;
+          }
 
           match widget {
             Widget::Checkbox => {
@@ -501,12 +549,16 @@ impl App {
   fn on_selection_changed(&mut self) -> Result {
     self.on_input()?;
 
-    self.textarea.set_value(&format!(
-      "{}\n// Press the `Run` button or `Shift + Enter` to execute",
-      EXAMPLES
-        .get(&*self.select.value())
-        .ok_or("Failed to get example")?
-    ));
+    if let Some(select) = &self.select {
+      let example = EXAMPLES
+          .get(&*select.value())
+          .ok_or("Failed to get example")?;
+
+      self.textarea.set_value(&format!(
+          "{}\n// Press the `Run` button or `Shift + Enter` to execute",
+          example
+      ));
+    }
 
     self.textarea.focus()?;
 
@@ -529,9 +581,19 @@ impl App {
   fn start(&mut self) -> Result {
     if !self.started {
       self.html.class_list().remove_1("done")?;
-      self.nav.class_list().add_1("fade-out")?;
-      self.run_button.set_disabled(false);
-      self.share_button.set_disabled(false);
+
+      if let Some(nav) = &self.nav {
+        nav.class_list().add_1("fade-out")?;
+      }
+
+      if let Some(run_button) = &self.run_button {
+        run_button.set_disabled(false);
+      }
+
+      if let Some(share_button) = &self.share_button {
+        share_button.set_disabled(false);
+      }
+
       let _: Promise = self.audio_context.resume()?;
       self.started = true;
     }
