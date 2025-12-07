@@ -102,8 +102,8 @@ impl App {
     let loader = arguments == ["loader"];
 
     let worker = if loader {
-      let mut worker_options = WorkerOptions::new();
-      worker_options.type_(WorkerType::Module);
+      let worker_options = WorkerOptions::new();
+      worker_options.set_type(WorkerType::Module);
       Worker::new_with_options("/loader.js", &worker_options)?
     } else {
       main.class_list().add_1("fade-in")?;
@@ -315,15 +315,14 @@ impl App {
             let result = app.on_get_user_media(stream);
             app.stderr.update(result);
           }) as Box<dyn FnMut(JsValue)>);
+          let constraints = MediaStreamConstraints::new();
+          constraints.set_audio(&true.into());
+          constraints.set_video(&false.into());
           let _ = self
             .window
             .navigator()
             .media_devices()?
-            .get_user_media_with_constraints(
-              MediaStreamConstraints::new()
-                .audio(&true.into())
-                .video(&false.into()),
-            )?
+            .get_user_media_with_constraints(&constraints)?
             .then(&closure);
           closure.forget();
         }

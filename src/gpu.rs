@@ -29,16 +29,15 @@ impl Gpu {
     canvas: &HtmlCanvasElement,
     analyser_node: &AnalyserNode,
   ) -> Result<Self> {
-    let mut context_options = WebGlContextAttributes::new();
+    let context_options = WebGlContextAttributes::new();
 
-    context_options
-      .alpha(true)
-      .antialias(false)
-      .depth(false)
-      .stencil(false);
+    context_options.set_alpha(true);
+    context_options.set_antialias(false);
+    context_options.set_depth(false);
+    context_options.set_stencil(false);
 
     if js_sys::eval("window.preserveDrawingBuffer")?.as_bool() == Some(true) {
-      context_options.preserve_drawing_buffer(true);
+      context_options.set_preserve_drawing_buffer(true);
     }
 
     let gl = canvas
