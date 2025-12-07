@@ -15,7 +15,7 @@ defaults:
 env:
   RUSTFLAGS: --deny warnings
   # keep in sync with `Cargo.toml`
-  WASM_BINDGEN_VERSION: 0.2.83
+  WASM_BINDGEN_VERSION: 0.2.106
 
 jobs:
   test:
