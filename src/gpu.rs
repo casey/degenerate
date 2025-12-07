@@ -29,16 +29,15 @@ impl Gpu {
     canvas: &HtmlCanvasElement,
     analyser_node: &AnalyserNode,
   ) -> Result<Self> {
-    let mut context_options = WebGlContextAttributes::new();
+    let context_options = WebGlContextAttributes::new();
 
-    context_options
-      .alpha(true)
-      .antialias(false)
-      .depth(false)
-      .stencil(false);
+    context_options.set_alpha(true);
+    context_options.set_antialias(false);
+    context_options.set_depth(false);
+    context_options.set_stencil(false);
 
     if js_sys::eval("window.preserveDrawingBuffer")?.as_bool() == Some(true) {
-      context_options.preserve_drawing_buffer(true);
+      context_options.set_preserve_drawing_buffer(true);
     }
 
     let gl = canvas
@@ -464,8 +463,8 @@ impl Gpu {
         return Ok(());
       }
     } else {
-      let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
-      let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
+      let css_pixel_height: f64 = self.canvas.client_height().into();
+      let css_pixel_width: f64 = self.canvas.client_width().into();
 
       let device_pixel_ratio = self.window.device_pixel_ratio();
       let device_pixel_height = (css_pixel_height * device_pixel_ratio).ceil() as u32;

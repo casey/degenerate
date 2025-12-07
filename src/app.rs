@@ -18,7 +18,7 @@ pub(crate) struct App {
   started: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
-  this: Option<Arc<Mutex<Self>>>,
+  this: Option<Rc<Mutex<Self>>>,
   window: Window,
   worker: Worker,
 }
@@ -102,8 +102,8 @@ impl App {
     let loader = arguments == ["loader"];
 
     let worker = if loader {
-      let mut worker_options = WorkerOptions::new();
-      worker_options.type_(WorkerType::Module);
+      let worker_options = WorkerOptions::new();
+      worker_options.set_type(WorkerType::Module);
       Worker::new_with_options("/loader.js", &worker_options)?
     } else {
       main.class_list().add_1("fade-in")?;
@@ -123,7 +123,7 @@ impl App {
 
     oscillator_gain_node.connect_with_audio_node(&analyser_node)?;
 
-    let app = Arc::new(Mutex::new(Self {
+    let app = Rc::new(Mutex::new(Self {
       analyser_node,
       animation_frame_callback: None,
       aside: document.select::<HtmlElement>("aside")?,
@@ -203,7 +203,7 @@ impl App {
   }
 
   fn add_event_listener(
-    app: &Arc<Mutex<Self>>,
+    app: &Rc<Mutex<Self>>,
     target: &EventTarget,
     name: &str,
     callback: impl Fn(&mut Self) -> Result + 'static,
@@ -214,7 +214,7 @@ impl App {
   }
 
   fn add_event_listener_with_event<E: FromWasmAbi + 'static>(
-    app: &Arc<Mutex<Self>>,
+    app: &Rc<Mutex<Self>>,
     target: &EventTarget,
     name: &str,
     callback: impl Fn(&mut Self, E) -> Result + 'static,
@@ -315,15 +315,14 @@ impl App {
             let result = app.on_get_user_media(stream);
             app.stderr.update(result);
           }) as Box<dyn FnMut(JsValue)>);
+          let constraints = MediaStreamConstraints::new();
+          constraints.set_audio(&true.into());
+          constraints.set_video(&false.into());
           let _ = self
             .window
             .navigator()
             .media_devices()?
-            .get_user_media_with_constraints(
-              MediaStreamConstraints::new()
-                .audio(&true.into())
-                .video(&false.into()),
-            )?
+            .get_user_media_with_constraints(&constraints)?
             .then(&closure);
           closure.forget();
         }
@@ -551,7 +550,7 @@ impl App {
     Ok(())
   }
 
-  fn this(&self) -> Arc<Mutex<Self>> {
+  fn this(&self) -> Rc<Mutex<Self>> {
     self.this.as_ref().unwrap().clone()
   }
 }
