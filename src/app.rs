@@ -18,7 +18,7 @@ pub(crate) struct App {
   started: bool,
   stderr: Stderr,
   textarea: HtmlTextAreaElement,
-  this: Option<Arc<Mutex<Self>>>,
+  this: Option<Rc<Mutex<Self>>>,
   window: Window,
   worker: Worker,
 }
@@ -123,7 +123,7 @@ impl App {
 
     oscillator_gain_node.connect_with_audio_node(&analyser_node)?;
 
-    let app = Arc::new(Mutex::new(Self {
+    let app = Rc::new(Mutex::new(Self {
       analyser_node,
       animation_frame_callback: None,
       aside: document.select::<HtmlElement>("aside")?,
@@ -203,7 +203,7 @@ impl App {
   }
 
   fn add_event_listener(
-    app: &Arc<Mutex<Self>>,
+    app: &Rc<Mutex<Self>>,
     target: &EventTarget,
     name: &str,
     callback: impl Fn(&mut Self) -> Result + 'static,
@@ -214,7 +214,7 @@ impl App {
   }
 
   fn add_event_listener_with_event<E: FromWasmAbi + 'static>(
-    app: &Arc<Mutex<Self>>,
+    app: &Rc<Mutex<Self>>,
     target: &EventTarget,
     name: &str,
     callback: impl Fn(&mut Self, E) -> Result + 'static,
@@ -550,7 +550,7 @@ impl App {
     Ok(())
   }
 
-  fn this(&self) -> Arc<Mutex<Self>> {
+  fn this(&self) -> Rc<Mutex<Self>> {
     self.this.as_ref().unwrap().clone()
   }
 }

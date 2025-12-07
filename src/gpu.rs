@@ -463,8 +463,8 @@ impl Gpu {
         return Ok(());
       }
     } else {
-      let css_pixel_height: f64 = self.canvas.client_height().try_into()?;
-      let css_pixel_width: f64 = self.canvas.client_width().try_into()?;
+      let css_pixel_height: f64 = self.canvas.client_height().into();
+      let css_pixel_width: f64 = self.canvas.client_width().into();
 
       let device_pixel_ratio = self.window.device_pixel_ratio();
       let device_pixel_height = (css_pixel_height * device_pixel_ratio).ceil() as u32;

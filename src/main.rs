@@ -18,9 +18,10 @@ use {
     mem,
     num::TryFromIntError,
     ops::Deref,
+    rc::Rc,
     str::{self, Utf8Error},
     string::ToString,
-    sync::{Arc, Mutex},
+    sync::Mutex,
   },
   wasm_bindgen::{closure::Closure, convert::FromWasmAbi, JsCast, JsValue},
   web_sys::{
